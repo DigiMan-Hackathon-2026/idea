@@ -131,3 +131,21 @@ test("saves a clearly local-only demo information report", async ({ page }) => {
     page.getByText("運営者には送信されません"),
   ).toBeVisible();
 });
+
+test("shows recoverable empty and missing quest states", async ({ page }) => {
+  await page.goto("/quests?durationMax=60");
+  await expect(
+    page.getByRole("heading", {
+      name: "条件に合うクエストが見つかりませんでした",
+    }),
+  ).toBeVisible();
+  await expect(page.getByLabel("最大時間")).toHaveValue("60");
+
+  await page.goto("/quests/not-a-real-quest");
+  await expect(
+    page.getByRole("heading", { name: "クエストが見つかりません" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "クエスト一覧に戻る" }),
+  ).toBeVisible();
+});

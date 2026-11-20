@@ -22,8 +22,20 @@ function getServerSnapshot() {
   return null;
 }
 
+function subscribeToHydration() {
+  return () => undefined;
+}
+
 export function useDemoRunStorage(): string | null {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+export function useClientReady(): boolean {
+  return useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
 }
 
 export function saveDemoRunStorage(value: string) {

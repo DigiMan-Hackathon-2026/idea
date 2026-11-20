@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useDemoRunStorage } from "@/hooks/use-demo-run-storage";
+import {
+  useClientReady,
+  useDemoRunStorage,
+} from "@/hooks/use-demo-run-storage";
 import {
   DEMO_RUN_ID,
   isDemoRunComplete,
@@ -10,6 +13,7 @@ import {
 } from "@/modules/progress/demo-run";
 
 export function StartDemoButton() {
+  const clientReady = useClientReady();
   const storedProgress = useDemoRunStorage();
   const progress = useMemo(
     () => parseDemoRun(storedProgress),
@@ -42,8 +46,9 @@ export function StartDemoButton() {
     <>
       <button
         type="button"
+        disabled={!clientReady}
         onClick={() => setIsOpen(true)}
-        className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.28)] transition hover:-translate-y-0.5 hover:bg-[#df4223]"
+        className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.28)] transition hover:-translate-y-0.5 hover:bg-[#df4223] disabled:cursor-wait disabled:opacity-70"
       >
         このデモクエストを始める
       </button>
