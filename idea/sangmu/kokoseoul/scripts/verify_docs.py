@@ -64,6 +64,14 @@ VISITOR_SESSION_REFERENCE_FILES = (
     ROOT / "docs" / "STATE_MACHINES_v0.1.md",
     ROOT / "docs" / "TEST_PLAN_v0.1.md",
 )
+BACKGROUND_JOBS_CONTRACT = ROOT / "docs" / "BACKGROUND_JOBS_v0.1.md"
+BACKGROUND_JOBS_REFERENCE_FILES = (
+    ROOT / "docs" / "ANALYTICS_EVENT_CONTRACT_v0.1.md",
+    ROOT / "docs" / "DATA_RETENTION_ERASURE_v0.1.md",
+    ROOT / "docs" / "OBSERVABILITY_CONTRACT_v0.1.md",
+    ROOT / "docs" / "OPERATIONS_RUNBOOK_v0.1.md",
+    ROOT / "docs" / "VISITOR_SESSION_LIFECYCLE_v0.1.md",
+)
 HTTP_METHODS = "GET|POST|PUT|PATCH|DELETE"
 UUID_PATH_SEGMENT = re.compile(
     r"/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
@@ -544,6 +552,35 @@ def check_visitor_session_contract() -> list[str]:
     return errors
 
 
+def check_background_jobs_contract() -> list[str]:
+    errors: list[str] = []
+    text = BACKGROUND_JOBS_CONTRACT.read_text(encoding="utf-8")
+    required_fragments = (
+        "visitor_expiry_cleanup",
+        "anonymous_analytics_cleanup",
+        "post_restore_privacy_cleanup",
+        "FOR UPDATE SKIP LOCKED LIMIT 1",
+        "event_name = 'detail_viewed'",
+        "visitor_id is null",
+        "interval '30 days'",
+        "24시간",
+        "public traffic을 닫는다",
+    )
+    for fragment in required_fragments:
+        if fragment not in text:
+            errors.append(
+                f"{BACKGROUND_JOBS_CONTRACT.relative_to(ROOT)}: "
+                f"missing background job invariant {fragment}"
+            )
+
+    for path in BACKGROUND_JOBS_REFERENCE_FILES:
+        if BACKGROUND_JOBS_CONTRACT.resolve() not in resolved_link_targets(path):
+            errors.append(
+                f"{path.relative_to(ROOT)}: missing background jobs contract reference"
+            )
+    return errors
+
+
 def main() -> int:
     files = markdown_files()
     checks = (
@@ -560,6 +597,7 @@ def main() -> int:
         check_api_contract_index(),
         check_pagination_contract(),
         check_visitor_session_contract(),
+        check_background_jobs_contract(),
     )
     errors = [error for group in checks for error in group]
     if errors:
@@ -573,7 +611,8 @@ def main() -> int:
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_block_count} JSON blocks, {len(example_endpoints())} API endpoints, "
         f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
-        "canonical H1/date metadata, balanced fences, pagination/session/error invariants, "
+        "canonical H1/date metadata, balanced fences, "
+        "pagination/session/error/job invariants, "
         "AC01-AC20 and D01-D13 covered."
     )
     return 0
