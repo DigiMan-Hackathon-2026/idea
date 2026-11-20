@@ -180,12 +180,14 @@ PATCH 응답 유실 뒤 report 최신 revision·status를 재조회한다. 이�
 | `ORIGIN_FORBIDDEN` | 현재 화면 입력 유지 | canonical origin 재진입 | 금지 |
 | `ADMIN_FORBIDDEN` | 운영 입력·data 제거 | principal 재인증 후보 | 금지 |
 | `NOT_FOUND` | 대상 입력 제거 | 존재 추측 금지 | 금지 |
+| `METHOD_NOT_ALLOWED` | 현재 입력 유지 | client·release 불일치 확인 | 금지 |
 | `QUEST_UNAVAILABLE` | 비개인 form 후보 유지 | quest·run 재조회 | 금지 |
 | `STEP_ORDER_CONFLICT` | 없음 | run 재조회 | 금지 |
 | `RUN_NOT_COMPLETED` | feedback 입력 유지 가능 | run 재조회 | 금지 |
 | `VERSION_CONFLICT` | local draft 분리 유지 | 최신 resource 조회 | 금지 |
 | `REQUEST_CONFLICT` | 입력·기존 key 유지 | 사용자 결정 | 금지 |
 | `RATE_LIMITED` | 입력·identity 유지 | 필요 시 mutation별 조회 | 시각 전 금지 |
+| `INTERNAL_ERROR` | 화면 memory에 유지 | mutation별 상태 조회·request ID | 금지 |
 | `SERVICE_UNAVAILABLE` | 화면 memory에 유지 | mutation별 조회 우선 | GET만 제한 후보 |
 
 error의 `retryable: true`만 보고 mutation을 자동 반복하지 않는다. method, operation identity와 상태 조회 가능성을 함께 판단한다.
@@ -264,7 +266,7 @@ request ID, run·visitor UUID, URL query, body, comment, cookie를 analytics eve
 - [ ] GET retry와 mutation confirmation 로직이 분리돼 있다.
 - [ ] idempotency key·expectedRevision lifecycle이 test에 고정됐다.
 - [ ] service worker·cache가 개인·운영 response와 mutation을 보관하지 않는다.
-- [ ] 12개 공통 error code의 화면·focus·자동 재시도 여부가 검수됐다.
+- [ ] 14개 공통 error code의 화면·focus·자동 재시도 여부가 검수됐다.
 - [ ] AC03·AC05·AC09·AC12·AC13·AC16 fault injection을 통과했다.
 
 연결 검수: AC03~AC06, AC08~AC13, AC16, AC18

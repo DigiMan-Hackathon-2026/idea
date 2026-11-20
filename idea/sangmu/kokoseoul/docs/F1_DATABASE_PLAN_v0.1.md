@@ -78,7 +78,7 @@ host만 검사하지 않는다. 같은 관리형 host에 여러 환경이 있을
 | 활성 신고 요청 | `reports_visitor_request_active_uq` |
 | 분석 의미 중복 | `analytics_events_dedupe_key_uq` |
 
-constraint 이름을 client의 `details`에 반환하지 않는다. 매핑되지 않은 DB 오류는 500 내부 오류로 기록하되 SQL과 값을 숨기고, 계약에 필요한 오류 변환을 테스트로 추가한다.
+constraint 이름을 client의 `details`에 반환하지 않는다. 매핑되지 않은 DB 오류는 500 `INTERNAL_ERROR`로 기록하되 SQL과 값을 숨기고, 계약에 필요한 오류 변환을 테스트로 추가한다. dependency·transaction retry 소진의 503과 구분은 [오류 catalog](API_ERROR_CATALOG_v0.1.md)를 따른다.
 
 ## 타입 선택 검토
 

@@ -219,7 +219,7 @@ known run 읽기는 격리된 복구 DB의 무결성 검사다. production 승�
 - Origin 검사와 cookie 속성
 - CSP·cache·HSTS·referrer·Permissions Policy header snapshot
 - 개인 응답 `Cache-Control: no-store`, `Vary: Cookie`
-- 400, 401, 403 `ORIGIN_FORBIDDEN`·`ADMIN_FORBIDDEN`, 404, 409, 429, 503 오류 shape
+- 400, 401, 403 `ORIGIN_FORBIDDEN`·`ADMIN_FORBIDDEN`, 404, 405, 409, 429, 500, 503 오류 shape와 [오류 catalog](API_ERROR_CATALOG_v0.1.md)의 details·request ID
 - request ID가 응답과 server log에서 연결됨
 - SQL·stack·constraint 이름·token이 응답에 없음
 

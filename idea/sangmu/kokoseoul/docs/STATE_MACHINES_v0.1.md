@@ -165,6 +165,8 @@ principal을 disabled로 바꾸면 기존 운영 session도 다음 요청에서 
 
 ## 오류와 HTTP 결과
 
+아래 표는 domain·권한 전이 오류다. 공통 400·405·429·500·503과 request ID·details는 [API 오류 catalog](API_ERROR_CATALOG_v0.1.md)를 따른다.
+
 | 실패 | code | HTTP | DB 변화 |
 | --- | --- | ---: | --- |
 | session 없음·만료 | `SESSION_REQUIRED` | 401 | 없음 |

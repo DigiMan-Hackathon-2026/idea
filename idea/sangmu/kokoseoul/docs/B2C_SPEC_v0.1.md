@@ -245,8 +245,10 @@ BR10. 콘텐츠 공개 전에 필수 일본어, 단계 순서, 비용 범위, �
 | 401 | 세션 없음·만료 |
 | 403 | 운영 권한 또는 요청 출처 검증 실패 |
 | 404 | 대상 없음·본인 접근 불가·미공개 콘텐츠 |
+| 405 | 알려진 경로에서 허용되지 않은 method |
 | 409 | 상태 충돌·단계 순서·운영 revision 충돌 |
 | 429 | 요청 제한, 재시도 시각 안내 |
+| 500 | 예상하지 못한 서버 결함 |
 | 503 | 일시 장애, 재시도 가능 |
 
 에러 형식은 다음과 같다. 사용자 화면은 code에 대응하는 일본어 문구를 사용한다. 내부 오류 내용과 스택은 응답에 포함하지 않는다.
@@ -263,7 +265,7 @@ BR10. 콘텐츠 공개 전에 필수 일본어, 단계 순서, 비용 범위, �
 }
 ```
 
-정의한 주요 code는 VALIDATION_ERROR, SESSION_REQUIRED, ORIGIN_FORBIDDEN, ADMIN_FORBIDDEN, QUEST_UNAVAILABLE, STEP_ORDER_CONFLICT, VERSION_CONFLICT, REQUEST_CONFLICT, RUN_NOT_COMPLETED, NOT_FOUND, RATE_LIMITED, SERVICE_UNAVAILABLE이다. ORIGIN_FORBIDDEN은 변경 요청의 Origin 누락·불일치, ADMIN_FORBIDDEN은 로그인했지만 운영 권한이 없는 경우, REQUEST_CONFLICT는 같은 멱등 키에 다른 본문을 보낸 경우 사용한다. details는 공개 가능한 필드 오류·현재 revision·선행 단계 ID 등으로 제한하며 허용 Origin 목록은 반환하지 않는다.
+정의한 code는 VALIDATION_ERROR, SESSION_REQUIRED, ORIGIN_FORBIDDEN, ADMIN_FORBIDDEN, QUEST_UNAVAILABLE, STEP_ORDER_CONFLICT, VERSION_CONFLICT, REQUEST_CONFLICT, RUN_NOT_COMPLETED, NOT_FOUND, METHOD_NOT_ALLOWED, RATE_LIMITED, INTERNAL_ERROR, SERVICE_UNAVAILABLE이다. code별 HTTP·retryable·공개 details·판정 우선순위는 [오류·request ID catalog](API_ERROR_CATALOG_v0.1.md)를 따른다.
 
 서버가 보내는 canStart, canContinue, nextStepId를 화면 동작의 기준으로 사용하되 서버는 매 변경 요청에서도 조건을 다시 검사한다. 잠금·트랜잭션 재시도는 서버 내부에서 제한 횟수로 처리하며 최종 실패는 재시도 가능한 503으로 반환한다.
 

@@ -13,6 +13,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [B2C API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_B2C_v0.1.md)
 - [운영 API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_ADMIN_v0.1.md)
 - [API 인증·캐시·재시도 계약 인덱스 v0.1](docs/API_CONTRACT_INDEX_v0.1.md)
+- [API 오류·request ID catalog v0.1](docs/API_ERROR_CATALOG_v0.1.md)
 - [목록 pagination·cursor 계약 v0.1](docs/PAGINATION_CURSOR_v0.1.md)
 - [입력 검증·정규화 계약 v0.1](docs/INPUT_VALIDATION_v0.1.md)
 - [속도 제한·남용 대응 계약 v0.1](docs/RATE_LIMIT_ABUSE_v0.1.md)

@@ -28,6 +28,7 @@
 | 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
+| API 오류·request ID | 준비됨 | [오류 catalog](API_ERROR_CATALOG_v0.1.md) | error factory·우선순위·405/500 통합 검수 |
 | 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
 | DB 정합성 설계 | 완료 | [데이터 계약](DATA_CONSTRAINTS_v0.1.md), [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | 실제 migration·PostgreSQL 동시성 테스트 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
@@ -66,7 +67,7 @@
 
 - 제품 코드는 없다.
 - 외부 서비스 계정과 secret은 저장소에 없다.
-- 전체 Markdown의 JSON block 42개는 JSON parser를 통과한다.
+- 전체 Markdown의 JSON block 44개는 JSON parser를 통과한다.
 - B2C 스펙과 테스트 계획에 AC01~AC20이 모두 존재한다.
 - 위 항목은 구현·테스트 통과를 뜻하지 않는다.
 - `main`은 기능 단위 문서·검증 변경을 원격 저장소와 동기화한다.

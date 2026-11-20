@@ -4,6 +4,8 @@
 
 이 문서는 DigiMan의 request ID, 구조화 로그, 기술 지표, 알림과 보존 범위를 정의한다. 관측 데이터는 사용자 원문을 복제하는 저장소가 아니며, monitoring 장애가 핵심 run transaction을 실패시키지 않게 한다.
 
+공개 오류 code·HTTP·details와 500/503 경계는 [API 오류·request ID catalog](API_ERROR_CATALOG_v0.1.md)를 따른다.
+
 신호를 발견한 뒤 incident 선언·완화·복구·종료하는 절차는 [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md)을 따른다.
 
 ## 목표
@@ -234,7 +236,7 @@ request ID가 없다는 이유로 사용자의 브라우저 storage나 cookie �
 - [ ] 모든 응답·log에 같은 최종 request ID가 있다.
 - [ ] route template만 기록되고 raw URL·query·UUID가 없다.
 - [ ] cookie·token·secret·자유 입력 canary가 어디에도 없다.
-- [ ] 12개 공통 오류 code가 안전한 level·metric으로 분류된다.
+- [ ] 14개 공통 오류 code가 안전한 level·metric으로 분류된다.
 - [ ] metric label에 고 cardinality·사용자 값이 없다.
 - [ ] preview·demo·test가 production 운영 신호를 왜곡하지 않는다.
 - [ ] monitoring 실패가 사용자 transaction을 rollback하지 않는다.

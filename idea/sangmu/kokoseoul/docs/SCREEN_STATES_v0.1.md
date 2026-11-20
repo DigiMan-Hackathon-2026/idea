@@ -330,7 +330,9 @@ pending·응답 유실·idempotency key·revision과 자동 재시도 금지는 
 | REQUEST_CONFLICT | 입력 유지, 명시적 새 제출 제공 |
 | RUN_NOT_COMPLETED | 진행 화면 이동 |
 | NOT_FOUND | 동일한 찾을 수 없음 화면 |
+| METHOD_NOT_ALLOWED | 일반 오류와 request ID, 자동 재시도 금지 |
 | RATE_LIMITED | 서버 재시도 시각 안내, 자동 연타 금지 |
+| INTERNAL_ERROR | 일반 오류와 request ID, mutation 상태 확인 우선 |
 | SERVICE_UNAVAILABLE | 입력 유지, 제한된 재시도 |
 
 운영자 전용 `ADMIN_FORBIDDEN`, `VERSION_CONFLICT`는 B2C 화면에 노출하지 않는다.

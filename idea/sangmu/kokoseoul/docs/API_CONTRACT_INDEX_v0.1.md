@@ -27,6 +27,8 @@ route 유형별 cache·CSP·cookie·CORS와 browser header는 [HTTP 보안·캐�
 
 모든 응답에는 서버가 확정한 `X-Request-Id`가 있다. JSON 요청의 알 수 없는 필드, 서버 결정 필드와 잘못된 Content-Type은 400 `VALIDATION_ERROR`다. 인증 실패와 소유권 실패는 대상 존재 여부를 노출하지 않는다.
 
+공통 오류 envelope, 14개 code의 HTTP·retryable·details, 405·500과 판정 우선순위는 [API 오류·request ID catalog](API_ERROR_CATALOG_v0.1.md)를 따른다.
+
 JSON·query·Unicode·UUID·body 크기와 idempotency canonical 비교는 [입력 검증·정규화 계약](INPUT_VALIDATION_v0.1.md)을 따른다. 목록의 route별 정렬 tuple, filter fingerprint, 동시 변경과 cursor 서명·만료·복구는 [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)을 따른다.
 
 ## B2C endpoint
@@ -75,12 +77,14 @@ quest 생성의 `clientRequestId`는 UI가 생성 행동마다 만드는 UUID다
 | `ORIGIN_FORBIDDEN` | 403 | mutation의 Origin 누락·불일치 |
 | `ADMIN_FORBIDDEN` | 403 | 활성 principal 없음·역할 거부 |
 | `NOT_FOUND` | 404 | 없음·미공개·다른 visitor 소유 |
+| `METHOD_NOT_ALLOWED` | 405 | 알려진 route의 허용되지 않은 method |
 | `QUEST_UNAVAILABLE` | 409 | 중지·보관·시작 또는 미완료 진행 차단 |
 | `STEP_ORDER_CONFLICT` | 409 | 선행 단계 미완료 |
 | `RUN_NOT_COMPLETED` | 409 | 완료 카드·feedback 선행 상태 미충족 |
 | `VERSION_CONFLICT` | 409 | quest 또는 report expectedRevision 불일치 |
 | `REQUEST_CONFLICT` | 409 | 같은 clientRequestId에 다른 정규화 요청 |
 | `RATE_LIMITED` | 429 | 제한과 안전한 retry 시각 제공 |
+| `INTERNAL_ERROR` | 500 | 예상하지 못한 server 결함·mapping 누락 |
 | `SERVICE_UNAVAILABLE` | 503 | 제한된 서버 재시도 뒤 일시 장애 |
 
 Origin 실패는 visitor·admin 모두 `ORIGIN_FORBIDDEN`으로 매핑하고 허용 Origin 목록을 details에 넣지 않는다. 인증을 먼저 자세히 판별해 공격자에게 principal 존재 여부를 알려 주지 않으며 화면은 재시도를 반복하지 않는다.
