@@ -21,6 +21,7 @@
 
 ```text
 python3 scripts/verify_docs.py
+python3 scripts/verify_research.py
 ```
 
 - 단위:

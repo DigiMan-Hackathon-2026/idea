@@ -88,4 +88,5 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 
 ```bash
 python3 scripts/verify_docs.py
+python3 scripts/verify_research.py
 ```
