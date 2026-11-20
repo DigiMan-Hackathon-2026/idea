@@ -1,6 +1,6 @@
 # F1 PostgreSQL 구현·검수 계획 v0.1
 
-작성일: 2026-11-21 · 상태: base identity·quest content·progress schema 구현·실DB 검증 완료, 나머지 도메인 schema 진행 중
+작성일: 2026-11-21 · 상태: base identity·quest content·progress·report schema 구현·실DB 검증 완료, 나머지 도메인 schema 진행 중
 
 이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다. 행사 규칙 미확인은 구현 차단 조건이 아니라 제출 전 위험이다.
 
@@ -23,15 +23,17 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - 첫 migration SHA-256은 `ca0ec318b4e86b0dd847b150643970bdd4859aaf0aa7f2e82f04a1716ab8973e`다.
 - 빈 `digiman_local` DB 적용과 같은 DB 재적용이 성공했다.
 - `digiman:test` marker가 있는 `digiman_test_base`에서 32-byte hash, expiry, cascade, supplier state·trim, coordinate pair 4개 PostgreSQL 통합 테스트가 성공했다.
-- GitHub Actions run `44817242423`은 같은 image digest로 `digiman_test_ci`를 만들고 두 migration·constraint test 10개와 Pixel 5·Desktop Chrome 흐름까지 `1m 53s`에 모두 통과했다.
+- GitHub Actions run `44818030950`은 같은 image digest로 `digiman_test_ci`를 만들고 세 migration·constraint test 16개와 Pixel 5·Desktop Chrome 흐름까지 `2m 19s`에 모두 통과했다.
 - Drizzle이 custom `bytea` type을 `"bytea"`로 생성한 SQL은 검토 과정에서 PostgreSQL 내장 `bytea`로 교정했다.
 - 두 번째 migration은 `quests`, `quest_versions`, `quest_steps` 3개 table이며 SHA-256은 `7db5f4cacb6f361ba09c26ef71ccfd14209d3aa9a9b29f81c2b1196515f269d8`이다.
 - 세 번째 migration은 `runs`, `run_steps`, `feedback` 3개 table이며 SHA-256은 `68659b443bf1ea52d78ec8c0632922aa1df98f920f843b24465457ddf9a3e363`이다.
-- 완전히 빈 marker DB에서 세 migration 적용·재적용과 PostgreSQL 통합 테스트 16개가 성공했다.
+- 네 번째 migration은 `reports` table이며 SHA-256은 `196daf2133a0ba1e676e2a59dc2af79c3b2a805af631bf9b93c5c17ab30f31bf`이다.
+- 완전히 빈 marker DB에서 네 migration 적용·재적용과 PostgreSQL 통합 테스트 20개가 성공했다.
 - quest당 draft 한 개, 3~5개 연속 step, 공개 version의 같은 quest 소속, 공개 version·step 불변성을 named constraint·trigger로 강제한다.
 - run의 한 visitor·quest 유일성, 고정 version 소속, 순서대로 단계 완료, 모든 단계 뒤 완료 전환, 완료 후 불변성과 완료 run feedback만 허용하는 규칙을 named constraint·trigger로 강제한다.
+- report의 활성 멱등 키 유일성, quest-version 소속, 운영 상태 전이·revision 증가, 익명화 뒤 사용자 재연결 금지를 named constraint·trigger로 강제한다.
 
-이는 F1 전체 완료가 아니다. report·audit·analytics schema, 역할 분리, 동시성·실패 주입은 남아 있다.
+이는 F1 전체 완료가 아니다. audit·analytics schema, 역할 분리, 동시성·실패 주입은 남아 있다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 
