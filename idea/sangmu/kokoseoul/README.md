@@ -94,7 +94,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - PR은 실행한 검사, migration·보안·일본어·rollback 영향을 기록
 - 변경 이유와 영향을 문서 또는 PR에 남기고, 이후 팀 저장소로 옮길 때 이력을 유지합니다.
 
-실제 제품 코드 작성 시점은 행사에서 허용한 사전 개발 범위에 맞춥니다. 현재 공유된 안내의 사전 준비 항목은 아이디어 도출, 기술 조사, 개발 환경 준비입니다.
+제품 구현은 사용자 지시에 따라 진행합니다. 행사 전 제품 코드 허용 범위는 아직 공식 확인되지 않았으므로 제출·공개 전에는 주최 측 답변을 별도로 기록합니다.
 
 ## 문서 검증
 
@@ -111,4 +111,21 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/verify_docs.py
 python3 scripts/verify_research.py
 python3 scripts/verify_scope_gate.py
+```
+
+## 로컬 웹 개발
+
+Node.js 24.19.0과 Corepack을 사용합니다.
+
+```bash
+corepack enable pnpm
+pnpm install --frozen-lockfile
+cp .env.example .env.local
+pnpm dev
+```
+
+`.env.local`의 `APP_ENV`는 `local`로 설정합니다. 전체 로컬 품질 검사는 다음 명령으로 실행합니다.
+
+```bash
+pnpm verify
 ```

@@ -12,13 +12,27 @@
 
 # Dependencies and generated output
 node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 .venv/
 __pycache__/
 dist/
 build/
 .next/
+out/
 coverage/
+test-results/
+playwright-report/
 *.log
+.pnpm-debug.log*
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
 
 # Local editor and OS files
 .idea/
