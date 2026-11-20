@@ -38,6 +38,9 @@ UUID_PATH_SEGMENT = re.compile(
     re.IGNORECASE,
 )
 NAMED_PATH_SEGMENT = re.compile(r"/:[A-Za-z][A-Za-z0-9]*(?=/|$)")
+ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+H1 = re.compile(r"^#\s+\S.+$", re.MULTILINE)
+FENCED_BLOCK = re.compile(r"^```[^\n]*\n.*?^```[ \t]*$", re.MULTILINE | re.DOTALL)
 
 
 def markdown_files() -> list[Path]:
@@ -61,8 +64,36 @@ def check_links(files: list[Path]) -> list[str]:
     errors: list[str] = []
     for path in files:
         for target in local_link_targets(path.read_text(encoding="utf-8")):
-            if not (path.parent / target).resolve().exists():
+            resolved = (path.parent / target).resolve()
+            if not resolved.is_relative_to(ROOT):
+                errors.append(
+                    f"{path.relative_to(ROOT)}: local link leaves repository {target}"
+                )
+            elif not resolved.exists():
                 errors.append(f"{path.relative_to(ROOT)}: missing link target {target}")
+    return errors
+
+
+def check_markdown_structure(files: list[Path]) -> list[str]:
+    errors: list[str] = []
+    for path in files:
+        text = path.read_text(encoding="utf-8")
+        headings = H1.findall(FENCED_BLOCK.sub("", text))
+        if not headings or not text.startswith("# "):
+            errors.append(
+                f"{path.relative_to(ROOT)}: expected an H1 on the first line"
+            )
+        if len(headings) != len(set(headings)):
+            errors.append(f"{path.relative_to(ROOT)}: duplicate H1 heading")
+        if not text.endswith("\n"):
+            errors.append(f"{path.relative_to(ROOT)}: missing final newline")
+
+        if path.parent == ROOT / "docs":
+            preamble = "\n".join(text.splitlines()[:5])
+            if not ISO_DATE.search(preamble):
+                errors.append(
+                    f"{path.relative_to(ROOT)}: no ISO date in first five lines"
+                )
     return errors
 
 
@@ -137,12 +168,18 @@ def check_decision_queue() -> list[str]:
 
 def check_readme_index() -> list[str]:
     text = (ROOT / "README.md").read_text(encoding="utf-8")
-    linked = set(local_link_targets(text))
+    targets = local_link_targets(text)
+    linked = set(targets)
     expected = {
         str(path.relative_to(ROOT)) for path in sorted((ROOT / "docs").glob("*.md"))
     }
     missing = sorted(expected - linked)
-    return [f"README.md: missing document index link {path}" for path in missing]
+    errors = [f"README.md: missing document index link {path}" for path in missing]
+    for target in sorted(expected):
+        count = targets.count(target)
+        if count > 1:
+            errors.append(f"README.md: document index link appears {count} times {target}")
+    return errors
 
 
 def canonical_endpoint(method: str, path: str) -> str:
@@ -197,6 +234,7 @@ def main() -> int:
     files = markdown_files()
     checks = (
         check_links(files),
+        check_markdown_structure(files),
         check_json_blocks(),
         check_acceptance_coverage(),
         check_error_code_coverage(),
@@ -218,7 +256,8 @@ def main() -> int:
     print(
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_blocks} JSON blocks, {len(example_endpoints())} API endpoints, "
-        f"{len(EXPECTED_ERROR_CODES)} error codes, AC01-AC20 and D01-D13 covered."
+        f"{len(EXPECTED_ERROR_CODES)} error codes, canonical H1/date metadata, "
+        "AC01-AC20 and D01-D13 covered."
     )
     return 0
 
