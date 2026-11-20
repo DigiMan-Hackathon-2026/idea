@@ -16,6 +16,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [PostgreSQL 데이터 정합성 계약 v0.1](docs/DATA_CONSTRAINTS_v0.1.md)
 - [분석 이벤트와 지표 계약 v0.1](docs/ANALYTICS_EVENT_CONTRACT_v0.1.md)
 - [B2C 구현 계획 v0.1](docs/IMPLEMENTATION_PLAN_v0.1.md)
+- [F0 개발 환경 착수 계획 v0.1](docs/F0_BOOTSTRAP_PLAN_v0.1.md)
 - [B2C 화면 상태와 일본어 문구 계약 v0.1](docs/SCREEN_STATES_v0.1.md)
 - [B2C 검수와 테스트 계획 v0.1](docs/TEST_PLAN_v0.1.md)
 - [보안과 개인정보 위협 모델 v0.1](docs/SECURITY_PRIVACY_v0.1.md)

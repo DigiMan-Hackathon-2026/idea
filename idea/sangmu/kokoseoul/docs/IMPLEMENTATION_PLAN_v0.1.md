@@ -53,6 +53,8 @@ F2와 F3은 F1 이후 병렬로 진행할 수 있다. F7은 공개 콘텐츠가 
 
 목표는 모든 팀원이 같은 명령으로 개발·검사를 실행하는 것이다.
 
+행사 규칙 확인 직후의 세부 실행 순서, 환경 변수 경계와 clean clone 증거는 [F0 개발 환경 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md)을 따른다.
+
 ### 포함
 
 - Next.js App Router, TypeScript, Tailwind CSS

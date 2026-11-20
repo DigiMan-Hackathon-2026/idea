@@ -19,7 +19,7 @@
 | 영역 | 상태 | 근거 | 다음 완료 조건 |
 | --- | --- | --- | --- |
 | B2C 제품 범위 | 완료 | [B2C 스펙](B2C_SPEC_v0.1.md) | 사용자 조사 결과에 따른 변경 반영 |
-| 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md) | 팀 동의와 실제 package version 고정 |
+| 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md) | 팀 동의와 실제 package version 고정 |
 | 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | 행사 규칙 확인 뒤 F0 착수 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
