@@ -36,6 +36,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [배포와 복구 운영 런북 v0.1](docs/OPERATIONS_RUNBOOK_v0.1.md)
 - [장애 대응 런북 v0.1](docs/INCIDENT_RESPONSE_v0.1.md)
 - [2분 제품 시연 런북 v0.1](docs/DEMO_RUNBOOK_v0.1.md)
+- [출시 준비 판정 v0.1](docs/RELEASE_READINESS_v0.1.md)
 - [해커톤 사전 개발 범위 확인서](docs/EVENT_RULES_CHECKLIST.md)
 - [일본인 사용자 검증 계획 v0.1](docs/USER_RESEARCH_v0.1.md)
 - [퀘스트 콘텐츠 사실과 권리 검수 v0.1](docs/CONTENT_VERIFICATION_v0.1.md)

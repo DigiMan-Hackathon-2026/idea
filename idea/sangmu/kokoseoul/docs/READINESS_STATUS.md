@@ -35,6 +35,7 @@
 | 장애 대응 | 준비됨 | [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md) | 역할·연락 경로 확정과 P0·P1 tabletop 훈련 |
 | 로그·관측성 | 준비됨 | [관측 계약](OBSERVABILITY_CONTRACT_v0.1.md) | provider 설정과 canary·alert 검수 |
 | 제품 시연 | 준비됨 | [2분 시연 런북](DEMO_RUNBOOK_v0.1.md) | 구현 뒤 실제 기기 100초 리허설과 기록 |
+| 출시 판정 | 준비됨 | [출시 준비 gate](RELEASE_READINESS_v0.1.md) | 고정 commit·환경에서 모든 필수 증거와 승인 기록 |
 | 문서 자동 검증 | 완료 | `python3 scripts/verify_docs.py` | CI 연결은 행사 규칙 확인 후 결정 |
 | 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md) | 주최 측 공식 답변 기록 |
 | 사용자 인터뷰 | 진행 가능 | [조사 계획](USER_RESEARCH_v0.1.md), [작업공간](../research/README.md) | 익명 기록 3~5개와 조사 합성 |

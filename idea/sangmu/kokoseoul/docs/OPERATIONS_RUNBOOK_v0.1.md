@@ -20,6 +20,8 @@ DB, OIDC callback, cookie 이름과 secret을 환경별로 분리한다. preview
 
 ## 배포 전 확인
 
+전체 release 유형, 절대 차단 gate와 증거 완전성은 [출시 준비 판정](RELEASE_READINESS_v0.1.md)을 먼저 확인한다.
+
 - [ ] 대상 commit과 변경 기능을 기록했다.
 - [ ] lint, typecheck, unit, PostgreSQL integration, build가 통과했다.
 - [ ] migration을 별도 검수 DB에 적용했다.
