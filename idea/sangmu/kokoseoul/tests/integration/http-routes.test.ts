@@ -107,6 +107,11 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
     const cookie = sessionResponse.headers
       .get("set-cookie")!
       .split(";", 1)[0];
+    const repeatedSession = await createSession(
+      mutationRequest("/api/v1/visitor-sessions", cookie, {}),
+    );
+    expect(repeatedSession.status).toBe(200);
+    expect(repeatedSession.headers.get("set-cookie")).toBeNull();
 
     const startResponse = await startRun(
       mutationRequest(`/api/v1/quests/${questId}/runs`, cookie, {}),
@@ -116,6 +121,12 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
     const started = await startResponse.json();
     expect(started.nextStepId).toBe(stepIds[0]);
     const runId = started.id as string;
+    const repeatedStart = await startRun(
+      mutationRequest(`/api/v1/quests/${questId}/runs`, cookie, {}),
+      { params: Promise.resolve({ questId }) },
+    );
+    expect(repeatedStart.status).toBe(200);
+    expect((await repeatedStart.json()).id).toBe(runId);
 
     const initialResponse = await getRun(
       new NextRequest(`${origin}/api/v1/runs/${runId}`, {
@@ -126,7 +137,24 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
     expect(initialResponse.status).toBe(200);
     expect((await initialResponse.json()).steps).toHaveLength(3);
 
-    for (const stepId of stepIds) {
+    const outOfOrder = await completeStep(
+      mutationRequest(
+        `/api/v1/runs/${runId}/steps/${stepIds[1]}`,
+        cookie,
+        { completed: true },
+        "PUT",
+      ),
+      { params: Promise.resolve({ runId, stepId: stepIds[1] }) },
+    );
+    expect(outOfOrder.status).toBe(409);
+    expect(await outOfOrder.json()).toMatchObject({
+      error: {
+        code: "STEP_ORDER_CONFLICT",
+        details: { expectedStepId: stepIds[0] },
+      },
+    });
+
+    for (const [index, stepId] of stepIds.entries()) {
       const stepResponse = await completeStep(
         mutationRequest(
           `/api/v1/runs/${runId}/steps/${stepId}`,
@@ -137,6 +165,22 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
         { params: Promise.resolve({ runId, stepId }) },
       );
       expect(stepResponse.status).toBe(200);
+      if (index === 0) {
+        const firstBody = await stepResponse.json();
+        const repeatedStep = await completeStep(
+          mutationRequest(
+            `/api/v1/runs/${runId}/steps/${stepId}`,
+            cookie,
+            { completed: true },
+            "PUT",
+          ),
+          { params: Promise.resolve({ runId, stepId }) },
+        );
+        expect(repeatedStep.status).toBe(200);
+        expect((await repeatedStep.json()).updatedStep.completedAt).toBe(
+          firstBody.updatedStep.completedAt,
+        );
+      }
     }
 
     const feedbackResponse = await saveFeedback(
@@ -153,17 +197,54 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
       { params: Promise.resolve({ runId }) },
     );
     expect(feedbackResponse.status).toBe(200);
+    const updatedFeedback = await saveFeedback(
+      mutationRequest(
+        `/api/v1/runs/${runId}/feedback`,
+        cookie,
+        { joyScore: 4, feltNewExperience: false, comment: null },
+        "PUT",
+      ),
+      { params: Promise.resolve({ runId }) },
+    );
+    expect(updatedFeedback.status).toBe(200);
+    expect((await updatedFeedback.json()).joyScore).toBe(4);
 
+    const clientRequestId = randomUUID();
     const reportResponse = await submitReport(
       mutationRequest(`/api/v1/quests/${questId}/reports`, cookie, {
         versionId,
-        clientRequestId: randomUUID(),
+        clientRequestId,
         category: "information",
         comment: "表示内容を確認できませんでした。",
       }),
       { params: Promise.resolve({ questId }) },
     );
     expect(reportResponse.status).toBe(201);
+    const report = await reportResponse.json();
+    const repeatedReport = await submitReport(
+      mutationRequest(`/api/v1/quests/${questId}/reports`, cookie, {
+        versionId,
+        clientRequestId,
+        category: "information",
+        comment: "表示内容を確認できませんでした。",
+      }),
+      { params: Promise.resolve({ questId }) },
+    );
+    expect(repeatedReport.status).toBe(200);
+    expect((await repeatedReport.json()).id).toBe(report.id);
+    const conflictingReport = await submitReport(
+      mutationRequest(`/api/v1/quests/${questId}/reports`, cookie, {
+        versionId,
+        clientRequestId,
+        category: "information",
+        comment: "異なる再送内容です。",
+      }),
+      { params: Promise.resolve({ questId }) },
+    );
+    expect(conflictingReport.status).toBe(409);
+    expect(await conflictingReport.json()).toMatchObject({
+      error: { code: "REQUEST_CONFLICT" },
+    });
 
     const counts = await setupClient.query(
       `select
