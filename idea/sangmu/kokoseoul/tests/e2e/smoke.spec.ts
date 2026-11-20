@@ -7,6 +7,8 @@ test("renders the Japanese landing page without horizontal overflow", async ({
 
   await expect(page.getByRole("heading", { name: /ソウルで/ })).toBeVisible();
   await expect(page.getByText("登録なしで探せる")).toBeVisible();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "本文へスキップ" })).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
     await page.evaluate(() => document.documentElement.clientWidth),
   );
@@ -36,6 +38,9 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "進行記録について" }),
   ).toBeVisible();
+  await expect(page.getByRole("button", { name: "閉じる" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
 });
 
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
@@ -103,6 +108,12 @@ test("resumes and deletes the browser-only demo record", async ({ page }) => {
     .getByRole("button", { name: "このブラウザの記録を削除する" })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("button", { name: "キャンセル" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await page
+    .getByRole("button", { name: "このブラウザの記録を削除する" })
+    .click();
   await page
     .getByRole("button", { name: "すべての記録を削除する" })
     .click();

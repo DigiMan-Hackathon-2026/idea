@@ -24,6 +24,7 @@
 - 공통 error envelope·request ID·405/500·14개 code는 [API 오류 catalog](API_ERROR_CATALOG_v0.1.md), 목록 정렬·cursor·rotation은 [pagination 계약](PAGINATION_CURSOR_v0.1.md)에 정리했다.
 - B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
 - demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류에 일본어 복구 행동을 제공한다. 네트워크·서버 장애 주입은 실제 API 연결 뒤 검수한다.
+- 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점과 Escape 종료를 Playwright로 검수한다. focus trap·screen reader·실제 기기 검수는 아직 남아 있다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.
 - 익명·운영 세션, 소유권, 입력·출력, 로그·secret과 삭제 통제는 [보안과 개인정보 위협 모델 v0.1](SECURITY_PRIVACY_v0.1.md)에 정리했다.

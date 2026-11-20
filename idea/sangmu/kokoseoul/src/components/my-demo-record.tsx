@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   clearDemoRunStorage,
   useDemoRunStorage,
@@ -23,6 +23,17 @@ export function MyDemoRecord() {
     [storedProgress],
   );
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const cancelDeleteRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isConfirmingDelete) return;
+    cancelDeleteRef.current?.focus();
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsConfirmingDelete(false);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isConfirmingDelete]);
 
   if (!progress) {
     return (
@@ -93,7 +104,7 @@ export function MyDemoRecord() {
             <p className="mt-3 leading-7 text-slate-600">進行中と完了済みの記録、フィードバックが削除され、元に戻せません。</p>
             <div className="mt-6 grid gap-3">
               <button type="button" onClick={handleDelete} className="min-h-12 rounded-2xl bg-[#b83322] px-5 text-sm font-black text-white">すべての記録を削除する</button>
-              <button type="button" onClick={() => setIsConfirmingDelete(false)} className="min-h-11 rounded-2xl text-sm font-black text-slate-600">キャンセル</button>
+              <button ref={cancelDeleteRef} type="button" onClick={() => setIsConfirmingDelete(false)} className="min-h-11 rounded-2xl text-sm font-black text-slate-600">キャンセル</button>
             </div>
           </section>
         </div>
