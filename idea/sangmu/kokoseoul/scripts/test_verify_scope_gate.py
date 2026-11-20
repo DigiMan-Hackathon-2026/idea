@@ -6,6 +6,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts import verify_scope_gate as verifier
 from scripts import verify_all
@@ -92,6 +93,13 @@ class ScopeGateVerifierTest(unittest.TestCase):
         self.assertEqual(
             len(verifier.check_open_gate_metadata("PRODUCT_ALLOWED", impossible)), 1
         )
+        with mock.patch.object(verifier.subprocess, "run") as git_run:
+            git_run.return_value.returncode = 1
+            commit_errors = verifier.check_open_gate_commit(
+                "PRODUCT_ALLOWED", recorded
+            )
+        self.assertEqual(len(commit_errors), 1)
+        self.assertIn("must exist", commit_errors[0])
 
     def test_closed_gate_still_requires_single_metadata_fields(self) -> None:
         text = (

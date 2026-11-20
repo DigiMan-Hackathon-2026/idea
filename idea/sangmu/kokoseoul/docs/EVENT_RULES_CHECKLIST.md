@@ -6,7 +6,7 @@
 게이트 근거: 미기록
 허용 시작 시각: 미기록
 
-`CLOSED`는 문서·조사·Python 검증 도구만 허용하고 scaffold·workflow·제품 파일을 금지한다. 공식 답변을 먼저 기록·커밋한 뒤, 빈 개발 환경만 허용하면 gate commit에서 `F0_ONLY`로, 제품 코드까지 허용하면 `PRODUCT_ALLOWED`로 바꾼다. 열린 gate는 선행 근거를 `D01 @ abc1234` 형식으로, 허용 시작 시각을 timezone offset을 포함한 ISO 8601로 기록해야 한다. `F0_ONLY`에서도 API·DB·domain module·migration은 금지되며 중립 scaffold 여부는 수동 검수한다. 답변 근거 없이 이 값을 바꾸지 않는다.
+`CLOSED`는 문서·조사·Python 검증 도구만 허용하고 scaffold·workflow·제품 파일을 금지한다. 공식 답변을 먼저 기록·커밋한 뒤, 빈 개발 환경만 허용하면 gate commit에서 `F0_ONLY`로, 제품 코드까지 허용하면 `PRODUCT_ALLOWED`로 바꾼다. 열린 gate는 선행 근거를 `D01 @ abc1234` 형식으로, 허용 시작 시각을 timezone offset을 포함한 ISO 8601로 기록해야 한다. 검증기는 근거 SHA가 현재 HEAD의 실제 선행 commit인지도 확인한다. `F0_ONLY`에서도 API·DB·domain module·migration은 금지되며 중립 scaffold 여부는 수동 검수한다. 답변 근거 없이 이 값을 바꾸지 않는다.
 
 공유된 행사 안내에서는 행사 전 아이디어 도출, 기술 조사, 개발 환경 준비가 허용된다고 이해했다. 제품 코드, DB 마이그레이션, 실제 배포와 콘텐츠 제작이 행사 전에 허용되는지는 근거가 없다. 공식 답변을 받기 전에는 설계·조사·계약·환경 점검만 진행하고 제품 코드는 작성하지 않는다.
 

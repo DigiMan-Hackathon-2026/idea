@@ -153,6 +153,27 @@ def check_open_gate_metadata(gate: str, text: str) -> list[str]:
     return errors
 
 
+def check_open_gate_commit(gate: str, text: str) -> list[str]:
+    if gate == "CLOSED":
+        return []
+    evidence = EVIDENCE_PATTERN.findall(text)
+    if len(evidence) != 1 or not OPEN_GATE_EVIDENCE.fullmatch(evidence[0].strip()):
+        return []
+    commit = evidence[0].strip().rsplit(" ", 1)[1]
+    result = subprocess.run(
+        ("git", "merge-base", "--is-ancestor", commit, "HEAD"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return [
+            "docs/EVENT_RULES_CHECKLIST.md: D01 evidence commit must exist "
+            "and precede the gate commit"
+        ]
+    return []
+
+
 def candidate_files() -> list[str]:
     result = subprocess.run(
         ("git", "ls-files", "--cached", "--others", "--exclude-standard"),
@@ -252,6 +273,7 @@ def main() -> int:
     gate, errors = parse_gate(rules_text)
     if not errors and gate is not None:
         errors.extend(check_open_gate_metadata(gate, rules_text))
+        errors.extend(check_open_gate_commit(gate, rules_text))
     if not errors and gate is not None:
         try:
             errors.extend(check_scope(gate, candidate_files()))
