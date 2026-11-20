@@ -59,7 +59,7 @@ export default async function QuestDetailPage({
       <SiteHeader />
       <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8 sm:pt-10">
         <Link href="/quests" className="inline-flex items-center gap-2 rounded-full text-sm font-black text-slate-600 hover:text-slate-950">
-          <span aria-hidden="true">←</span> {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
+          {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
         </Link>
 
         <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
@@ -93,7 +93,7 @@ export default async function QuestDetailPage({
             </div>
 
             <section className="mt-12 max-w-2xl">
-              <p className="text-xs font-black tracking-[0.18em] text-[#c93418]">3 SMALL STEPS</p>
+              <p className="text-xs font-black tracking-[0.18em] text-[#c93418]">{pickLocale(locale, "3つのステップ", "3단계로 진행")}</p>
               <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-slate-950">{pickLocale(locale, "このクエストの流れ", "퀘스트 진행 순서")}</h2>
               <ol className="mt-6 grid gap-3">
                 {quest.steps.map((step) => (

@@ -7,3 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## DigiMan UX rules
+
+Before changing any user-facing screen, interaction, or copy, read and apply `docs/UX_PRINCIPLES_v0.1.md`. Keep the experience bilingual in Korean and Japanese, with equivalent information, actions, and recovery paths in both languages. Do not copy Toss branding or visual assets; use the documented principles within DigiMan's own visual identity.

@@ -79,7 +79,7 @@ export default async function Home() {
               </div>
               <p className="mt-4 text-2xl font-black leading-tight tracking-[-0.04em]">{pickLocale(locale, <>今日のソウルに、<br />小さな物語を。</>, <>오늘의 서울에<br />작은 이야기를.</>)}</p>
               <Link href="/quests" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-white underline decoration-[#ff5a36] decoration-2 underline-offset-4">
-                {pickLocale(locale, "体験を見てみる", "체험 둘러보기")} <span aria-hidden="true">↗</span>
+                {pickLocale(locale, "クエストを見る", "퀘스트 둘러보기")}
               </Link>
             </div>
           </div>

@@ -41,8 +41,8 @@ export function MyDemoRecord() {
     return (
       <section className="mx-auto mt-10 max-w-xl rounded-[2rem] border border-dashed border-slate-900/15 bg-white/65 px-6 py-16 text-center">
         <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0eb] text-2xl" aria-hidden="true">✦</span>
-        <h1 className="mt-5 text-2xl font-black tracking-tight text-slate-950">{pickLocale(locale, "まだ記録がありません", "아직 기록이 없습니다")}</h1>
-        <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, "クエストを始めると、このブラウザで続きから再開できます。", "퀘스트를 시작하면 이 브라우저에서 이어서 진행할 수 있습니다.")}</p>
+        <h1 className="mt-5 text-2xl font-black tracking-tight text-slate-950">{pickLocale(locale, "最初のクエストを始めてみましょう", "첫 퀘스트를 시작해 보세요")}</h1>
+        <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, "始めたクエストは、このブラウザで続きから再開できます。", "시작한 퀘스트는 이 브라우저에서 이어서 진행할 수 있어요.")}</p>
         <Link href="/quests" className="mt-6 inline-flex min-h-12 items-center rounded-full bg-slate-950 px-6 text-sm font-black text-white">{pickLocale(locale, "クエストを探す", "퀘스트 찾기")}</Link>
       </section>
     );

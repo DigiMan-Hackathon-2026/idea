@@ -107,7 +107,7 @@ export function DemoRunner() {
         </div>
 
         <div className="p-6 sm:p-8">
-          <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">YOUR NEXT MOVE</p>
+          <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">{pickLocale(locale, "次のステップ", "다음 단계")}</p>
           <h2 className="mt-3 text-3xl font-black leading-tight tracking-[-0.04em] text-slate-950">{pickLocale(locale, currentStep.titleJa, currentStep.titleKo)}</h2>
           <p className="mt-4 text-base font-medium leading-8 text-slate-600">{pickLocale(locale, currentStep.bodyJa, currentStep.bodyKo)}</p>
 
@@ -129,7 +129,6 @@ export function DemoRunner() {
             <section className="mt-6 overflow-hidden rounded-2xl border-2 border-slate-950">
               <div className="flex items-center justify-between bg-[#ffcd57] px-5 py-3">
                 <span className="text-xs font-black tracking-[0.12em] text-slate-950">{pickLocale(locale, "見せる韓国語カード", "보여 주는 한국어 카드")}</span>
-                <span aria-hidden="true">↗</span>
               </div>
               <div className="p-5 text-center sm:p-7">
                 <p className="text-3xl font-black leading-tight tracking-tight text-slate-950" lang="ko">{currentStep.phrase.ko}</p>
@@ -150,7 +149,7 @@ export function DemoRunner() {
       </section>
 
       <aside className="rounded-[2rem] bg-white/75 p-5 shadow-sm lg:sticky lg:top-5">
-        <p className="text-xs font-black tracking-[0.15em] text-slate-400">QUEST MAP</p>
+        <p className="text-xs font-black tracking-[0.15em] text-slate-400">{pickLocale(locale, "全体の流れ", "전체 진행")}</p>
         <ol className="mt-4 grid gap-3">
           {DEMO_RUN_STEPS.map((step) => {
             const isCompleted = progress.completedStepIds.includes(step.id);

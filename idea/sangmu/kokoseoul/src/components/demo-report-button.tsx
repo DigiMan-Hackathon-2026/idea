@@ -56,7 +56,7 @@ export function DemoReportButton() {
           <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" className="w-full max-w-lg rounded-t-[2rem] bg-[#f7f3eb] p-6 shadow-2xl sm:rounded-[2rem] sm:p-8">
             <div className="flex items-start justify-between gap-5">
               <div>
-                <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">DEMO REPORT</p>
+                <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">{pickLocale(locale, "デモ報告", "데모 신고")}</p>
                 <h2 id="report-dialog-title" className="mt-2 text-2xl font-black tracking-tight text-slate-950">{pickLocale(locale, "情報の誤りを報告", "잘못된 정보 신고")}</h2>
               </div>
               <button ref={closeButtonRef} type="button" onClick={close} className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-xl font-bold text-slate-700 shadow-sm" aria-label={pickLocale(locale, "閉じる", "닫기")}>×</button>

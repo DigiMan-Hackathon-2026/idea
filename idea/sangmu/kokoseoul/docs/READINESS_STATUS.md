@@ -33,7 +33,7 @@
 | 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
 | DB 정합성 설계 | local·CI 완료 | 전체 domain 14 tables migration, capability roles, 동시성·rollback, visitor repositories, HMAC session core와 HTTP 세로 흐름, PostgreSQL 17.12 통합 테스트 46개, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | provider login mapping·나머지 visitor/admin adapter 연결 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
-| 화면 상태·문구 | 진행 중 | [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI, 한국어·일본어 전환과 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
+| 화면 상태·문구 | 진행 중 | [DigiMan UX 원칙](UX_PRINCIPLES_v0.1.md), [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI, 한국어·일본어 전환과 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
 | 웹 접근성 구현 | 진행 중 | skip link, focus-visible, reduced-motion, modal 초기 초점·focus trap·Escape와 Chromium E2E | screen reader·실제 기기 수동 검수 |
 | locale·표시 형식 | 진행 중 | 한국어·일본어 UI, locale cookie, 날짜·금액 formatter와 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 일본어 모어 화자·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |

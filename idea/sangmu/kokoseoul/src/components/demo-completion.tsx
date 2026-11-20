@@ -64,14 +64,13 @@ export function DemoCompletion() {
           <span className="text-sm font-bold text-[#ffcd57]">{completedDate}</span>
         </div>
         <div className="mt-14 grid size-28 place-items-center rounded-full bg-[#ffcd57] text-5xl text-slate-950 shadow-[0_15px_50px_rgba(255,205,87,0.25)]" aria-hidden="true">✦</div>
-        <p className="mt-8 text-xs font-black tracking-[0.2em] text-[#ff7658]">QUEST COMPLETE</p>
-        <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">{pickLocale(locale, "クエスト完了", "퀘스트 완료")}</h1>
+        <h1 className="mt-8 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">{pickLocale(locale, "クエスト完了", "퀘스트 완료")}</h1>
         <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, "ひとりで楽しむ聖水クラフト散歩", "혼자 즐기는 성수 크래프트 산책")}</p>
         <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/55">{pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")}</p>
       </section>
 
       <form onSubmit={handleFeedback} className="rounded-[2rem] bg-white p-6 shadow-sm">
-        <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">QUICK FEEDBACK</p>
+        <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">{pickLocale(locale, "かんたんフィードバック", "간단한 피드백")}</p>
         <fieldset className="mt-4">
           <legend className="text-lg font-black leading-7 text-slate-950">{pickLocale(locale, "この体験はどのくらい楽しかったですか。", "이 체험은 얼마나 즐거웠나요?")}</legend>
           <div className="mt-3 flex gap-2">

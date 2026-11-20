@@ -83,8 +83,7 @@ export function FilterForm({
         type="submit"
         className="flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 text-base font-black text-white shadow-[0_10px_30px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 hover:bg-[#ff5a36]"
       >
-        {pickLocale(locale, "クエストを探す", "퀘스트 찾기")}
-        <span aria-hidden="true">→</span>
+        {pickLocale(locale, "条件に合うクエストを探す", "조건에 맞는 퀘스트 찾기")}
       </button>
     </form>
   );

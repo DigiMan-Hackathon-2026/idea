@@ -80,7 +80,7 @@ export function StartDemoButton() {
           >
             <div className="flex items-start justify-between gap-6">
               <div>
-                <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">BEFORE YOU START</p>
+                <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">{pickLocale(locale, "開始前に確認", "시작 전 확인")}</p>
                 <h2 id="progress-dialog-title" className="mt-2 text-2xl font-black tracking-tight text-slate-950">
                   {pickLocale(locale, "進行記録について", "진행 기록 안내")}
                 </h2>

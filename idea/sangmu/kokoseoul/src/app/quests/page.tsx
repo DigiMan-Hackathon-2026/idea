@@ -64,10 +64,10 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
         <section className="mt-8 max-w-2xl rounded-[2rem] border border-dashed border-slate-900/20 bg-white/65 px-6 py-16 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0eb] text-2xl" aria-hidden="true">↺</span>
           <h2 className="mt-5 text-2xl font-black tracking-tight text-slate-950">
-            {pickLocale(locale, "条件に合うクエストが見つかりませんでした", "조건에 맞는 퀘스트를 찾지 못했습니다")}
+            {pickLocale(locale, "条件を変えて、もう一度探してみましょう", "조건을 바꿔 다시 찾아보세요")}
           </h2>
           <p className="mx-auto mt-3 max-w-md leading-7 text-slate-600">
-            {pickLocale(locale, "選んだ条件を確認するか、条件を減らしてもう一度探してください。", "선택한 조건을 확인하거나 조건을 줄여 다시 찾아보세요.")}
+            {pickLocale(locale, "今の条件に合うクエストはありません。条件を減らすと見つけやすくなります。", "현재 조건과 맞는 퀘스트가 없어요. 조건을 줄이면 더 쉽게 찾을 수 있어요.")}
           </p>
           <Link href="/quests" className="mt-6 inline-flex min-h-12 items-center rounded-full bg-slate-950 px-6 text-sm font-black text-white">
             {pickLocale(locale, "条件を変更する", "조건 변경하기")}

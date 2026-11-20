@@ -43,7 +43,7 @@ test("switches to Korean and keeps the language across navigation", async ({
   ).toBeVisible();
   await expect(page.getByText("가입 없이 찾을 수 있어요")).toBeVisible();
 
-  await page.getByRole("link", { name: "퀘스트" }).click();
+  await page.getByRole("link", { name: "퀘스트", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "나에게 맞는 퀘스트" }),
   ).toBeVisible();
@@ -61,7 +61,9 @@ test("filters the demo and opens its start notice", async ({ page }) => {
 
   await page.getByLabel("エリア").selectOption("seongsu");
   await page.getByLabel("ものづくり").check({ force: true });
-  await page.getByRole("button", { name: "クエストを探す" }).click();
+  await page
+    .getByRole("button", { name: "条件に合うクエストを探す" })
+    .click();
 
   await expect(page).toHaveURL(/\/quests\?area=seongsu&tags=craft/);
   await expect(
@@ -69,7 +71,7 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText("デモ体験").first()).toBeVisible();
 
-  await page.getByRole("link", { name: "詳しく見る" }).click();
+  await page.getByRole("link", { name: "クエストの詳細を見る" }).click();
   await expect(
     page.getByRole("heading", { name: "ひとりで楽しむ聖水クラフト散歩" }),
   ).toBeVisible();
@@ -125,7 +127,7 @@ test("completes the ordered demo flow and saves feedback", async ({ page }) => {
 test("resumes and deletes the browser-only demo record", async ({ page }) => {
   await page.goto("/my");
   await expect(
-    page.getByRole("heading", { name: "まだ記録がありません" }),
+    page.getByRole("heading", { name: "最初のクエストを始めてみましょう" }),
   ).toBeVisible();
 
   await page.goto(
@@ -164,7 +166,7 @@ test("resumes and deletes the browser-only demo record", async ({ page }) => {
     .getByRole("button", { name: "すべての記録を削除する" })
     .click();
   await expect(
-    page.getByRole("heading", { name: "まだ記録がありません" }),
+    page.getByRole("heading", { name: "最初のクエストを始めてみましょう" }),
   ).toBeVisible();
 });
 
@@ -193,7 +195,7 @@ test("shows recoverable empty and missing quest states", async ({ page }) => {
   await page.goto("/quests?durationMax=60");
   await expect(
     page.getByRole("heading", {
-      name: "条件に合うクエストが見つかりませんでした",
+      name: "条件を変えて、もう一度探してみましょう",
     }),
   ).toBeVisible();
   await expect(page.getByLabel("最大時間")).toHaveValue("60");

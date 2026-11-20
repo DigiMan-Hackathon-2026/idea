@@ -84,7 +84,7 @@ export function QuestCard({
             href={`/quests/${quest.id}`}
             className="shrink-0 rounded-full bg-[#ff5a36] px-5 py-3 text-sm font-black text-white shadow-[0_8px_22px_rgba(255,90,54,0.25)] transition hover:-translate-y-0.5 hover:bg-[#df4223]"
           >
-            {pickLocale(locale, "詳しく見る", "자세히 보기")}
+            {pickLocale(locale, "クエストの詳細を見る", "퀘스트 자세히 보기")}
           </Link>
         </div>
       </div>
