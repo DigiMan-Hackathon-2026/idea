@@ -30,6 +30,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [B2C 화면 상태와 일본어 문구 계약 v0.1](docs/SCREEN_STATES_v0.1.md)
 - [클라이언트 요청·복구 계약 v0.1](docs/CLIENT_RECOVERY_v0.1.md)
 - [일본어 문구 검수 절차 v0.1](docs/JAPANESE_COPY_REVIEW_v0.1.md)
+- [일본어 locale·표시 형식 계약 v0.1](docs/LOCALIZATION_FORMATTING_v0.1.md)
 - [모바일 접근성 구현·검수 v0.1](docs/ACCESSIBILITY_VERIFICATION_v0.1.md)
 - [지도 URL·한국어 주소 전달 계약 v0.1](docs/MAP_ADDRESS_HANDOFF_v0.1.md)
 - [B2C 검수와 테스트 계획 v0.1](docs/TEST_PLAN_v0.1.md)
