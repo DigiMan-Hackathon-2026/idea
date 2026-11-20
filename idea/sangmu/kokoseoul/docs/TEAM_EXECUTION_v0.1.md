@@ -203,7 +203,7 @@ frontend owner가 제공:
 3. reviewer가 사용자 결과와 failure path를 확인한다.
 4. DB·보안 영향이 있으면 해당 reviewer가 transaction·권한·로그를 본다.
 5. UI 문구가 있으면 일본어·접근성 상태를 확인한다.
-6. merge 뒤 main에서 핵심 smoke와 문서 검증을 다시 실행한다.
+6. merge 뒤 main에서 핵심 smoke와 `python3 scripts/verify_all.py`를 다시 실행한다.
 7. 준비도와 issue 상태를 실제 증거에 맞게 갱신한다.
 
 PR line 수보다 변경 책임 수를 본다. 책임이 두 개면 나눌 수 있는지 먼저 검토한다.

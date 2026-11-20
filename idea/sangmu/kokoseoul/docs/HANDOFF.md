@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21
 
-이 문서는 Windows 데스크톱에서 진행한 제품 설계 대화의 결정과 작업 상태를 맥북에서 이어가기 위한 요약이다. 대화 원문이나 앱 세션을 복제하는 파일은 아니다. 전체 구현 계약은 [B2C 설계 스펙 v0.1](B2C_SPEC_v0.1.md)을 따른다.
+이 문서는 Windows 데스크톱에서 시작한 제품 설계 대화를 맥북 저장소에서 이어 온 결정과 작업 상태의 요약이다. 대화 원문이나 앱 세션을 복제하는 파일은 아니다. 전체 구현 계약은 [B2C 설계 스펙 v0.1](B2C_SPEC_v0.1.md)을 따른다.
 
 완료·준비·대기·보류를 구분한 최신 상태는 [현재 구현 준비도](READINESS_STATUS.md)를 먼저 확인한다.
 
@@ -11,20 +11,26 @@
 - 개인 비공개 저장소: https://github.com/sangmu1126/digiman
 - 기본 브랜치: `main`
 - Windows 작업 위치: `D:\dev\digiman`
-- 맥북에서는 원하는 로컬 경로에 복제한 뒤 그 폴더를 Codex 프로젝트로 연다. Windows 경로를 그대로 사용하지 않는다.
+- 맥북 작업본도 `origin/main`과 기능 단위로 동기화한다. 새 기기에서는 원하는 로컬 경로에 복제하고 Windows 경로를 그대로 사용하지 않는다.
 - 제품 코드는 아직 없다. 설계 스펙, 기술 결정, 사용자 검증 계획과 저장소 기본 설정을 준비했다.
+- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 22개 tooling 회귀 테스트, Markdown 63개, JSON block 44개, API endpoint 21개, 오류 code 14개와 조사 안전·evidence 참조를 외부 package 없이 검사한다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
 - 외부 서비스의 현재 region·복구·비용 제약과 Singapore 배치 후보는 [외부 서비스 평가 v0.1](EXTERNAL_SERVICES_EVALUATION_v0.1.md)에 정리했다.
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.
 - DB 제약·인덱스·잠금·삭제 순서는 [PostgreSQL 데이터 정합성 계약 v0.1](DATA_CONSTRAINTS_v0.1.md)에 정리했다.
 - 화면 mock과 서버 계약 테스트에 사용할 공개·진행 API JSON은 [B2C API 요청과 응답 예시 v0.1](API_EXAMPLES_B2C_v0.1.md)에 정리했다.
+- 공통 error envelope·request ID·405/500·14개 code는 [API 오류 catalog](API_ERROR_CATALOG_v0.1.md), 목록 정렬·cursor·rotation은 [pagination 계약](PAGINATION_CURSOR_v0.1.md)에 정리했다.
 - B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
+- 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.
 - 익명·운영 세션, 소유권, 입력·출력, 로그·secret과 삭제 통제는 [보안과 개인정보 위협 모델 v0.1](SECURITY_PRIVACY_v0.1.md)에 정리했다.
+- 익명 cookie·HMAC·pepper rotation·고정 만료는 [visitor session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md), cleanup 중복·budget·restore 실행은 [background job 계약](BACKGROUND_JOBS_v0.1.md)에 정리했다.
 - preview·production 배포, rollback, 긴급 중지와 backup 복구 순서는 [배포와 복구 운영 런북 v0.1](OPERATIONS_RUNBOOK_v0.1.md)에 정리했다.
 - 운영자 권한·revision·콘텐츠 상태·신고 처리 JSON은 [운영 API 요청과 응답 예시 v0.1](API_EXAMPLES_ADMIN_v0.1.md)에 정리했다.
+- 실제 scaffold 뒤 import 방향·transaction owner·DTO/DB row·server-only 경계는 [module·import 계약](MODULE_BOUNDARIES_v0.1.md)을 따른다.
 - 행사 전 제품 코드·scaffold·DB·배포 허용 여부는 [사전 개발 범위 확인서](EVENT_RULES_CHECKLIST.md)로 질문하고 답변 전까지 제품 코드를 보류한다.
 - 실제 퀘스트의 장소·가격·혼자 이용·일본어·asset 권리는 [콘텐츠 사실과 권리 검수 v0.1](CONTENT_VERIFICATION_v0.1.md)에 따라 기록한다.
+- 첫 타깃·지역·quest는 [evidence coding 가이드](../research/EVIDENCE_CODING_GUIDE.md)와 [후보 선택 가이드](../research/CANDIDATE_SELECTION_GUIDE.md)에 따라 실제 사건·반대 근거·현장 사실 ID로 고른다.
 - 운영자 인증은 Auth.js와 Google OIDC의 DB 세션, 지도는 Google Maps 범용 URL과 한국어 주소 복사를 우선 검증한다. 외부 서비스 프로비저닝과 제품 코드는 아직 없다.
 - 비밀값이나 로그인 세션은 저장소로 이전하지 않는다. 맥북의 GitHub 인증과 도구 가용성은 그 기기에서 확인한다.
 
@@ -83,12 +89,13 @@
 
 ## 다음에 이어갈 일
 
-1. README와 설계 스펙을 읽고 현재 Git 상태를 확인한다.
-2. 외부 서비스 계정과 제품 코드를 이미 준비한 것으로 취급하지 않는다. Neon·Vercel은 아직 후보이고 행사 개발 허용 범위도 미확인이다.
-3. 개발 착수 준비를 한다면 기술 결정 문서의 착수 게이트를 확인하고, 행사 전 제품 코드 작성 허용 범위를 먼저 확정한다.
-4. [사용자 검증 계획](USER_RESEARCH_v0.1.md)에 따라 인터뷰 가능한 일본인에게 실제 최근 경험을 묻고, 첫 타깃·지역·체험 콘텐츠를 검증한다.
-5. 구현 단계에서는 [구현 계획](IMPLEMENTATION_PLAN_v0.1.md)의 F0·F1 이후 퀘스트 1개를 탐색부터 완료 기록까지 서버·DB로 연결하는 F4 흐름을 먼저 통합한다.
-6. 스펙의 AC01~AC20은 검수 시나리오다. 아직 구현하거나 실행해 통과한 테스트가 아니다.
+1. `git status --short --branch`로 `main...origin/main`과 clean 상태를 확인하고 `python3 scripts/verify_all.py`를 실행한다.
+2. 외부 서비스 계정·secret·제품 코드를 이미 준비한 것으로 취급하지 않는다. D01 행사 전 개발 허용 범위의 공식 답변을 [규칙 확인서](EVENT_RULES_CHECKLIST.md)에 먼저 기록한다.
+3. D02 일본어 검수자와 일정이 정해지면 모집·동의·stimulus P0 문구를 검수하고, 그전에는 모집을 공개 게시하지 않는다.
+4. 검수 뒤 [사용자 검증 계획](USER_RESEARCH_v0.1.md)에 따라 최근 실제 사건 3~5개를 익명 기록한다. 각 인터뷰는 `E/O` evidence ID, 반대 사례와 도움 전/후 관찰을 가진다.
+5. 3개 시점 합성에서 D04 문제 가설을 먼저 판단하고, 통과한 사건에서만 D05 지역·D06 quest 후보를 현장 사실과 함께 고른다. 가상 demo를 실제 후보 근거로 세지 않는다.
+6. D01이 제품 코드를 허용한 뒤에만 [F0 계획](F0_BOOTSTRAP_PLAN_v0.1.md)의 exact version·clean clone으로 scaffold한다. 이어 F1 DB·공통 API, F2 탐색·F3 session, F4 진행 세로 흐름 순서로 구현한다.
+7. AC01~AC20은 아직 제품 구현에서 실행·통과한 테스트가 아니다. 문서·tooling 검증 통과를 제품 검수 통과로 표현하지 않는다.
 
 ## 문서 전달 관련 주의
 

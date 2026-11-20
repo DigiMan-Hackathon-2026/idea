@@ -145,7 +145,7 @@ F0 테스트는 runner가 실제 실패를 검출한다는 증거만 만든다.
 - Vitest: 순수 함수 또는 환경 값 parsing의 success·failure
 - Playwright: 360px Chromium에서 빈 화면 heading 접근 가능, 가로 overflow 없음
 - build: client bundle에 server-only 환경 참조가 없는지 확인
-- 문서: 기존 `python3 scripts/verify_docs.py` 유지
+- 문서·조사 tooling: 기존 `python3 scripts/verify_all.py` 유지
 
 Playwright browser 다운로드가 CI에서 필요한지 설치 로그로 확인하고 cache가 없어도 재현되는 명령을 문서화한다.
 
