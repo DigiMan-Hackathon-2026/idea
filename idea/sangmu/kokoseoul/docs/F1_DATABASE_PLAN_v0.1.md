@@ -1,6 +1,6 @@
 # F1 PostgreSQL 구현·검수 계획 v0.1
 
-작성일: 2026-11-21 · 상태: schema 구현 게이트 대기
+작성일: 2026-11-21 · 상태: base identity schema 구현·실DB 검증 완료, 도메인 schema 진행 중
 
 이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다. 행사 규칙 미확인은 구현 차단 조건이 아니라 제출 전 위험이다.
 
@@ -14,6 +14,18 @@
 - 빈 DB와 이미 적용된 DB 모두에서 재현한 migration 증거
 
 F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포함하지 않는다.
+
+## 2026-11-21 base schema 실행 증거
+
+- PostgreSQL `17.12` Alpine 3.24 공식 multi-arch image를 digest `sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32`로 고정했다.
+- Drizzle ORM `0.45.4`, Drizzle Kit `0.31.11`, pg `8.23.1`을 exact version으로 고정했다.
+- 첫 migration은 `supplier_orgs`, `admin_principals`, `visitors`, `visitor_sessions`, `places` 5개 table이다.
+- 첫 migration SHA-256은 `ca0ec318b4e86b0dd847b150643970bdd4859aaf0aa7f2e82f04a1716ab8973e`다.
+- 빈 `digiman_local` DB 적용과 같은 DB 재적용이 성공했다.
+- `digiman:test` marker가 있는 `digiman_test_base`에서 32-byte hash, expiry, cascade, supplier state·trim, coordinate pair 4개 PostgreSQL 통합 테스트가 성공했다.
+- Drizzle이 custom `bytea` type을 `"bytea"`로 생성한 SQL은 검토 과정에서 PostgreSQL 내장 `bytea`로 교정했다.
+
+이는 F1 전체 완료가 아니다. quest·version·step·run·feedback·report·audit·analytics schema, 역할 분리, 동시성·실패 주입은 남아 있다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 

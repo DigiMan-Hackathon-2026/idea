@@ -130,8 +130,20 @@ pnpm dev
 pnpm verify
 ```
 
-네트워크가 가능한 환경에서 high 이상 알려진 패키지 취약점도 확인합니다.
+네트워크가 가능한 환경에서 moderate 이상 알려진 패키지 취약점도 확인합니다.
 
 ```bash
 pnpm audit:dependencies
 ```
+
+## 로컬 PostgreSQL
+
+PostgreSQL 17.12 이미지를 digest로 고정했습니다. `.env.local` 또는 현재 shell에 `LOCAL_POSTGRES_PASSWORD`, `APP_ENV`, `DATABASE_DIRECT_URL`, `TEST_DATABASE_URL`을 실제 값으로 설정하고 비밀값은 커밋하지 않습니다.
+
+```bash
+docker compose up -d --wait postgres
+pnpm db:migrate
+pnpm test:integration
+```
+
+DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` 이름만 허용합니다. 통합 테스트 DB에는 `digiman:test` database comment marker가 있어야 합니다.

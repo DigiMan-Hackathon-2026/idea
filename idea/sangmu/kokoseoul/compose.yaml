@@ -1,0 +1,23 @@
+name: digiman-local
+
+services:
+  postgres:
+    image: postgres:17.12-alpine3.24@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32
+    environment:
+      POSTGRES_DB: ${LOCAL_POSTGRES_DB:-digiman_local}
+      POSTGRES_USER: ${LOCAL_POSTGRES_USER:-digiman_migration}
+      POSTGRES_PASSWORD: ${LOCAL_POSTGRES_PASSWORD:?Set LOCAL_POSTGRES_PASSWORD for local development}
+    ports:
+      - "127.0.0.1:${LOCAL_POSTGRES_PORT:-55434}:5432"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
