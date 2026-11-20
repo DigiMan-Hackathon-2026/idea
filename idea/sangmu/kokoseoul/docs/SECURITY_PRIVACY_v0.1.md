@@ -190,10 +190,13 @@ AI가 만든 코드·번역·콘텐츠는 신뢰된 입력이 아니며 같은 r
 
 ## backup과 삭제
 
+전체 삭제 transaction, cleanup과 삭제 전 backup의 privacy-first 승격 규칙은 [방문자 데이터 보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md)을 따른다.
+
 - backup은 운영 DB와 같은 접근 권한으로 공개하지 않는다.
 - 복구는 별도 검수 DB에서 수행한다.
 - 전체 삭제·만료 대상이 backup에 남을 수 있음을 보존 안내와 정책에 반영한다.
 - 복구 후 만료·삭제 cleanup을 실행하고 서비스 연결 전에 재노출 여부를 확인한다.
+- 독립 erasure ledger가 없으면 restored DB의 모든 visitor 연결 데이터를 제거한 뒤에만 production 승격을 검토한다.
 - backup 보존 7일은 제공자·요금제에서 확인되기 전 확정 사실로 표시하지 않는다.
 
 report를 운영 요약으로 남길 때 visitor ID, client request ID, 자유 입력을 제거하고 `anonymized_at`을 기록한다.

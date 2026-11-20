@@ -81,7 +81,7 @@ Neon project는 생성할 때 하나의 region에 고정되며 기존 project re
 - preview branch에는 가상 seed만 둔다.
 - 임시 branch는 expiration을 설정하고 검수 뒤 제거한다.
 - 복구 branch는 production endpoint에 바로 연결하지 않고 별도 검수 DB에서 AC20을 실행한다.
-- restore 뒤 만료·삭제 cleanup을 실행한다.
+- restore 뒤 만료 cleanup과 erasure ledger replay를 실행하며, 독립 ledger가 없으면 모든 visitor 연결 데이터를 purge한다.
 
 ## Auth.js와 Google OIDC
 

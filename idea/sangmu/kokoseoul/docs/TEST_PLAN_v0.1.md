@@ -199,8 +199,10 @@ commit 전 연결 종료 사례도 별도로 실행해 미완료 상태와 안�
 - 계층: 운영 훈련
 - 실행: 백업을 production이 아닌 별도 검수 DB로 복구
 - 확인: schema version, 공개 읽기, 기존 run 읽기, 테스트 진행 mutation
-- 후속: 만료·삭제 cleanup 실행, 삭제 사용자 재노출 없음
+- 후속: 만료 cleanup 뒤 독립 erasure ledger가 없으면 모든 visitor 연결 데이터 purge, report 익명화, 삭제 사용자 재노출 없음
 - 증거: 복구 시작·완료 시각, 사용한 backup 시점, RPO·RTO 결과, 삭제 검수 결과
+
+known run 읽기는 격리된 복구 DB의 무결성 검사다. production 승격 후보에서는 [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md)에 따라 ledger replay 또는 privacy-first purge를 끝낸 뒤 visitor 연결 데이터가 남지 않았는지 별도로 확인한다.
 
 ## API 계약 검수
 

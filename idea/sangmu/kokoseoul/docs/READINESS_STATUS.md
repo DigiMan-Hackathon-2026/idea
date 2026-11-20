@@ -28,7 +28,7 @@
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | DB 정합성 설계 | 완료 | [데이터 계약](DATA_CONSTRAINTS_v0.1.md), [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | 실제 migration·PostgreSQL 동시성 테스트 |
 | 화면 상태·문구 | 준비됨 | [화면 계약](SCREEN_STATES_v0.1.md), [일본어 검수 절차](JAPANESE_COPY_REVIEW_v0.1.md), [접근성 검수](ACCESSIBILITY_VERIFICATION_v0.1.md) | 일본어 모어 화자 검수와 UI 관찰 |
-| 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md) | 구현 통제와 출시 전 gate 실행 |
+| 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | 구현 통제와 출시 전 gate 실행 |
 | 테스트 계획 | 준비됨 | [테스트 계획](TEST_PLAN_v0.1.md) | 구현 후 AC01~AC20 실제 pass 증거 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md) | 서비스 확정 후 명령·계정·복구 훈련 |
 | 로그·관측성 | 준비됨 | [관측 계약](OBSERVABILITY_CONTRACT_v0.1.md) | provider 설정과 canary·alert 검수 |

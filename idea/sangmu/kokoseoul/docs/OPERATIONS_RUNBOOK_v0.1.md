@@ -109,11 +109,13 @@ published version을 직접 수정하지 않는다.
 4. 공개 목록·기존 run·완료 카드를 읽는다.
 5. 검수 visitor로 단계 mutation을 실행한다.
 6. 만료 session과 삭제 대상 cleanup을 실행한다.
-7. 삭제한 사용자 데이터가 재노출되지 않는지 확인한다.
-8. 시작부터 검수 완료까지 시간을 기록해 RTO와 비교한다.
-9. 검수 DB와 임시 credential을 폐기한다.
+7. 독립 erasure ledger가 검증됐으면 replay하고, 없으면 모든 visitor 연결 데이터를 privacy-first purge한다.
+8. 삭제한 사용자 데이터가 재노출되지 않고 report가 익명화됐는지 확인한다.
+9. 승격 전 visitor 연결 table count와 개인 진행 손실 범위를 두 사람이 검토한다.
+10. 시작부터 검수 완료까지 시간을 기록해 RTO와 비교한다.
+11. 검수 DB와 임시 credential을 폐기한다.
 
-복구 성공만으로 AC20을 통과하지 않는다. 삭제·만료 재적용 결과가 필수다.
+복구 성공만으로 AC20을 통과하지 않는다. 삭제·만료 재적용 결과가 필수다. 독립 ledger가 없는 P0의 승격 기본값과 구체적인 검수는 [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md)을 따른다.
 
 ## secret 유출
 

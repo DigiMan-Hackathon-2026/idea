@@ -288,10 +288,11 @@ quest → run 잠금 순서로 pause·archive와 단계 완료의 선후를 결�
 
 1. visitor를 잠그고 유효한 본인 세션인지 확인한다.
 2. feedback과 run_steps를 삭제한다.
-3. runs와 visitor analytics events를 삭제한다.
-4. reports는 visitor 연결·client request ID·자유 입력을 제거하고 운영 요약만 남기거나 정책에 따라 삭제한다.
-5. visitor_sessions와 visitor를 삭제한다.
-6. commit 성공 뒤 응답에서 쿠키를 만료한다.
+3. run 참조를 포함한 visitor analytics events를 삭제한다.
+4. runs를 삭제한다.
+5. reports는 visitor 연결·client request ID·자유 입력을 제거하고 운영 요약만 남기거나 정책에 따라 삭제한다.
+6. visitor_sessions와 visitor를 삭제한다.
+7. commit 성공 뒤 응답에서 쿠키를 만료한다.
 
 중간 실패는 전체 rollback한다. 204를 보낸 뒤 비동기 정리를 완료하는 구조로 구현하지 않는다.
 
@@ -318,7 +319,7 @@ quest → run 잠금 순서로 pause·archive와 단계 완료의 선후를 결�
 | 오류 로그 | 7일 정책안 | 토큰·자유 입력 원문 금지 |
 | audit log | 90일 정책안 | 만료 후 집계 필요 여부 결정 |
 
-백업 복구 뒤 서비스 공개 전에 만료·삭제 정리를 먼저 실행한다. AC20은 복구 성공뿐 아니라 삭제된 개인 데이터가 다시 노출되지 않는지 확인한다.
+백업 복구 뒤 서비스 공개 전에 만료·삭제 정리를 먼저 실행한다. 삭제 전 backup에는 삭제 요청 근거가 없으므로 단순 만료 cleanup만으로 충분하지 않다. 독립 erasure ledger를 검증하지 않은 P0에서는 [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md)에 따라 restored DB의 모든 visitor 연결 데이터를 purge한 뒤에만 승격을 검토한다. AC20은 복구 성공뿐 아니라 이 재노출 방지를 확인한다.
 
 ## migration 규칙
 

@@ -49,7 +49,7 @@ D06 첫 quest + D09 외부 환경 + D11 복구·보존 + D12 release 근거
 | D08 | 팀 역할·reviewer·merge checkpoint | collecting | 팀 인원·숙련도·가용 시간 | kickoff | 역할 책임을 제거하지 않고 한 사람이 겸임 |
 | D09 | Vercel·Neon plan·region·preview/prod 분리 | waiting | D01 배포 허용·예산·현재 plan·latency 측정 | 외부 project 생성 전 | 계정 생성 보류, 후보로만 표시 |
 | D10 | Google OIDC client·callback·admin principal 절차 | blocked | D07 Auth 조합·D09 domain·권한 owner | F7 착수 전 | 운영 API 공개·우회 로그인 금지 |
-| D11 | 7일 backup 또는 수정된 보존 약속 | waiting | plan 비용·복구 기능·AC20 훈련 책임 | 실제 사용자 기록 수집 전 | Free preview만, 공개 운영 보류 |
+| D11 | 7일 backup·독립 erasure ledger 또는 privacy-first 복구 정책 | waiting | plan 비용·복구 기능·삭제 전 backup 재현·AC20 책임 | 실제 사용자 기록 수집 전 | Free preview만, 복구 승격 시 visitor 전체 purge |
 | D12 | monitoring provider·7일 log·alert 수신 | blocked | D09 배포 환경·개인정보 설정·팀 대응자 | F8 release 전 | provider SDK와 원격 전송 보류 |
 | D13 | demo만 시연할지 실제 콘텐츠를 공개할지 | blocked | D02·D06·D09·D11, AC와 모바일 증거 | release 후보 전 | demo 표시와 실제 방문 미인증 유지 |
 
