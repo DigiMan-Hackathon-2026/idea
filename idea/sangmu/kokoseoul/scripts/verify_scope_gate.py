@@ -96,6 +96,8 @@ F0_ONLY_CONFIG_PREFIXES = ("drizzle.config.",)
 SECRET_PATTERNS = (
     ("AWS access key", re.compile(rb"\bAKIA[0-9A-Z]{16}\b")),
     ("GitHub token", re.compile(rb"\bgh[pousr]_[A-Za-z0-9]{30,}\b")),
+    ("Google API key", re.compile(rb"\bAIza[0-9A-Za-z_-]{35}\b")),
+    ("OpenAI API key", re.compile(rb"\bsk-[0-9A-Za-z_-]{20,}\b")),
     (
         "PEM private key",
         re.compile(rb"-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----"),
