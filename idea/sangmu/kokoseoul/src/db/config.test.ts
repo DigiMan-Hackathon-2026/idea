@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertSafeDatabaseTarget,
   getSafeMigrationDatabaseUrl,
+  getSafeRuntimeDatabaseUrl,
 } from "./config";
 
 const LOCAL_URL = "postgresql://digiman_migration:local@127.0.0.1:55434/digiman_local";
@@ -53,5 +54,21 @@ describe("database tooling guard", () => {
     expect(() => getSafeMigrationDatabaseUrl({ APP_ENV: "local" })).toThrow(
       "Database URL is required",
     );
+  });
+
+  it("requires a runtime role for application connections", () => {
+    expect(
+      getSafeRuntimeDatabaseUrl({
+        APP_ENV: "local",
+        DATABASE_URL:
+          "postgresql://digiman_runtime_local:secret@127.0.0.1:55434/digiman_local",
+      }),
+    ).toContain("digiman_runtime_local");
+    expect(() =>
+      getSafeRuntimeDatabaseUrl({
+        APP_ENV: "local",
+        DATABASE_URL: LOCAL_URL,
+      }),
+    ).toThrow("runtime role");
   });
 });

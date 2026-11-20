@@ -37,6 +37,7 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - `digiman_runtime`, `digiman_retention`, `digiman_readonly`, `digiman_integration_test`는 password 없는 `NOLOGIN` capability role이다. marker DB에서 역할 구성 재적용과 `SET ROLE` 실제 DDL·audit 변경 거부를 포함한 PostgreSQL 통합 테스트 29개가 성공했다.
 - 독립 PostgreSQL 연결 두 개로 같은 visitor·quest 시작, 같은 step, 같은 마지막 step을 동시에 요청했다. unique lock과 `ON CONFLICT` 뒤 run 1개·run_step 1개·완료 전환 1개로 수렴하는 통합 테스트를 포함해 총 32개가 성공했다.
 - quest row lock에서 pause가 먼저면 신규 run 0개, start가 먼저면 기존 run 1개를 보존한 paused 상태로 직렬화됐다. 같은 report 멱등 키 동시 제출은 한 행으로 수렴했고, 잘못된 audit insert는 같은 transaction의 quest 상태·revision까지 rollback했다. 전체 PostgreSQL 통합 테스트는 36개다.
+- application runtime URL은 local/test namespace와 `digiman_runtime*` role만 허용하고 migration role을 거절한다. server-only pool은 최초 사용 때 만들며 transaction마다 statement 5초·lock 3초·idle-in-transaction 5초 제한과 rollback 후 원래 오류 보존을 적용한다.
 
 local·CI 기준 F1 schema·권한·대표 경합·실패 rollback은 구현됐다. 실제 배포 provider의 login-role mapping과 application repository transaction 연결은 외부 서비스 결정 뒤 남아 있다. draft 저장 revision 경합과 publish·start 경합은 repository 기능 단위에서 같은 quest row lock 순서를 사용해 추가 검수한다.
 

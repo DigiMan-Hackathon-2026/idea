@@ -2,6 +2,7 @@ import { parseAppEnvironment, type AppEnvironment } from "../lib/environment";
 
 const LOCAL_DATABASE_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 const SAFE_DATABASE_NAMES = /^(digiman_local|digiman_test)(_[a-z0-9_]+)?$/;
+const SAFE_RUNTIME_ROLES = /^digiman_runtime(?:_[a-z0-9_]+)?$/;
 
 export type SafeDatabaseTarget = {
   environment: Extract<AppEnvironment, "local" | "test">;
@@ -54,5 +55,16 @@ export function getSafeMigrationDatabaseUrl(
 ): string {
   const value = environment.DATABASE_DIRECT_URL;
   assertSafeDatabaseTarget(environment.APP_ENV, value);
+  return value!;
+}
+
+export function getSafeRuntimeDatabaseUrl(
+  environment: Readonly<Record<string, string | undefined>>,
+): string {
+  const value = environment.DATABASE_URL;
+  const target = assertSafeDatabaseTarget(environment.APP_ENV, value);
+  if (!SAFE_RUNTIME_ROLES.test(target.role)) {
+    throw new Error("Database runtime URL must use a DigiMan runtime role");
+  }
   return value!;
 }

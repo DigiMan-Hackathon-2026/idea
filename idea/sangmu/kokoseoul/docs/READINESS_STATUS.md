@@ -24,7 +24,7 @@
 | 도메인 용어·명명 | 준비됨 | [용어 계약](DOMAIN_GLOSSARY_v0.1.md) | schema·API type·일본어 검수에 실제 적용 |
 | 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md), `package.json`·`pnpm-lock.yaml` | 팀 동의와 F1 PostgreSQL 연결 |
 | module·import 경계 | 준비됨 | [module 경계 계약](MODULE_BOUNDARIES_v0.1.md) | F0/F1 lint·build canary·integration에 적용 |
-| 환경 설정·secret | 준비됨 | [환경·secret 계약](CONFIGURATION_SECRETS_v0.1.md) | D09·D10 뒤 provider 설정과 rotation 훈련 |
+| 환경 설정·secret | 진행 중 | [환경·secret 계약](CONFIGURATION_SECRETS_v0.1.md), local/test runtime URL role guard와 server-only pool | D09·D10 뒤 provider 설정과 rotation 훈련 |
 | 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | F1 공통 기반과 명시적 demo 세로 흐름 착수 |
 | 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
@@ -38,7 +38,7 @@
 | locale·표시 형식 | 준비됨 | [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 실제 formatter·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
 | 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | 구현 통제와 출시 전 gate 실행 |
-| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 26개 unit·36개 PostgreSQL integration·12개 Chromium E2E | 실제 API·repository 경합·실기기에서 AC01~AC20 증거 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 27개 unit·36개 PostgreSQL integration·12개 Chromium E2E | 실제 API·repository 경합·실기기에서 AC01~AC20 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |
