@@ -261,7 +261,7 @@ BR10. 콘텐츠 공개 전에 필수 일본어, 단계 순서, 비용 범위, �
 }
 ```
 
-정의한 주요 code는 VALIDATION_ERROR, SESSION_REQUIRED, QUEST_UNAVAILABLE, STEP_ORDER_CONFLICT, VERSION_CONFLICT, REQUEST_CONFLICT, RUN_NOT_COMPLETED, NOT_FOUND, RATE_LIMITED, SERVICE_UNAVAILABLE이다. REQUEST_CONFLICT는 같은 멱등 키에 다른 본문을 보낸 경우 사용한다. details는 공개 가능한 필드 오류·현재 revision·선행 단계 ID 등으로 제한한다.
+정의한 주요 code는 VALIDATION_ERROR, SESSION_REQUIRED, ADMIN_FORBIDDEN, QUEST_UNAVAILABLE, STEP_ORDER_CONFLICT, VERSION_CONFLICT, REQUEST_CONFLICT, RUN_NOT_COMPLETED, NOT_FOUND, RATE_LIMITED, SERVICE_UNAVAILABLE이다. ADMIN_FORBIDDEN은 로그인했지만 운영 권한이 없는 경우, REQUEST_CONFLICT는 같은 멱등 키에 다른 본문을 보낸 경우 사용한다. details는 공개 가능한 필드 오류·현재 revision·선행 단계 ID 등으로 제한한다.
 
 서버가 보내는 canStart, canContinue, nextStepId를 화면 동작의 기준으로 사용하되 서버는 매 변경 요청에서도 조건을 다시 검사한다. 잠금·트랜잭션 재시도는 서버 내부에서 제한 횟수로 처리하며 최종 실패는 재시도 가능한 503으로 반환한다.
 
@@ -471,5 +471,6 @@ publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. pau
 | 2026-11-21 | Next.js·TypeScript·PostgreSQL 구현 작업 기준 채택 | 한 배포 단위에서 화면·API를 만들고 DB 제약·트랜잭션으로 정합성 보장 |
 | 2026-11-21 | Google OIDC 운영자 세션과 Maps URL 우선 검증 | 방문자 세션과 운영 권한을 분리하고 지도 SDK 없이 핵심 흐름 검증 |
 | 2026-11-21 | 멱등 키 본문 충돌에 REQUEST_CONFLICT 사용 | 운영 revision 충돌과 사용자 요청 재전송 충돌을 구분 |
+| 2026-11-21 | 운영 권한 거절에 ADMIN_FORBIDDEN 사용 | 방문자 세션·인증 없음·인증됐지만 권한 없음 상태를 구분 |
 
 변경 시 날짜·변경 이유·영향받는 화면/API/검수 항목을 추가한다. 로컬 docs/B2C_SPEC_v0.1.md를 개발 계약의 기준으로 사용하고, 검토용 Page는 같은 버전의 사본으로 관리한다. 다음 버전에서 호환되지 않는 계약을 바꾸면 변경 범위와 이행 방법을 명시한다.
