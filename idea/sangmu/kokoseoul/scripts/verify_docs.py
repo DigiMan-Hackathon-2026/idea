@@ -11,6 +11,20 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_AC = {f"AC{number:02d}" for number in range(1, 21)}
+EXPECTED_ERROR_CODES = {
+    "VALIDATION_ERROR",
+    "SESSION_REQUIRED",
+    "ORIGIN_FORBIDDEN",
+    "ADMIN_FORBIDDEN",
+    "QUEST_UNAVAILABLE",
+    "STEP_ORDER_CONFLICT",
+    "VERSION_CONFLICT",
+    "REQUEST_CONFLICT",
+    "RUN_NOT_COMPLETED",
+    "NOT_FOUND",
+    "RATE_LIMITED",
+    "SERVICE_UNAVAILABLE",
+}
 API_EXAMPLE_FILES = (
     ROOT / "docs" / "API_EXAMPLES_B2C_v0.1.md",
     ROOT / "docs" / "API_EXAMPLES_ADMIN_v0.1.md",
@@ -91,6 +105,22 @@ def check_acceptance_coverage() -> list[str]:
     return errors
 
 
+def check_error_code_coverage() -> list[str]:
+    errors: list[str] = []
+    paths = (
+        ROOT / "docs" / "B2C_SPEC_v0.1.md",
+        API_CONTRACT_INDEX,
+    )
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        missing = sorted(code for code in EXPECTED_ERROR_CODES if code not in text)
+        if missing:
+            errors.append(
+                f"{path.relative_to(ROOT)}: missing error codes {', '.join(missing)}"
+            )
+    return errors
+
+
 def check_readme_index() -> list[str]:
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     linked = set(local_link_targets(text))
@@ -155,6 +185,7 @@ def main() -> int:
         check_links(files),
         check_json_blocks(),
         check_acceptance_coverage(),
+        check_error_code_coverage(),
         check_readme_index(),
         check_api_contract_index(),
     )
@@ -172,7 +203,7 @@ def main() -> int:
     print(
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_blocks} JSON blocks, {len(example_endpoints())} API endpoints, "
-        "AC01-AC20 covered."
+        f"{len(EXPECTED_ERROR_CODES)} error codes, AC01-AC20 covered."
     )
     return 0
 
