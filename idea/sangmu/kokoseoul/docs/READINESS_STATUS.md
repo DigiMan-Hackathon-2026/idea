@@ -31,6 +31,7 @@
 | 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | 구현 통제와 출시 전 gate 실행 |
 | 테스트 계획 | 준비됨 | [테스트 계획](TEST_PLAN_v0.1.md) | 구현 후 AC01~AC20 실제 pass 증거 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md) | 서비스 확정 후 명령·계정·복구 훈련 |
+| 장애 대응 | 준비됨 | [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md) | 역할·연락 경로 확정과 P0·P1 tabletop 훈련 |
 | 로그·관측성 | 준비됨 | [관측 계약](OBSERVABILITY_CONTRACT_v0.1.md) | provider 설정과 canary·alert 검수 |
 | 제품 시연 | 준비됨 | [2분 시연 런북](DEMO_RUNBOOK_v0.1.md) | 구현 뒤 실제 기기 100초 리허설과 기록 |
 | 문서 자동 검증 | 완료 | `python3 scripts/verify_docs.py` | CI 연결은 행사 규칙 확인 후 결정 |

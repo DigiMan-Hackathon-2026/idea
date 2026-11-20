@@ -6,6 +6,8 @@ preview와 production의 배포, DB migration, 장애 확인, backup 복구와 �
 
 request ID, log allowlist, 기술 지표와 alert 기준은 [로그·지표·오류 관측 계약](OBSERVABILITY_CONTRACT_v0.1.md)을 따른다.
 
+장애 선언, 역할, 완화, 사용자 안내, 종료와 사후 검토는 [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md)을 따른다.
+
 ## 환경
 
 | 환경 | 용도 | 데이터 원칙 |

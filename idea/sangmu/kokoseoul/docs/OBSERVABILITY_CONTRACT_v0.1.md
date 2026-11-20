@@ -4,6 +4,8 @@
 
 이 문서는 DigiMan의 request ID, 구조화 로그, 기술 지표, 알림과 보존 범위를 정의한다. 관측 데이터는 사용자 원문을 복제하는 저장소가 아니며, monitoring 장애가 핵심 run transaction을 실패시키지 않게 한다.
 
+신호를 발견한 뒤 incident 선언·완화·복구·종료하는 절차는 [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md)을 따른다.
+
 ## 목표
 
 - 사용자가 본 request ID로 서버 요청·오류 범주를 찾을 수 있다.
