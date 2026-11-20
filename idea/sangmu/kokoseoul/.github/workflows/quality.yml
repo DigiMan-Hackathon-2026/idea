@@ -35,6 +35,9 @@ jobs:
       - name: Verify application and documents
         run: pnpm verify
 
+      - name: Audit high-severity dependency vulnerabilities
+        run: pnpm audit:dependencies
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 

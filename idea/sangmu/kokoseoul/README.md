@@ -129,3 +129,9 @@ pnpm dev
 ```bash
 pnpm verify
 ```
+
+네트워크가 가능한 환경에서 high 이상 알려진 패키지 취약점도 확인합니다.
+
+```bash
+pnpm audit:dependencies
+```
