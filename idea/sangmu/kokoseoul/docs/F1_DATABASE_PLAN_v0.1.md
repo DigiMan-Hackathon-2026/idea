@@ -1,6 +1,6 @@
 # F1 PostgreSQL 구현·검수 계획 v0.1
 
-작성일: 2026-11-21 · 상태: 전체 domain schema·local/CI 역할·핵심 unique 동시성 실DB 검증 완료, 경합·실패 주입 진행 중
+작성일: 2026-11-21 · 상태: 전체 domain schema·local/CI 역할·핵심 동시성·audit 실패 rollback 실DB 검증 완료
 
 이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다. 행사 규칙 미확인은 구현 차단 조건이 아니라 제출 전 위험이다.
 
@@ -36,8 +36,9 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - audit action별 summary exact key·active actor·entity 존재·update 금지와 analytics event별 property·run 소속·demo environment·update 금지를 named constraint·trigger로 강제한다.
 - `digiman_runtime`, `digiman_retention`, `digiman_readonly`, `digiman_integration_test`는 password 없는 `NOLOGIN` capability role이다. marker DB에서 역할 구성 재적용과 `SET ROLE` 실제 DDL·audit 변경 거부를 포함한 PostgreSQL 통합 테스트 29개가 성공했다.
 - 독립 PostgreSQL 연결 두 개로 같은 visitor·quest 시작, 같은 step, 같은 마지막 step을 동시에 요청했다. unique lock과 `ON CONFLICT` 뒤 run 1개·run_step 1개·완료 전환 1개로 수렴하는 통합 테스트를 포함해 총 32개가 성공했다.
+- quest row lock에서 pause가 먼저면 신규 run 0개, start가 먼저면 기존 run 1개를 보존한 paused 상태로 직렬화됐다. 같은 report 멱등 키 동시 제출은 한 행으로 수렴했고, 잘못된 audit insert는 같은 transaction의 quest 상태·revision까지 rollback했다. 전체 PostgreSQL 통합 테스트는 36개다.
 
-이는 F1 전체 완료가 아니다. 배포 provider의 login-role mapping, publish·pause와 시작 경합, audit 실패 rollback 주입은 남아 있다.
+local·CI 기준 F1 schema·권한·대표 경합·실패 rollback은 구현됐다. 실제 배포 provider의 login-role mapping과 application repository transaction 연결은 외부 서비스 결정 뒤 남아 있다. draft 저장 revision 경합과 publish·start 경합은 repository 기능 단위에서 같은 quest row lock 순서를 사용해 추가 검수한다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 

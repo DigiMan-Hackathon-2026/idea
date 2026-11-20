@@ -9,6 +9,7 @@ assertSafeDatabaseTarget("test", testDatabaseUrl);
 const setupClient = new Client({ connectionString: testDatabaseUrl });
 
 type ConcurrentFixture = {
+  adminId: string;
   questId: string;
   versionId: string;
   visitorId: string;
@@ -78,7 +79,7 @@ async function createConcurrentFixture(): Promise<ConcurrentFixture> {
     [questId, versionId],
   );
 
-  return { questId, versionId, visitorId, stepIds };
+  return { adminId, questId, versionId, visitorId, stepIds };
 }
 
 async function connectPair() {
@@ -252,6 +253,204 @@ describe("PostgreSQL concurrency serialization", () => {
         [runId],
       );
       expect(finalState.rows[0]).toEqual({ steps: 3, completed: 1 });
+    } finally {
+      await closePair(first, second);
+    }
+  });
+
+  it("blocks a start when pause wins the quest row lock", async () => {
+    const fixture = await createConcurrentFixture();
+    const { first, second } = await connectPair();
+
+    try {
+      await Promise.all([first.query("begin"), second.query("begin")]);
+      await first.query("select id from quests where id = $1 for update", [
+        fixture.questId,
+      ]);
+      await first.query(
+        `update quests
+         set status = 'paused', pause_reason_ja = $2, revision = revision + 1
+         where id = $1`,
+        [fixture.questId, "利用条件を確認しています。"],
+      );
+
+      const competingLock = second.query(
+        `select status, published_version_id
+         from quests where id = $1 for update`,
+        [fixture.questId],
+      );
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await first.query("commit");
+
+      const available = await competingLock;
+      expect(available.rows[0].status).toBe("paused");
+      if (available.rows[0].status === "published") {
+        await second.query(
+          `insert into runs (id, visitor_id, quest_id, version_id)
+           values ($1, $2, $3, $4)`,
+          [
+            randomUUID(),
+            fixture.visitorId,
+            fixture.questId,
+            available.rows[0].published_version_id,
+          ],
+        );
+      }
+      await second.query("commit");
+
+      const runs = await setupClient.query(
+        "select count(*)::int as count from runs where quest_id = $1",
+        [fixture.questId],
+      );
+      expect(runs.rows[0].count).toBe(0);
+    } finally {
+      await closePair(first, second);
+    }
+  });
+
+  it("preserves a run when start wins before pause", async () => {
+    const fixture = await createConcurrentFixture();
+    const runId = randomUUID();
+    const { first, second } = await connectPair();
+
+    try {
+      await Promise.all([first.query("begin"), second.query("begin")]);
+      const available = await first.query(
+        `select status, published_version_id
+         from quests where id = $1 for update`,
+        [fixture.questId],
+      );
+      expect(available.rows[0].status).toBe("published");
+      await first.query(
+        `insert into runs (id, visitor_id, quest_id, version_id)
+         values ($1, $2, $3, $4)`,
+        [
+          runId,
+          fixture.visitorId,
+          fixture.questId,
+          available.rows[0].published_version_id,
+        ],
+      );
+
+      const competingLock = second.query(
+        "select id from quests where id = $1 for update",
+        [fixture.questId],
+      );
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await first.query("commit");
+      await competingLock;
+      await second.query(
+        `update quests
+         set status = 'paused', pause_reason_ja = $2, revision = revision + 1
+         where id = $1`,
+        [fixture.questId, "利用条件を確認しています。"],
+      );
+      await second.query("commit");
+
+      const state = await setupClient.query(
+        `select q.status, count(r.id)::int as runs
+         from quests q
+         left join runs r on r.quest_id = q.id
+         where q.id = $1
+         group by q.status`,
+        [fixture.questId],
+      );
+      expect(state.rows).toEqual([{ status: "paused", runs: 1 }]);
+    } finally {
+      await closePair(first, second);
+    }
+  });
+
+  it("rolls back a quest change when its audit insert fails", async () => {
+    const fixture = await createConcurrentFixture();
+
+    await setupClient.query("begin");
+    await setupClient.query(
+      `update quests
+       set status = 'paused', pause_reason_ja = $2, revision = 2,
+         updated_at = now()
+       where id = $1`,
+      [fixture.questId, "利用条件を確認しています。"],
+    );
+    await expect(
+      setupClient.query(
+        `insert into audit_logs
+          (id, admin_id, request_id, action, entity_type, entity_id,
+           before_summary, after_summary)
+         values ($1, $2, $3, 'quest.paused', 'quest', $4, $5, $6)`,
+        [
+          randomUUID(),
+          fixture.adminId,
+          "01KAUDITROLLBACK",
+          fixture.questId,
+          { status: "published", revision: 1 },
+          { status: "paused", revision: 2 },
+        ],
+      ),
+    ).rejects.toMatchObject({ constraint: "audit_logs_summary_schema_ck" });
+    await setupClient.query("rollback");
+
+    const state = await setupClient.query(
+      "select status, revision, pause_reason_ja from quests where id = $1",
+      [fixture.questId],
+    );
+    expect(state.rows).toEqual([
+      { status: "published", revision: 1, pause_reason_ja: null },
+    ]);
+  });
+
+  it("converges simultaneous report submissions to one row", async () => {
+    const fixture = await createConcurrentFixture();
+    const clientRequestId = randomUUID();
+    const { first, second } = await connectPair();
+
+    try {
+      await Promise.all([first.query("begin"), second.query("begin")]);
+      await first.query(
+        `insert into reports
+          (id, visitor_id, quest_id, version_id, client_request_id,
+           category, comment)
+         values ($1, $2, $3, $4, $5, 'information', $6)`,
+        [
+          randomUUID(),
+          fixture.visitorId,
+          fixture.questId,
+          fixture.versionId,
+          clientRequestId,
+          "表示内容を確認できませんでした。",
+        ],
+      );
+
+      const competingInsert = second.query(
+        `insert into reports
+          (id, visitor_id, quest_id, version_id, client_request_id,
+           category, comment)
+         values ($1, $2, $3, $4, $5, 'information', $6)
+         on conflict (visitor_id, client_request_id)
+           where visitor_id is not null
+         do nothing
+         returning id`,
+        [
+          randomUUID(),
+          fixture.visitorId,
+          fixture.questId,
+          fixture.versionId,
+          clientRequestId,
+          "表示内容を確認できませんでした。",
+        ],
+      );
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await first.query("commit");
+
+      const competingResult = await competingInsert;
+      expect(competingResult.rowCount).toBe(0);
+      await second.query("commit");
+      const reports = await setupClient.query(
+        `select count(*)::int as count
+         from reports where visitor_id = $1 and client_request_id = $2`,
+        [fixture.visitorId, clientRequestId],
+      );
+      expect(reports.rows[0].count).toBe(1);
     } finally {
       await closePair(first, second);
     }
