@@ -135,13 +135,20 @@ class ResearchArtifactShapeTest(unittest.TestCase):
                 "조사 실행 게이트: `INTERVIEWS_ALLOWED`\n"
                 "일본어 검수 근거: 미기록\n"
             )
+            open_with_evidence = (
+                "조사 실행 게이트: `INTERVIEWS_ALLOWED`\n"
+                "일본어 검수 근거: JR01 @ abc1234\n"
+            )
 
             draft_errors = verifier.check_execution_gate([interview], draft)
             gate, open_errors = verifier.parse_execution_gate(open_without_evidence)
+            valid_gate, valid_errors = verifier.parse_execution_gate(open_with_evidence)
 
             self.assertEqual(gate, "INTERVIEWS_ALLOWED")
+            self.assertEqual(valid_gate, "INTERVIEWS_ALLOWED")
+            self.assertEqual(valid_errors, [])
             self.assertTrue(any("gate is DRAFT_ONLY" in error for error in draft_errors))
-            self.assertTrue(any("requires Japanese review" in error for error in open_errors))
+            self.assertTrue(any("JR01 @ abc1234" in error for error in open_errors))
 
     def test_valid_interview_has_matching_code_consent_and_sections(self) -> None:
         with isolated_research_tree() as (_, research):

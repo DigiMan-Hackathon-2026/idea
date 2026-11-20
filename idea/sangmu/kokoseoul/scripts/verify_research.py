@@ -58,6 +58,7 @@ EXECUTION_GATE = re.compile(
     r"^조사 실행 게이트: `(DRAFT_ONLY|INTERVIEWS_ALLOWED)`$", re.MULTILINE
 )
 REVIEW_EVIDENCE = re.compile(r"^일본어 검수 근거: (.+)$", re.MULTILINE)
+REVIEW_EVIDENCE_VALUE = re.compile(r"^JR\d{2} @ [0-9a-f]{7,40}$")
 RESEARCH_README = RESEARCH / "README.md"
 READINESS = ROOT / "docs" / "READINESS_STATUS.md"
 
@@ -314,9 +315,12 @@ def parse_execution_gate(text: str) -> tuple[str | None, list[str]]:
     if errors:
         return None, errors
     gate = gates[0]
-    if gate == "INTERVIEWS_ALLOWED" and evidence[0].strip() == "미기록":
+    if gate == "INTERVIEWS_ALLOWED" and not REVIEW_EVIDENCE_VALUE.fullmatch(
+        evidence[0].strip()
+    ):
         errors.append(
-            "research/README.md: interview execution requires Japanese review evidence"
+            "research/README.md: interview execution requires evidence like "
+            "'JR01 @ abc1234'"
         )
     return gate, errors
 
