@@ -15,18 +15,14 @@ API_EXAMPLE_FILES = (
     ROOT / "docs" / "API_EXAMPLES_B2C_v0.1.md",
     ROOT / "docs" / "API_EXAMPLES_ADMIN_v0.1.md",
 )
-REQUIRED_README_LINKS = {
-    "docs/READINESS_STATUS.md",
-    "docs/B2C_SPEC_v0.1.md",
-    "docs/TECH_DECISIONS_v0.1.md",
-    "docs/EXTERNAL_SERVICES_EVALUATION_v0.1.md",
-    "docs/IMPLEMENTATION_PLAN_v0.1.md",
-    "docs/USER_RESEARCH_v0.1.md",
-    "docs/CONTENT_VERIFICATION_v0.1.md",
-    "docs/TEST_PLAN_v0.1.md",
-    "docs/SECURITY_PRIVACY_v0.1.md",
-    "docs/OPERATIONS_RUNBOOK_v0.1.md",
-}
+API_CONTRACT_INDEX = ROOT / "docs" / "API_CONTRACT_INDEX_v0.1.md"
+HTTP_METHODS = "GET|POST|PUT|PATCH|DELETE"
+UUID_PATH_SEGMENT = re.compile(
+    r"/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+    r"(?=/|$)",
+    re.IGNORECASE,
+)
+NAMED_PATH_SEGMENT = re.compile(r"/:[A-Za-z][A-Za-z0-9]*(?=/|$)")
 
 
 def markdown_files() -> list[Path]:
@@ -98,8 +94,59 @@ def check_acceptance_coverage() -> list[str]:
 def check_readme_index() -> list[str]:
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     linked = set(local_link_targets(text))
-    missing = sorted(REQUIRED_README_LINKS - linked)
+    expected = {
+        str(path.relative_to(ROOT)) for path in sorted((ROOT / "docs").glob("*.md"))
+    }
+    missing = sorted(expected - linked)
     return [f"README.md: missing document index link {path}" for path in missing]
+
+
+def canonical_endpoint(method: str, path: str) -> str:
+    path = path.split("?", 1)[0]
+    if path.startswith("/api/v1"):
+        path = path.removeprefix("/api/v1")
+    path = UUID_PATH_SEGMENT.sub("/:param", path)
+    path = NAMED_PATH_SEGMENT.sub("/:param", path)
+    return f"{method} {path or '/'}"
+
+
+def example_endpoints() -> set[str]:
+    endpoints: set[str] = set()
+    request_line = re.compile(
+        rf"^({HTTP_METHODS})\s+([^\s]+)\s+HTTP/1\.1$", re.MULTILINE
+    )
+    for path in API_EXAMPLE_FILES:
+        text = path.read_text(encoding="utf-8")
+        endpoints.update(
+            canonical_endpoint(method, endpoint)
+            for method, endpoint in request_line.findall(text)
+        )
+    return endpoints
+
+
+def indexed_endpoints() -> set[str]:
+    text = API_CONTRACT_INDEX.read_text(encoding="utf-8")
+    inline_endpoint = re.compile(rf"`({HTTP_METHODS})\s+(/[^`\s]+)`")
+    return {
+        canonical_endpoint(method, endpoint)
+        for method, endpoint in inline_endpoint.findall(text)
+    }
+
+
+def check_api_contract_index() -> list[str]:
+    examples = example_endpoints()
+    indexed = indexed_endpoints()
+    errors = [
+        f"{API_CONTRACT_INDEX.relative_to(ROOT)}: missing endpoint {endpoint}"
+        for endpoint in sorted(examples - indexed)
+    ]
+    errors.extend(
+        f"{API_CONTRACT_INDEX.relative_to(ROOT)}: endpoint has no request example {endpoint}"
+        for endpoint in sorted(indexed - examples)
+    )
+    if not examples:
+        errors.append("API example documents: no HTTP request lines found")
+    return errors
 
 
 def main() -> int:
@@ -109,6 +156,7 @@ def main() -> int:
         check_json_blocks(),
         check_acceptance_coverage(),
         check_readme_index(),
+        check_api_contract_index(),
     )
     errors = [error for group in checks for error in group]
     if errors:
@@ -123,7 +171,8 @@ def main() -> int:
     )
     print(
         f"Documentation verification passed: {len(files)} Markdown files, "
-        f"{json_blocks} JSON blocks, AC01-AC20 covered."
+        f"{json_blocks} JSON blocks, {len(example_endpoints())} API endpoints, "
+        "AC01-AC20 covered."
     )
     return 0
 
