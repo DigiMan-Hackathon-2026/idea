@@ -4,6 +4,8 @@
 
 이 문서는 계획된 것과 실제 완료된 것을 구분하는 현재 상태판이다. 상세 계약의 원본은 각 링크 문서이며, 상태가 바뀌면 근거 commit·실행 결과와 함께 이 표를 갱신한다.
 
+외부 답변·사용자 근거·기술 선택의 의존 순서와 미확정 기본 행동은 [결정 큐](DECISION_QUEUE.md)에서 관리한다.
+
 ## 상태 의미
 
 | 상태 | 의미 |
@@ -21,6 +23,7 @@
 | B2C 제품 범위 | 완료 | [B2C 스펙](B2C_SPEC_v0.1.md) | 사용자 조사 결과에 따른 변경 반영 |
 | 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md) | 팀 동의와 실제 package version 고정 |
 | 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | 행사 규칙 확인 뒤 F0 착수 |
+| 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | DB 정합성 설계 | 완료 | [데이터 계약](DATA_CONSTRAINTS_v0.1.md), [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | 실제 migration·PostgreSQL 동시성 테스트 |
