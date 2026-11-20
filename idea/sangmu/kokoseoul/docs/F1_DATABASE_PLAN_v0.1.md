@@ -1,6 +1,6 @@
 # F1 PostgreSQL 구현·검수 계획 v0.1
 
-작성일: 2026-11-21 · 상태: base identity schema 구현·실DB 검증 완료, 도메인 schema 진행 중
+작성일: 2026-11-21 · 상태: base identity·quest content schema 구현·실DB 검증 완료, 나머지 도메인 schema 진행 중
 
 이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다. 행사 규칙 미확인은 구현 차단 조건이 아니라 제출 전 위험이다.
 
@@ -25,8 +25,11 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - `digiman:test` marker가 있는 `digiman_test_base`에서 32-byte hash, expiry, cascade, supplier state·trim, coordinate pair 4개 PostgreSQL 통합 테스트가 성공했다.
 - GitHub Actions run `44815670336`은 같은 image digest로 `digiman_test_ci`를 만들고 marker·migration·constraint test와 Pixel 5·Desktop Chrome 흐름까지 `2m 12s`에 모두 통과했다.
 - Drizzle이 custom `bytea` type을 `"bytea"`로 생성한 SQL은 검토 과정에서 PostgreSQL 내장 `bytea`로 교정했다.
+- 두 번째 migration은 `quests`, `quest_versions`, `quest_steps` 3개 table이며 SHA-256은 `7db5f4cacb6f361ba09c26ef71ccfd14209d3aa9a9b29f81c2b1196515f269d8`이다.
+- 완전히 빈 marker DB에서 두 migration 적용·재적용과 PostgreSQL 통합 테스트 10개가 성공했다.
+- quest당 draft 한 개, 3~5개 연속 step, 공개 version의 같은 quest 소속, 공개 version·step 불변성을 named constraint·trigger로 강제한다.
 
-이는 F1 전체 완료가 아니다. quest·version·step·run·feedback·report·audit·analytics schema, 역할 분리, 동시성·실패 주입은 남아 있다.
+이는 F1 전체 완료가 아니다. run·feedback·report·audit·analytics schema, 역할 분리, 동시성·실패 주입은 남아 있다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 
@@ -104,6 +107,8 @@ constraint 이름을 client의 `details`에 반환하지 않는다. 매핑되지
 - 문자열 길이를 `varchar(n)`와 check 중 어디서 보장할지
 
 어느 선택을 하든 API의 허용 값, unknown field 거절, 공개 version 불변성과 삭제 순서는 바뀌지 않는다. DB에서 보장하지 못하는 다중 행 규칙은 같은 트랜잭션과 실제 통합 테스트로 보완한다고 명시한다.
+
+2026-11-21 quest content migration에서는 상태를 기존 base schema와 일관된 `varchar + named check`로, 현재 제품 관심사 `craft`·`food`를 중복 없는 최대 5개 `text[]`로, `place_snapshot`을 object 형태만 허용하는 `jsonb`로 선택했다. UUID는 호출자가 만들고 DB default를 두지 않는다. 공개 전환의 3~5개 연속 step처럼 행 하나의 check로 표현할 수 없는 규칙과 공개 후 불변성은 named trigger로 강제한다.
 
 ## seed 경계
 
