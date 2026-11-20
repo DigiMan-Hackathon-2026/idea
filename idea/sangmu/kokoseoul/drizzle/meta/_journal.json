@@ -15,6 +15,13 @@
       "when": 1795208468898,
       "tag": "0001_careless_lockheed",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795208815937,
+      "tag": "0002_amusing_king_bedlam",
+      "breakpoints": true
     }
   ]
 }
