@@ -159,6 +159,13 @@ class ResearchArtifactShapeTest(unittest.TestCase):
             self.assertTrue(any("JR01 @ abc1234" in error for error in open_errors))
             self.assertTrue(any("review time" in error for error in open_errors))
             self.assertTrue(any("predate Japanese review" in error for error in early_errors))
+            with mock.patch.object(verifier.subprocess, "run") as git_run:
+                git_run.return_value.returncode = 1
+                commit_errors = verifier.check_review_commit(
+                    "INTERVIEWS_ALLOWED", open_with_evidence
+                )
+            self.assertEqual(len(commit_errors), 1)
+            self.assertIn("must exist", commit_errors[0])
 
     def test_valid_interview_has_matching_code_consent_and_sections(self) -> None:
         with isolated_research_tree() as (_, research):

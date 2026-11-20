@@ -361,10 +361,34 @@ def parse_execution_gate(text: str) -> tuple[str | None, list[str]]:
     return gate, errors
 
 
+def check_review_commit(gate: str, text: str) -> list[str]:
+    if gate != "INTERVIEWS_ALLOWED":
+        return []
+    evidence = REVIEW_EVIDENCE.findall(text)
+    if len(evidence) != 1 or not REVIEW_EVIDENCE_VALUE.fullmatch(
+        evidence[0].strip()
+    ):
+        return []
+    commit = evidence[0].strip().rsplit(" ", 1)[1]
+    result = subprocess.run(
+        ("git", "merge-base", "--is-ancestor", commit, "HEAD"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return [
+            "research/README.md: Japanese review evidence commit must exist "
+            "and precede the interview gate commit"
+        ]
+    return []
+
+
 def check_execution_gate(paths: list[Path], text: str) -> list[str]:
     gate, errors = parse_execution_gate(text)
     if errors or gate is None:
         return errors
+    errors.extend(check_review_commit(gate, text))
     interview_count = sum(
         path.parent == RESEARCH / "interviews" and path.name != "TEMPLATE.md"
         for path in paths
