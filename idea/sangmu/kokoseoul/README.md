@@ -100,7 +100,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 외부 패키지 없이 내부 링크, API JSON 예시와 AC01~AC20 문서 매핑을 검사합니다.
 
 ```bash
-python3 -m unittest scripts/test_verify_docs.py
+python3 -m unittest scripts/test_verify_docs.py scripts/test_verify_research.py
 python3 scripts/verify_docs.py
 python3 scripts/verify_research.py
 ```
