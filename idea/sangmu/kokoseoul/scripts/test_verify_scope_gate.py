@@ -106,6 +106,9 @@ class ScopeGateVerifierTest(unittest.TestCase):
             self.assertIn(relative, verifier.candidate_files())
             self.assertTrue(verifier.is_closed_forbidden(relative))
 
+    def test_contribution_templates_keep_scope_gate_contract(self) -> None:
+        self.assertEqual(verifier.check_contribution_templates(), [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RULES_PATH = ROOT / "docs" / "EVENT_RULES_CHECKLIST.md"
+PR_TEMPLATE_PATH = ROOT / ".github" / "PULL_REQUEST_TEMPLATE.md"
+FEATURE_TEMPLATE_PATH = ROOT / ".github" / "ISSUE_TEMPLATE" / "feature.yml"
 GATE_PATTERN = re.compile(
     r"^사전 코드 게이트: `(CLOSED|F0_ONLY|PRODUCT_ALLOWED)`$", re.MULTILINE
 )
@@ -75,6 +77,18 @@ F0_ONLY_PREFIXES = (
 )
 F0_ONLY_SUFFIXES = (".sql",)
 F0_ONLY_CONFIG_PREFIXES = ("drizzle.config.",)
+
+REQUIRED_PR_TEMPLATE_TOKENS = (
+    "python3 scripts/verify_all.py",
+    "사전 코드 게이트 전/후",
+    "docs/EVENT_RULES_CHECKLIST.md",
+    "제품 AC·build·E2E",
+)
+REQUIRED_FEATURE_TEMPLATE_TOKENS = (
+    "EVENT_RULES_CHECKLIST",
+    "정확한 gate 값",
+    "근거 commit",
+)
 
 
 def parse_gate(text: str) -> tuple[str | None, list[str]]:
@@ -154,6 +168,21 @@ def check_scope(gate: str, paths: list[str]) -> list[str]:
     ]
 
 
+def check_contribution_templates() -> list[str]:
+    errors: list[str] = []
+    for path, tokens in (
+        (PR_TEMPLATE_PATH, REQUIRED_PR_TEMPLATE_TOKENS),
+        (FEATURE_TEMPLATE_PATH, REQUIRED_FEATURE_TEMPLATE_TOKENS),
+    ):
+        text = path.read_text(encoding="utf-8")
+        for token in tokens:
+            if token not in text:
+                errors.append(
+                    f"{path.relative_to(ROOT)}: missing scope gate token {token!r}"
+                )
+    return errors
+
+
 def main() -> int:
     rules_text = RULES_PATH.read_text(encoding="utf-8")
     gate, errors = parse_gate(rules_text)
@@ -164,6 +193,7 @@ def main() -> int:
             errors.extend(check_scope(gate, candidate_files()))
         except RuntimeError as error:
             errors.append(str(error))
+    errors.extend(check_contribution_templates())
 
     if errors:
         print("Pre-code scope verification failed:", file=sys.stderr)

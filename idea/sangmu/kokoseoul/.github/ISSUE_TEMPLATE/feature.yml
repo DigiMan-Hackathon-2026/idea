@@ -79,7 +79,7 @@ body:
     attributes:
       label: 착수 확인
       options:
-        - label: 행사 규칙상 이 작업을 지금 진행할 수 있다.
+        - label: EVENT_RULES_CHECKLIST의 정확한 gate 값과 근거 commit이 이 작업을 허용한다.
           required: true
         - label: 필요한 선행 결정과 콘텐츠가 준비됐다.
           required: true

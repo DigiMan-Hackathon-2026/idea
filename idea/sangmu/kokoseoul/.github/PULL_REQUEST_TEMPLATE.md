@@ -14,14 +14,15 @@
 - 영향받는 스펙·API·화면:
 - 관련 AC:
 - 신규 dependency·asset·AI 보조 출처:
+- 사전 코드 게이트 전/후 (`CLOSED` / `F0_ONLY` / `PRODUCT_ALLOWED`):
+- gate 변경 시 공식 근거·허용 시작 시각을 기록한 선행 commit:
 
 ## 검증
 
 실행한 명령과 결과를 적습니다. 실행하지 않은 항목은 이유를 남깁니다.
 
 ```text
-python3 scripts/verify_docs.py
-python3 scripts/verify_research.py
+python3 scripts/verify_all.py
 ```
 
 - 단위:
@@ -57,6 +58,8 @@ python3 scripts/verify_research.py
 ## 완료 확인
 
 - [ ] 기능 단위이며 무관한 포맷 변경을 섞지 않았다.
+- [ ] `docs/EVENT_RULES_CHECKLIST.md`의 사전 코드 게이트가 이 변경 범위를 허용한다.
 - [ ] 관련 계약 문서와 변경 기록을 갱신했다.
 - [ ] 신규·중복·응답 유실·권한·충돌 경로를 검수했다.
+- [ ] 문서·tooling 검증 통과를 제품 AC·build·E2E 통과로 표현하지 않았다.
 - [ ] 알려진 제한과 후속 작업을 적었다.
