@@ -31,7 +31,7 @@
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | API 오류·request ID | 준비됨 | [오류 catalog](API_ERROR_CATALOG_v0.1.md) | error factory·우선순위·405/500 통합 검수 |
 | 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
-| DB 정합성 설계 | 진행 중 | base 5 tables migration, PostgreSQL 17.12 제약 통합 테스트 4개, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | 도메인 schema·역할·동시성·실패 주입 |
+| DB 정합성 설계 | 진행 중 | base 5 tables migration, PostgreSQL 17.12 제약 통합 테스트 4개, Actions run `44815670336`, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | 도메인 schema·역할·동시성·실패 주입 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
 | 화면 상태·문구 | 진행 중 | [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI와 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
 | 웹 접근성 구현 | 진행 중 | skip link, focus-visible, reduced-motion, modal 초기 초점·focus trap·Escape와 Chromium E2E | screen reader·실제 기기 수동 검수 |

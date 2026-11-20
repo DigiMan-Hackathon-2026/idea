@@ -23,7 +23,7 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - 첫 migration SHA-256은 `ca0ec318b4e86b0dd847b150643970bdd4859aaf0aa7f2e82f04a1716ab8973e`다.
 - 빈 `digiman_local` DB 적용과 같은 DB 재적용이 성공했다.
 - `digiman:test` marker가 있는 `digiman_test_base`에서 32-byte hash, expiry, cascade, supplier state·trim, coordinate pair 4개 PostgreSQL 통합 테스트가 성공했다.
-- GitHub Actions도 같은 image digest로 `digiman_test_ci`를 만들고 marker·migration·constraint test를 실행한다.
+- GitHub Actions run `44815670336`은 같은 image digest로 `digiman_test_ci`를 만들고 marker·migration·constraint test와 Pixel 5·Desktop Chrome 흐름까지 `2m 12s`에 모두 통과했다.
 - Drizzle이 custom `bytea` type을 `"bytea"`로 생성한 SQL은 검토 과정에서 PostgreSQL 내장 `bytea`로 교정했다.
 
 이는 F1 전체 완료가 아니다. quest·version·step·run·feedback·report·audit·analytics schema, 역할 분리, 동시성·실패 주입은 남아 있다.
