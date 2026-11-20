@@ -10,6 +10,7 @@ export type PublicErrorCode =
   | "NOT_FOUND"
   | "QUEST_UNAVAILABLE"
   | "STEP_ORDER_CONFLICT"
+  | "RUN_NOT_COMPLETED"
   | "SERVICE_UNAVAILABLE";
 
 const ERROR_DEFINITIONS: Record<
@@ -45,6 +46,11 @@ const ERROR_DEFINITIONS: Record<
     status: 409,
     retryable: false,
     messageJa: "前のステップを完了してから進んでください。",
+  },
+  RUN_NOT_COMPLETED: {
+    status: 409,
+    retryable: false,
+    messageJa: "クエストを完了してから感想を保存してください。",
   },
   SERVICE_UNAVAILABLE: {
     status: 503,

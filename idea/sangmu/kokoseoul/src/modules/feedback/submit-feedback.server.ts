@@ -22,7 +22,8 @@ export type FeedbackRecord = {
 
 export type SubmitFeedbackResult =
   | { outcome: "saved"; feedback: FeedbackRecord }
-  | { outcome: "not_found" | "not_completed" };
+  | { outcome: "not_found" }
+  | { outcome: "not_completed" };
 
 type RunRow = { status: "in_progress" | "completed" };
 type FeedbackRow = {

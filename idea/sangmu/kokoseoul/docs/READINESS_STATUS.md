@@ -38,7 +38,7 @@
 | locale·표시 형식 | 준비됨 | [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 실제 formatter·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
 | 보안·개인정보 | 진행 중 | 기본 `no-referrer`·`nosniff`·frame deny·camera/microphone/geolocation 차단과 Chromium 검수, [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | CSP·HSTS·cookie 삭제·출시 전 gate 실행 |
-| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 51개 unit·44개 PostgreSQL integration·12개 Chromium E2E | 실제 DB를 연결한 HTTP·cookie·admin 경합·실기기에서 AC01~AC20 증거 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 59개 unit·44개 PostgreSQL integration·12개 Chromium E2E | 실제 DB를 연결한 HTTP·cookie·admin 경합·실기기에서 AC01~AC20 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |
@@ -63,7 +63,7 @@
 | 익명 visitor session | 진행 중 | HMAC token repository, `POST /api/v1/visitor-sessions` 생성과 visitor 인증을 거친 퀘스트 시작 API의 Origin·JSON·cookie·no-store 계약, [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | rate limit·실DB HTTP/browser·삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
 | 지도 연결 | 준비됨 | [지도·주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md) | 일본어 iOS·Android 실제 장소·앱 fallback 검수 |
-| 제품 코드 F0~F8 | 진행 중 | F0 완료, 명시적 demo 흐름·모바일 E2E, visitor session 생성·멱등 퀘스트 시작·순서형 단계 완료 API 구현 | 진행 조회·완료 카드 API와 화면을 실제 서버 세션에 연결 |
+| 제품 코드 F0~F8 | 진행 중 | F0 완료, 명시적 demo 흐름·모바일 E2E, visitor session 생성·멱등 퀘스트 시작·순서형 단계 완료·피드백 upsert API 구현 | 진행 조회·완료 카드 API와 화면을 실제 서버 세션에 연결 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
 ## 현재 사실
