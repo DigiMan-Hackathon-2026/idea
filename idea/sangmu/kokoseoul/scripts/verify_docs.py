@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_AC = {f"AC{number:02d}" for number in range(1, 21)}
+EXPECTED_DECISIONS = {f"D{number:02d}" for number in range(1, 14)}
 EXPECTED_ERROR_CODES = {
     "VALIDATION_ERROR",
     "SESSION_REQUIRED",
@@ -121,6 +122,19 @@ def check_error_code_coverage() -> list[str]:
     return errors
 
 
+def check_decision_queue() -> list[str]:
+    path = ROOT / "docs" / "DECISION_QUEUE.md"
+    actual = set(re.findall(r"\bD\d{2}\b", path.read_text(encoding="utf-8")))
+    missing = sorted(EXPECTED_DECISIONS - actual)
+    unexpected = sorted(actual - EXPECTED_DECISIONS)
+    errors: list[str] = []
+    if missing:
+        errors.append(f"{path.relative_to(ROOT)}: missing {', '.join(missing)}")
+    if unexpected:
+        errors.append(f"{path.relative_to(ROOT)}: unexpected {', '.join(unexpected)}")
+    return errors
+
+
 def check_readme_index() -> list[str]:
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     linked = set(local_link_targets(text))
@@ -186,6 +200,7 @@ def main() -> int:
         check_json_blocks(),
         check_acceptance_coverage(),
         check_error_code_coverage(),
+        check_decision_queue(),
         check_readme_index(),
         check_api_contract_index(),
     )
@@ -203,7 +218,7 @@ def main() -> int:
     print(
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_blocks} JSON blocks, {len(example_endpoints())} API endpoints, "
-        f"{len(EXPECTED_ERROR_CODES)} error codes, AC01-AC20 covered."
+        f"{len(EXPECTED_ERROR_CODES)} error codes, AC01-AC20 and D01-D13 covered."
     )
     return 0
 
