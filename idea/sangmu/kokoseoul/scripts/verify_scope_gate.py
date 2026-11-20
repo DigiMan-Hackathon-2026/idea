@@ -14,29 +14,47 @@ RULES_PATH = ROOT / "docs" / "EVENT_RULES_CHECKLIST.md"
 GATE_PATTERN = re.compile(
     r"^사전 코드 게이트: `(CLOSED|F0_ONLY|PRODUCT_ALLOWED)`$", re.MULTILINE
 )
+EVIDENCE_PATTERN = re.compile(r"^게이트 근거: (.+)$", re.MULTILINE)
+START_PATTERN = re.compile(r"^허용 시작 시각: (.+)$", re.MULTILINE)
+ISO_8601_PATTERN = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$"
+)
 
 CLOSED_EXACT = {
     ".env.example",
+    ".node-version",
+    ".npmrc",
+    ".nvmrc",
     "bun.lock",
     "bun.lockb",
+    "components.json",
+    "compose.yaml",
+    "compose.yml",
+    "docker-compose.yaml",
+    "docker-compose.yml",
     "next-env.d.ts",
     "package-lock.json",
     "package.json",
     "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
     "tsconfig.json",
+    "turbo.json",
     "vercel.json",
     "yarn.lock",
 }
 CLOSED_PREFIXES = (
     ".github/workflows/",
     "app/",
+    "components/",
     "drizzle/",
+    "lib/",
     "migrations/",
     "public/",
     "src/",
     "tests/",
 )
 CLOSED_CONFIG_PREFIXES = (
+    "Dockerfile",
     "eslint.config.",
     "next.config.",
     "playwright.config.",
@@ -56,6 +74,7 @@ F0_ONLY_PREFIXES = (
     "tests/integration/",
 )
 F0_ONLY_SUFFIXES = (".sql",)
+F0_ONLY_CONFIG_PREFIXES = ("drizzle.config.",)
 
 
 def parse_gate(text: str) -> tuple[str | None, list[str]]:
@@ -65,6 +84,31 @@ def parse_gate(text: str) -> tuple[str | None, list[str]]:
             "docs/EVENT_RULES_CHECKLIST.md: expected exactly one pre-code gate marker"
         ]
     return matches[0], []
+
+
+def check_open_gate_metadata(gate: str, text: str) -> list[str]:
+    evidence = EVIDENCE_PATTERN.findall(text)
+    starts = START_PATTERN.findall(text)
+    errors: list[str] = []
+    if len(evidence) != 1:
+        errors.append(
+            "docs/EVENT_RULES_CHECKLIST.md: expected exactly one gate evidence field"
+        )
+    if len(starts) != 1:
+        errors.append(
+            "docs/EVENT_RULES_CHECKLIST.md: expected exactly one allowed start field"
+        )
+    if errors or gate == "CLOSED":
+        return errors
+    if evidence[0].strip() == "미기록":
+        errors.append(
+            "docs/EVENT_RULES_CHECKLIST.md: an open gate requires recorded evidence"
+        )
+    if not ISO_8601_PATTERN.fullmatch(starts[0].strip()):
+        errors.append(
+            "docs/EVENT_RULES_CHECKLIST.md: an open gate requires an ISO 8601 start time"
+        )
+    return errors
 
 
 def candidate_files() -> list[str]:
@@ -91,7 +135,12 @@ def is_closed_forbidden(path: str) -> bool:
 
 
 def is_f0_only_forbidden(path: str) -> bool:
-    return path.startswith(F0_ONLY_PREFIXES) or path.endswith(F0_ONLY_SUFFIXES)
+    name = Path(path).name
+    return (
+        path.startswith(F0_ONLY_PREFIXES)
+        or name.startswith(F0_ONLY_CONFIG_PREFIXES)
+        or path.endswith(F0_ONLY_SUFFIXES)
+    )
 
 
 def check_scope(gate: str, paths: list[str]) -> list[str]:
@@ -106,7 +155,10 @@ def check_scope(gate: str, paths: list[str]) -> list[str]:
 
 
 def main() -> int:
-    gate, errors = parse_gate(RULES_PATH.read_text(encoding="utf-8"))
+    rules_text = RULES_PATH.read_text(encoding="utf-8")
+    gate, errors = parse_gate(rules_text)
+    if not errors and gate is not None:
+        errors.extend(check_open_gate_metadata(gate, rules_text))
     if not errors and gate is not None:
         try:
             errors.extend(check_scope(gate, candidate_files()))
