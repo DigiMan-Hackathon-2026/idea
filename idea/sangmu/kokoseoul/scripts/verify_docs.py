@@ -97,6 +97,32 @@ def check_markdown_structure(files: list[Path]) -> list[str]:
     return errors
 
 
+def check_markdown_reachability(files: list[Path]) -> list[str]:
+    known = {path.resolve(): path for path in files}
+    graph: dict[Path, set[Path]] = {path: set() for path in known}
+    for resolved, path in known.items():
+        text = path.read_text(encoding="utf-8")
+        for target in local_link_targets(text):
+            linked = (path.parent / target).resolve()
+            if linked in known:
+                graph[resolved].add(linked)
+
+    start = (ROOT / "README.md").resolve()
+    visited: set[Path] = set()
+    pending = [start]
+    while pending:
+        current = pending.pop()
+        if current in visited:
+            continue
+        visited.add(current)
+        pending.extend(graph.get(current, set()) - visited)
+
+    return [
+        f"{known[path].relative_to(ROOT)}: Markdown file is unreachable from README.md"
+        for path in sorted(known.keys() - visited)
+    ]
+
+
 def check_json_blocks() -> list[str]:
     errors: list[str] = []
     for path in API_EXAMPLE_FILES:
@@ -235,6 +261,7 @@ def main() -> int:
     checks = (
         check_links(files),
         check_markdown_structure(files),
+        check_markdown_reachability(files),
         check_json_blocks(),
         check_acceptance_coverage(),
         check_error_code_coverage(),
@@ -256,7 +283,8 @@ def main() -> int:
     print(
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_blocks} JSON blocks, {len(example_endpoints())} API endpoints, "
-        f"{len(EXPECTED_ERROR_CODES)} error codes, canonical H1/date metadata, "
+        f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
+        "canonical H1/date metadata, "
         "AC01-AC20 and D01-D13 covered."
     )
     return 0
