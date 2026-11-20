@@ -19,6 +19,8 @@ P0에서 역할 차이를 실제로 사용하지 않으므로 `editor`와 `admin
 
 모든 응답에는 서버가 확정한 `X-Request-Id`가 있다. JSON 요청의 알 수 없는 필드, 서버 결정 필드와 잘못된 Content-Type은 400 `VALIDATION_ERROR`다. 인증 실패와 소유권 실패는 대상 존재 여부를 노출하지 않는다.
 
+JSON·query·Unicode·UUID·body 크기·cursor와 idempotency canonical 비교는 [입력 검증·정규화 계약](INPUT_VALIDATION_v0.1.md)을 따른다.
+
 ## B2C endpoint
 
 | 메서드와 경로 | 권한 | 성공 | 중복·동시성 계약 | 주요 실패 | 연결 AC |

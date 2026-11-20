@@ -12,6 +12,7 @@
 - 시각은 `timestamptz`로 UTC 저장하며 DB 기본 시각을 사용한다.
 - 상태와 category는 허용 값이 작은 경우 PostgreSQL enum 또는 동일한 check constraint로 제한한다.
 - 사용자 입력 문자열은 길이 제한과 빈 문자열 금지를 DB와 API 양쪽에서 적용한다.
+- 저장 전 NFC·공백·줄바꿈과 멱등 비교 정규화는 [입력 검증 계약](INPUT_VALIDATION_v0.1.md)을 따른다.
 - 외래키 삭제 동작은 명시하고 기본값에 의존하지 않는다.
 - 공개 버전과 완료 기록을 깨뜨리는 물리 삭제는 허용하지 않는다.
 - API의 사전 조회보다 DB 제약과 트랜잭션 결과를 최종 기준으로 삼는다.
@@ -212,7 +213,7 @@ step 소속 검증은 run의 version과 step의 version을 함께 비교한다. 
 | anonymization | anonymized_at이 있으면 visitor_id·client_request_id·comment는 null |
 | index | `(status, created_at, id)` |
 
-같은 멱등 키의 기존 행을 찾으면 quest, version, category, comment의 정규화된 값이 모두 같은지 비교한다. 다르면 `REQUEST_CONFLICT`다.
+같은 멱등 키의 기존 행을 찾으면 quest, version, category, comment의 [canonical 값](INPUT_VALIDATION_v0.1.md)이 모두 같은지 비교한다. 다르면 `REQUEST_CONFLICT`다.
 
 활성 신고는 visitor_id와 client_request_id가 필수다. 전체 기록 삭제나 만료 정리 뒤 운영상 신고 요약을 보존할 때는 `anonymized_at`을 기록하고 사용자 연결, 멱등 키와 자유 입력을 제거한다. 이 상태를 표현하기 위해 reports의 visitor_id와 client_request_id는 DB에서 nullable로 두되 check constraint로 활성·익명 상태를 구분한다.
 

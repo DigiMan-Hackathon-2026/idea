@@ -99,6 +99,8 @@ ID가 UUID라 추측하기 어렵다는 사실은 권한 검사를 대신하지 
 
 ### 입력
 
+세부 Unicode·JSON·query·UUID·cursor와 body 상한은 [입력 검증·정규화 계약](INPUT_VALIDATION_v0.1.md)을 따른다.
+
 - JSON body 크기 제한을 endpoint별로 적용한다.
 - unknown field를 거절한다.
 - 문자열 길이, trim 후 빈 값, enum, UUID, 숫자 범위를 검사한다.

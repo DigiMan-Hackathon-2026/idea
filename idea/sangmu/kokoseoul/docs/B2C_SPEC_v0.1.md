@@ -478,5 +478,6 @@ publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. pau
 | 2026-11-21 | quest 생성 멱등 키와 신고 처리 revision 추가 | 응답 유실의 중복 초안과 운영자 간 신고 덮어쓰기 방지 |
 | 2026-11-21 | Origin 거부를 ORIGIN_FORBIDDEN으로 분리 | 운영 권한 실패와 visitor·admin CSRF 경계를 구분 |
 | 2026-11-21 | 삭제 전 backup은 ledger 없이는 visitor 전체 purge 뒤 승격 | 사용자 삭제가 오래된 backup 복구로 되살아나는 위험 방지 |
+| 2026-11-21 | 입력은 NFC·LF·strict shape로 canonical 비교 | Unicode 표현·공백 차이와 raw JSON 순서가 멱등 결과를 바꾸지 않게 함 |
 
 변경 시 날짜·변경 이유·영향받는 화면/API/검수 항목을 추가한다. 로컬 docs/B2C_SPEC_v0.1.md를 개발 계약의 기준으로 사용하고, 검토용 Page는 같은 버전의 사본으로 관리한다. 다음 버전에서 호환되지 않는 계약을 바꾸면 변경 범위와 이행 방법을 명시한다.
