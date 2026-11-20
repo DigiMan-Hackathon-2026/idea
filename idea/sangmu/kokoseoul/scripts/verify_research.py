@@ -54,6 +54,12 @@ SENSITIVE_FIELD = re.compile(
     r")\s*:\s*\S.+$",
     re.IGNORECASE | re.MULTILINE,
 )
+EXECUTION_GATE = re.compile(
+    r"^조사 실행 게이트: `(DRAFT_ONLY|INTERVIEWS_ALLOWED)`$", re.MULTILINE
+)
+REVIEW_EVIDENCE = re.compile(r"^일본어 검수 근거: (.+)$", re.MULTILINE)
+RESEARCH_README = RESEARCH / "README.md"
+READINESS = ROOT / "docs" / "READINESS_STATUS.md"
 
 
 def tracked_research_files() -> tuple[list[Path], list[str]]:
@@ -297,8 +303,47 @@ def check_evidence_references(paths: list[Path]) -> list[str]:
     return errors
 
 
+def parse_execution_gate(text: str) -> tuple[str | None, list[str]]:
+    gates = EXECUTION_GATE.findall(text)
+    evidence = REVIEW_EVIDENCE.findall(text)
+    errors: list[str] = []
+    if len(gates) != 1:
+        errors.append("research/README.md: expected exactly one research execution gate")
+    if len(evidence) != 1:
+        errors.append("research/README.md: expected exactly one Japanese review evidence field")
+    if errors:
+        return None, errors
+    gate = gates[0]
+    if gate == "INTERVIEWS_ALLOWED" and evidence[0].strip() == "미기록":
+        errors.append(
+            "research/README.md: interview execution requires Japanese review evidence"
+        )
+    return gate, errors
+
+
+def check_execution_gate(paths: list[Path], text: str) -> list[str]:
+    gate, errors = parse_execution_gate(text)
+    if errors or gate is None:
+        return errors
+    interview_count = sum(
+        path.parent == RESEARCH / "interviews" and path.name != "TEMPLATE.md"
+        for path in paths
+    )
+    if gate == "DRAFT_ONLY" and interview_count:
+        errors.append(
+            f"research: {interview_count} interview artifact(s) exist while gate is DRAFT_ONLY"
+        )
+    readiness_marker = f"현재 조사 실행 게이트는 `{gate}`다."
+    if readiness_marker not in READINESS.read_text(encoding="utf-8"):
+        errors.append(
+            f"docs/READINESS_STATUS.md: missing research gate marker {gate}"
+        )
+    return errors
+
+
 def main() -> int:
     paths, errors = tracked_research_files()
+    research_readme_text = RESEARCH_README.read_text(encoding="utf-8")
     checks = (
         check_tracked_safety(paths),
         check_sensitive_text(paths),
@@ -306,6 +351,7 @@ def main() -> int:
         check_syntheses(paths),
         check_candidates(paths),
         check_evidence_references(paths),
+        check_execution_gate(paths, research_readme_text),
     )
     errors.extend(error for group in checks for error in group)
     if errors:
@@ -324,9 +370,11 @@ def main() -> int:
         and path.name != "TEMPLATE.md"
         for path in paths
     )
+    execution_gate, _ = parse_execution_gate(research_readme_text)
     print(
         f"Research verification passed: {markdown_count} tracked Markdown files, "
-        f"{interview_count} interviews, {candidate_count} candidates; "
+        f"{interview_count} interviews, {candidate_count} candidates, "
+        f"gate {execution_gate}; "
         "no tracked private paths, blocked media, obvious contact fields, "
         "or unresolved E/O evidence references."
     )

@@ -110,6 +110,39 @@ class ResearchSafetyTest(unittest.TestCase):
 
 
 class ResearchArtifactShapeTest(unittest.TestCase):
+    def test_current_research_execution_gate_matches_readiness(self) -> None:
+        paths, errors = verifier.tracked_research_files()
+
+        self.assertEqual(errors, [])
+        self.assertEqual(
+            verifier.check_execution_gate(
+                paths, verifier.RESEARCH_README.read_text(encoding="utf-8")
+            ),
+            [],
+        )
+
+    def test_draft_gate_rejects_interview_and_open_gate_needs_evidence(self) -> None:
+        with isolated_research_tree() as (_, research):
+            interviews = research / "interviews"
+            interviews.mkdir()
+            interview = interviews / "P01.md"
+            interview.write_text("# Interview\n", encoding="utf-8")
+            draft = (
+                "조사 실행 게이트: `DRAFT_ONLY`\n"
+                "일본어 검수 근거: 미기록\n"
+            )
+            open_without_evidence = (
+                "조사 실행 게이트: `INTERVIEWS_ALLOWED`\n"
+                "일본어 검수 근거: 미기록\n"
+            )
+
+            draft_errors = verifier.check_execution_gate([interview], draft)
+            gate, open_errors = verifier.parse_execution_gate(open_without_evidence)
+
+            self.assertEqual(gate, "INTERVIEWS_ALLOWED")
+            self.assertTrue(any("gate is DRAFT_ONLY" in error for error in draft_errors))
+            self.assertTrue(any("requires Japanese review" in error for error in open_errors))
+
     def test_valid_interview_has_matching_code_consent_and_sections(self) -> None:
         with isolated_research_tree() as (_, research):
             interviews = research / "interviews"

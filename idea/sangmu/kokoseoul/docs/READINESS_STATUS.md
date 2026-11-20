@@ -46,7 +46,7 @@
 | 운영 감사 로그 | 준비됨 | [audit 계약](AUDIT_LOG_CONTRACT_v0.1.md) | schema·원자성·append-only 권한 구현 |
 | 제품 시연 | 준비됨 | [2분 시연 런북](DEMO_RUNBOOK_v0.1.md) | 구현 뒤 실제 기기 100초 리허설과 기록 |
 | 출시 판정 | 준비됨 | [출시 준비 gate](RELEASE_READINESS_v0.1.md) | 고정 commit·환경에서 모든 필수 증거와 승인 기록 |
-| 문서·조사 자동 검증 | 완료 | `python3 scripts/verify_all.py`, 35개 회귀 테스트와 scope gate | CI 연결은 행사 규칙 확인 후 결정 |
+| 문서·조사 자동 검증 | 완료 | `python3 scripts/verify_all.py`, 37개 회귀 테스트와 scope·research gate | CI 연결은 행사 규칙 확인 후 결정 |
 | 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md), gate `CLOSED` | 주최 측 공식 답변·근거·허용 시작 시각 기록 |
 | 사용자 인터뷰 | 준비됨 | [조사 계획](USER_RESEARCH_v0.1.md), [작업공간](../research/README.md) | D02 일본어 검수 뒤 모집·일정, 익명 기록 3~5개와 합성 |
 | 첫 타깃 | 대기 | 재방문 일본인 혼행객은 가설 | 인터뷰 사례로 유지·수정·폐기 결정 |
@@ -69,6 +69,7 @@
 
 - 제품 코드는 없다.
 - 현재 사전 코드 게이트는 `CLOSED`다. 문서·조사·Python 검증 도구 외 scaffold·workflow·제품 파일은 보류한다.
+- 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.
 - 전체 Markdown의 JSON block 44개는 JSON parser를 통과한다.
 - B2C 스펙과 테스트 계획에 AC01~AC20이 모두 존재한다.
