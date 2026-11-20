@@ -196,7 +196,7 @@ AI는 콘텐츠·번역 초안 작성에 선택적으로 활용한다. 공개 �
 | runs | id, visitor_id, quest_id, version_id, status, started_at, completed_at | visitor_id·quest_id 유일 |
 | run_steps | run_id, step_id, completed_at | run_id·step_id 유일, 해당 run의 버전 단계만 허용 |
 | feedback | id, run_id, joy_score, felt_new_experience, comment, updated_at | run_id 유일, 완료한 기록만 허용 |
-| reports | id, visitor_id, quest_id, version_id, client_request_id, category, comment, status, created_at | visitor_id·client_request_id 유일, category는 정보·이용 불가·기타 |
+| reports | id, visitor_id, quest_id, version_id, client_request_id, category, comment, status, created_at, anonymized_at | 활성 신고는 visitor_id·client_request_id 유일, 익명화 후 사용자 연결·멱등 키·자유 입력 null |
 | audit_logs | id, admin_id, action, entity_id, before_summary, after_summary, created_at | 공개·중지·보관·편집 기록 |
 | analytics_events | event_id, event_name, visitor_id, quest_id, run_id, environment, created_at | event_id 유일, 사용자 원문·위치 저장 금지 |
 
@@ -472,5 +472,6 @@ publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. pau
 | 2026-11-21 | Google OIDC 운영자 세션과 Maps URL 우선 검증 | 방문자 세션과 운영 권한을 분리하고 지도 SDK 없이 핵심 흐름 검증 |
 | 2026-11-21 | 멱등 키 본문 충돌에 REQUEST_CONFLICT 사용 | 운영 revision 충돌과 사용자 요청 재전송 충돌을 구분 |
 | 2026-11-21 | 운영 권한 거절에 ADMIN_FORBIDDEN 사용 | 방문자 세션·인증 없음·인증됐지만 권한 없음 상태를 구분 |
+| 2026-11-21 | 신고 익명화 상태를 데이터 계약에 추가 | 전체 기록 삭제·만료 뒤 운영 요약을 보존하면서 사용자 연결과 자유 입력 제거 |
 
 변경 시 날짜·변경 이유·영향받는 화면/API/검수 항목을 추가한다. 로컬 docs/B2C_SPEC_v0.1.md를 개발 계약의 기준으로 사용하고, 검토용 Page는 같은 버전의 사본으로 관리한다. 다음 버전에서 호환되지 않는 계약을 바꾸면 변경 범위와 이행 방법을 명시한다.

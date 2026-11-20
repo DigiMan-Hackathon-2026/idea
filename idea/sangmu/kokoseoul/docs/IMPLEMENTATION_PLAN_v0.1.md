@@ -79,6 +79,7 @@ F2와 F3은 F1 이후 병렬로 진행할 수 있다. F7은 공개 콘텐츠가 
 ### 포함
 
 - Drizzle 스키마와 첫 SQL 마이그레이션
+- [PostgreSQL 데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)에 정의한 제약·인덱스·트랜잭션
 - 주요 UUID, UTC 시각, 상태 enum, 외래키, 유일 제약
 - DB 연결과 트랜잭션 실행 경계
 - API 오류 형식, 요청 ID, 입력 검증, `Cache-Control` 정책

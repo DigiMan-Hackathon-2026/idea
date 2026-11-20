@@ -10,6 +10,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [B2C API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_B2C_v0.1.md)
 - [운영 API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_ADMIN_v0.1.md)
 - [기술 결정 v0.1](docs/TECH_DECISIONS_v0.1.md)
+- [PostgreSQL 데이터 정합성 계약 v0.1](docs/DATA_CONSTRAINTS_v0.1.md)
 - [B2C 구현 계획 v0.1](docs/IMPLEMENTATION_PLAN_v0.1.md)
 - [해커톤 사전 개발 범위 확인서](docs/EVENT_RULES_CHECKLIST.md)
 - [일본인 사용자 검증 계획 v0.1](docs/USER_RESEARCH_v0.1.md)
