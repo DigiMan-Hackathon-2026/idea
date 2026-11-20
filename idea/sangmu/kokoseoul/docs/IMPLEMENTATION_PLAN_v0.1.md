@@ -81,6 +81,8 @@ F2와 F3은 F1 이후 병렬로 진행할 수 있다. F7은 공개 콘텐츠가 
 
 목표는 이후 모든 기능이 사용할 PostgreSQL 계약과 오류 응답을 만든다.
 
+schema 생성 순서, 연결 역할, 동시성 검수와 migration 증거는 [F1 PostgreSQL 구현·검수 계획](F1_DATABASE_PLAN_v0.1.md)을 따른다.
+
 ### 포함
 
 - Drizzle 스키마와 첫 SQL 마이그레이션
