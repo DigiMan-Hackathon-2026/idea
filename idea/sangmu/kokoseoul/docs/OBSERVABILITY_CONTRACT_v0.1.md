@@ -165,6 +165,7 @@ provider 기본 보존이 더 길면 설정을 줄이거나 정책을 갱신한�
 - monitoring SDK가 request body와 header를 자동 수집하지 않게 기본 설정을 검토한다.
 - 전송 queue가 memory·응답 지연을 고갈시키면 sampling·drop 정책을 적용한다.
 - audit log는 관측 log가 아니라 도메인 transaction 일부이므로 쓰기 실패 시 운영 mutation을 rollback한다.
+- audit의 action·summary·접근·보존·정합성 점검은 [운영 감사 로그 계약](AUDIT_LOG_CONTRACT_v0.1.md)을 따른다.
 - analytics event는 별도 best-effort이며 run 상태의 원본이 아니다.
 
 세 부류를 동일한 “로그”로 취급하지 않는다.

@@ -45,6 +45,8 @@ create ──► draft ── publish ──► published ── pause ──►
 
 published 상태에서 편집 draft가 존재해도 공개 목록과 신규 run은 현재 `publishedVersion`을 사용한다. draft 저장만으로 사용자 화면이 바뀌지 않는다.
 
+current revision에서 canonical draft 내용이 완전히 같은 저장은 상태 전이가 아니며 current result를 반환하고 revision·audit를 늘리지 않는다.
+
 paused에 미공개 draft가 있어도 `resume`은 기존 published version을 재개하며 draft를 삭제하지 않는다. 수정 내용을 공개하려면 `publish`를 사용한다. draft-only quest에는 publishedVersion이 없으므로 resume·pause를 허용하지 않는다.
 
 archive는 draft도 함께 더 이상 수정할 수 없게 하지만, 과거 published version과 run은 읽기 위해 보존한다. 한 번도 공개되지 않은 archived quest는 공개 API에서 계속 404다.

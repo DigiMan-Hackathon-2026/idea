@@ -66,9 +66,10 @@
 2. quest를 잠그고 expected revision과 archived 여부를 검사한다.
 3. 기존 draft가 없으면 `max(versionNo)+1`의 draft를 만든다.
 4. 전체 field·step·place snapshot 후보를 검증한다.
-5. 기존 draft content를 원자적으로 교체한다.
-6. review 결과를 미검수 상태로 둔다.
-7. quest revision을 1 증가시키고 audit를 기록한다.
+5. canonical content가 현재 draft와 완전히 같으면 current revision을 200으로 반환하고 변경·audit를 만들지 않는다.
+6. 다르면 기존 draft content를 원자적으로 교체한다.
+7. review 결과를 미검수 상태로 둔다.
+8. quest revision을 1 증가시키고 audit를 기록한다.
 
 published version의 row·step·place를 update하거나 draft row로 재사용하지 않는다.
 
@@ -247,6 +248,7 @@ paused에 draft가 있어도 resume가 draft를 공개하지 않는다. 오류 �
 - [ ] 빈 draft 생성과 같은 key 재전송 200 기존 결과
 - [ ] draft-only 저장이 public 목록·상세에 없음
 - [ ] published quest 편집이 next draft를 만들고 public pointer 유지
+- [ ] 같은 canonical draft의 명시적 재저장은 revision·audit를 늘리지 않음
 - [ ] draft 변경 뒤 이전 review 재사용 불가
 - [ ] validation 하나씩 누락해 publish DB 무변경
 - [ ] 두 운영자 같은 revision 저장에서 하나만 성공

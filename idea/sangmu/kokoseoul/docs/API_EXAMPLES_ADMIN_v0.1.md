@@ -236,6 +236,8 @@ Cookie: digiman_admin=<server-session-token>
 
 서버는 단계 ID와 place snapshot을 생성한다. 공개된 버전을 수정할 때는 기존 버전을 바꾸지 않고 다음 version 번호의 draft를 만든다.
 
+current revision에서 canonical draft가 완전히 같은 저장은 200과 현재 결과를 반환하고 revision·audit를 늘리지 않는다. 응답 유실 뒤 stale expectedRevision 요청은 먼저 409가 될 수 있으므로 화면은 상세를 재조회해 실제 저장 상태를 확인한다.
+
 ## 공개
 
 공개 요청은 운영자가 일본어와 사실 정보를 확인했다는 체크를 명시한다. 체크 값만 믿지 않고 서버가 필수 필드를 다시 검사한다.
@@ -483,7 +485,9 @@ Cookie: digiman_admin=<server-session-token>
 ```json
 {
   "adminId": "99999999-9999-4999-8999-999999999999",
+  "requestId": "01KAMEADMINEXAMPLE000000000",
   "action": "quest.paused",
+  "entityType": "quest",
   "entityId": "11111111-1111-4111-8111-111111111111",
   "beforeSummary": {
     "status": "published",
@@ -498,6 +502,8 @@ Cookie: digiman_admin=<server-session-token>
 ```
 
 감사 로그 예시는 내부 저장 형태이며 공개 API 응답이 아니다. 세션 토큰, 자유 입력 원문 전체와 민감정보를 before·after summary에 복제하지 않는다.
+
+action·summary allowlist, 실패 시 rollback, append-only 접근과 보존은 [운영 감사 로그 계약](AUDIT_LOG_CONTRACT_v0.1.md)을 따른다.
 
 ## 화면 mock과 계약 테스트
 

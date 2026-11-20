@@ -197,7 +197,7 @@ AI는 콘텐츠·번역 초안 작성에 선택적으로 활용한다. 공개 �
 | run_steps | run_id, step_id, completed_at | run_id·step_id 유일, 해당 run의 버전 단계만 허용 |
 | feedback | id, run_id, joy_score, felt_new_experience, comment, updated_at | run_id 유일, 완료한 기록만 허용 |
 | reports | id, visitor_id, quest_id, version_id, client_request_id, category, comment, status, revision, internal_note, created_at, updated_at, anonymized_at | 활성 신고는 visitor_id·client_request_id 유일, 운영 변경은 revision 검사, 익명화 후 사용자 연결·멱등 키·자유 입력 null |
-| audit_logs | id, admin_id, action, entity_id, before_summary, after_summary, created_at | 공개·중지·보관·편집 기록 |
+| audit_logs | id, admin_id, request_id, action, entity_type, entity_id, before_summary, after_summary, created_at | 공개·중지·보관·편집 기록 |
 | analytics_events | event_id, event_name, dedupe_key, visitor_id, quest_id, run_id, environment, properties, created_at | event_id·dedupe_key 유일, 사용자 원문·위치 저장 금지 |
 
 place_snapshot에는 당시 주소·이용 조건·지도 대상·근거·확인일을 보관한다. 장소 원본이 수정돼도 이미 시작한 퀘스트의 안내를 조용히 바꾸지 않는다. 긴급 이용 불가 변경은 퀘스트 중지로 처리한다.

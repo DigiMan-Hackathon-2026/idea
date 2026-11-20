@@ -223,11 +223,15 @@ step 소속 검증은 run의 version과 step의 version을 함께 비교한다. 
 | --- | --- |
 | primary key | `id` |
 | admin | 활성 여부와 무관하게 기존 principal 참조 유지 |
+| request | server가 확정한 request ID, 응답·허용 log와 연결 |
 | action | 허용된 action 코드 |
-| summaries | 제한된 JSON object, 토큰·자유 입력 원문 금지 |
-| index | `(entity_id, created_at desc)`, `(admin_id, created_at desc)` |
+| entity | `entity_type`과 `entity_id`, action prefix와 type 일치 |
+| summaries | action별 제한된 JSON object, 토큰·자유 입력 원문 금지 |
+| index | `(entity_type, entity_id, created_at desc)`, `(admin_id, created_at desc)`, `(request_id)` |
 
 상태 변경과 감사 로그 insert는 같은 트랜잭션이다. 감사 로그 쓰기 실패 시 운영 변경도 rollback한다.
+
+action catalog, summary allowlist, append-only 권한과 보존 검수는 [운영 감사 로그 계약](AUDIT_LOG_CONTRACT_v0.1.md)을 따른다.
 
 ### analytics_events
 
@@ -272,9 +276,10 @@ quest → run 잠금 순서로 pause·archive와 단계 완료의 선후를 결�
 
 1. quest를 `id`와 `expected_revision`으로 잠그거나 조건부 update한다.
 2. revision 불일치면 아무 내용도 쓰지 않고 `VERSION_CONFLICT`를 반환한다.
-3. 기존 draft 전체를 검증해 교체하거나 새 version의 draft를 만든다.
-4. quest revision을 1 증가시킨다.
-5. 제한된 before·after summary로 audit log를 쓴다.
+3. 기존 draft 전체를 검증하고 canonical 값이 같으면 current result를 반환한다.
+4. 값이 다르면 전체를 교체하거나 새 version의 draft를 만든다.
+5. quest revision을 1 증가시킨다.
+6. 제한된 before·after summary로 audit log를 쓴다.
 
 ### 공개
 
