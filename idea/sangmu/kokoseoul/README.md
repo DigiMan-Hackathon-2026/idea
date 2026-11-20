@@ -55,6 +55,8 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [인터뷰용 가상 안내 예시와 사용 규칙](research/stimuli/README.md)
 - [인터뷰 기록 양식](research/interviews/TEMPLATE.md)
 - [조사 합성 양식](research/synthesis/TEMPLATE.md)
+- [첫 지역·퀘스트 후보 선택 가이드](research/CANDIDATE_SELECTION_GUIDE.md)
+- [지역 후보 양식](research/region-candidates/TEMPLATE.md)
 - [퀘스트 후보 양식](research/quest-candidates/TEMPLATE.md)
 
 익명화한 텍스트 기록만 커밋하며 연락처, 녹음, 영상과 원본 사진은 저장소에 넣지 않습니다.

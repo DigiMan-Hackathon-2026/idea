@@ -9,8 +9,9 @@
 3. `interviews/TEMPLATE.md`를 복사해 `P01.md`처럼 참여자 코드로 기록한다.
 4. 최근 실제 사건 질문을 끝낸 뒤 [가상 안내 예시와 사용 규칙](stimuli/README.md)으로 안내 이해를 관찰하고 두 근거를 분리해 기록한다.
 5. 인터뷰 3~5개가 모이면 `synthesis/TEMPLATE.md`로 공통 패턴과 반대 사례를 합성한다.
-6. 선택한 문제와 연결된 퀘스트만 `quest-candidates/TEMPLATE.md`로 구체화하고 [콘텐츠 검수 계약](../docs/CONTENT_VERIFICATION_v0.1.md)에 따라 출처·일본어·asset 권리를 기록한다.
-7. 타깃·지역·퀘스트 결정이 바뀌면 B2C 스펙의 변경 기록도 갱신한다.
+6. [후보 선택 가이드](CANDIDATE_SELECTION_GUIDE.md)에 따라 evidence ID를 연결하고 `region-candidates/TEMPLATE.md`로 지역 hard gate를 먼저 확인한다.
+7. 선택한 문제·지역과 연결된 퀘스트만 `quest-candidates/TEMPLATE.md`로 구체화하고 [콘텐츠 검수 계약](../docs/CONTENT_VERIFICATION_v0.1.md)에 따라 출처·일본어·asset 권리를 기록한다.
+8. 타깃·지역·퀘스트 결정이 바뀌면 D04~D06과 B2C 스펙의 변경 기록도 갱신한다.
 
 ## 저장 가능 여부
 
@@ -29,6 +30,7 @@
 
 - 인터뷰: `interviews/P01.md`, `interviews/P02.md`
 - 조사 합성: `synthesis/2026-11-round-01.md`
+- 지역 후보: `region-candidates/성수.md`
 - 퀘스트 후보: `quest-candidates/지역-행동.md`
 
 파일 이름에도 이름, 연락처, 소속처럼 참여자를 식별할 수 있는 값을 넣지 않는다.
