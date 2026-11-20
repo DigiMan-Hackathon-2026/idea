@@ -3,6 +3,7 @@ import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
 import { submitFeedbackWithClient } from "../../src/modules/feedback/submit-feedback.server";
+import { submitReportWithClient } from "../../src/modules/feedback/submit-report.server";
 import { completeQuestStepWithClient } from "../../src/modules/progress/complete-step.server";
 import { startQuestRunWithClient } from "../../src/modules/progress/start-run.server";
 
@@ -512,44 +513,29 @@ describe("PostgreSQL concurrency serialization", () => {
 
     try {
       await Promise.all([first.query("begin"), second.query("begin")]);
-      await first.query(
-        `insert into reports
-          (id, visitor_id, quest_id, version_id, client_request_id,
-           category, comment)
-         values ($1, $2, $3, $4, $5, 'information', $6)`,
-        [
-          randomUUID(),
-          fixture.visitorId,
-          fixture.questId,
-          fixture.versionId,
-          clientRequestId,
-          "表示内容を確認できませんでした。",
-        ],
-      );
+      const firstReport = await submitReportWithClient(first, {
+        visitorId: fixture.visitorId,
+        questId: fixture.questId,
+        versionId: fixture.versionId,
+        clientRequestId,
+        category: "information",
+        comment: "表示内容を確認できませんでした。",
+      });
+      expect(firstReport.outcome).toBe("created");
 
-      const competingInsert = second.query(
-        `insert into reports
-          (id, visitor_id, quest_id, version_id, client_request_id,
-           category, comment)
-         values ($1, $2, $3, $4, $5, 'information', $6)
-         on conflict (visitor_id, client_request_id)
-           where visitor_id is not null
-         do nothing
-         returning id`,
-        [
-          randomUUID(),
-          fixture.visitorId,
-          fixture.questId,
-          fixture.versionId,
-          clientRequestId,
-          "表示内容を確認できませんでした。",
-        ],
-      );
+      const competingInsert = submitReportWithClient(second, {
+        visitorId: fixture.visitorId,
+        questId: fixture.questId,
+        versionId: fixture.versionId,
+        clientRequestId,
+        category: "information",
+        comment: "表示内容を確認できませんでした。",
+      });
       await new Promise((resolve) => setTimeout(resolve, 50));
       await first.query("commit");
 
       const competingResult = await competingInsert;
-      expect(competingResult.rowCount).toBe(0);
+      expect(competingResult.outcome).toBe("existing");
       await second.query("commit");
       const reports = await setupClient.query(
         `select count(*)::int as count
@@ -557,6 +543,27 @@ describe("PostgreSQL concurrency serialization", () => {
         [fixture.visitorId, clientRequestId],
       );
       expect(reports.rows[0].count).toBe(1);
+
+      await setupClient.query("begin");
+      const conflict = await submitReportWithClient(setupClient, {
+        visitorId: fixture.visitorId,
+        questId: fixture.questId,
+        versionId: fixture.versionId,
+        clientRequestId,
+        category: "information",
+        comment: "異なる再送内容です。",
+      });
+      const missing = await submitReportWithClient(setupClient, {
+        visitorId: fixture.visitorId,
+        questId: fixture.questId,
+        versionId: randomUUID(),
+        clientRequestId: randomUUID(),
+        category: "information",
+        comment: null,
+      });
+      await setupClient.query("commit");
+      expect(conflict).toEqual({ outcome: "request_conflict" });
+      expect(missing).toEqual({ outcome: "not_found" });
     } finally {
       await closePair(first, second);
     }
