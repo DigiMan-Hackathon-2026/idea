@@ -247,6 +247,8 @@ log field allowlist·request ID·자유 입력 canary 검사는 [로그·지표�
 
 로컬 고성능 환경 결과를 production 보장으로 표현하지 않는다. cold start와 DB 지역 지연을 preview에서 별도로 확인한다.
 
+같은 공유 IP의 정상 visitor 20명, report·session churn, multi-instance counter와 limiter 장애는 [속도 제한·남용 대응 계약](RATE_LIMIT_ABUSE_v0.1.md)에 따라 별도로 검수한다.
+
 ## 테스트 증거 형식
 
 release 검수마다 다음을 기록한다.

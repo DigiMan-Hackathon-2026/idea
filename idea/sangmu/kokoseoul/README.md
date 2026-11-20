@@ -13,6 +13,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [운영 API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_ADMIN_v0.1.md)
 - [API 인증·캐시·재시도 계약 인덱스 v0.1](docs/API_CONTRACT_INDEX_v0.1.md)
 - [입력 검증·정규화 계약 v0.1](docs/INPUT_VALIDATION_v0.1.md)
+- [속도 제한·남용 대응 계약 v0.1](docs/RATE_LIMIT_ABUSE_v0.1.md)
 - [기술 결정 v0.1](docs/TECH_DECISIONS_v0.1.md)
 - [외부 서비스 평가와 선택 조건 v0.1](docs/EXTERNAL_SERVICES_EVALUATION_v0.1.md)
 - [PostgreSQL 데이터 정합성 계약 v0.1](docs/DATA_CONSTRAINTS_v0.1.md)

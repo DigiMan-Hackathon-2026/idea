@@ -142,6 +142,8 @@ Content Security Policy는 실제 외부 이미지·font·analytics 목록을 �
 
 ## 속도 제한과 남용
 
+key 신뢰 경계, endpoint별 bucket, 429·Retry-After, 공유 Wi-Fi와 limiter 장애는 [속도 제한·남용 대응 계약](RATE_LIMIT_ABUSE_v0.1.md)을 따른다.
+
 초기 정책안:
 
 | endpoint 범위 | 제한 |

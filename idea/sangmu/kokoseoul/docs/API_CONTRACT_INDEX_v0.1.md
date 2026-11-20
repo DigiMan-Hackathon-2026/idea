@@ -77,6 +77,8 @@ quest 생성의 `clientRequestId`는 UI가 생성 행동마다 만드는 UUID다
 
 Origin 실패는 visitor·admin 모두 `ORIGIN_FORBIDDEN`으로 매핑하고 허용 Origin 목록을 details에 넣지 않는다. 인증을 먼저 자세히 판별해 공격자에게 principal 존재 여부를 알려 주지 않으며 화면은 재시도를 반복하지 않는다.
 
+429 header·화면 복구, bucket key와 limiter 장애는 [속도 제한·남용 대응 계약](RATE_LIMIT_ABUSE_v0.1.md)을 따른다.
+
 ## 클라이언트 재시도 규칙
 
 | 상황 | 허용 행동 |
