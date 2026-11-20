@@ -7,49 +7,36 @@ import {
 } from "../../../../../../../server/api-response";
 import { getApplicationOrigin } from "../../../../../../../server/http-config";
 import {
+  hasOnlyKeys,
+  isUuid,
+  parseJsonObject,
+} from "../../../../../../../server/http-validation";
+import {
   getVisitorIdentity,
   visitorResponse,
 } from "../../../../../../../server/visitor-http";
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type RouteContext = {
   params: Promise<{ runId: string; stepId: string }>;
 };
 
 async function hasCompletionBody(request: NextRequest): Promise<boolean> {
-  const mediaType = request.headers
-    .get("content-type")
-    ?.split(";", 1)[0]
-    .trim()
-    .toLowerCase();
-  if (mediaType !== "application/json") return false;
-  const text = await request.text();
-  if (text.length > 128) return false;
-  try {
-    const value: unknown = JSON.parse(text);
-    return (
-      typeof value === "object" &&
-      value !== null &&
-      !Array.isArray(value) &&
-      Object.keys(value).length === 1 &&
-      "completed" in value &&
-      value.completed === true
-    );
-  } catch {
-    return false;
-  }
+  const value = await parseJsonObject(request, 128);
+  return (
+    value !== null &&
+    hasOnlyKeys(value, new Set(["completed"])) &&
+    value.completed === true
+  );
 }
 
 export async function PUT(request: NextRequest, context: RouteContext) {
   const requestId = resolveRequestId(request.headers.get("x-request-id"));
   const { runId, stepId } = await context.params;
   const invalidFields = [
-    ...(!UUID_PATTERN.test(runId)
+    ...(!isUuid(runId)
       ? [{ path: "runId", reason: "INVALID_FORMAT" }]
       : []),
-    ...(!UUID_PATTERN.test(stepId)
+    ...(!isUuid(stepId)
       ? [{ path: "stepId", reason: "INVALID_FORMAT" }]
       : []),
   ];

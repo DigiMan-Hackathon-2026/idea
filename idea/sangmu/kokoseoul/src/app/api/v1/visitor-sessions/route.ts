@@ -9,8 +9,8 @@ import {
   resolveRequestId,
 } from "../../../../server/api-response";
 import { getApplicationOrigin } from "../../../../server/http-config";
+import { hasExactEmptyJsonBody } from "../../../../server/http-validation";
 import {
-  hasExactEmptyJsonBody,
   visitorResponse,
   VISITOR_COOKIE_NAME,
 } from "../../../../server/visitor-http";

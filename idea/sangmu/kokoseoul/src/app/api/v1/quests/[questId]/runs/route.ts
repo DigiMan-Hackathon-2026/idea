@@ -7,13 +7,13 @@ import {
 } from "../../../../../../server/api-response";
 import { getApplicationOrigin } from "../../../../../../server/http-config";
 import {
-  getVisitorIdentity,
   hasExactEmptyJsonBody,
+  isUuid,
+} from "../../../../../../server/http-validation";
+import {
+  getVisitorIdentity,
   visitorResponse,
 } from "../../../../../../server/visitor-http";
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type RouteContext = { params: Promise<{ questId: string }> };
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const requestId = resolveRequestId(request.headers.get("x-request-id"));
   const { questId } = await context.params;
 
-  if (!UUID_PATTERN.test(questId)) {
+  if (!isUuid(questId)) {
     return visitorResponse(
       errorResponse("VALIDATION_ERROR", requestId, {
         fields: [{ path: "questId", reason: "INVALID_FORMAT" }],

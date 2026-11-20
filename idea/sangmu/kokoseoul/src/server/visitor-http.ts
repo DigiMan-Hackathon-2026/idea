@@ -8,31 +8,6 @@ export function visitorResponse<T extends NextResponse>(response: T): T {
   return response;
 }
 
-export async function hasExactEmptyJsonBody(
-  request: NextRequest,
-): Promise<boolean> {
-  const mediaType = request.headers
-    .get("content-type")
-    ?.split(";", 1)[0]
-    .trim()
-    .toLowerCase();
-  if (mediaType !== "application/json") return false;
-
-  const text = await request.text();
-  if (text.length > 128) return false;
-  try {
-    const parsed: unknown = JSON.parse(text);
-    return (
-      typeof parsed === "object" &&
-      parsed !== null &&
-      !Array.isArray(parsed) &&
-      Object.keys(parsed).length === 0
-    );
-  } catch {
-    return false;
-  }
-}
-
 export async function getVisitorIdentity(
   request: NextRequest,
 ): Promise<{ visitorId: string; expiresAt: string } | null> {

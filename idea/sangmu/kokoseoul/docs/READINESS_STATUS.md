@@ -38,7 +38,7 @@
 | locale·표시 형식 | 준비됨 | [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 실제 formatter·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
 | 보안·개인정보 | 진행 중 | 기본 `no-referrer`·`nosniff`·frame deny·camera/microphone/geolocation 차단과 Chromium 검수, [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | CSP·HSTS·cookie 삭제·출시 전 gate 실행 |
-| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 68개 unit·44개 PostgreSQL integration·12개 Chromium E2E | 실제 DB를 연결한 HTTP·cookie·admin 경합·실기기에서 AC01~AC20 증거 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 72개 unit·44개 PostgreSQL integration·12개 Chromium E2E | 실제 DB를 연결한 HTTP·cookie·admin 경합·실기기에서 AC01~AC20 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |

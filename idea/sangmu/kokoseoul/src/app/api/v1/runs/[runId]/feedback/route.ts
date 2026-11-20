@@ -7,12 +7,14 @@ import {
 } from "../../../../../../server/api-response";
 import { getApplicationOrigin } from "../../../../../../server/http-config";
 import {
+  hasOnlyKeys,
+  isUuid,
+  parseJsonObject,
+} from "../../../../../../server/http-validation";
+import {
   getVisitorIdentity,
   visitorResponse,
 } from "../../../../../../server/visitor-http";
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type FeedbackBody = {
   joyScore: number;
@@ -23,23 +25,11 @@ type FeedbackBody = {
 type RouteContext = { params: Promise<{ runId: string }> };
 
 async function parseFeedbackBody(request: NextRequest): Promise<FeedbackBody | null> {
-  const mediaType = request.headers
-    .get("content-type")
-    ?.split(";", 1)[0]
-    .trim()
-    .toLowerCase();
-  if (mediaType !== "application/json") return null;
-  const text = await request.text();
-  if (text.length > 2_048) return null;
-
+  const body = await parseJsonObject(request, 2_048);
+  if (!body) return null;
   try {
-    const value: unknown = JSON.parse(text);
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-      return null;
-    }
-    const body = value as Record<string, unknown>;
     const allowed = new Set(["joyScore", "feltNewExperience", "comment"]);
-    if (Object.keys(body).some((key) => !allowed.has(key))) return null;
+    if (!hasOnlyKeys(body, allowed)) return null;
     const comment = body.comment ?? null;
     if (
       !Number.isInteger(body.joyScore) ||
@@ -64,7 +54,7 @@ async function parseFeedbackBody(request: NextRequest): Promise<FeedbackBody | n
 export async function PUT(request: NextRequest, context: RouteContext) {
   const requestId = resolveRequestId(request.headers.get("x-request-id"));
   const { runId } = await context.params;
-  if (!UUID_PATTERN.test(runId)) {
+  if (!isUuid(runId)) {
     return visitorResponse(
       errorResponse("VALIDATION_ERROR", requestId, {
         fields: [{ path: "runId", reason: "INVALID_FORMAT" }],

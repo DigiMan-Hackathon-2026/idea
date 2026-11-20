@@ -10,12 +10,15 @@ import {
 } from "../../../../../../server/api-response";
 import { getApplicationOrigin } from "../../../../../../server/http-config";
 import {
+  hasOnlyKeys,
+  isUuid,
+  parseJsonObject,
+} from "../../../../../../server/http-validation";
+import {
   getVisitorIdentity,
   visitorResponse,
 } from "../../../../../../server/visitor-http";
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REPORT_CATEGORIES = new Set<ReportCategory>([
   "information",
   "unavailable",
@@ -31,33 +34,22 @@ type ReportBody = {
 type RouteContext = { params: Promise<{ questId: string }> };
 
 async function parseReportBody(request: NextRequest): Promise<ReportBody | null> {
-  const mediaType = request.headers
-    .get("content-type")
-    ?.split(";", 1)[0]
-    .trim()
-    .toLowerCase();
-  if (mediaType !== "application/json") return null;
-  const text = await request.text();
-  if (text.length > 2_048) return null;
+  const body = await parseJsonObject(request, 2_048);
+  if (!body) return null;
   try {
-    const value: unknown = JSON.parse(text);
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-      return null;
-    }
-    const body = value as Record<string, unknown>;
     const allowed = new Set([
       "versionId",
       "clientRequestId",
       "category",
       "comment",
     ]);
-    if (Object.keys(body).some((key) => !allowed.has(key))) return null;
+    if (!hasOnlyKeys(body, allowed)) return null;
     const comment = body.comment ?? null;
     if (
       typeof body.versionId !== "string" ||
-      !UUID_PATTERN.test(body.versionId) ||
+      !isUuid(body.versionId) ||
       typeof body.clientRequestId !== "string" ||
-      !UUID_PATTERN.test(body.clientRequestId) ||
+      !isUuid(body.clientRequestId) ||
       typeof body.category !== "string" ||
       !REPORT_CATEGORIES.has(body.category as ReportCategory) ||
       (comment !== null &&
@@ -79,7 +71,7 @@ async function parseReportBody(request: NextRequest): Promise<ReportBody | null>
 export async function POST(request: NextRequest, context: RouteContext) {
   const requestId = resolveRequestId(request.headers.get("x-request-id"));
   const { questId } = await context.params;
-  if (!UUID_PATTERN.test(questId)) {
+  if (!isUuid(questId)) {
     return visitorResponse(
       errorResponse("VALIDATION_ERROR", requestId, {
         fields: [{ path: "questId", reason: "INVALID_FORMAT" }],
