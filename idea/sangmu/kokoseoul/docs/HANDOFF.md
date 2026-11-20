@@ -44,6 +44,7 @@
 - `GET /api/v1/runs/:runId`는 visitor 소유 run만 반환하고 고정 version의 제목·demo 표시·단계·문구·장소 snapshot과 완료 시각을 position 순서로 조립한다. quest가 중지되면 기록은 읽을 수 있지만 이어하기는 막고 공개 pause 문구를 반환한다.
 - 구현된 6개 API route의 지원하지 않는 method는 Next 기본 body 대신 공통 `METHOD_NOT_ALLOWED` envelope, 검증된 request ID, `Allow`, `no-store`, `Vary: Cookie`를 포함한 405를 반환한다.
 - visitor cookie 인증은 4 KiB를 넘는 header, 128자를 넘는 token과 같은 이름의 중복 cookie를 DB 검증 전에 거절한다. session 생성 의도에서는 이를 기존 세션으로 해석하지 않고 제한된 신규 발급 흐름으로 보낸다.
+- API 예외는 연결 거절·reset·timeout, PostgreSQL 연결 class·lock/query timeout과 설정 누락만 재시도 가능한 503으로 분류한다. 예상하지 못한 repository 불변식·코드 오류는 내부 내용을 숨긴 비재시도 500으로 반환해 client의 위험한 자동 mutation 반복을 막는다.
 - CI는 같은 PostgreSQL digest의 `digiman_test_ci` service에 marker와 migration을 적용한 뒤 전체 constraint 통합 테스트를 실행한다. Actions run `44818613781`에서 reports까지 DB 검사와 Pixel 5·Desktop Chrome 12개 브라우저 흐름이 `2m 19s`에 모두 통과했다. `ci-local-only`는 격리된 Actions service의 비운영 값이며 repository·production secret이 아니다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.

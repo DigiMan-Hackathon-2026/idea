@@ -8,6 +8,7 @@ import {
   errorResponse,
   jsonResponse,
   resolveRequestId,
+  unexpectedErrorResponse,
 } from "../../../../../../server/api-response";
 import { getApplicationOrigin } from "../../../../../../server/http-config";
 import {
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
         requestId,
       ),
     );
-  } catch {
-    return visitorResponse(errorResponse("SERVICE_UNAVAILABLE", requestId));
+  } catch (error) {
+    return visitorResponse(unexpectedErrorResponse(error, requestId));
   }
 }

@@ -13,6 +13,7 @@ export type PublicErrorCode =
   | "STEP_ORDER_CONFLICT"
   | "RUN_NOT_COMPLETED"
   | "REQUEST_CONFLICT"
+  | "INTERNAL_ERROR"
   | "SERVICE_UNAVAILABLE";
 
 const ERROR_DEFINITIONS: Record<
@@ -63,6 +64,11 @@ const ERROR_DEFINITIONS: Record<
     status: 409,
     retryable: false,
     messageJa: "同じ送信IDで異なる内容を受け付けることはできません。",
+  },
+  INTERNAL_ERROR: {
+    status: 500,
+    retryable: false,
+    messageJa: "処理を完了できませんでした。状態を確認してください。",
   },
   SERVICE_UNAVAILABLE: {
     status: 503,
@@ -122,4 +128,52 @@ export function createMethodNotAllowedHandler(allow: readonly string[]) {
     response.headers.set("Vary", "Cookie");
     return response;
   };
+}
+
+const SERVICE_ERROR_CODES = new Set([
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "53300",
+  "55P03",
+  "57014",
+  "57P01",
+  "57P02",
+  "57P03",
+  "08000",
+  "08001",
+  "08003",
+  "08004",
+  "08006",
+  "08007",
+  "08P01",
+]);
+
+const CONFIGURATION_ERROR_PREFIXES = [
+  "APP_ORIGIN",
+  "Database URL",
+  "Database runtime URL",
+  "Session token",
+  "SESSION_TOKEN_",
+] as const;
+
+export function unexpectedErrorResponse(
+  error: unknown,
+  requestId: string,
+): NextResponse {
+  const code =
+    typeof error === "object" && error !== null && "code" in error
+      ? String(error.code)
+      : null;
+  const message = error instanceof Error ? error.message : "";
+  const isUnavailable =
+    (code !== null &&
+      (SERVICE_ERROR_CODES.has(code) || code.startsWith("08"))) ||
+    CONFIGURATION_ERROR_PREFIXES.some((prefix) =>
+      message.startsWith(prefix),
+    );
+  return errorResponse(
+    isUnavailable ? "SERVICE_UNAVAILABLE" : "INTERNAL_ERROR",
+    requestId,
+  );
 }

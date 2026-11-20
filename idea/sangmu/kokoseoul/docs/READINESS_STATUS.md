@@ -29,7 +29,7 @@
 | 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
-| API 오류·request ID | 진행 중 | 공통 오류 factory·request ID·6개 route의 405/Allow 처리, [오류 catalog](API_ERROR_CATALOG_v0.1.md) | 500 분류·전체 endpoint 통합 검수 |
+| API 오류·request ID | 진행 중 | 공통 오류 factory·request ID·6개 route의 405/Allow와 dependency 503·invariant 500 분리, [오류 catalog](API_ERROR_CATALOG_v0.1.md) | 구조화 server log·전체 endpoint 통합 검수 |
 | 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
 | DB 정합성 설계 | local·CI 완료 | 전체 domain 14 tables migration, capability roles, 동시성·rollback, visitor repositories, HMAC session core와 HTTP 세로 흐름, PostgreSQL 17.12 통합 테스트 46개, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | provider login mapping·나머지 visitor/admin adapter 연결 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
@@ -38,7 +38,7 @@
 | locale·표시 형식 | 준비됨 | [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 실제 formatter·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
 | 보안·개인정보 | 진행 중 | 기본 `no-referrer`·`nosniff`·frame deny·camera/microphone/geolocation 차단과 Chromium 검수, [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | CSP·HSTS·cookie 삭제·출시 전 gate 실행 |
-| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 80개 unit·46개 PostgreSQL integration·12개 Chromium E2E | admin 경합·실기기에서 AC01~AC20 전체 증거 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 83개 unit·46개 PostgreSQL integration·12개 Chromium E2E | admin 경합·실기기에서 AC01~AC20 전체 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |

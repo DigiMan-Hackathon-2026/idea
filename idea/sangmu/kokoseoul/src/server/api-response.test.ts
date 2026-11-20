@@ -4,6 +4,7 @@ import {
   createMethodNotAllowedHandler,
   errorResponse,
   resolveRequestId,
+  unexpectedErrorResponse,
 } from "./api-response";
 
 describe("API response primitives", () => {
@@ -46,6 +47,26 @@ describe("API response primitives", () => {
     expect(response.headers.get("vary")).toBe("Cookie");
     expect(await response.json()).toMatchObject({
       error: { code: "METHOD_NOT_ALLOWED", retryable: false },
+    });
+  });
+
+  it("separates retryable dependency failures from programming errors", async () => {
+    const unavailable = unexpectedErrorResponse(
+      Object.assign(new Error("connection failed"), { code: "ECONNREFUSED" }),
+      "request_123456789",
+    );
+    const internal = unexpectedErrorResponse(
+      new Error("Run uniqueness invariant failed"),
+      "request_123456789",
+    );
+
+    expect(unavailable.status).toBe(503);
+    expect(await unavailable.json()).toMatchObject({
+      error: { code: "SERVICE_UNAVAILABLE", retryable: true },
+    });
+    expect(internal.status).toBe(500);
+    expect(await internal.json()).toMatchObject({
+      error: { code: "INTERNAL_ERROR", retryable: false, details: {} },
     });
   });
 });

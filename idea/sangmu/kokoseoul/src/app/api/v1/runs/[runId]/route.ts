@@ -5,6 +5,7 @@ import {
   errorResponse,
   jsonResponse,
   resolveRequestId,
+  unexpectedErrorResponse,
 } from "../../../../../server/api-response";
 import { isUuid } from "../../../../../server/http-validation";
 import {
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return run
       ? visitorResponse(jsonResponse(run, 200, requestId))
       : visitorResponse(errorResponse("NOT_FOUND", requestId));
-  } catch {
-    return visitorResponse(errorResponse("SERVICE_UNAVAILABLE", requestId));
+  } catch (error) {
+    return visitorResponse(unexpectedErrorResponse(error, requestId));
   }
 }

@@ -117,4 +117,26 @@ describe("POST /api/v1/visitor-sessions", () => {
       },
     });
   });
+
+  it.each([
+    [new Error("unexpected invariant"), 500, "INTERNAL_ERROR", false],
+    [
+      Object.assign(new Error("connection failed"), { code: "ECONNREFUSED" }),
+      503,
+      "SERVICE_UNAVAILABLE",
+      true,
+    ],
+  ])(
+    "classifies creation failures without exposing internals",
+    async (error, status, code, retryable) => {
+      sessionMocks.createVisitorSession.mockRejectedValue(error);
+
+      const response = await POST(request());
+
+      expect(response.status).toBe(status);
+      expect(await response.json()).toMatchObject({
+        error: { code, retryable, details: {} },
+      });
+    },
+  );
 });
