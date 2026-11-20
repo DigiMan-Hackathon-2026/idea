@@ -15,6 +15,7 @@
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.
 - DB 제약·인덱스·잠금·삭제 순서는 [PostgreSQL 데이터 정합성 계약 v0.1](DATA_CONSTRAINTS_v0.1.md)에 정리했다.
 - 화면 mock과 서버 계약 테스트에 사용할 공개·진행 API JSON은 [B2C API 요청과 응답 예시 v0.1](API_EXAMPLES_B2C_v0.1.md)에 정리했다.
+- B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
 - 운영자 권한·revision·콘텐츠 상태·신고 처리 JSON은 [운영 API 요청과 응답 예시 v0.1](API_EXAMPLES_ADMIN_v0.1.md)에 정리했다.
 - 행사 전 제품 코드·scaffold·DB·배포 허용 여부는 [사전 개발 범위 확인서](EVENT_RULES_CHECKLIST.md)로 질문하고 답변 전까지 제품 코드를 보류한다.
 - 운영자 인증은 Auth.js와 Google OIDC의 DB 세션, 지도는 Google Maps 범용 URL과 한국어 주소 복사를 우선 검증한다. 외부 서비스 프로비저닝과 제품 코드는 아직 없다.
