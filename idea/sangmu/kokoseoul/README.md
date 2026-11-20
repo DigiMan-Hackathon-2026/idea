@@ -19,6 +19,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [속도 제한·남용 대응 계약 v0.1](docs/RATE_LIMIT_ABUSE_v0.1.md)
 - [HTTP 보안·캐시 header 계약 v0.1](docs/HTTP_SECURITY_HEADERS_v0.1.md)
 - [기술 결정 v0.1](docs/TECH_DECISIONS_v0.1.md)
+- [애플리케이션 module·import 경계 계약 v0.1](docs/MODULE_BOUNDARIES_v0.1.md)
 - [외부 서비스 평가와 선택 조건 v0.1](docs/EXTERNAL_SERVICES_EVALUATION_v0.1.md)
 - [PostgreSQL 데이터 정합성 계약 v0.1](docs/DATA_CONSTRAINTS_v0.1.md)
 - [도메인 상태 머신 계약 v0.1](docs/STATE_MACHINES_v0.1.md)

@@ -165,6 +165,8 @@ pull request와 main push에서 frozen install, 문서 검증, lint, typecheck, 
 
 F0에서는 실제 도메인 파일을 만들지 않지만 F1 이후 다음 경계를 유지한다.
 
+실제 module 책임·의존 방향·server-only guard와 자동 import restriction은 [module·import 경계 계약](MODULE_BOUNDARIES_v0.1.md)을 따른다.
+
 ```text
 app/ 또는 src/app/       route와 화면 조합
 src/modules/content/     quest·version·공개 상태

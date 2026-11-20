@@ -101,6 +101,8 @@ server startup은 현재 환경·활성 기능에 필요한 변수만 읽고, �
 
 ## build·runtime 경계
 
+server-only path, client import 금지와 build canary의 구체적인 적용은 [module·import 경계 계약](MODULE_BOUNDARIES_v0.1.md)을 따른다.
+
 - server-only config module에 client import guard를 둔다.
 - build 중 secret이 없어도 가능한 static 검사는 가짜 secret을 만들지 않고 실행한다.
 - runtime에 필요한 값을 build artifact에 bake하지 않는다.

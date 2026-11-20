@@ -26,6 +26,8 @@
 
 첫 버전은 모노레포나 별도 API 서버를 두지 않는다. 하나의 Next.js 애플리케이션 안에서 다음 경계를 지킨다.
 
+구체적인 import 방향, transaction owner, DTO·DB row, server-only와 job entrypoint 경계는 [module·import 계약](MODULE_BOUNDARIES_v0.1.md)을 따른다.
+
 ```text
 app/                 화면과 얇은 Route Handler
 src/modules/content  퀘스트·버전·공개 상태
