@@ -14,6 +14,7 @@
 - 맥북에서는 원하는 로컬 경로에 복제한 뒤 그 폴더를 Codex 프로젝트로 연다. Windows 경로를 그대로 사용하지 않는다.
 - 제품 코드는 아직 없다. 설계 스펙, 기술 결정, 사용자 검증 계획과 저장소 기본 설정을 준비했다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
+- 외부 서비스의 현재 region·복구·비용 제약과 Singapore 배치 후보는 [외부 서비스 평가 v0.1](EXTERNAL_SERVICES_EVALUATION_v0.1.md)에 정리했다.
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.
 - DB 제약·인덱스·잠금·삭제 순서는 [PostgreSQL 데이터 정합성 계약 v0.1](DATA_CONSTRAINTS_v0.1.md)에 정리했다.
 - 화면 mock과 서버 계약 테스트에 사용할 공개·진행 API JSON은 [B2C API 요청과 응답 예시 v0.1](API_EXAMPLES_B2C_v0.1.md)에 정리했다.

@@ -19,6 +19,7 @@ REQUIRED_README_LINKS = {
     "docs/READINESS_STATUS.md",
     "docs/B2C_SPEC_v0.1.md",
     "docs/TECH_DECISIONS_v0.1.md",
+    "docs/EXTERNAL_SERVICES_EVALUATION_v0.1.md",
     "docs/IMPLEMENTATION_PLAN_v0.1.md",
     "docs/USER_RESEARCH_v0.1.md",
     "docs/TEST_PLAN_v0.1.md",

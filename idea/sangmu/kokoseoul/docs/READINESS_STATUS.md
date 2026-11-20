@@ -35,8 +35,9 @@
 | 첫 지역 | 대기 | 후보 미선정 | 사례·현장 검증 기준을 통과한 지역 1곳 |
 | 첫 퀘스트 | 대기 | 후보 미작성 | 검수 가능한 후보 1개와 예비 2개 |
 | 일본어 검수자 | 대기 | 미배정 | 화면·콘텐츠 검수자 코드와 일정 |
-| Neon·Vercel | 대기 | 외부 서비스 후보 | 요금제·지역·backup·preview 범위 확인 |
+| Neon·Vercel | 준비됨 | [외부 서비스 평가](EXTERNAL_SERVICES_EVALUATION_v0.1.md) | 계정·plan 승인, Singapore 배치와 지연 측정 |
 | Google OIDC | 대기 | 구현 기준만 결정 | 환경별 client·callback·허용 principal 준비 |
+| 지도 연결 | 준비됨 | Google Maps URL·주소 복사 작업 기준 | 일본어 iOS·Android 서울 경로 실제 검수 |
 | 제품 코드 F0~F8 | 보류 | 행사 전 코드 허용 범위 미확인 | 규칙 gate 해제 후 기능별 착수 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
