@@ -31,6 +31,8 @@ SQLite와 in-memory repository는 PostgreSQL lock·partial index·constraint 동
 
 ## 고정 테스트 데이터
 
+고정 ID·clock, Q1~Q5·V1~V3·A1~A3의 상세 상태, seed profile과 count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
+
 UUID와 시각을 고정해 API fixture, DB seed, E2E가 같은 대상을 사용한다.
 
 | fixture | 상태 | 목적 |

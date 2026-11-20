@@ -15,6 +15,8 @@
 
 F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포함하지 않는다.
 
+가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
+
 ## 연결 역할
 
 | 역할 | 허용 | 금지 |

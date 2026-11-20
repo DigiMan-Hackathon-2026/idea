@@ -31,6 +31,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [일본어 문구 검수 절차 v0.1](docs/JAPANESE_COPY_REVIEW_v0.1.md)
 - [모바일 접근성 구현·검수 v0.1](docs/ACCESSIBILITY_VERIFICATION_v0.1.md)
 - [B2C 검수와 테스트 계획 v0.1](docs/TEST_PLAN_v0.1.md)
+- [테스트 fixture·seed 계약 v0.1](docs/TEST_FIXTURES_v0.1.md)
 - [성능·부하 검수 계약 v0.1](docs/PERFORMANCE_LOAD_TEST_v0.1.md)
 - [보안과 개인정보 위협 모델 v0.1](docs/SECURITY_PRIVACY_v0.1.md)
 - [운영자 인증·인가 계약 v0.1](docs/ADMIN_AUTHORIZATION_v0.1.md)

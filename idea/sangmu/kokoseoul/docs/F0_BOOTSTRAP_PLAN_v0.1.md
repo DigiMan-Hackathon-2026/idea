@@ -128,7 +128,7 @@ F0 종료 시 다음 script 이름을 제공한다.
 | `AUTH_GOOGLE_ID` | secret | F7 OIDC |
 | `AUTH_GOOGLE_SECRET` | secret | F7 OIDC |
 
-브라우저에 필요한 값이 생기기 전에는 `NEXT_PUBLIC_` 변수를 만들지 않는다. `APP_ENV`는 `local`, `preview`, `production`만 허용하고 분석의 `demo`, `test`, `production`과 섞지 않는다.
+브라우저에 필요한 값이 생기기 전에는 `NEXT_PUBLIC_` 변수를 만들지 않는다. `APP_ENV`는 `local`, `test`, `preview`, `production`만 허용하고 분석의 `demo`, `test`, `production`과 섞지 않는다.
 
 환경 검사 모듈은 다음 원칙을 따른다.
 

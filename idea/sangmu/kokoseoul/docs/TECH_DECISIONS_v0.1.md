@@ -114,7 +114,7 @@ Vitest는 빠른 TypeScript 단위·통합 테스트에 사용하고, DB 테스�
 
 ## 환경과 비밀값
 
-환경은 `local`, `preview`, `production`으로 나눈다. 제품 이벤트에는 `demo`, `test`, `production` 값을 별도로 기록해 시연 데이터를 실제 성과와 분리한다.
+환경은 `local`, `test`, `preview`, `production`으로 나눈다. `test`는 격리 PostgreSQL·자동 검수용이며 외부 사용자 환경이 아니다. 제품 이벤트에는 `demo`, `test`, `production` 값을 별도로 기록해 시연 데이터를 실제 성과와 분리한다.
 
 저장소에는 `.env.example`만 두며 실제 값은 커밋하지 않는다. 예상 비밀값은 다음과 같다.
 

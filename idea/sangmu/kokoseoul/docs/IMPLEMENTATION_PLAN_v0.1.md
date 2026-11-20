@@ -63,7 +63,7 @@ F2와 F3은 F1 이후 병렬로 진행할 수 있다. F7은 공개 콘텐츠가 
 - Next.js App Router, TypeScript, Tailwind CSS
 - pnpm 버전과 lockfile, Node.js 버전 고정
 - ESLint, TypeScript 검사, Vitest, Playwright 기본 설정
-- `local`, `preview`, `production` 환경 검증
+- `local`, `test`, `preview`, `production` 환경 검증
 - `.env.example`과 비밀값 누락 시 명확한 시작 오류
 - CI에서 설치, 정적 검사, 단위 테스트, 빌드 실행
 
