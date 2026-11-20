@@ -7,6 +7,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 ## 설계 문서
 
 - [B2C 설계 스펙 v0.1](docs/B2C_SPEC_v0.1.md)
+- [B2C API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_B2C_v0.1.md)
 - [기술 결정 v0.1](docs/TECH_DECISIONS_v0.1.md)
 - [B2C 구현 계획 v0.1](docs/IMPLEMENTATION_PLAN_v0.1.md)
 - [일본인 사용자 검증 계획 v0.1](docs/USER_RESEARCH_v0.1.md)
