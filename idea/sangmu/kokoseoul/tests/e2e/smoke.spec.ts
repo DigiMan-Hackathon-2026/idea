@@ -6,6 +6,7 @@ test("renders the Japanese landing page without horizontal overflow", async ({
   const response = await page.goto("/");
 
   expect(response).not.toBeNull();
+  expect(response?.headers()["cache-control"]).toContain("no-store");
   expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
   expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
   expect(response?.headers()["x-frame-options"]).toBe("DENY");
