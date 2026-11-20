@@ -9,6 +9,7 @@ export type PublicErrorCode =
   | "ORIGIN_FORBIDDEN"
   | "NOT_FOUND"
   | "QUEST_UNAVAILABLE"
+  | "STEP_ORDER_CONFLICT"
   | "SERVICE_UNAVAILABLE";
 
 const ERROR_DEFINITIONS: Record<
@@ -39,6 +40,11 @@ const ERROR_DEFINITIONS: Record<
     status: 409,
     retryable: false,
     messageJa: "現在、このクエストを開始できません。",
+  },
+  STEP_ORDER_CONFLICT: {
+    status: 409,
+    retryable: false,
+    messageJa: "前のステップを完了してから進んでください。",
   },
   SERVICE_UNAVAILABLE: {
     status: 503,

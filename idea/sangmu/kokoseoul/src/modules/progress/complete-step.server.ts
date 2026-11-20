@@ -13,23 +13,52 @@ export type CompleteQuestStepResult =
       outcome: "step_completed" | "run_completed" | "existing";
       completedAt: string;
       runStatus: "in_progress" | "completed";
+      runCompletedAt: string | null;
+      nextStepId: string | null;
     }
-  | {
-      outcome:
-        | "not_found"
-        | "unavailable"
-        | "step_not_found"
-        | "order_conflict";
-    };
+  | { outcome: "not_found" }
+  | { outcome: "unavailable" }
+  | { outcome: "step_not_found" }
+  | { outcome: "order_conflict"; expectedStepId: string | null };
 
 type RunLookupRow = { quest_id: string };
 type QuestStateRow = { status: string };
 type RunLockRow = {
   version_id: string;
   status: "in_progress" | "completed";
+  completed_at: Date | null;
 };
 type StepRow = { position: number };
 type CompletionRow = { completed_at: Date };
+type ProgressState = {
+  runCompletedAt: string | null;
+  nextStepId: string | null;
+};
+
+async function loadProgressState(
+  client: Pick<PoolClient, "query">,
+  runId: string,
+  versionId: string,
+): Promise<ProgressState> {
+  const run = await client.query<{ completed_at: Date | null }>(
+    "select completed_at from runs where id = $1",
+    [runId],
+  );
+  const nextStep = await client.query<{ id: string }>(
+    `select qs.id
+     from quest_steps qs
+     left join run_steps rs
+       on rs.run_id = $1 and rs.step_id = qs.id
+     where qs.version_id = $2 and rs.step_id is null
+     order by qs.position
+     limit 1`,
+    [runId, versionId],
+  );
+  return {
+    runCompletedAt: run.rows[0]?.completed_at?.toISOString() ?? null,
+    nextStepId: nextStep.rows[0]?.id ?? null,
+  };
+}
 
 export async function completeQuestStepWithClient(
   client: Pick<PoolClient, "query">,
@@ -57,7 +86,7 @@ export async function completeQuestStepWithClient(
   }
 
   const run = await client.query<RunLockRow>(
-    `select version_id, status
+    `select version_id, status, completed_at
      from runs
      where id = $1 and visitor_id = $2
      for update`,
@@ -85,15 +114,21 @@ export async function completeQuestStepWithClient(
     [input.runId, input.stepId],
   );
   if (existing.rowCount === 1) {
+    const state = await loadProgressState(
+      client,
+      input.runId,
+      pinnedRun.version_id,
+    );
     return {
       outcome: "existing",
       completedAt: existing.rows[0].completed_at.toISOString(),
       runStatus: pinnedRun.status,
+      ...state,
     };
   }
 
   if (pinnedRun.status !== "in_progress") {
-    return { outcome: "order_conflict" };
+    return { outcome: "order_conflict", expectedStepId: null };
   }
 
   const progress = await client.query<{ completed_count: number }>(
@@ -103,7 +138,12 @@ export async function completeQuestStepWithClient(
     [input.runId],
   );
   if (step.rows[0].position !== progress.rows[0].completed_count + 1) {
-    return { outcome: "order_conflict" };
+    const state = await loadProgressState(
+      client,
+      input.runId,
+      pinnedRun.version_id,
+    );
+    return { outcome: "order_conflict", expectedStepId: state.nextStepId };
   }
 
   const inserted = await client.query<CompletionRow>(
@@ -130,10 +170,16 @@ export async function completeQuestStepWithClient(
     );
   }
 
+  const state = await loadProgressState(
+    client,
+    input.runId,
+    pinnedRun.version_id,
+  );
   return {
     outcome: isLastStep ? "run_completed" : "step_completed",
     completedAt: completedAt.toISOString(),
     runStatus: isLastStep ? "completed" : "in_progress",
+    ...state,
   };
 }
 

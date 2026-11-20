@@ -263,7 +263,10 @@ describe("PostgreSQL concurrency serialization", () => {
       stepId: fixture.stepIds[1],
     });
     await setupClient.query("commit");
-    expect(wrongOrder).toEqual({ outcome: "order_conflict" });
+    expect(wrongOrder).toEqual({
+      outcome: "order_conflict",
+      expectedStepId: fixture.stepIds[0],
+    });
 
     await setupClient.query("begin");
     const missingRun = await completeQuestStepWithClient(setupClient, {
@@ -297,6 +300,10 @@ describe("PostgreSQL concurrency serialization", () => {
     await setupClient.query("commit");
     expect(completed.outcome).toBe("step_completed");
     expect(repeated.outcome).toBe("existing");
+    if (completed.outcome === "step_completed") {
+      expect(completed.nextStepId).toBe(fixture.stepIds[1]);
+      expect(completed.runCompletedAt).toBeNull();
+    }
     if (
       "completedAt" in completed &&
       "completedAt" in repeated
@@ -344,6 +351,10 @@ describe("PostgreSQL concurrency serialization", () => {
         stepId: fixture.stepIds[2],
       });
       expect(firstCompletion.outcome).toBe("run_completed");
+      if (firstCompletion.outcome === "run_completed") {
+        expect(firstCompletion.nextStepId).toBeNull();
+        expect(firstCompletion.runCompletedAt).toBe(firstCompletion.completedAt);
+      }
 
       const competingInsert = completeQuestStepWithClient(second, {
         visitorId: fixture.visitorId,
