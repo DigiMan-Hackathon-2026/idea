@@ -16,6 +16,7 @@ API_EXAMPLE_FILES = (
     ROOT / "docs" / "API_EXAMPLES_ADMIN_v0.1.md",
 )
 REQUIRED_README_LINKS = {
+    "docs/READINESS_STATUS.md",
     "docs/B2C_SPEC_v0.1.md",
     "docs/TECH_DECISIONS_v0.1.md",
     "docs/IMPLEMENTATION_PLAN_v0.1.md",
