@@ -15,6 +15,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [B2C 화면 상태와 일본어 문구 계약 v0.1](docs/SCREEN_STATES_v0.1.md)
 - [B2C 검수와 테스트 계획 v0.1](docs/TEST_PLAN_v0.1.md)
 - [보안과 개인정보 위협 모델 v0.1](docs/SECURITY_PRIVACY_v0.1.md)
+- [배포와 복구 운영 런북 v0.1](docs/OPERATIONS_RUNBOOK_v0.1.md)
 - [해커톤 사전 개발 범위 확인서](docs/EVENT_RULES_CHECKLIST.md)
 - [일본인 사용자 검증 계획 v0.1](docs/USER_RESEARCH_v0.1.md)
 - [맥북 Codex 인수인계](docs/HANDOFF.md)
