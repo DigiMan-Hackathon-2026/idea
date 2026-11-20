@@ -29,7 +29,7 @@
 - Playwright는 Pixel 5와 Desktop Chrome 두 project에서 6개 핵심 흐름, 총 12개 E2E를 실행한다. 개발 서버 초기 compile이 겹치는 병렬 실행을 고려해 test 45초·expect 10초 한계를 명시했다.
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않으며 manifest·SVG app icon은 demo 식별용으로만 사용한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
-- F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 local·CI capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 constraint 통합 테스트 44개를 통과했다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. provider login mapping과 나머지 HTTP adapter 연결은 남아 있다.
+- F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 local·CI capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 constraint 통합 테스트 45개를 통과했다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. provider login mapping과 나머지 HTTP adapter 연결은 남아 있다.
 - runtime DB pool은 server-only로 지연 생성되며 local/test `digiman_runtime*` role만 허용한다. transaction은 statement 5초·lock 3초·idle 5초 제한을 사용하고 오류 시 rollback 뒤 원래 오류를 다시 던진다. production provider host와 login mapping은 아직 열지 않았다.
 - 첫 progress repository `startQuestRun`은 quest를 `FOR UPDATE`로 잠그고 현재 published version만 고정한다. 같은 visitor·quest 동시 시작은 `created` 한 번과 같은 run의 `existing`으로 수렴하며, 없는 quest와 paused quest는 각각 `not_found`, `unavailable`을 반환한다.
 - `completeQuestStep`은 quest share lock→run update lock 순서로 pause와 단계 완료를 직렬화한다. 소유자·pinned version·position을 다시 확인하고 마지막 step과 run 완료를 한 transaction에 기록하며, 중복 단계는 최초 `completedAt`을 그대로 반환한다.
@@ -41,6 +41,7 @@
 - `PUT /api/v1/runs/:runId/feedback`은 점수 1~5 정수, boolean, 선택 500자 comment와 unknown field를 경계에서 검사한다. 완료·소유 run만 한 행으로 upsert하고, 미완료는 `RUN_NOT_COMPLETED`, 타인·없음은 `NOT_FOUND`로 분리한다.
 - `POST /api/v1/quests/:questId/reports`는 공개 version·category·500자 comment·client request UUID를 검사해 최초 201, 동일 재전송 200을 반환한다. 같은 visitor의 같은 key에 다른 canonical 요청은 `REQUEST_CONFLICT`, 미공개·불일치 version은 `NOT_FOUND`다.
 - mutation route는 공통 JSON object·UTF-8 byte limit·UUID·unknown-key 검증 함수를 사용한다. Content-Type이 다르거나 array·primitive·oversize·비정규 UUID인 요청은 repository와 session 조회 전에 거절한다.
+- `GET /api/v1/runs/:runId`는 visitor 소유 run만 반환하고 고정 version의 제목·demo 표시·단계·문구·장소 snapshot과 완료 시각을 position 순서로 조립한다. quest가 중지되면 기록은 읽을 수 있지만 이어하기는 막고 공개 pause 문구를 반환한다.
 - CI는 같은 PostgreSQL digest의 `digiman_test_ci` service에 marker와 migration을 적용한 뒤 전체 constraint 통합 테스트를 실행한다. Actions run `44818613781`에서 reports까지 DB 검사와 Pixel 5·Desktop Chrome 12개 브라우저 흐름이 `2m 19s`에 모두 통과했다. `ci-local-only`는 격리된 Actions service의 비운영 값이며 repository·production secret이 아니다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.

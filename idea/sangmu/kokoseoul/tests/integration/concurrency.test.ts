@@ -10,6 +10,7 @@ import {
   verifyVisitorSessionWithClient,
 } from "../../src/modules/session/visitor-session.server";
 import { completeQuestStepWithClient } from "../../src/modules/progress/complete-step.server";
+import { getQuestRunWithClient } from "../../src/modules/progress/get-run.server";
 import { startQuestRunWithClient } from "../../src/modules/progress/start-run.server";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
@@ -651,6 +652,59 @@ describe("PostgreSQL concurrency serialization", () => {
       felt_new_experience: true,
       comment_is_null: true,
     });
+  });
+
+  it("reads only the owned pinned run and reflects availability", async () => {
+    const fixture = await createConcurrentFixture();
+    const runId = randomUUID();
+    await setupClient.query("begin");
+    await startQuestRunWithClient(setupClient, {
+      runId,
+      visitorId: fixture.visitorId,
+      questId: fixture.questId,
+    });
+    await setupClient.query("commit");
+
+    const hidden = await getQuestRunWithClient(setupClient, {
+      visitorId: randomUUID(),
+      runId,
+    });
+    expect(hidden).toBeNull();
+
+    const initial = await getQuestRunWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+    });
+    expect(initial?.steps).toHaveLength(3);
+    expect(initial?.nextStepId).toBe(fixture.stepIds[0]);
+    expect(initial?.canContinue).toBe(true);
+
+    await setupClient.query("begin");
+    await completeQuestStepWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      stepId: fixture.stepIds[0],
+    });
+    await setupClient.query("commit");
+    const progressed = await getQuestRunWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+    });
+    expect(progressed?.steps[0].completedAt).not.toBeNull();
+    expect(progressed?.nextStepId).toBe(fixture.stepIds[1]);
+
+    await setupClient.query(
+      `update quests
+       set status = 'paused', pause_reason_ja = $2, revision = revision + 1
+       where id = $1`,
+      [fixture.questId, "利用条件を確認しています。"],
+    );
+    const paused = await getQuestRunWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+    });
+    expect(paused?.canContinue).toBe(false);
+    expect(paused?.unavailableReasonJa).toBe("利用条件を確認しています。");
   });
 
   it("converges simultaneous pepper rehash to one active hash", async () => {
