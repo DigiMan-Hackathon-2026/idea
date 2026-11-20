@@ -31,6 +31,25 @@ API_EXAMPLE_FILES = (
     ROOT / "docs" / "API_EXAMPLES_ADMIN_v0.1.md",
 )
 API_CONTRACT_INDEX = ROOT / "docs" / "API_CONTRACT_INDEX_v0.1.md"
+PAGINATION_CONTRACT = ROOT / "docs" / "PAGINATION_CURSOR_v0.1.md"
+PAGINATED_ENDPOINTS = {
+    "GET /quests",
+    "GET /me/runs",
+    "GET /admin/quests",
+    "GET /admin/reports",
+}
+PAGINATION_SORT_TUPLES = {
+    "firstPublishedAt DESC, questId ASC",
+    "startedAt DESC, runId ASC",
+    "createdAt DESC, questId ASC",
+    "createdAt DESC, reportId ASC",
+}
+PAGINATION_REFERENCE_FILES = (
+    ROOT / "docs" / "API_CONTRACT_INDEX_v0.1.md",
+    ROOT / "docs" / "B2C_SPEC_v0.1.md",
+    ROOT / "docs" / "INPUT_VALIDATION_v0.1.md",
+    ROOT / "docs" / "TEST_PLAN_v0.1.md",
+)
 HTTP_METHODS = "GET|POST|PUT|PATCH|DELETE"
 UUID_PATH_SEGMENT = re.compile(
     r"/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
@@ -123,14 +142,20 @@ def check_markdown_reachability(files: list[Path]) -> list[str]:
     ]
 
 
-def check_json_blocks() -> list[str]:
+def json_blocks(path: Path) -> list[str]:
+    return re.findall(
+        r"^```json[ \t]*\n(.*?)^```[ \t]*$",
+        path.read_text(encoding="utf-8"),
+        re.MULTILINE | re.DOTALL,
+    )
+
+
+def check_json_blocks(files: list[Path]) -> list[str]:
     errors: list[str] = []
-    for path in API_EXAMPLE_FILES:
-        text = path.read_text(encoding="utf-8")
-        blocks = re.findall(r"```json\n(.*?)\n```", text, re.DOTALL)
-        if not blocks:
+    for path in files:
+        blocks = json_blocks(path)
+        if path in API_EXAMPLE_FILES and not blocks:
             errors.append(f"{path.relative_to(ROOT)}: no JSON blocks found")
-            continue
         for index, block in enumerate(blocks, start=1):
             try:
                 json.loads(block)
@@ -139,6 +164,21 @@ def check_json_blocks() -> list[str]:
                     f"{path.relative_to(ROOT)}: JSON block {index}: "
                     f"line {exc.lineno}, column {exc.colno}: {exc.msg}"
                 )
+    return errors
+
+
+def check_fenced_blocks(files: list[Path]) -> list[str]:
+    errors: list[str] = []
+    for path in files:
+        fence_count = sum(
+            1
+            for line in path.read_text(encoding="utf-8").splitlines()
+            if line.startswith("```")
+        )
+        if fence_count % 2:
+            errors.append(
+                f"{path.relative_to(ROOT)}: unbalanced fenced code blocks"
+            )
     return errors
 
 
@@ -256,18 +296,82 @@ def check_api_contract_index() -> list[str]:
     return errors
 
 
+def resolved_link_targets(path: Path) -> set[Path]:
+    return {
+        (path.parent / target).resolve()
+        for target in local_link_targets(path.read_text(encoding="utf-8"))
+    }
+
+
+def check_pagination_contract() -> list[str]:
+    errors: list[str] = []
+    text = PAGINATION_CONTRACT.read_text(encoding="utf-8")
+    request_line = re.compile(rf"`({HTTP_METHODS})\s+(/api/v1/[^`\s]+)`")
+    endpoints = {
+        canonical_endpoint(method, endpoint)
+        for method, endpoint in request_line.findall(text)
+    }
+    missing_endpoints = sorted(PAGINATED_ENDPOINTS - endpoints)
+    unexpected_endpoints = sorted(endpoints - PAGINATED_ENDPOINTS)
+    if missing_endpoints:
+        errors.append(
+            f"{PAGINATION_CONTRACT.relative_to(ROOT)}: missing paginated endpoints "
+            f"{', '.join(missing_endpoints)}"
+        )
+    if unexpected_endpoints:
+        errors.append(
+            f"{PAGINATION_CONTRACT.relative_to(ROOT)}: unexpected paginated endpoints "
+            f"{', '.join(unexpected_endpoints)}"
+        )
+
+    missing_sorts = sorted(value for value in PAGINATION_SORT_TUPLES if value not in text)
+    if missing_sorts:
+        errors.append(
+            f"{PAGINATION_CONTRACT.relative_to(ROOT)}: missing stable sort tuples "
+            f"{', '.join(missing_sorts)}"
+        )
+
+    for path in PAGINATION_REFERENCE_FILES:
+        if PAGINATION_CONTRACT.resolve() not in resolved_link_targets(path):
+            errors.append(
+                f"{path.relative_to(ROOT)}: missing pagination contract reference"
+            )
+
+    config_text = (ROOT / "docs" / "CONFIGURATION_SECRETS_v0.1.md").read_text(
+        encoding="utf-8"
+    )
+    for variable in ("CURSOR_SIGNING_KEYS", "CURSOR_SIGNING_ACTIVE_VERSION"):
+        if variable not in config_text:
+            errors.append(
+                "docs/CONFIGURATION_SECRETS_v0.1.md: "
+                f"missing cursor configuration {variable}"
+            )
+
+    data_text = (ROOT / "docs" / "DATA_CONSTRAINTS_v0.1.md").read_text(
+        encoding="utf-8"
+    )
+    for field in ("first_published_at", "created_at desc", "started_at desc"):
+        if field not in data_text:
+            errors.append(
+                f"docs/DATA_CONSTRAINTS_v0.1.md: missing pagination field/index {field}"
+            )
+    return errors
+
+
 def main() -> int:
     files = markdown_files()
     checks = (
         check_links(files),
         check_markdown_structure(files),
         check_markdown_reachability(files),
-        check_json_blocks(),
+        check_json_blocks(files),
+        check_fenced_blocks(files),
         check_acceptance_coverage(),
         check_error_code_coverage(),
         check_decision_queue(),
         check_readme_index(),
         check_api_contract_index(),
+        check_pagination_contract(),
     )
     errors = [error for group in checks for error in group]
     if errors:
@@ -276,15 +380,12 @@ def main() -> int:
         print(f"Documentation verification failed with {len(errors)} error(s).")
         return 1
 
-    json_blocks = sum(
-        len(re.findall(r"```json\n(.*?)\n```", path.read_text(), re.DOTALL))
-        for path in API_EXAMPLE_FILES
-    )
+    json_block_count = sum(len(json_blocks(path)) for path in files)
     print(
         f"Documentation verification passed: {len(files)} Markdown files, "
-        f"{json_blocks} JSON blocks, {len(example_endpoints())} API endpoints, "
+        f"{json_block_count} JSON blocks, {len(example_endpoints())} API endpoints, "
         f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
-        "canonical H1/date metadata, "
+        "canonical H1/date metadata, balanced fences, pagination invariants, "
         "AC01-AC20 and D01-D13 covered."
     )
     return 0
