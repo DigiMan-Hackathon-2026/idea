@@ -24,6 +24,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [F0 개발 환경 착수 계획 v0.1](docs/F0_BOOTSTRAP_PLAN_v0.1.md)
 - [환경 설정·secret 운영 계약 v0.1](docs/CONFIGURATION_SECRETS_v0.1.md)
 - [F1 PostgreSQL 구현·검수 계획 v0.1](docs/F1_DATABASE_PLAN_v0.1.md)
+- [PostgreSQL migration·backfill 배포 계약 v0.1](docs/DATABASE_MIGRATION_RELEASE_v0.1.md)
 - [의존성·에셋·AI 출처 관리 v0.1](docs/DEPENDENCY_ATTRIBUTION_v0.1.md)
 - [팀 실행·인수인계 계획 v0.1](docs/TEAM_EXECUTION_v0.1.md)
 - [B2C 화면 상태와 일본어 문구 계약 v0.1](docs/SCREEN_STATES_v0.1.md)

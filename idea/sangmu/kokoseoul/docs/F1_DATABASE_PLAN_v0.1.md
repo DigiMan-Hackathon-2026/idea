@@ -196,6 +196,8 @@ deadlock timeout이나 test timeout을 성공으로 처리하지 않는다. Post
 
 ## 변경과 rollback
 
+실제 데이터가 있는 환경의 expand·backfill·read switch·contract, lock·timeout과 production 실행 gate는 [migration·backfill 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md)을 따른다.
+
 초기 빈 DB migration도 rollback SQL만 믿지 않고 재생성으로 검증한다. 데이터가 생긴 뒤에는 다음 순서를 사용한다.
 
 1. nullable column·새 table·호환 index 추가

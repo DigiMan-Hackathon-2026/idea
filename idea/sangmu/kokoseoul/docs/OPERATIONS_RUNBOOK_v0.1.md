@@ -45,6 +45,8 @@ DB, OIDC callback, cookie 이름과 secret을 환경별로 분리한다. preview
 
 migration과 애플리케이션 순서가 호환되지 않으면 한 번에 배포하지 않는다. expand → code switch → contract 순서로 나눈다.
 
+lock·timeout·backfill·non-transaction statement와 destructive gate는 [PostgreSQL migration·backfill 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md)을 따른다.
+
 ## smoke test
 
 | 영역 | 확인 |

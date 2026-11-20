@@ -185,6 +185,7 @@ internal preview와 demo release도 권한·소유권·정합성·secret 누출�
 
 - [ ] backup 또는 복구 기준 시점과 예상 RPO 확인
 - [ ] expand → code switch → contract 호환 순서 확인
+- [ ] migration checksum·lock·timeout·backfill·old/new application 호환 증거
 - [ ] preview smoke test와 production read-only smoke test 분리
 - [ ] application rollback이 현재 schema와 호환
 - [ ] destructive migration의 별도 복구 계획
