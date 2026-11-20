@@ -12,7 +12,7 @@
 - 기본 브랜치: `main`
 - Windows 작업 위치: `D:\dev\digiman`
 - 맥북 작업본도 `origin/main`과 기능 단위로 동기화한다. 새 기기에서는 원하는 로컬 경로에 복제하고 Windows 경로를 그대로 사용하지 않는다.
-- F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세 화면이 있고 code scope는 `UNRESTRICTED`다. 제품 화면·API·DB 파일 생성과 검증을 제한하거나 경고하지 않는다.
+- F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·피드백 화면이 있고 code scope는 `UNRESTRICTED`다. demo 기록은 브라우저 localStorage에만 저장되며 서버 기록으로 표현하지 않는다.
 - 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
 - 현재 통합 검증은 `python3 scripts/verify_all.py`다. 37개 tooling 회귀 테스트, Markdown 63개, JSON block 44개, API endpoint 21개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
