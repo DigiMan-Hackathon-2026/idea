@@ -61,6 +61,7 @@ EXECUTION_GATE = re.compile(
 )
 REVIEW_EVIDENCE = re.compile(r"^일본어 검수 근거: (.+)$", re.MULTILINE)
 REVIEW_EVIDENCE_VALUE = re.compile(r"^JR\d{2} @ [0-9a-f]{7,40}$")
+REVIEW_TIME = re.compile(r"^일본어 검수 완료 시각: (.+)$", re.MULTILINE)
 RESEARCH_README = RESEARCH / "README.md"
 READINESS = ROOT / "docs" / "READINESS_STATUS.md"
 
@@ -75,6 +76,12 @@ def valid_iso_8601_time(value: str) -> bool:
     except ValueError:
         return False
     return parsed.tzinfo is not None and parsed.utcoffset() is not None
+
+
+def parse_iso_8601_time(value: str) -> datetime | None:
+    if not valid_iso_8601_time(value):
+        return None
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 def tracked_research_files() -> tuple[list[Path], list[str]]:
@@ -326,11 +333,14 @@ def check_evidence_references(paths: list[Path]) -> list[str]:
 def parse_execution_gate(text: str) -> tuple[str | None, list[str]]:
     gates = EXECUTION_GATE.findall(text)
     evidence = REVIEW_EVIDENCE.findall(text)
+    review_times = REVIEW_TIME.findall(text)
     errors: list[str] = []
     if len(gates) != 1:
         errors.append("research/README.md: expected exactly one research execution gate")
     if len(evidence) != 1:
         errors.append("research/README.md: expected exactly one Japanese review evidence field")
+    if len(review_times) != 1:
+        errors.append("research/README.md: expected exactly one Japanese review time field")
     if errors:
         return None, errors
     gate = gates[0]
@@ -340,6 +350,13 @@ def parse_execution_gate(text: str) -> tuple[str | None, list[str]]:
         errors.append(
             "research/README.md: interview execution requires evidence like "
             "'JR01 @ abc1234'"
+        )
+    if gate == "INTERVIEWS_ALLOWED" and not valid_iso_8601_time(
+        review_times[0].strip()
+    ):
+        errors.append(
+            "research/README.md: interview execution requires a valid ISO 8601 "
+            "Japanese review time"
         )
     return gate, errors
 
@@ -356,6 +373,20 @@ def check_execution_gate(paths: list[Path], text: str) -> list[str]:
         errors.append(
             f"research: {interview_count} interview artifact(s) exist while gate is DRAFT_ONLY"
         )
+    if gate == "INTERVIEWS_ALLOWED":
+        review_time = parse_iso_8601_time(REVIEW_TIME.findall(text)[0].strip())
+        early_count = 0
+        for path in paths:
+            if path.parent != RESEARCH / "interviews" or path.name == "TEMPLATE.md":
+                continue
+            match = INTERVIEW_TIME.search(path.read_text(encoding="utf-8"))
+            interview_time = parse_iso_8601_time(match.group(1)) if match else None
+            if review_time is not None and interview_time is not None and interview_time < review_time:
+                early_count += 1
+        if early_count:
+            errors.append(
+                f"research: {early_count} interview artifact(s) predate Japanese review"
+            )
     readiness_marker = f"현재 조사 실행 게이트는 `{gate}`다."
     if readiness_marker not in READINESS.read_text(encoding="utf-8"):
         errors.append(
