@@ -70,3 +70,43 @@ test("completes the ordered demo flow and saves feedback", async ({ page }) => {
     .click();
   await expect(page.getByText("フィードバックを保存しました")).toBeVisible();
 });
+
+test("resumes and deletes the browser-only demo record", async ({ page }) => {
+  await page.goto("/my");
+  await expect(
+    page.getByRole("heading", { name: "まだ記録がありません" }),
+  ).toBeVisible();
+
+  await page.goto(
+    "/quests/11111111-1111-4111-8111-111111111111",
+  );
+  await page
+    .getByRole("button", { name: "このデモクエストを始める" })
+    .click();
+  await page
+    .getByRole("link", { name: "記録を作成して始める" })
+    .click();
+  await page.getByRole("button", { name: "案内を確認しました" }).click();
+  await expect(
+    page.getByRole("button", { name: "韓国語カードを使いました" }),
+  ).toBeVisible();
+
+  await page.goto("/my");
+  await expect(page.getByText("進行中 · 1/3")).toBeVisible();
+  await page.getByRole("link", { name: "続きから始める" }).click();
+  await expect(
+    page.getByRole("button", { name: "韓国語カードを使いました" }),
+  ).toBeVisible();
+
+  await page.goto("/my");
+  await page
+    .getByRole("button", { name: "このブラウザの記録を削除する" })
+    .click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page
+    .getByRole("button", { name: "すべての記録を削除する" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "まだ記録がありません" }),
+  ).toBeVisible();
+});

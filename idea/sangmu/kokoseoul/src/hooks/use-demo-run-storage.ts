@@ -30,3 +30,8 @@ export function saveDemoRunStorage(value: string) {
   localStorage.setItem(DEMO_RUN_STORAGE_KEY, value);
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
+
+export function clearDemoRunStorage() {
+  localStorage.removeItem(DEMO_RUN_STORAGE_KEY);
+  window.dispatchEvent(new Event(CHANGE_EVENT));
+}

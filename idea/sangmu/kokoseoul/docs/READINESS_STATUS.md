@@ -62,12 +62,12 @@
 | 익명 visitor session | 준비됨 | [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | token·cookie·rotation·만료/삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
 | 지도 연결 | 준비됨 | [지도·주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md) | 일본어 iOS·Android 실제 장소·앱 fallback 검수 |
-| 제품 코드 F0~F8 | 진행 중 | F0 완료, 명시적 demo 랜딩·탐색·상세·순차 진행·완료·피드백과 모바일 E2E 구현 | F1 DB·API와 서버 세션 연결 |
+| 제품 코드 F0~F8 | 진행 중 | F0 완료, 명시적 demo 탐색·순차 진행·완료·기록 이어하기·삭제·피드백과 모바일 E2E 구현 | F1 DB·API와 서버 세션 연결 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
 ## 현재 사실
 
-- F0 품질 gate와 명시적 가상 demo의 일본어 랜딩·조건 탐색·상세·3단계 진행·완료·피드백 화면이 있다. demo 기록은 이 브라우저에만 저장되며 실제 콘텐츠·API·DB schema는 아직 없다.
+- F0 품질 gate와 명시적 가상 demo의 일본어 랜딩·조건 탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백 화면이 있다. demo 기록은 이 브라우저에만 저장되며 실제 콘텐츠·API·DB schema는 아직 없다.
 - 현재 사전 코드 게이트는 `UNRESTRICTED`다. 코드 파일 생성·검증에 제한이나 경고를 적용하지 않는다.
 - 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.

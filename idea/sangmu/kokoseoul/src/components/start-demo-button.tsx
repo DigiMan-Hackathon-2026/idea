@@ -1,15 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDemoRunStorage } from "@/hooks/use-demo-run-storage";
+import {
+  DEMO_RUN_ID,
+  isDemoRunComplete,
+  parseDemoRun,
+} from "@/modules/progress/demo-run";
 
 export function StartDemoButton() {
+  const storedProgress = useDemoRunStorage();
+  const progress = useMemo(
+    () => parseDemoRun(storedProgress),
+    [storedProgress],
+  );
   const [isOpen, setIsOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) closeButtonRef.current?.focus();
   }, [isOpen]);
+
+  if (progress) {
+    const completed = isDemoRunComplete(progress);
+    return (
+      <Link
+        href={
+          completed
+            ? `/runs/${DEMO_RUN_ID}/completion`
+            : `/runs/${DEMO_RUN_ID}`
+        }
+        className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.28)] transition hover:-translate-y-0.5 hover:bg-[#df4223]"
+      >
+        {completed ? "完了した記録を見る" : "続きから始める"}
+      </Link>
+    );
+  }
 
   return (
     <>

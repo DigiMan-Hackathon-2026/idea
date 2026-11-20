@@ -16,12 +16,20 @@ export function SiteHeader() {
         </span>
         <span className="text-lg font-black tracking-[-0.04em]">DIGIMAN</span>
       </Link>
-      <Link
-        href="/quests"
-        className="rounded-full border border-slate-900/10 bg-white/70 px-4 py-2 text-sm font-bold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
-      >
-        クエスト一覧
-      </Link>
+      <nav className="flex items-center gap-1 rounded-full border border-slate-900/10 bg-white/70 p-1 shadow-sm backdrop-blur" aria-label="メインナビゲーション">
+        <Link
+          href="/quests"
+          className="rounded-full px-3 py-2 text-sm font-bold text-slate-800 transition hover:bg-white sm:px-4"
+        >
+          クエスト
+        </Link>
+        <Link
+          href="/my"
+          className="rounded-full px-3 py-2 text-sm font-bold text-slate-800 transition hover:bg-white sm:px-4"
+        >
+          記録
+        </Link>
+      </nav>
     </header>
   );
 }
