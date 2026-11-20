@@ -4,12 +4,13 @@
 
 ## 진행 순서
 
-1. 인터뷰 전에 참여자에게 조사 목적, 메모·녹음 여부, 중단 가능성을 안내한다.
-2. `interviews/TEMPLATE.md`를 복사해 `P01.md`처럼 참여자 코드로 기록한다.
-3. 최근 실제 사건과 안내 예시 관찰을 분리해 기록한다.
-4. 인터뷰 3~5개가 모이면 `synthesis/TEMPLATE.md`로 공통 패턴과 반대 사례를 합성한다.
-5. 선택한 문제와 연결된 퀘스트만 `quest-candidates/TEMPLATE.md`로 구체화하고 [콘텐츠 검수 계약](../docs/CONTENT_VERIFICATION_v0.1.md)에 따라 출처·일본어·asset 권리를 기록한다.
-6. 타깃·지역·퀘스트 결정이 바뀌면 B2C 스펙의 변경 기록도 갱신한다.
+1. [모집 문안](RECRUITMENT_MESSAGES.md)을 일본어 검수한 뒤 참여자를 모집한다.
+2. 인터뷰 전에 참여자에게 조사 목적, 메모·녹음 여부, 중단 가능성을 안내한다.
+3. `interviews/TEMPLATE.md`를 복사해 `P01.md`처럼 참여자 코드로 기록한다.
+4. 최근 실제 사건과 안내 예시 관찰을 분리해 기록한다.
+5. 인터뷰 3~5개가 모이면 `synthesis/TEMPLATE.md`로 공통 패턴과 반대 사례를 합성한다.
+6. 선택한 문제와 연결된 퀘스트만 `quest-candidates/TEMPLATE.md`로 구체화하고 [콘텐츠 검수 계약](../docs/CONTENT_VERIFICATION_v0.1.md)에 따라 출처·일본어·asset 권리를 기록한다.
+7. 타깃·지역·퀘스트 결정이 바뀌면 B2C 스펙의 변경 기록도 갱신한다.
 
 ## 저장 가능 여부
 
