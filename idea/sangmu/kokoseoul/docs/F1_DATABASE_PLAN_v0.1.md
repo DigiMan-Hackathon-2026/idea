@@ -29,7 +29,8 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - 세 번째 migration은 `runs`, `run_steps`, `feedback` 3개 table이며 SHA-256은 `68659b443bf1ea52d78ec8c0632922aa1df98f920f843b24465457ddf9a3e363`이다.
 - 네 번째 migration은 `reports` table이며 SHA-256은 `196daf2133a0ba1e676e2a59dc2af79c3b2a805af631bf9b93c5c17ab30f31bf`이다.
 - 다섯 번째 migration은 `audit_logs`, `analytics_events` 2개 table이며 SHA-256은 `c8bd029c3fe1ce70a832df7c6eb5d587d249d6b230ff92872d627794fa7558c5`다.
-- 완전히 빈 marker DB에서 다섯 migration 적용·재적용과 PostgreSQL 통합 테스트 25개가 성공했다.
+- 여섯 번째 migration은 `visitors.expires_at`과 visitor·session 30일 DB 기본값을 추가하며 SHA-256은 `3b8fc7b2b616beef0a99f7637e28e91161567b10e6e472a4db72d1845bc5f61d`다.
+- 완전히 빈 marker DB에서 여섯 migration 적용·재적용, 역할 구성과 PostgreSQL 통합 테스트 40개가 성공했다.
 - quest당 draft 한 개, 3~5개 연속 step, 공개 version의 같은 quest 소속, 공개 version·step 불변성을 named constraint·trigger로 강제한다.
 - run의 한 visitor·quest 유일성, 고정 version 소속, 순서대로 단계 완료, 모든 단계 뒤 완료 전환, 완료 후 불변성과 완료 run feedback만 허용하는 규칙을 named constraint·trigger로 강제한다.
 - report의 활성 멱등 키 유일성, quest-version 소속, 운영 상태 전이·revision 증가, 익명화 뒤 사용자 재연결 금지를 named constraint·trigger로 강제한다.
@@ -39,7 +40,7 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - quest row lock에서 pause가 먼저면 신규 run 0개, start가 먼저면 기존 run 1개를 보존한 paused 상태로 직렬화됐다. 같은 report 멱등 키 동시 제출은 한 행으로 수렴했고, 잘못된 audit insert는 같은 transaction의 quest 상태·revision까지 rollback했다. 전체 PostgreSQL 통합 테스트는 36개다.
 - application runtime URL은 local/test namespace와 `digiman_runtime*` role만 허용하고 migration role을 거절한다. server-only pool은 최초 사용 때 만들며 transaction마다 statement 5초·lock 3초·idle-in-transaction 5초 제한과 rollback 후 원래 오류 보존을 적용한다.
 
-local·CI 기준 F1 schema·권한·대표 경합·실패 rollback은 구현됐다. `startQuestRun`은 quest row lock, 현재 공개 version pinning, 중복 시 기존 run 반환과 `not_found`·`unavailable`을 처리한다. `completeQuestStep`은 quest share lock 뒤 run을 잠그고 소유자·고정 version·순서를 재검사하며 마지막 step과 run 완료를 같은 transaction에서 처리한다. `submitFeedback`은 소유 run을 잠그고 완료된 run만 run당 한 행으로 upsert한다. `submitReport`는 published version 소속과 partial unique 멱등 키를 사용해 같은 요청은 기존 행, 다른 본문은 `request_conflict`로 분류한다. 실제 PostgreSQL 통합 검사는 39개다. 실제 배포 provider의 login-role mapping과 나머지 repository transaction 연결은 외부 서비스 결정 뒤 남아 있다. draft 저장 revision 경합과 publish·start 경합은 repository 기능 단위에서 같은 quest row lock 순서를 사용해 추가 검수한다.
+local·CI 기준 F1 schema·권한·대표 경합·실패 rollback은 구현됐다. `startQuestRun`은 quest row lock, 현재 공개 version pinning, 중복 시 기존 run 반환과 `not_found`·`unavailable`을 처리한다. `completeQuestStep`은 quest share lock 뒤 run을 잠그고 소유자·고정 version·순서를 재검사하며 마지막 step과 run 완료를 같은 transaction에서 처리한다. `submitFeedback`은 소유 run을 잠그고 완료된 run만 run당 한 행으로 upsert한다. `submitReport`는 published version 소속과 partial unique 멱등 키를 사용해 같은 요청은 기존 행, 다른 본문은 `request_conflict`로 분류한다. visitor·session의 transaction clock과 30일 고정 만료도 같은 instant로 검증했으며 실제 PostgreSQL 통합 검사는 40개다. 실제 배포 provider의 login-role mapping과 나머지 repository transaction 연결은 외부 서비스 결정 뒤 남아 있다. draft 저장 revision 경합과 publish·start 경합은 repository 기능 단위에서 같은 quest row lock 순서를 사용해 추가 검수한다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 

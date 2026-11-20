@@ -31,14 +31,14 @@
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | API 오류·request ID | 준비됨 | [오류 catalog](API_ERROR_CATALOG_v0.1.md) | error factory·우선순위·405/500 통합 검수 |
 | 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
-| DB 정합성 설계 | local·CI 완료 | 전체 domain 14 tables migration, capability roles, unique·row-lock 동시성, audit rollback, start·complete·feedback·report repositories, PostgreSQL 17.12 통합 테스트 39개, Actions run `44818613781`, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | provider login mapping·admin repository transaction 연결 |
+| DB 정합성 설계 | local·CI 완료 | 전체 domain 14 tables migration, 고정 30일 visitor expiry, capability roles, 동시성·rollback, visitor repositories, PostgreSQL 17.12 통합 테스트 40개, Actions run `44818613781`, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | provider login mapping·session/admin repository 연결 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
 | 화면 상태·문구 | 진행 중 | [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI와 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
 | 웹 접근성 구현 | 진행 중 | skip link, focus-visible, reduced-motion, modal 초기 초점·focus trap·Escape와 Chromium E2E | screen reader·실제 기기 수동 검수 |
 | locale·표시 형식 | 준비됨 | [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 실제 formatter·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
 | 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | 구현 통제와 출시 전 gate 실행 |
-| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 27개 unit·39개 PostgreSQL integration·12개 Chromium E2E | 실제 API·나머지 repository 경합·실기기에서 AC01~AC20 증거 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 27개 unit·40개 PostgreSQL integration·12개 Chromium E2E | 실제 API·나머지 repository 경합·실기기에서 AC01~AC20 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |

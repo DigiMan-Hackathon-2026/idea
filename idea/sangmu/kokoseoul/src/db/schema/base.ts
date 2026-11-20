@@ -86,12 +86,25 @@ export const adminPrincipals = pgTable(
   ],
 );
 
-export const visitors = pgTable("visitors", {
-  id: uuid("id").primaryKey(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const visitors = pgTable(
+  "visitors",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now() + interval '30 days'`),
+  },
+  (table) => [
+    check(
+      "visitors_expiry_ck",
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    index("visitors_expires_at_idx").on(table.expiresAt),
+  ],
+);
 
 export const visitorSessions = pgTable(
   "visitor_sessions",
@@ -105,7 +118,9 @@ export const visitorSessions = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now() + interval '30 days'`),
   },
   (table) => [
     unique("visitor_sessions_token_hash_uq").on(

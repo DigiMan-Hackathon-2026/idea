@@ -103,4 +103,42 @@ describe("PostgreSQL base schema constraints", () => {
       ),
     ).rejects.toMatchObject({ constraint: "places_coordinate_pair_ck" });
   });
+
+  it("uses one fixed 30-day transaction clock for visitor and session", async () => {
+    const visitorId = randomUUID();
+    const visitor = await client.query(
+      `insert into visitors (id) values ($1)
+       returning created_at, expires_at`,
+      [visitorId],
+    );
+    const session = await client.query(
+      `insert into visitor_sessions
+        (id, visitor_id, token_hash_version, token_hash)
+       values ($1, $2, 1, $3)
+       returning created_at, expires_at`,
+      [randomUUID(), visitorId, Buffer.alloc(32, 9)],
+    );
+
+    expect(session.rows[0].created_at).toEqual(visitor.rows[0].created_at);
+    expect(session.rows[0].expires_at).toEqual(visitor.rows[0].expires_at);
+    expect(
+      session.rows[0].expires_at.getTime() -
+        session.rows[0].created_at.getTime(),
+    ).toBe(30 * 24 * 60 * 60 * 1000);
+
+    await expectConstraintFailure();
+
+    async function expectConstraintFailure() {
+      await client.query("savepoint invalid_visitor_expiry");
+      await expect(
+        client.query(
+          `insert into visitors (id, expires_at)
+           values ($1, now() - interval '1 second')`,
+          [randomUUID()],
+        ),
+      ).rejects.toMatchObject({ constraint: "visitors_expiry_ck" });
+      await client.query("rollback to savepoint invalid_visitor_expiry");
+      await client.query("release savepoint invalid_visitor_expiry");
+    }
+  });
 });

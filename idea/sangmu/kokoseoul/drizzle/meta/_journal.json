@@ -36,6 +36,13 @@
       "when": 1795209346598,
       "tag": "0004_striped_clea",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795210677010,
+      "tag": "0005_hard_gambit",
+      "breakpoints": true
     }
   ]
 }
