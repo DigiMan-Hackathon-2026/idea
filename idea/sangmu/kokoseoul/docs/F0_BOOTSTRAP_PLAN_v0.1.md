@@ -112,6 +112,8 @@ F0 종료 시 다음 script 이름을 제공한다.
 
 ### 5. 환경 변수 경계
 
+변수 분류, 환경 불변식, build/runtime 경계, rotation·revoke와 누출 대응은 [환경 설정·secret 운영 계약](CONFIGURATION_SECRETS_v0.1.md)을 따른다.
+
 `.env.example`은 값 없이 목적과 필수 환경을 설명한다.
 
 | 변수 | 공개 여부 | 첫 사용 단계 |

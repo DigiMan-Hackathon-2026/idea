@@ -186,6 +186,8 @@ report 자유 입력은 HTML로 렌더링하지 않고 운영 화면에서도 te
 
 ## secret과 공급망
 
+환경별 inventory, validation, secret store, rotation·revoke와 증거는 [환경 설정·secret 운영 계약](CONFIGURATION_SECRETS_v0.1.md)을 따른다.
+
 - 실제 `.env`는 Git에 커밋하지 않는다.
 - local·preview·production secret을 분리한다.
 - 최소 권한 DB credential을 사용하고 migration 권한과 runtime 권한 분리를 검토한다.

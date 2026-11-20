@@ -126,6 +126,8 @@ published version을 직접 수정하지 않는다.
 
 ## secret 유출
 
+key별 rotation·revoke와 환경 검수는 [환경 설정·secret 운영 계약](CONFIGURATION_SECRETS_v0.1.md)을 따른다.
+
 1. 노출 위치와 접근 가능 기간을 보존하되 secret 값을 다시 복사하지 않는다.
 2. 해당 secret을 즉시 비활성화·교체한다.
 3. DB, OIDC, 배포, session 중 영향 범위를 확인한다.
