@@ -74,12 +74,12 @@ class ScopeGateVerifierTest(unittest.TestCase):
         )
         recorded = (
             "사전 코드 게이트: `PRODUCT_ALLOWED`\n"
-            "게이트 근거: 2026-11-22 주최 측 공개 답변 요약\n"
+            "게이트 근거: D01 @ abc1234\n"
             "허용 시작 시각: 2026-11-22T09:00:00+09:00\n"
         )
         impossible = (
             "사전 코드 게이트: `PRODUCT_ALLOWED`\n"
-            "게이트 근거: 2026-11-22 주최 측 공개 답변 요약\n"
+            "게이트 근거: D01 @ abc1234\n"
             "허용 시작 시각: 2026-02-30T25:00:00+09:00\n"
         )
 

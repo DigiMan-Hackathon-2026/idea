@@ -20,6 +20,7 @@ GATE_PATTERN = re.compile(
     r"^사전 코드 게이트: `(CLOSED|F0_ONLY|PRODUCT_ALLOWED)`$", re.MULTILINE
 )
 EVIDENCE_PATTERN = re.compile(r"^게이트 근거: (.+)$", re.MULTILINE)
+OPEN_GATE_EVIDENCE = re.compile(r"^D01 @ [0-9a-f]{7,40}$")
 START_PATTERN = re.compile(r"^허용 시작 시각: (.+)$", re.MULTILINE)
 ISO_8601_PATTERN = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$"
@@ -140,9 +141,10 @@ def check_open_gate_metadata(gate: str, text: str) -> list[str]:
         )
     if errors or gate == "CLOSED":
         return errors
-    if evidence[0].strip() == "미기록":
+    if not OPEN_GATE_EVIDENCE.fullmatch(evidence[0].strip()):
         errors.append(
-            "docs/EVENT_RULES_CHECKLIST.md: an open gate requires recorded evidence"
+            "docs/EVENT_RULES_CHECKLIST.md: an open gate requires evidence like "
+            "'D01 @ abc1234'"
         )
     if not valid_iso_8601_start(starts[0].strip()):
         errors.append(
