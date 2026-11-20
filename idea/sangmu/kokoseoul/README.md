@@ -43,6 +43,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [운영자 인증·인가 계약 v0.1](docs/ADMIN_AUTHORIZATION_v0.1.md)
 - [익명 방문자 session 수명주기 계약 v0.1](docs/VISITOR_SESSION_LIFECYCLE_v0.1.md)
 - [방문자 데이터 보존·삭제·복구 계약 v0.1](docs/DATA_RETENTION_ERASURE_v0.1.md)
+- [보존·cleanup background job 계약 v0.1](docs/BACKGROUND_JOBS_v0.1.md)
 - [로그·지표·오류 관측 계약 v0.1](docs/OBSERVABILITY_CONTRACT_v0.1.md)
 - [운영 감사 로그 계약 v0.1](docs/AUDIT_LOG_CONTRACT_v0.1.md)
 - [배포와 복구 운영 런북 v0.1](docs/OPERATIONS_RUNBOOK_v0.1.md)

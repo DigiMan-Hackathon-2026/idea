@@ -110,6 +110,8 @@ request ID, UUID, raw path, IP, User-Agent, query, error message를 metric label
 
 분석 지표는 [분석 이벤트 계약](ANALYTICS_EVENT_CONTRACT_v0.1.md)을 따르고 기술 monitoring과 분리한다. run 시작·완료 수를 HTTP counter에서 제품 성과로 계산하지 않는다.
 
+cleanup invocation·oldest eligible age·budget·overlap과 scheduler 환경 분리는 [background job 계약](BACKGROUND_JOBS_v0.1.md)을 따른다.
+
 ## SLI와 초기 목표
 
 다음 수치는 공개 SLA가 아니라 검수 환경의 초기 목표다.

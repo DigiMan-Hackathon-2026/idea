@@ -151,6 +151,8 @@ pepper 노출이 의심되면 해당 version을 즉시 폐기한다. 영향 sess
 
 만료와 mutation이 경합하면 visitor row lock 또는 동등한 serialization 아래 DB clock을 다시 확인한다. 만료 뒤 새 step·feedback·report가 commit되면 안 된다.
 
+job 호출 인증, `SKIP LOCKED`, invocation budget, cadence와 restore mode는 [background job 계약](BACKGROUND_JOBS_v0.1.md)을 따른다.
+
 ## 전체 삭제와 cookie
 
 `DELETE /api/v1/me/data`는 valid session, exact Origin과 `{}` JSON을 요구한다.

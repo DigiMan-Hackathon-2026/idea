@@ -117,7 +117,7 @@ published version을 직접 수정하지 않는다.
 3. schema version과 주요 table count를 확인한다.
 4. 공개 목록·기존 run·완료 카드를 읽는다.
 5. 검수 visitor로 단계 mutation을 실행한다.
-6. 만료 session과 삭제 대상 cleanup을 실행한다.
+6. [background job 계약](BACKGROUND_JOBS_v0.1.md)의 restore mode로 만료 session·비연결 analytics와 D11 삭제 정책을 재적용한다.
 7. 독립 erasure ledger가 검증됐으면 replay하고, 없으면 모든 visitor 연결 데이터를 privacy-first purge한다.
 8. 삭제한 사용자 데이터가 재노출되지 않고 report가 익명화됐는지 확인한다.
 9. 승격 전 visitor 연결 table count와 개인 진행 손실 범위를 두 사람이 검토한다.

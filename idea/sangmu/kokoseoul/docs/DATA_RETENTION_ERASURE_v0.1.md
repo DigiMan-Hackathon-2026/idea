@@ -93,6 +93,8 @@ UI는 다음처럼 처리한다.
 
 인증은 `expires_at <= DB now`이면 cleanup 전에도 401이다. cleanup은 중복 실행돼도 같은 결과가 되도록 visitor 단위 transaction을 재사용한다.
 
+scheduler identity, DB clock, one-visitor transaction, worker overlap·budget과 restore 전용 실행은 [background job 계약](BACKGROUND_JOBS_v0.1.md)을 따른다.
+
 | 단계 | 기준 |
 | --- | --- |
 | 후보 선택 | expiresAt이 현재 시각 이전, 작은 batch |
