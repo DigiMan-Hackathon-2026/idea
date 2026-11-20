@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
+import { submitFeedbackWithClient } from "../../src/modules/feedback/submit-feedback.server";
 import { completeQuestStepWithClient } from "../../src/modules/progress/complete-step.server";
 import { startQuestRunWithClient } from "../../src/modules/progress/start-run.server";
 
@@ -559,5 +560,69 @@ describe("PostgreSQL concurrency serialization", () => {
     } finally {
       await closePair(first, second);
     }
+  });
+
+  it("upserts one feedback row only after run completion", async () => {
+    const fixture = await createConcurrentFixture();
+    const runId = randomUUID();
+    await setupClient.query("begin");
+    const started = await startQuestRunWithClient(setupClient, {
+      runId,
+      visitorId: fixture.visitorId,
+      questId: fixture.questId,
+    });
+    const earlyFeedback = await submitFeedbackWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      joyScore: 5,
+      feltNewExperience: true,
+      comment: null,
+    });
+    await setupClient.query("commit");
+    expect(started.outcome).toBe("created");
+    expect(earlyFeedback).toEqual({ outcome: "not_completed" });
+
+    for (const stepId of fixture.stepIds) {
+      await setupClient.query("begin");
+      await completeQuestStepWithClient(setupClient, {
+        visitorId: fixture.visitorId,
+        runId,
+        stepId,
+      });
+      await setupClient.query("commit");
+    }
+
+    await setupClient.query("begin");
+    const firstFeedback = await submitFeedbackWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      joyScore: 5,
+      feltNewExperience: true,
+      comment: "分かりやすかったです。",
+    });
+    const updatedFeedback = await submitFeedbackWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      joyScore: 4,
+      feltNewExperience: false,
+      comment: null,
+    });
+    await setupClient.query("commit");
+    expect(firstFeedback.outcome).toBe("saved");
+    expect(updatedFeedback.outcome).toBe("saved");
+
+    const stored = await setupClient.query(
+      `select count(*)::int as count, min(joy_score)::int as joy_score,
+        bool_and(not felt_new_experience) as felt_new_experience,
+        bool_and(comment is null) as comment_is_null
+       from feedback where run_id = $1`,
+      [runId],
+    );
+    expect(stored.rows[0]).toEqual({
+      count: 1,
+      joy_score: 4,
+      felt_new_experience: true,
+      comment_is_null: true,
+    });
   });
 });
