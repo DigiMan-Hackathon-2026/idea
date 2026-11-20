@@ -93,6 +93,8 @@ smoke test에서 만든 기록은 `environment=test`로 구분하고 검수 후 
 
 ## 콘텐츠 긴급 중지
 
+사용자 report에서 시작한 분류·중지·검증·해결은 [정보 오류 신고 처리 런북](REPORT_TRIAGE_v0.1.md)을 따른다.
+
 1. 사실 오류와 사용자 영향 범위를 확인한다.
 2. 공개 가능한 일본어 사유를 작성한다.
 3. expected revision으로 pause한다.

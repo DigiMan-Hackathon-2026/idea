@@ -454,6 +454,8 @@ Cookie: digiman_admin=<server-session-token>
 
 신고 상태는 `new`, `in_progress`, `resolved`다. 허용 전이는 new에서 in_progress·resolved, in_progress에서 resolved, resolved에서 재확인용 in_progress다. new로 되돌리거나 같은 상태·같은 메모의 빈 PATCH는 허용하지 않는다. 내부 메모는 사용자 API와 공개 퀘스트 응답에 포함하지 않는다. 상태·메모 변경은 expectedRevision을 검사하고 감사 로그와 같은 트랜잭션에서 저장한다. 다른 운영자가 먼저 처리했으면 409 `VERSION_CONFLICT`와 현재 revision을 반환하며 자동 덮어쓰지 않는다.
 
+위험도 분류, quest 우선 pause와 사실 확인·새 version·resume 절차는 [정보 오류 신고 처리 런북](REPORT_TRIAGE_v0.1.md)을 따른다.
+
 ## 권한 오류
 
 운영 세션이 없으면 401, 로그인했지만 활성 운영 principal이 없으면 403을 반환한다. 운영 대상의 존재 여부가 권한 없는 사용자에게 드러나지 않게 한다.
