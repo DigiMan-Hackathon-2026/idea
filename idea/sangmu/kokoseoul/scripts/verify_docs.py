@@ -12,27 +12,29 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_AC = {f"AC{number:02d}" for number in range(1, 21)}
 EXPECTED_DECISIONS = {f"D{number:02d}" for number in range(1, 14)}
-EXPECTED_ERROR_CODES = {
-    "VALIDATION_ERROR",
-    "SESSION_REQUIRED",
-    "ORIGIN_FORBIDDEN",
-    "ADMIN_FORBIDDEN",
-    "QUEST_UNAVAILABLE",
-    "STEP_ORDER_CONFLICT",
-    "VERSION_CONFLICT",
-    "REQUEST_CONFLICT",
-    "RUN_NOT_COMPLETED",
-    "NOT_FOUND",
-    "METHOD_NOT_ALLOWED",
-    "RATE_LIMITED",
-    "INTERNAL_ERROR",
-    "SERVICE_UNAVAILABLE",
+EXPECTED_ERROR_CONTRACT = {
+    "VALIDATION_ERROR": (400, False),
+    "SESSION_REQUIRED": (401, False),
+    "ORIGIN_FORBIDDEN": (403, False),
+    "ADMIN_FORBIDDEN": (403, False),
+    "NOT_FOUND": (404, False),
+    "METHOD_NOT_ALLOWED": (405, False),
+    "QUEST_UNAVAILABLE": (409, False),
+    "STEP_ORDER_CONFLICT": (409, False),
+    "RUN_NOT_COMPLETED": (409, False),
+    "VERSION_CONFLICT": (409, False),
+    "REQUEST_CONFLICT": (409, False),
+    "RATE_LIMITED": (429, True),
+    "INTERNAL_ERROR": (500, False),
+    "SERVICE_UNAVAILABLE": (503, True),
 }
+EXPECTED_ERROR_CODES = set(EXPECTED_ERROR_CONTRACT)
 API_EXAMPLE_FILES = (
     ROOT / "docs" / "API_EXAMPLES_B2C_v0.1.md",
     ROOT / "docs" / "API_EXAMPLES_ADMIN_v0.1.md",
 )
 API_CONTRACT_INDEX = ROOT / "docs" / "API_CONTRACT_INDEX_v0.1.md"
+API_ERROR_CATALOG = ROOT / "docs" / "API_ERROR_CATALOG_v0.1.md"
 PAGINATION_CONTRACT = ROOT / "docs" / "PAGINATION_CURSOR_v0.1.md"
 PAGINATED_ENDPOINTS = {
     "GET /quests",
@@ -220,6 +222,7 @@ def check_error_code_coverage() -> list[str]:
     paths = (
         ROOT / "docs" / "B2C_SPEC_v0.1.md",
         API_CONTRACT_INDEX,
+        API_ERROR_CATALOG,
     )
     for path in paths:
         text = path.read_text(encoding="utf-8")
@@ -227,6 +230,88 @@ def check_error_code_coverage() -> list[str]:
         if missing:
             errors.append(
                 f"{path.relative_to(ROOT)}: missing error codes {', '.join(missing)}"
+            )
+    return errors
+
+
+def check_error_catalog() -> list[str]:
+    errors: list[str] = []
+    text = API_ERROR_CATALOG.read_text(encoding="utf-8")
+    row = re.compile(
+        r"^\| `([A-Z][A-Z0-9_]*)` \| (\d{3}) \| (true|false) \|",
+        re.MULTILINE,
+    )
+    rows = row.findall(text)
+    actual: dict[str, tuple[int, bool]] = {}
+    for code, status, retryable in rows:
+        if code in actual:
+            errors.append(
+                f"{API_ERROR_CATALOG.relative_to(ROOT)}: duplicate code row {code}"
+            )
+        actual[code] = (int(status), retryable == "true")
+
+    missing = sorted(EXPECTED_ERROR_CODES - set(actual))
+    unexpected = sorted(set(actual) - EXPECTED_ERROR_CODES)
+    if missing:
+        errors.append(
+            f"{API_ERROR_CATALOG.relative_to(ROOT)}: missing code rows "
+            f"{', '.join(missing)}"
+        )
+    if unexpected:
+        errors.append(
+            f"{API_ERROR_CATALOG.relative_to(ROOT)}: unexpected code rows "
+            f"{', '.join(unexpected)}"
+        )
+    for code, expected in EXPECTED_ERROR_CONTRACT.items():
+        if code in actual and actual[code] != expected:
+            errors.append(
+                f"{API_ERROR_CATALOG.relative_to(ROOT)}: {code} expected "
+                f"HTTP {expected[0]} retryable={str(expected[1]).lower()}, got "
+                f"HTTP {actual[code][0]} retryable={str(actual[code][1]).lower()}"
+            )
+
+    index_text = API_CONTRACT_INDEX.read_text(encoding="utf-8")
+    index_row = re.compile(r"^\| `([A-Z][A-Z0-9_]*)` \| (\d{3}) \|", re.MULTILINE)
+    index_contract = {
+        code: int(status) for code, status in index_row.findall(index_text)
+    }
+    if set(index_contract) != EXPECTED_ERROR_CODES:
+        missing_index = sorted(EXPECTED_ERROR_CODES - set(index_contract))
+        unexpected_index = sorted(set(index_contract) - EXPECTED_ERROR_CODES)
+        if missing_index:
+            errors.append(
+                f"{API_CONTRACT_INDEX.relative_to(ROOT)}: missing error rows "
+                f"{', '.join(missing_index)}"
+            )
+        if unexpected_index:
+            errors.append(
+                f"{API_CONTRACT_INDEX.relative_to(ROOT)}: unexpected error rows "
+                f"{', '.join(unexpected_index)}"
+            )
+    for code, (status, _) in EXPECTED_ERROR_CONTRACT.items():
+        if code in index_contract and index_contract[code] != status:
+            errors.append(
+                f"{API_CONTRACT_INDEX.relative_to(ROOT)}: {code} expected HTTP "
+                f"{status}, got {index_contract[code]}"
+            )
+
+    catalog_json = json_blocks(API_ERROR_CATALOG)
+    if not catalog_json:
+        errors.append(f"{API_ERROR_CATALOG.relative_to(ROOT)}: missing JSON envelope")
+    else:
+        envelope = json.loads(catalog_json[0])
+        error = envelope.get("error", {})
+        required_fields = {
+            "code",
+            "messageJa",
+            "requestId",
+            "retryable",
+            "details",
+        }
+        if set(error) != required_fields:
+            errors.append(
+                f"{API_ERROR_CATALOG.relative_to(ROOT)}: error envelope fields must be "
+                f"{', '.join(sorted(required_fields))}"
             )
     return errors
 
@@ -469,6 +554,7 @@ def main() -> int:
         check_fenced_blocks(files),
         check_acceptance_coverage(),
         check_error_code_coverage(),
+        check_error_catalog(),
         check_decision_queue(),
         check_readme_index(),
         check_api_contract_index(),
@@ -487,7 +573,7 @@ def main() -> int:
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_block_count} JSON blocks, {len(example_endpoints())} API endpoints, "
         f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
-        "canonical H1/date metadata, balanced fences, pagination/session invariants, "
+        "canonical H1/date metadata, balanced fences, pagination/session/error invariants, "
         "AC01-AC20 and D01-D13 covered."
     )
     return 0
