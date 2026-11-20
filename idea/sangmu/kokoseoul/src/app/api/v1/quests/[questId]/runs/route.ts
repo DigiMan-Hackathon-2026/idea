@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { startQuestRun } from "../../../../../../modules/progress/start-run.server";
 import {
+  createMethodNotAllowedHandler,
   errorResponse,
   jsonResponse,
   resolveRequestId,
@@ -16,6 +17,14 @@ import {
 } from "../../../../../../server/visitor-http";
 
 type RouteContext = { params: Promise<{ questId: string }> };
+
+const methodNotAllowed = createMethodNotAllowedHandler(["POST"]);
+export const GET = methodNotAllowed;
+export const PUT = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+export const OPTIONS = methodNotAllowed;
+export const HEAD = methodNotAllowed;
 
 export async function POST(request: NextRequest, context: RouteContext) {
   const requestId = resolveRequestId(request.headers.get("x-request-id"));

@@ -4,6 +4,7 @@ import {
   verifyVisitorSession,
 } from "../../../../modules/session/visitor-session.server";
 import {
+  createMethodNotAllowedHandler,
   errorResponse,
   jsonResponse,
   resolveRequestId,
@@ -17,6 +18,14 @@ import {
 
 const NOTICE_JA =
   "進行記録はこのブラウザに保存され、他の端末とは共有されません。";
+
+const methodNotAllowed = createMethodNotAllowedHandler(["POST"]);
+export const GET = methodNotAllowed;
+export const PUT = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+export const OPTIONS = methodNotAllowed;
+export const HEAD = methodNotAllowed;
 
 export async function POST(request: NextRequest) {
   const requestId = resolveRequestId(request.headers.get("x-request-id"));

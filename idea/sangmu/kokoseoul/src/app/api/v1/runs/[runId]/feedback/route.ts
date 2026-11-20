@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { submitFeedback } from "../../../../../../modules/feedback/submit-feedback.server";
 import {
+  createMethodNotAllowedHandler,
   errorResponse,
   jsonResponse,
   resolveRequestId,
@@ -23,6 +24,14 @@ type FeedbackBody = {
 };
 
 type RouteContext = { params: Promise<{ runId: string }> };
+
+const methodNotAllowed = createMethodNotAllowedHandler(["PUT"]);
+export const GET = methodNotAllowed;
+export const POST = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+export const OPTIONS = methodNotAllowed;
+export const HEAD = methodNotAllowed;
 
 async function parseFeedbackBody(request: NextRequest): Promise<FeedbackBody | null> {
   const body = await parseJsonObject(request, 2_048);

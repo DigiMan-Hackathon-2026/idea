@@ -4,6 +4,7 @@ import {
   type ReportCategory,
 } from "../../../../../../modules/feedback/submit-report.server";
 import {
+  createMethodNotAllowedHandler,
   errorResponse,
   jsonResponse,
   resolveRequestId,
@@ -32,6 +33,14 @@ type ReportBody = {
   comment: string | null;
 };
 type RouteContext = { params: Promise<{ questId: string }> };
+
+const methodNotAllowed = createMethodNotAllowedHandler(["POST"]);
+export const GET = methodNotAllowed;
+export const PUT = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+export const OPTIONS = methodNotAllowed;
+export const HEAD = methodNotAllowed;
 
 async function parseReportBody(request: NextRequest): Promise<ReportBody | null> {
   const body = await parseJsonObject(request, 2_048);

@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { completeQuestStep } from "../../../../../../../modules/progress/complete-step.server";
 import {
+  createMethodNotAllowedHandler,
   errorResponse,
   jsonResponse,
   resolveRequestId,
@@ -19,6 +20,14 @@ import {
 type RouteContext = {
   params: Promise<{ runId: string; stepId: string }>;
 };
+
+const methodNotAllowed = createMethodNotAllowedHandler(["PUT"]);
+export const GET = methodNotAllowed;
+export const POST = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+export const OPTIONS = methodNotAllowed;
+export const HEAD = methodNotAllowed;
 
 async function hasCompletionBody(request: NextRequest): Promise<boolean> {
   const value = await parseJsonObject(request, 128);

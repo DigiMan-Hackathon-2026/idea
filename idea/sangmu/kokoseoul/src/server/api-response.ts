@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{16,64}$/;
 
@@ -8,6 +8,7 @@ export type PublicErrorCode =
   | "SESSION_REQUIRED"
   | "ORIGIN_FORBIDDEN"
   | "NOT_FOUND"
+  | "METHOD_NOT_ALLOWED"
   | "QUEST_UNAVAILABLE"
   | "STEP_ORDER_CONFLICT"
   | "RUN_NOT_COMPLETED"
@@ -37,6 +38,11 @@ const ERROR_DEFINITIONS: Record<
     status: 404,
     retryable: false,
     messageJa: "対象を見つけることができませんでした。",
+  },
+  METHOD_NOT_ALLOWED: {
+    status: 405,
+    retryable: false,
+    messageJa: "この操作方法は利用できません。",
   },
   QUEST_UNAVAILABLE: {
     status: 409,
@@ -105,4 +111,15 @@ export function errorResponse(
     definition.status,
     requestId,
   );
+}
+
+export function createMethodNotAllowedHandler(allow: readonly string[]) {
+  const allowHeader = allow.join(", ");
+  return function methodNotAllowed(request: NextRequest): NextResponse {
+    const requestId = resolveRequestId(request.headers.get("x-request-id"));
+    const response = errorResponse("METHOD_NOT_ALLOWED", requestId);
+    response.headers.set("Allow", allowHeader);
+    response.headers.set("Vary", "Cookie");
+    return response;
+  };
 }
