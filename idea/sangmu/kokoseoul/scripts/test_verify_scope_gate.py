@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from scripts import verify_scope_gate as verifier
+from scripts import verify_all
 
 
 class ScopeGateVerifierTest(unittest.TestCase):
@@ -120,8 +121,14 @@ class ScopeGateVerifierTest(unittest.TestCase):
     def test_handoff_and_readiness_report_current_test_count(self) -> None:
         count = verifier.test_method_count()
 
-        self.assertEqual(count, 33)
+        self.assertEqual(count, 34)
         self.assertEqual(verifier.check_reported_test_count(count), [])
+
+    def test_unified_verifier_discovers_every_test_module(self) -> None:
+        self.assertEqual(
+            verify_all.COMMANDS[0][1:],
+            ("-m", "unittest", "discover", "-s", "scripts", "-p", "test_*.py"),
+        )
 
 
 if __name__ == "__main__":
