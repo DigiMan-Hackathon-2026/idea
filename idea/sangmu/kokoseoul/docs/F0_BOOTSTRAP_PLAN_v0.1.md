@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 실행 게이트 대기
 
-이 문서는 행사 규칙이 허용하는 즉시 [구현 계획](IMPLEMENTATION_PLAN_v0.1.md)의 F0만 재현 가능하게 시작하기 위한 실행 순서다. 지금은 제품 파일, package manifest, lockfile, CI workflow를 생성하지 않는다. 공식 답변에 따라 빈 개발 환경까지 허용되면 F0만, 제품 코드까지 허용되면 F0 검증 후 F1로 진행한다.
+이 문서는 [구현 계획](IMPLEMENTATION_PLAN_v0.1.md)의 F0를 재현 가능하게 시작하기 위한 실행 순서다. 사용자 지시에 따라 code scope 제한은 해제됐으며 제품 파일, package manifest, lockfile과 CI workflow를 지금 생성할 수 있다. 행사 규칙 불확실성은 구현을 막지 않되 제출·공개 전 별도로 확인한다. F0 검증 뒤 F1로 진행한다.
 
 ## 현재 로컬 도구 관찰
 

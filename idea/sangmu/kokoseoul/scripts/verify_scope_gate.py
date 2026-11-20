@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed when repository files exceed the recorded pre-code permission."""
+"""Validate repository safety metadata without restricting product code."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ PR_TEMPLATE_PATH = ROOT / ".github" / "PULL_REQUEST_TEMPLATE.md"
 FEATURE_TEMPLATE_PATH = ROOT / ".github" / "ISSUE_TEMPLATE" / "feature.yml"
 READINESS_PATH = ROOT / "docs" / "READINESS_STATUS.md"
 GATE_PATTERN = re.compile(
-    r"^사전 코드 게이트: `(CLOSED|F0_ONLY|PRODUCT_ALLOWED)`$", re.MULTILINE
+    r"^사전 코드 게이트: `(UNRESTRICTED|F0_ONLY|PRODUCT_ALLOWED)`$", re.MULTILINE
 )
 EVIDENCE_PATTERN = re.compile(r"^게이트 근거: (.+)$", re.MULTILINE)
 OPEN_GATE_EVIDENCE = re.compile(r"^D01 @ [0-9a-f]{7,40}$")
@@ -25,73 +25,6 @@ START_PATTERN = re.compile(r"^허용 시작 시각: (.+)$", re.MULTILINE)
 ISO_8601_PATTERN = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$"
 )
-
-CLOSED_EXACT = {
-    ".env.example",
-    ".node-version",
-    ".npmrc",
-    ".nvmrc",
-    "bun.lock",
-    "bun.lockb",
-    "components.json",
-    "compose.yaml",
-    "compose.yml",
-    "docker-compose.yaml",
-    "docker-compose.yml",
-    "next-env.d.ts",
-    "package-lock.json",
-    "package.json",
-    "pnpm-lock.yaml",
-    "pnpm-workspace.yaml",
-    "tsconfig.json",
-    "turbo.json",
-    "vercel.json",
-    "yarn.lock",
-}
-CLOSED_PREFIXES = (
-    ".github/workflows/",
-    "app/",
-    "components/",
-    "drizzle/",
-    "lib/",
-    "migrations/",
-    "public/",
-    "src/",
-    "tests/",
-)
-CLOSED_CONFIG_PREFIXES = (
-    "Dockerfile",
-    "eslint.config.",
-    "next.config.",
-    "playwright.config.",
-    "postcss.config.",
-    "tailwind.config.",
-    "vitest.config.",
-)
-CLOSED_SUFFIXES = (
-    ".cjs",
-    ".css",
-    ".html",
-    ".js",
-    ".jsx",
-    ".mjs",
-    ".scss",
-    ".sql",
-    ".ts",
-    ".tsx",
-)
-
-F0_ONLY_PREFIXES = (
-    "app/api/",
-    "drizzle/",
-    "migrations/",
-    "src/app/api/",
-    "src/db/",
-    "src/modules/",
-    "tests/integration/",
-)
-F0_ONLY_SUFFIXES = (".sql",)
-F0_ONLY_CONFIG_PREFIXES = ("drizzle.config.",)
 
 SECRET_PATTERNS = (
     ("AWS access key", re.compile(rb"\bAKIA[0-9A-Z]{16}\b")),
@@ -112,16 +45,15 @@ SECRET_PATTERNS = (
 
 REQUIRED_PR_TEMPLATE_TOKENS = (
     "python3 scripts/verify_all.py",
-    "사전 코드 게이트 전/후",
+    "코드 범위 상태",
     "docs/EVENT_RULES_CHECKLIST.md",
     "제품 AC·build·E2E",
     "조사 실행 게이트 전/후",
     "INTERVIEWS_ALLOWED",
 )
 REQUIRED_FEATURE_TEMPLATE_TOKENS = (
-    "EVENT_RULES_CHECKLIST",
-    "정확한 gate 값",
-    "근거 commit",
+    "Code scope는 UNRESTRICTED",
+    "제출 전 위험",
 )
 
 
@@ -156,7 +88,7 @@ def check_open_gate_metadata(gate: str, text: str) -> list[str]:
         errors.append(
             "docs/EVENT_RULES_CHECKLIST.md: expected exactly one allowed start field"
         )
-    if errors or gate == "CLOSED":
+    if errors or gate == "UNRESTRICTED":
         return errors
     if not OPEN_GATE_EVIDENCE.fullmatch(evidence[0].strip()):
         errors.append(
@@ -171,7 +103,7 @@ def check_open_gate_metadata(gate: str, text: str) -> list[str]:
 
 
 def check_open_gate_commit(gate: str, text: str) -> list[str]:
-    if gate == "CLOSED":
+    if gate == "UNRESTRICTED":
         return []
     evidence = EVIDENCE_PATTERN.findall(text)
     if len(evidence) != 1 or not OPEN_GATE_EVIDENCE.fullmatch(evidence[0].strip()):
@@ -204,34 +136,9 @@ def candidate_files() -> list[str]:
     return sorted(path for path in result.stdout.splitlines() if path)
 
 
-def is_closed_forbidden(path: str) -> bool:
-    name = Path(path).name
-    return (
-        path in CLOSED_EXACT
-        or path.startswith(CLOSED_PREFIXES)
-        or name.startswith(CLOSED_CONFIG_PREFIXES)
-        or path.endswith(CLOSED_SUFFIXES)
-    )
-
-
-def is_f0_only_forbidden(path: str) -> bool:
-    name = Path(path).name
-    return (
-        path.startswith(F0_ONLY_PREFIXES)
-        or name.startswith(F0_ONLY_CONFIG_PREFIXES)
-        or path.endswith(F0_ONLY_SUFFIXES)
-    )
-
-
 def check_scope(gate: str, paths: list[str]) -> list[str]:
-    if gate == "PRODUCT_ALLOWED":
-        return []
-    predicate = is_closed_forbidden if gate == "CLOSED" else is_f0_only_forbidden
-    return [
-        f"{path}: forbidden while pre-code gate is {gate}"
-        for path in paths
-        if predicate(path)
-    ]
+    """Code scope is informational and never rejects repository files."""
+    return []
 
 
 def check_secret_patterns(paths: list[str]) -> list[str]:
@@ -311,7 +218,6 @@ def main() -> int:
     if not errors and gate is not None:
         try:
             paths = candidate_files()
-            errors.extend(check_scope(gate, paths))
             errors.extend(check_secret_patterns(paths))
         except RuntimeError as error:
             errors.append(str(error))

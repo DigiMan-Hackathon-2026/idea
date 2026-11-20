@@ -20,13 +20,13 @@ class ScopeGateVerifierTest(unittest.TestCase):
         self.assertEqual(errors, [])
 
     def test_parse_gate_fails_closed_for_missing_or_duplicate_marker(self) -> None:
-        for text in ("# no marker\n", "사전 코드 게이트: `CLOSED`\n" * 2):
+        for text in ("# no marker\n", "사전 코드 게이트: `UNRESTRICTED`\n" * 2):
             with self.subTest(text=text):
                 gate, errors = verifier.parse_gate(text)
                 self.assertIsNone(gate)
                 self.assertEqual(len(errors), 1)
 
-    def test_closed_gate_rejects_scaffold_and_product_files(self) -> None:
+    def test_unrestricted_gate_allows_code_files_without_warning(self) -> None:
         paths = [
             "docs/PLAN.md",
             "scripts/verify_docs.py",
@@ -39,12 +39,11 @@ class ScopeGateVerifierTest(unittest.TestCase):
             "src/app/page.tsx",
         ]
 
-        errors = verifier.check_scope("CLOSED", paths)
+        errors = verifier.check_scope("UNRESTRICTED", paths)
 
-        self.assertEqual(len(errors), 7)
-        self.assertTrue(all("gate is CLOSED" in error for error in errors))
+        self.assertEqual(errors, [])
 
-    def test_f0_only_gate_allows_scaffold_but_rejects_product_layers(self) -> None:
+    def test_f0_only_label_does_not_restrict_product_layers(self) -> None:
         paths = [
             "package.json",
             "src/app/page.tsx",
@@ -56,8 +55,7 @@ class ScopeGateVerifierTest(unittest.TestCase):
 
         errors = verifier.check_scope("F0_ONLY", paths)
 
-        self.assertEqual(len(errors), 4)
-        self.assertTrue(all("gate is F0_ONLY" in error for error in errors))
+        self.assertEqual(errors, [])
 
     def test_product_allowed_gate_does_not_restrict_files(self) -> None:
         self.assertEqual(
@@ -101,16 +99,20 @@ class ScopeGateVerifierTest(unittest.TestCase):
         self.assertEqual(len(commit_errors), 1)
         self.assertIn("must exist", commit_errors[0])
 
-    def test_closed_gate_still_requires_single_metadata_fields(self) -> None:
+    def test_unrestricted_gate_still_requires_single_metadata_fields(self) -> None:
         text = (
-            "사전 코드 게이트: `CLOSED`\n"
+            "사전 코드 게이트: `UNRESTRICTED`\n"
             "게이트 근거: 미기록\n"
             "허용 시작 시각: 미기록\n"
         )
 
-        self.assertEqual(verifier.check_open_gate_metadata("CLOSED", text), [])
+        self.assertEqual(verifier.check_open_gate_metadata("UNRESTRICTED", text), [])
         self.assertEqual(
-            len(verifier.check_open_gate_metadata("CLOSED", "게이트 근거: 미기록\n")),
+            len(
+                verifier.check_open_gate_metadata(
+                    "UNRESTRICTED", "게이트 근거: 미기록\n"
+                )
+            ),
             1,
         )
 
@@ -138,7 +140,6 @@ class ScopeGateVerifierTest(unittest.TestCase):
             candidates = verifier.candidate_files()
             self.assertIn(relative, candidates)
             self.assertIn(secret_relative, candidates)
-            self.assertTrue(verifier.is_closed_forbidden(relative))
             secret_errors = verifier.check_secret_patterns(candidates)
             self.assertEqual(len(secret_errors), 3)
             self.assertTrue(any("possible AWS access key" in error for error in secret_errors))

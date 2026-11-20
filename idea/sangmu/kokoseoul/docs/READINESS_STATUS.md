@@ -47,7 +47,7 @@
 | 제품 시연 | 준비됨 | [2분 시연 런북](DEMO_RUNBOOK_v0.1.md) | 구현 뒤 실제 기기 100초 리허설과 기록 |
 | 출시 판정 | 준비됨 | [출시 준비 gate](RELEASE_READINESS_v0.1.md) | 고정 commit·환경에서 모든 필수 증거와 승인 기록 |
 | 문서·조사 자동 검증 | 완료 | `python3 scripts/verify_all.py`, 37개 회귀 테스트와 scope·research gate | CI 연결은 행사 규칙 확인 후 결정 |
-| 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md), gate `CLOSED` | 주최 측 공식 답변·근거·허용 시작 시각 기록 |
+| 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md), code scope `UNRESTRICTED` | 제출·공개 전 주최 측 공식 답변 기록 |
 | 사용자 인터뷰 | 준비됨 | [조사 계획](USER_RESEARCH_v0.1.md), [작업공간](../research/README.md) | D02 일본어 검수 뒤 모집·일정, 익명 기록 3~5개와 합성 |
 | 첫 타깃 | 대기 | 재방문 일본인 혼행객은 가설 | 인터뷰 사례로 유지·수정·폐기 결정 |
 | 첫 지역 | 대기 | 후보 미선정 | 사례·현장 검증 기준을 통과한 지역 1곳 |
@@ -62,13 +62,13 @@
 | 익명 visitor session | 준비됨 | [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | token·cookie·rotation·만료/삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
 | 지도 연결 | 준비됨 | [지도·주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md) | 일본어 iOS·Android 실제 장소·앱 fallback 검수 |
-| 제품 코드 F0~F8 | 보류 | 행사 전 코드 허용 범위 미확인 | 규칙 gate 해제 후 기능별 착수 |
+| 제품 코드 F0~F8 | 진행 가능 | 사용자 지시로 code scope 제한 해제 | F0부터 기능별 구현·검증 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
 ## 현재 사실
 
 - 제품 코드는 없다.
-- 현재 사전 코드 게이트는 `CLOSED`다. 문서·조사·Python 검증 도구 외 scaffold·workflow·제품 파일은 보류한다.
+- 현재 사전 코드 게이트는 `UNRESTRICTED`다. 코드 파일 생성·검증에 제한이나 경고를 적용하지 않는다.
 - 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.
 - 전체 Markdown의 JSON block 44개는 JSON parser를 통과한다.
@@ -97,7 +97,7 @@
 
 다음 조건을 모두 충족하기 전에는 제품 코드가 준비됐다고 표시하지 않는다.
 
-- [ ] 공식 근거와 시작 시각이 기록되고 사전 코드 게이트가 해당 작업 단위를 허용한다.
+- [ ] 행사 제출·공개 전에는 사전 코드 허용 범위의 공식 근거와 조건을 다시 확인한다.
 - [ ] Node·pnpm과 package version을 lockfile로 고정한다.
 - [ ] 개발 PostgreSQL과 production 분리 방법을 확인한다.
 - [ ] 팀이 기술 작업 기준과 기능 분담에 동의한다.

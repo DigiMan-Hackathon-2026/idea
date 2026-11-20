@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: schema 구현 게이트 대기
 
-이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. 행사 규칙이 제품 schema 작성을 허용하고 F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다.
+이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다. 행사 규칙 미확인은 구현 차단 조건이 아니라 제출 전 위험이다.
 
 ## F1의 종료 결과
 

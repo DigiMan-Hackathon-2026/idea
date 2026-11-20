@@ -246,7 +246,7 @@ F0·F1에서 실제 경로가 생기면 다음을 도구로 강제한다.
 - server-only canary의 client artifact 부재
 - API route별 runtime이 Node.js이며 Edge opt-in 없음
 
-package·lint plugin은 D01·D07 뒤 최소 도구로 선택한다. 검사가 false positive라면 전체 rule을 끄지 않고 경계·예외를 좁혀 문서화한다.
+package·lint plugin은 D07에서 최소 도구로 선택한다. 검사가 false positive라면 전체 rule을 끄지 않고 경계·예외를 좁혀 문서화한다.
 
 ## review checklist
 
