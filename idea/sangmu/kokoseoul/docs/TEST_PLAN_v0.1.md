@@ -239,6 +239,8 @@ log field allowlist·request ID·자유 입력 canary 검사는 [로그·지표�
 
 초기 목표는 합의한 검수 환경에서 공개 목록·상세 p95 1초 이내, 20명 동시 이용 5분이다.
 
+환경 고정, virtual user 행동·think time, cold/warm 구간, shared Wi-Fi, 정합성 gate와 증거 형식은 [성능·부하 검수 계약](PERFORMANCE_LOAD_TEST_v0.1.md)을 따른다.
+
 부하 시나리오:
 
 1. 공개 목록 50%, 상세 25%, run 조회 15%, 단계 완료 10%

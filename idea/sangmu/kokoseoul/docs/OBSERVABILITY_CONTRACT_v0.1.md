@@ -112,6 +112,8 @@ request ID, UUID, raw path, IP, User-Agent, query, error message를 metric label
 
 다음 수치는 공개 SLA가 아니라 검수 환경의 초기 목표다.
 
+workload와 측정 구간·판정·증거는 [성능·부하 검수 계약](PERFORMANCE_LOAD_TEST_v0.1.md)에 고정한다.
+
 | 항목 | 계산 | 초기 검수 목표 |
 | --- | --- | --- |
 | 공개 조회 가용성 | 성공·계약된 4xx / 전체, provider 장애 구분 | 기준선 측정 후 결정 |

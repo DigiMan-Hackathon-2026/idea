@@ -30,6 +30,7 @@
 | 화면 상태·문구 | 준비됨 | [화면 계약](SCREEN_STATES_v0.1.md), [일본어 검수 절차](JAPANESE_COPY_REVIEW_v0.1.md), [접근성 검수](ACCESSIBILITY_VERIFICATION_v0.1.md) | 일본어 모어 화자 검수와 UI 관찰 |
 | 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | 구현 통제와 출시 전 gate 실행 |
 | 테스트 계획 | 준비됨 | [테스트 계획](TEST_PLAN_v0.1.md) | 구현 후 AC01~AC20 실제 pass 증거 |
+| 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md) | 서비스 확정 후 명령·계정·복구 훈련 |
 | 장애 대응 | 준비됨 | [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md) | 역할·연락 경로 확정과 P0·P1 tabletop 훈련 |
 | 로그·관측성 | 준비됨 | [관측 계약](OBSERVABILITY_CONTRACT_v0.1.md) | provider 설정과 canary·alert 검수 |
