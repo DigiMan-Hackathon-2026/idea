@@ -32,10 +32,22 @@ PARTICIPANT_FILE = re.compile(r"P\d{2}\.md")
 SYNTHESIS_FILE = re.compile(r"\d{4}-\d{2}-round-\d{2}\.md")
 PARTICIPANT_CODE = re.compile(r"^- 참여자 코드:\s*(P\d{2})\s*$", re.MULTILINE)
 EMAIL = re.compile(r"(?<![\w.+-])[\w.+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?![\w.-])")
-KOREAN_PHONE = re.compile(r"(?<!\d)01[016789][ -]?\d{3,4}[ -]?\d{4}(?!\d)")
+PHONE = re.compile(
+    r"(?<![\d+])(?:"
+    r"01[016789][ -]?\d{3,4}[ -]?\d{4}|"
+    r"0[789]0[ -]?\d{4}[ -]?\d{4}|"
+    r"0(?:2|[3-6][1-5])[ -]?\d{3,4}[ -]?\d{4}|"
+    r"\+82[ -]?1[016789][ -]?\d{3,4}[ -]?\d{4}|"
+    r"\+81[ -]?[789]0[ -]?\d{4}[ -]?\d{4}"
+    r")(?!\d)"
+)
 SENSITIVE_FIELD = re.compile(
-    r"^-\s*(?:이름|실명|연락처|이메일|전화번호|휴대폰|카카오톡|LINE(?:\s+ID)?|"
-    r"숙소|정확한\s+주소)\s*:\s*\S.+$",
+    r"^-\s*(?:"
+    r"이름|실명|연락처|이메일|전화번호|휴대폰|카카오톡|숙소|정확한\s+주소|"
+    r"名前|氏名|連絡先|メール(?:アドレス)?|電話番号|携帯(?:電話)?|住所|宿泊先|"
+    r"name|full\s+name|contact|email|phone|mobile|address|accommodation|"
+    r"LINE(?:\s+ID)?|SNS(?:\s+ID)?"
+    r")\s*:\s*\S.+$",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -93,7 +105,7 @@ def check_sensitive_text(paths: list[Path]) -> list[str]:
         text = path.read_text(encoding="utf-8")
         if EMAIL.search(text):
             errors.append(f"{relative(path)}: possible email address in research artifact")
-        if KOREAN_PHONE.search(text):
+        if PHONE.search(text):
             errors.append(f"{relative(path)}: possible phone number in research artifact")
         if SENSITIVE_FIELD.search(text):
             errors.append(f"{relative(path)}: populated sensitive identity field")

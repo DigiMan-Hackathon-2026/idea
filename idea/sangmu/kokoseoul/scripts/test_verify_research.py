@@ -64,6 +64,22 @@ class ResearchSafetyTest(unittest.TestCase):
             self.assertTrue(any("phone number" in error for error in errors))
             self.assertTrue(any("sensitive identity field" in error for error in errors))
 
+    def test_japanese_and_international_contact_data_are_rejected(self) -> None:
+        with isolated_research_tree() as (_, research):
+            path = research / "participant.md"
+            path.write_text(
+                "# Participant\n\n"
+                "- 氏名: 実名\n"
+                "- 電話番号: 090-1234-5678\n"
+                "- contact: +81 80 1234 5678\n",
+                encoding="utf-8",
+            )
+
+            errors = verifier.check_sensitive_text([path])
+
+            self.assertTrue(any("phone number" in error for error in errors))
+            self.assertTrue(any("sensitive identity field" in error for error in errors))
+
     def test_template_is_not_scanned_as_participant_data(self) -> None:
         with isolated_research_tree() as (_, research):
             path = research / "TEMPLATE.md"
