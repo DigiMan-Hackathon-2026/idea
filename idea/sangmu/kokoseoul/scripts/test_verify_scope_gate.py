@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import tempfile
 import unittest
+from pathlib import Path
 
 from scripts import verify_scope_gate as verifier
 
@@ -92,6 +94,17 @@ class ScopeGateVerifierTest(unittest.TestCase):
             len(verifier.check_open_gate_metadata("CLOSED", "게이트 근거: 미기록\n")),
             1,
         )
+
+    def test_candidate_files_includes_nonignored_untracked_file(self) -> None:
+        with tempfile.TemporaryDirectory(
+            dir=verifier.ROOT, prefix="scope-gate-probe-"
+        ) as directory:
+            probe = Path(directory) / "unexpected.ts"
+            probe.write_text("export {};\n", encoding="utf-8")
+            relative = probe.relative_to(verifier.ROOT).as_posix()
+
+            self.assertIn(relative, verifier.candidate_files())
+            self.assertTrue(verifier.is_closed_forbidden(relative))
 
 
 if __name__ == "__main__":
