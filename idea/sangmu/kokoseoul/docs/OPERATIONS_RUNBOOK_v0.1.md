@@ -52,6 +52,7 @@ migration과 애플리케이션 순서가 호환되지 않으면 한 번에 배�
 | content | draft는 공개 404, published만 목록 노출 |
 | pause | 신규 시작·미완료 단계 차단, 이유 표시 |
 | observability | request ID, status, latency 확인; token·자유 입력 없음 |
+| headers | CSP·cache·cookie·HSTS·referrer가 환경·route 계약과 일치 |
 
 smoke test에서 만든 기록은 `environment=test`로 구분하고 검수 후 삭제한다.
 

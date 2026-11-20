@@ -73,6 +73,8 @@ cookie 탈취에 대비한 기기 복구·강제 로그아웃은 P0에 없으므
 
 ## 변경 요청 보호
 
+CSP·HSTS·cache·cookie·CORS·Permissions Policy의 route별 값과 검수는 [HTTP 보안·캐시 header 계약](HTTP_SECURITY_HEADERS_v0.1.md)을 따른다.
+
 SameSite cookie만으로 CSRF 방어를 끝내지 않는다.
 
 - POST·PUT·PATCH·DELETE는 허용된 정확한 Origin을 검사한다.
