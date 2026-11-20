@@ -13,7 +13,7 @@
 - Windows 작업 위치: `D:\dev\digiman`
 - 맥북 작업본도 `origin/main`과 기능 단위로 동기화한다. 새 기기에서는 원하는 로컬 경로에 복제하고 Windows 경로를 그대로 사용하지 않는다.
 - 제품 코드는 아직 없다. 설계 스펙, 기술 결정, 사용자 검증 계획과 저장소 기본 설정을 준비했다.
-- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 31개 tooling 회귀 테스트, Markdown 63개, JSON block 44개, API endpoint 21개, 오류 code 14개와 조사 안전·evidence 참조·사전 코드 범위를 외부 package 없이 검사한다.
+- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 32개 tooling 회귀 테스트, Markdown 63개, JSON block 44개, API endpoint 21개, 오류 code 14개와 조사 안전·evidence 참조·사전 코드 범위를 외부 package 없이 검사한다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
 - 외부 서비스의 현재 region·복구·비용 제약과 Singapore 배치 후보는 [외부 서비스 평가 v0.1](EXTERNAL_SERVICES_EVALUATION_v0.1.md)에 정리했다.
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.

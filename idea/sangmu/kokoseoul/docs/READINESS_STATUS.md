@@ -46,9 +46,9 @@
 | 운영 감사 로그 | 준비됨 | [audit 계약](AUDIT_LOG_CONTRACT_v0.1.md) | schema·원자성·append-only 권한 구현 |
 | 제품 시연 | 준비됨 | [2분 시연 런북](DEMO_RUNBOOK_v0.1.md) | 구현 뒤 실제 기기 100초 리허설과 기록 |
 | 출시 판정 | 준비됨 | [출시 준비 gate](RELEASE_READINESS_v0.1.md) | 고정 commit·환경에서 모든 필수 증거와 승인 기록 |
-| 문서·조사 자동 검증 | 완료 | `python3 scripts/verify_all.py` | CI 연결은 행사 규칙 확인 후 결정 |
-| 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md) | 주최 측 공식 답변 기록 |
-| 사용자 인터뷰 | 진행 가능 | [조사 계획](USER_RESEARCH_v0.1.md), [작업공간](../research/README.md) | 익명 기록 3~5개와 조사 합성 |
+| 문서·조사 자동 검증 | 완료 | `python3 scripts/verify_all.py`, 32개 회귀 테스트와 scope gate | CI 연결은 행사 규칙 확인 후 결정 |
+| 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md), gate `CLOSED` | 주최 측 공식 답변·근거·허용 시작 시각 기록 |
+| 사용자 인터뷰 | 준비됨 | [조사 계획](USER_RESEARCH_v0.1.md), [작업공간](../research/README.md) | D02 일본어 검수 뒤 모집·일정, 익명 기록 3~5개와 합성 |
 | 첫 타깃 | 대기 | 재방문 일본인 혼행객은 가설 | 인터뷰 사례로 유지·수정·폐기 결정 |
 | 첫 지역 | 대기 | 후보 미선정 | 사례·현장 검증 기준을 통과한 지역 1곳 |
 | 첫 퀘스트 | 대기 | 후보 미작성 | 검수 가능한 후보 1개와 예비 2개 |
@@ -68,6 +68,7 @@
 ## 현재 사실
 
 - 제품 코드는 없다.
+- 현재 사전 코드 게이트는 `CLOSED`다. 문서·조사·Python 검증 도구 외 scaffold·workflow·제품 파일은 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.
 - 전체 Markdown의 JSON block 44개는 JSON parser를 통과한다.
 - B2C 스펙과 테스트 계획에 AC01~AC20이 모두 존재한다.
@@ -79,9 +80,9 @@
 ### 사용자·팀이 필요한 작업
 
 1. [행사 규칙 질문](EVENT_RULES_CHECKLIST.md)을 주최 측에 보낸다.
-2. 일본어 사용자 3~5명을 모집해 인터뷰 일정을 잡는다.
-3. 팀의 Next.js·TypeScript·PostgreSQL 경험과 역할을 확인한다.
-4. 일본어 문구와 첫 콘텐츠를 검수할 사람을 정한다.
+2. 모집·동의·P0 자극물 문구를 검수할 일본어 모어 화자와 일정을 정한다.
+3. D02 검수 뒤 일본어 사용자 3~5명을 모집해 인터뷰 일정을 잡는다.
+4. 팀의 Next.js·TypeScript·PostgreSQL 경험과 역할을 확인한다.
 
 ### 저장소에서 계속 가능한 작업
 
@@ -95,7 +96,7 @@
 
 다음 조건을 모두 충족하기 전에는 제품 코드가 준비됐다고 표시하지 않는다.
 
-- [ ] 행사 규칙이 제품 코드 또는 해당 작업 단위를 허용한다.
+- [ ] 공식 근거와 시작 시각이 기록되고 사전 코드 게이트가 해당 작업 단위를 허용한다.
 - [ ] Node·pnpm과 package version을 lockfile로 고정한다.
 - [ ] 개발 PostgreSQL과 production 분리 방법을 확인한다.
 - [ ] 팀이 기술 작업 기준과 기능 분담에 동의한다.

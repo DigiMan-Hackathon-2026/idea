@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RULES_PATH = ROOT / "docs" / "EVENT_RULES_CHECKLIST.md"
 PR_TEMPLATE_PATH = ROOT / ".github" / "PULL_REQUEST_TEMPLATE.md"
 FEATURE_TEMPLATE_PATH = ROOT / ".github" / "ISSUE_TEMPLATE" / "feature.yml"
+READINESS_PATH = ROOT / "docs" / "READINESS_STATUS.md"
 GATE_PATTERN = re.compile(
     r"^사전 코드 게이트: `(CLOSED|F0_ONLY|PRODUCT_ALLOWED)`$", re.MULTILINE
 )
@@ -183,6 +184,16 @@ def check_contribution_templates() -> list[str]:
     return errors
 
 
+def check_readiness_alignment(gate: str) -> list[str]:
+    text = READINESS_PATH.read_text(encoding="utf-8")
+    marker = f"현재 사전 코드 게이트는 `{gate}`다."
+    if marker not in text:
+        return [
+            f"{READINESS_PATH.relative_to(ROOT)}: missing current gate marker {gate}"
+        ]
+    return []
+
+
 def main() -> int:
     rules_text = RULES_PATH.read_text(encoding="utf-8")
     gate, errors = parse_gate(rules_text)
@@ -193,6 +204,8 @@ def main() -> int:
             errors.extend(check_scope(gate, candidate_files()))
         except RuntimeError as error:
             errors.append(str(error))
+    if gate is not None:
+        errors.extend(check_readiness_alignment(gate))
     errors.extend(check_contribution_templates())
 
     if errors:

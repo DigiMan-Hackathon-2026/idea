@@ -109,6 +109,14 @@ class ScopeGateVerifierTest(unittest.TestCase):
     def test_contribution_templates_keep_scope_gate_contract(self) -> None:
         self.assertEqual(verifier.check_contribution_templates(), [])
 
+    def test_readiness_reports_the_same_scope_gate(self) -> None:
+        text = verifier.RULES_PATH.read_text(encoding="utf-8")
+        gate, errors = verifier.parse_gate(text)
+
+        self.assertEqual(errors, [])
+        self.assertIsNotNone(gate)
+        self.assertEqual(verifier.check_readiness_alignment(gate), [])
+
 
 if __name__ == "__main__":
     unittest.main()
