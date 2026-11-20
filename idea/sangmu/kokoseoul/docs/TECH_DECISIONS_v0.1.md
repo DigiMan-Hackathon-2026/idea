@@ -149,6 +149,7 @@ SESSION_TOKEN_PEPPER
 - 별도 NestJS/Express API: 첫 세로 흐름에는 배포와 계약 동기화 비용이 더 크다.
 - Supabase 전체 스택: PostgreSQL 후보로는 가능하지만 Auth·DB·정책을 한 번에 채택할 필요가 없다.
 - 지도 SDK: 위치 권한과 API 키 없이도 핵심 흐름을 검증할 수 있어 P0에서 제외한다.
+- 범용 URL shape, query·Place ID 우선순위, 주소 복사와 실제 기기 검수는 [지도 URL·한국어 주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md)을 따른다.
 - 마이크로서비스와 모노레포: 6명 해커톤의 초기 기능 규모에 비해 운영 부담이 크다.
 - 클라이언트 전용 저장: 스펙의 중복 요청·소유권·버전 고정 계약을 충족하지 못한다.
 

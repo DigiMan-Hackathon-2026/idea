@@ -54,7 +54,7 @@
 | Neon·Vercel | 준비됨 | [외부 서비스 평가](EXTERNAL_SERVICES_EVALUATION_v0.1.md) | 계정·plan 승인, Singapore 배치와 지연 측정 |
 | Google OIDC | 대기 | 구현 기준만 결정 | 환경별 client·callback·허용 principal 준비 |
 | 운영자 인증·인가 | 준비됨 | [운영 인증 계약](ADMIN_AUTHORIZATION_v0.1.md) | D10 결정과 검수 tenant에서 AC13~AC15 실행 |
-| 지도 연결 | 준비됨 | Google Maps URL·주소 복사 작업 기준 | 일본어 iOS·Android 서울 경로 실제 검수 |
+| 지도 연결 | 준비됨 | [지도·주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md) | 일본어 iOS·Android 실제 장소·앱 fallback 검수 |
 | 제품 코드 F0~F8 | 보류 | 행사 전 코드 허용 범위 미확인 | 규칙 gate 해제 후 기능별 착수 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
