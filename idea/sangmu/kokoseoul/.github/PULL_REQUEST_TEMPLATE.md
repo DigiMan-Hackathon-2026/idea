@@ -13,6 +13,7 @@
 - 사용자 조사 또는 결정 근거:
 - 영향받는 스펙·API·화면:
 - 관련 AC:
+- 신규 dependency·asset·AI 보조 출처:
 
 ## 검증
 
@@ -42,12 +43,14 @@ python3 scripts/verify_docs.py
 - [ ] token, cookie, 자유 입력과 개인정보를 로그·diff에 넣지 않았다.
 - [ ] 외부 URL·Origin·입력 크기와 unknown field를 검토했다.
 - [ ] 삭제·만료·backup 재노출 영향을 검토했다.
+- [ ] log·metric에 cookie, token, 자유 입력과 고 cardinality 값이 없다.
 
 ## 콘텐츠와 화면
 
 - [ ] 일본어 검수 상태를 표시했다.
 - [ ] demo와 실제 콘텐츠를 구분했다.
 - [ ] 360px·키보드·오류·빈 상태를 확인했다.
+- [ ] focus, dialog, 일본어·한국어 language와 동적 상태 전달을 확인했다.
 - [ ] 화면 변경이 있으면 캡처 또는 짧은 설명을 첨부했다.
 
 ## 완료 확인
