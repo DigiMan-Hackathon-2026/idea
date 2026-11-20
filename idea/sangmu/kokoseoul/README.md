@@ -14,6 +14,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [기술 결정 v0.1](docs/TECH_DECISIONS_v0.1.md)
 - [외부 서비스 평가와 선택 조건 v0.1](docs/EXTERNAL_SERVICES_EVALUATION_v0.1.md)
 - [PostgreSQL 데이터 정합성 계약 v0.1](docs/DATA_CONSTRAINTS_v0.1.md)
+- [도메인 상태 머신 계약 v0.1](docs/STATE_MACHINES_v0.1.md)
 - [분석 이벤트와 지표 계약 v0.1](docs/ANALYTICS_EVENT_CONTRACT_v0.1.md)
 - [B2C 구현 계획 v0.1](docs/IMPLEMENTATION_PLAN_v0.1.md)
 - [F0 개발 환경 착수 계획 v0.1](docs/F0_BOOTSTRAP_PLAN_v0.1.md)

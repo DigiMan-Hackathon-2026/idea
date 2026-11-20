@@ -4,6 +4,8 @@
 
 이 계약은 [B2C 설계 스펙](B2C_SPEC_v0.1.md)의 데이터 모델을 PostgreSQL 제약, 인덱스, 잠금과 트랜잭션 단위로 구체화한다. 실제 migration은 행사 규칙에서 제품 코드 작성이 허용된 뒤 생성한다.
 
+엔터티별 허용 상태 전이와 사용자 가용성은 [도메인 상태 머신 계약](STATE_MACHINES_v0.1.md)을 따른다.
+
 ## 공통 규칙
 
 - 모든 ID는 애플리케이션이 생성한 UUID다.
@@ -255,14 +257,15 @@ step 소속 검증은 run의 version과 step의 version을 함께 비교한다. 
 
 ### 단계 완료
 
-1. 본인 visitor의 run을 잠근다.
-2. run이 completed면 해당 step의 기존 결과 또는 순서 오류를 반환한다.
-3. quest 상태, run의 고정 version, 요청 step 소속을 검사한다.
-4. 미완료 선행 step이 있는지 position 기준으로 검사한다.
-5. run_steps를 insert한다. 기존 동일 행이면 기존 completed_at을 사용한다.
-6. 마지막 단계면 같은 트랜잭션에서 run을 completed로 바꾼다.
+1. 본인 visitor의 run에서 quest ID를 잠금 없이 후보 조회한다.
+2. quest를 잠근 뒤 run을 잠그고 소유권·quest ID를 다시 확인한다.
+3. run이 completed면 해당 step의 기존 결과 또는 순서 오류를 반환한다.
+4. quest 상태, run의 고정 version, 요청 step 소속을 검사한다.
+5. 미완료 선행 step이 있는지 position 기준으로 검사한다.
+6. run_steps를 insert한다. 기존 동일 행이면 기존 completed_at을 사용한다.
+7. 마지막 단계면 같은 트랜잭션에서 run을 completed로 바꾼다.
 
-완료 전환은 `status = 'in_progress'` 조건을 포함한 update로 한 번만 성공하게 한다. 동시 요청의 패자는 commit된 현재 상태를 다시 읽는다.
+quest → run 잠금 순서로 pause·archive와 단계 완료의 선후를 결정한다. 완료 전환은 `status = 'in_progress'` 조건을 포함한 update로 한 번만 성공하게 한다. 동시 요청의 패자는 commit된 현재 상태를 다시 읽는다.
 
 ### draft 저장
 
