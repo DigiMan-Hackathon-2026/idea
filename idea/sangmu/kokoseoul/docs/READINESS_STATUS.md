@@ -21,8 +21,8 @@
 | B2C 제품 범위 | 완료 | [B2C 스펙](B2C_SPEC_v0.1.md) | 사용자 조사 결과에 따른 변경 반영 |
 | 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md) | 팀 동의와 실제 package version 고정 |
 | 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | 행사 규칙 확인 뒤 F0 착수 |
-| B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
-| 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
+| B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
+| 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | DB 정합성 설계 | 완료 | [데이터 계약](DATA_CONSTRAINTS_v0.1.md) | 실제 migration·PostgreSQL 동시성 테스트 |
 | 화면 상태·문구 | 준비됨 | [화면 계약](SCREEN_STATES_v0.1.md) | 일본어 모어 화자 검수와 UI 관찰 |
 | 보안·개인정보 | 준비됨 | [위협 모델](SECURITY_PRIVACY_v0.1.md) | 구현 통제와 출시 전 gate 실행 |

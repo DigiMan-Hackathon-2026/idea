@@ -316,6 +316,7 @@
 | --- | --- |
 | VALIDATION_ERROR | 해당 입력 근처 일본어 오류와 summary |
 | SESSION_REQUIRED | 세션 만료·기록 없음 화면 |
+| ORIGIN_FORBIDDEN | 입력 유지, 현재 공식 화면을 다시 연 뒤에도 반복되면 request ID 안내 |
 | QUEST_UNAVAILABLE | 중지 사유와 목록 이동 |
 | STEP_ORDER_CONFLICT | run 재조회 후 현재 단계 표시 |
 | REQUEST_CONFLICT | 입력 유지, 명시적 새 제출 제공 |

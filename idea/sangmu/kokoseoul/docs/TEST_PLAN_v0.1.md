@@ -210,7 +210,7 @@ commit 전 연결 종료 사례도 별도로 실행해 미완료 상태와 안�
 - UUID·cursor·limit·문자 수·enum 범위
 - Origin 검사와 cookie 속성
 - 개인 응답 `Cache-Control: no-store`, `Vary: Cookie`
-- 400, 401, 403, 404, 409, 429, 503 오류 shape
+- 400, 401, 403 `ORIGIN_FORBIDDEN`·`ADMIN_FORBIDDEN`, 404, 409, 429, 503 오류 shape
 - request ID가 응답과 server log에서 연결됨
 - SQL·stack·constraint 이름·token이 응답에 없음
 

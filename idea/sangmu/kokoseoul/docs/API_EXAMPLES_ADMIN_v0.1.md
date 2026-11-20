@@ -35,6 +35,7 @@ X-Request-Id: 01KAMEADMINEXAMPLE000000000
 | 공개 버전 | `33333333-3333-4333-8333-333333333333` |
 | 장소 | `44444444-4444-4444-8444-444444444444` |
 | 신고 | `55555555-5555-4555-8555-555555555555` |
+| 퀘스트 생성 요청 | `66666666-6666-4666-8666-666666666666` |
 
 ## 퀘스트 목록
 
@@ -77,7 +78,9 @@ Content-Type: application/json
 Origin: https://admin.example.test
 Cookie: digiman_admin=<server-session-token>
 
-{}
+{
+  "clientRequestId": "66666666-6666-4666-8666-666666666666"
+}
 ```
 
 ```http
@@ -102,6 +105,8 @@ Location: /api/v1/admin/quests/11111111-1111-4111-8111-111111111111
 ```
 
 내부 공급자 ID와 작성 운영자 ID는 서버가 결정한다. 클라이언트가 `supplierOrgId`, `status`, `reviewedBy`를 보내면 입력 오류다.
+
+같은 운영자가 같은 `clientRequestId`로 다시 요청하면 200과 기존 quest를 반환한다. 응답 유실 뒤 새 UUID로 자동 재시도하지 않는다. 다른 운영자는 같은 UUID를 사용할 수 있지만 클라이언트는 충돌 가능성을 피하도록 매 생성 행동마다 새 UUID를 만든다.
 
 ## 운영 상세 조회
 
@@ -410,6 +415,7 @@ Cookie: digiman_admin=<server-session-token>
       "category": "information",
       "comment": "表示されている住所を確認できませんでした。",
       "status": "new",
+      "revision": 1,
       "createdAt": "2026-11-21T09:35:00Z",
       "updatedAt": "2026-11-21T09:35:00Z"
     }
@@ -430,6 +436,7 @@ Origin: https://admin.example.test
 Cookie: digiman_admin=<server-session-token>
 
 {
+  "expectedRevision": 1,
   "status": "in_progress",
   "internalNote": "주소와 지도 대상을 다시 확인한다."
 }
@@ -439,12 +446,13 @@ Cookie: digiman_admin=<server-session-token>
 {
   "id": "55555555-5555-4555-8555-555555555555",
   "status": "in_progress",
+  "revision": 2,
   "internalNote": "주소와 지도 대상을 다시 확인한다.",
   "updatedAt": "2026-11-21T11:00:00Z"
 }
 ```
 
-신고 상태는 `new`, `in_progress`, `resolved`다. 내부 메모는 사용자 API와 공개 퀘스트 응답에 포함하지 않는다. 상태·메모 변경은 감사 로그와 같은 트랜잭션에서 저장한다.
+신고 상태는 `new`, `in_progress`, `resolved`다. 내부 메모는 사용자 API와 공개 퀘스트 응답에 포함하지 않는다. 상태·메모 변경은 expectedRevision을 검사하고 감사 로그와 같은 트랜잭션에서 저장한다. 다른 운영자가 먼저 처리했으면 409 `VERSION_CONFLICT`와 현재 revision을 반환하며 자동 덮어쓰지 않는다.
 
 ## 권한 오류
 

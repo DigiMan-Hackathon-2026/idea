@@ -47,7 +47,8 @@ visitors ──< visitor_sessions
     ├─< reports
     └─< analytics_events
 
-admin_principals ──< audit_logs
+admin_principals ──< quests
+    └─< audit_logs
 ```
 
 퀘스트·공개 버전·단계·run은 보존한다. 방문자가 전체 기록 삭제를 요청하면 방문자 소유 데이터는 정해진 순서로 제거하고 신고는 사용자 연결과 자유 입력을 제거한 운영 요약만 남긴다.
@@ -109,7 +110,8 @@ place 수정은 앞으로 만들 draft에만 반영한다. 공개 버전 단계�
 | 제약 | 계약 |
 | --- | --- |
 | primary key | `id` |
-| 외래키 | `supplier_org_id` 필수, restrict delete |
+| 외래키 | `supplier_org_id`·`created_by` 필수, 모두 restrict delete |
+| create idempotency | `create_request_id` UUID 필수, `(created_by, create_request_id)` unique |
 | revision | 1 이상 정수, 모든 콘텐츠·상태 변경 때 증가 |
 | published version | null 또는 같은 quest의 published version |
 | pause reason | paused면 trim한 일본어 1~300자 필수, 나머지는 null |
@@ -203,6 +205,8 @@ step 소속 검증은 run의 version과 step의 version을 함께 비교한다. 
 | quest version | version이 해당 quest에 속함 |
 | comment | null 또는 최대 500자 |
 | status | 허용된 report 상태 |
+| revision | 1 이상 정수, 운영 status·내부 메모 변경 때 증가 |
+| internal note | null 또는 최대 2000자, 방문자 원문·식별자 복사 금지 |
 | anonymization | anonymized_at이 있으면 visitor_id·client_request_id·comment는 null |
 | index | `(status, created_at, id)` |
 

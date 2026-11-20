@@ -190,13 +190,13 @@ AI는 콘텐츠·번역 초안 작성에 선택적으로 활용한다. 공개 �
 | visitor_sessions | id, visitor_id, token_hash, expires_at | 원문 토큰 저장 금지 |
 | admin_principals | id, issuer, subject, role, status | issuer·subject 유일, 내부 운영자만 |
 | places | id, address_ko, lat, lng, source_ref, verified_at | 위도 -90~90, 경도 -180~180 |
-| quests | id, supplier_org_id, status, published_version_id, revision, pause_reason_ja | 공급자 필수, 클라이언트가 소유권 지정 불가 |
+| quests | id, supplier_org_id, created_by, create_request_id, status, published_version_id, revision, pause_reason_ja | 운영자별 create_request_id 유일, 공급자·생성자 서버 결정 |
 | quest_versions | id, quest_id, version_no, state, title_ja, summary_ja, body_ja, area_code, tags, duration_minutes, cost_min, cost_max, solo_status, solo_evidence, verified_at, is_demo, reviewed_by, reviewed_at | quest_id·version_no 유일, 공개 후 내용 불변 |
 | quest_steps | id, version_id, position, body_ja, phrase_ko, phrase_ja, place_id, place_snapshot | version_id·position 유일, 공개 버전에 속하면 불변 |
 | runs | id, visitor_id, quest_id, version_id, status, started_at, completed_at | visitor_id·quest_id 유일 |
 | run_steps | run_id, step_id, completed_at | run_id·step_id 유일, 해당 run의 버전 단계만 허용 |
 | feedback | id, run_id, joy_score, felt_new_experience, comment, updated_at | run_id 유일, 완료한 기록만 허용 |
-| reports | id, visitor_id, quest_id, version_id, client_request_id, category, comment, status, created_at, anonymized_at | 활성 신고는 visitor_id·client_request_id 유일, 익명화 후 사용자 연결·멱등 키·자유 입력 null |
+| reports | id, visitor_id, quest_id, version_id, client_request_id, category, comment, status, revision, internal_note, created_at, updated_at, anonymized_at | 활성 신고는 visitor_id·client_request_id 유일, 운영 변경은 revision 검사, 익명화 후 사용자 연결·멱등 키·자유 입력 null |
 | audit_logs | id, admin_id, action, entity_id, before_summary, after_summary, created_at | 공개·중지·보관·편집 기록 |
 | analytics_events | event_id, event_name, dedupe_key, visitor_id, quest_id, run_id, environment, properties, created_at | event_id·dedupe_key 유일, 사용자 원문·위치 저장 금지 |
 
@@ -261,7 +261,7 @@ BR10. 콘텐츠 공개 전에 필수 일본어, 단계 순서, 비용 범위, �
 }
 ```
 
-정의한 주요 code는 VALIDATION_ERROR, SESSION_REQUIRED, ADMIN_FORBIDDEN, QUEST_UNAVAILABLE, STEP_ORDER_CONFLICT, VERSION_CONFLICT, REQUEST_CONFLICT, RUN_NOT_COMPLETED, NOT_FOUND, RATE_LIMITED, SERVICE_UNAVAILABLE이다. ADMIN_FORBIDDEN은 로그인했지만 운영 권한이 없는 경우, REQUEST_CONFLICT는 같은 멱등 키에 다른 본문을 보낸 경우 사용한다. details는 공개 가능한 필드 오류·현재 revision·선행 단계 ID 등으로 제한한다.
+정의한 주요 code는 VALIDATION_ERROR, SESSION_REQUIRED, ORIGIN_FORBIDDEN, ADMIN_FORBIDDEN, QUEST_UNAVAILABLE, STEP_ORDER_CONFLICT, VERSION_CONFLICT, REQUEST_CONFLICT, RUN_NOT_COMPLETED, NOT_FOUND, RATE_LIMITED, SERVICE_UNAVAILABLE이다. ORIGIN_FORBIDDEN은 변경 요청의 Origin 누락·불일치, ADMIN_FORBIDDEN은 로그인했지만 운영 권한이 없는 경우, REQUEST_CONFLICT는 같은 멱등 키에 다른 본문을 보낸 경우 사용한다. details는 공개 가능한 필드 오류·현재 revision·선행 단계 ID 등으로 제한하며 허용 Origin 목록은 반환하지 않는다.
 
 서버가 보내는 canStart, canContinue, nextStepId를 화면 동작의 기준으로 사용하되 서버는 매 변경 요청에서도 조건을 다시 검사한다. 잠금·트랜잭션 재시도는 서버 내부에서 제한 횟수로 처리하며 최종 실패는 재시도 가능한 503으로 반환한다.
 
@@ -320,7 +320,7 @@ POST /visitor-sessions는 유효한 기존 쿠키가 있으면 만료 시각을 
 | 메서드와 경로 | 계약 |
 | --- | --- |
 | GET /admin/quests | 상태별 목록, 운영자 전용 |
-| POST /admin/quests | 내부 공급자로 quest와 version 1의 draft 생성, 201 |
+| POST /admin/quests | clientRequestId로 내부 공급자의 quest와 version 1 draft 생성, 201 또는 같은 요청의 기존 결과 200 |
 | GET /admin/quests/:questId | 현재 공개본·편집본·revision·검수 정보 |
 | PUT /admin/quests/:questId/draft | expectedRevision과 전체 콘텐츠, 200; 공개 후 수정이면 다음 draft 버전 생성 |
 | POST /admin/quests/:questId/publish | expectedRevision, 일본어·사실 정보 검수 확인; draft 확정·공개 |
@@ -328,11 +328,11 @@ POST /visitor-sessions는 유효한 기존 쿠키가 있으면 만료 시각을 
 | POST /admin/quests/:questId/resume | expectedRevision; paused에서 기존 공개본 재개 |
 | POST /admin/quests/:questId/archive | expectedRevision; 종료·보관 |
 | GET /admin/reports | 신규·처리 중·해결 신고 목록 |
-| PATCH /admin/reports/:reportId | status와 내부 처리 메모, 감사 기록 |
+| PATCH /admin/reports/:reportId | expectedRevision, status와 내부 처리 메모, 감사 기록 |
 
 draft 저장 요청은 제목·본문·지역·관심사·예상 시간·비용·혼자 이용 조건·검수 근거·isDemo·steps를 포함한다. 내부 공급자 ID와 검수자 ID는 서버가 결정한다. 단계 ID는 서버가 만들고 해당 draft 안에서만 유지한다.
 
-draft 저장·공개·중지·재개·보관은 expectedRevision을 필수로 받고 불일치 시 VERSION_CONFLICT와 현재 revision을 반환한다. 화면은 다시 불러오기 전 덮어쓰기를 허용하지 않는다.
+quest 생성은 운영자가 만든 UUID clientRequestId를 사용하며 같은 운영자·같은 키는 기존 quest를 반환한다. draft 저장·공개·중지·재개·보관과 신고 처리는 expectedRevision을 필수로 받고 불일치 시 VERSION_CONFLICT와 현재 revision을 반환한다. 화면은 다시 불러오기 전 덮어쓰기를 허용하지 않는다.
 
 publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. paused에서 새 draft를 공개하면 published로 전환한다. paused에서 내용 변경 없이 재개하려면 resume을 사용한다. archived에서는 저장·공개·재개를 허용하지 않는다.
 
@@ -473,5 +473,7 @@ publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. pau
 | 2026-11-21 | 멱등 키 본문 충돌에 REQUEST_CONFLICT 사용 | 운영 revision 충돌과 사용자 요청 재전송 충돌을 구분 |
 | 2026-11-21 | 운영 권한 거절에 ADMIN_FORBIDDEN 사용 | 방문자 세션·인증 없음·인증됐지만 권한 없음 상태를 구분 |
 | 2026-11-21 | 신고 익명화 상태를 데이터 계약에 추가 | 전체 기록 삭제·만료 뒤 운영 요약을 보존하면서 사용자 연결과 자유 입력 제거 |
+| 2026-11-21 | quest 생성 멱등 키와 신고 처리 revision 추가 | 응답 유실의 중복 초안과 운영자 간 신고 덮어쓰기 방지 |
+| 2026-11-21 | Origin 거부를 ORIGIN_FORBIDDEN으로 분리 | 운영 권한 실패와 visitor·admin CSRF 경계를 구분 |
 
 변경 시 날짜·변경 이유·영향받는 화면/API/검수 항목을 추가한다. 로컬 docs/B2C_SPEC_v0.1.md를 개발 계약의 기준으로 사용하고, 검토용 Page는 같은 버전의 사본으로 관리한다. 다음 버전에서 호환되지 않는 계약을 바꾸면 변경 범위와 이행 방법을 명시한다.
