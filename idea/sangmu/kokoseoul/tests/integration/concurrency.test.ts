@@ -4,6 +4,11 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
 import { submitFeedbackWithClient } from "../../src/modules/feedback/submit-feedback.server";
 import { submitReportWithClient } from "../../src/modules/feedback/submit-report.server";
+import type { SessionPepperKeyRing } from "../../src/modules/session/session-config";
+import {
+  createVisitorSessionWithClient,
+  verifyVisitorSessionWithClient,
+} from "../../src/modules/session/visitor-session.server";
 import { completeQuestStepWithClient } from "../../src/modules/progress/complete-step.server";
 import { startQuestRunWithClient } from "../../src/modules/progress/start-run.server";
 
@@ -631,5 +636,60 @@ describe("PostgreSQL concurrency serialization", () => {
       felt_new_experience: true,
       comment_is_null: true,
     });
+  });
+
+  it("converges simultaneous pepper rehash to one active hash", async () => {
+    const previousKeyRing: SessionPepperKeyRing = {
+      activeVersion: 1,
+      peppers: new Map([[1, Buffer.alloc(32, 1)]]),
+    };
+    const rotatedKeyRing: SessionPepperKeyRing = {
+      activeVersion: 2,
+      peppers: new Map([
+        [1, Buffer.alloc(32, 1)],
+        [2, Buffer.alloc(32, 2)],
+      ]),
+    };
+    await setupClient.query("begin");
+    const created = await createVisitorSessionWithClient(
+      setupClient,
+      previousKeyRing,
+    );
+    await setupClient.query("commit");
+    const { first, second } = await connectPair();
+
+    try {
+      await Promise.all([first.query("begin"), second.query("begin")]);
+      const firstVerification = await verifyVisitorSessionWithClient(
+        first,
+        rotatedKeyRing,
+        created.token,
+      );
+      expect(firstVerification.outcome).toBe("valid");
+
+      const competingVerification = verifyVisitorSessionWithClient(
+        second,
+        rotatedKeyRing,
+        created.token,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await first.query("commit");
+      const secondVerification = await competingVerification;
+      expect(secondVerification.outcome).toBe("valid");
+      await second.query("commit");
+
+      const stored = await setupClient.query(
+        `select token_hash_version, count(*)::int as count, expires_at
+         from visitor_sessions where visitor_id = $1
+         group by token_hash_version, expires_at`,
+        [created.visitorId],
+      );
+      expect(stored.rows).toHaveLength(1);
+      expect(stored.rows[0].token_hash_version).toBe(2);
+      expect(stored.rows[0].count).toBe(1);
+      expect(stored.rows[0].expires_at.toISOString()).toBe(created.expiresAt);
+    } finally {
+      await closePair(first, second);
+    }
   });
 });

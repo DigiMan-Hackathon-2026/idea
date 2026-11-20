@@ -1,6 +1,6 @@
 # 익명 방문자 session 수명주기 계약 v0.1
 
-작성일: 2026-11-21 · 상태: schema·고정 만료 실DB 검증 완료, token repository 구현 진행 중
+작성일: 2026-11-21 · 상태: schema·token repository·rotation 실DB 검증 완료, cookie·HTTP adapter 구현 전
 
 이 문서는 DigiMan P0 익명 방문자 session의 생성, cookie 전달, keyed hash 조회, pepper 교체, 고정 만료, 전체 삭제와 장애 복구를 repository 수준으로 정의한다. 운영자 OIDC session과는 이름·저장소·검증 함수를 공유하지 않는다.
 
