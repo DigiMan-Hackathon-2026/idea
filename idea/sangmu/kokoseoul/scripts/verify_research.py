@@ -31,7 +31,10 @@ BLOCKED_SUFFIXES = {
 PARTICIPANT_FILE = re.compile(r"P\d{2}\.md")
 SYNTHESIS_FILE = re.compile(r"\d{4}-\d{2}-round-\d{2}\.md")
 PARTICIPANT_CODE = re.compile(r"^- 참여자 코드:\s*(P\d{2})\s*$", re.MULTILINE)
-INTERVIEW_EVIDENCE = re.compile(r"\b[EO]-(P\d{2})-\d{2}\b")
+INTERVIEW_EVIDENCE = re.compile(r"\b[EO]-P\d{2}-\d{2}\b")
+INTERVIEW_EVIDENCE_DEFINITION = re.compile(
+    r"^- evidence ID:\s*([EO]-(P\d{2})-\d{2})\s*$", re.MULTILINE
+)
 EMAIL = re.compile(r"(?<![\w.+-])[\w.+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?![\w.-])")
 PHONE = re.compile(
     r"(?<![\d+])(?:"
@@ -132,14 +135,22 @@ def check_interviews(paths: list[Path]) -> list[str]:
             errors.append(
                 f"{relative(path)}: participant code {match.group(1)} does not match filename"
             )
-        evidence_codes = INTERVIEW_EVIDENCE.findall(text)
-        if not evidence_codes:
+        evidence_definitions = INTERVIEW_EVIDENCE_DEFINITION.findall(text)
+        if not evidence_definitions:
             errors.append(f"{relative(path)}: interview does not define an E/O evidence ID")
-        for evidence_code in evidence_codes:
+        evidence_ids = [evidence_id for evidence_id, _ in evidence_definitions]
+        for evidence_id, evidence_code in evidence_definitions:
             if evidence_code != expected_code:
                 errors.append(
                     f"{relative(path)}: evidence participant {evidence_code} "
-                    f"does not match filename {expected_code}"
+                    f"in {evidence_id} does not match filename {expected_code}"
+                )
+        for evidence_id in sorted(set(evidence_ids)):
+            count = evidence_ids.count(evidence_id)
+            if count > 1:
+                errors.append(
+                    f"{relative(path)}: evidence ID {evidence_id} "
+                    f"is defined {count} times"
                 )
         if not re.search(r"^- 메모 동의:\s*예\s*$", text, re.MULTILINE):
             errors.append(f"{relative(path)}: committed notes require explicit memo consent")
@@ -223,6 +234,42 @@ def check_candidates(paths: list[Path]) -> list[str]:
     return errors
 
 
+def check_evidence_references(paths: list[Path]) -> list[str]:
+    errors: list[str] = []
+    definitions: dict[str, Path] = {}
+    for path in paths:
+        if path.parent != RESEARCH / "interviews" or path.name == "TEMPLATE.md":
+            continue
+        text = path.read_text(encoding="utf-8")
+        for evidence_id, _ in INTERVIEW_EVIDENCE_DEFINITION.findall(text):
+            previous = definitions.get(evidence_id)
+            if previous is not None and previous != path:
+                errors.append(
+                    f"{relative(path)}: evidence ID {evidence_id} is already defined "
+                    f"in {relative(previous)}"
+                )
+            else:
+                definitions[evidence_id] = path
+
+    reference_directories = {
+        RESEARCH / "synthesis",
+        RESEARCH / "region-candidates",
+        RESEARCH / "quest-candidates",
+    }
+    for path in paths:
+        if path.parent not in reference_directories or path.name == "TEMPLATE.md":
+            continue
+        if path.suffix.lower() != ".md":
+            continue
+        references = set(INTERVIEW_EVIDENCE.findall(path.read_text(encoding="utf-8")))
+        for evidence_id in sorted(references - set(definitions)):
+            errors.append(
+                f"{relative(path)}: evidence reference {evidence_id} "
+                "is not defined in a tracked interview"
+            )
+    return errors
+
+
 def main() -> int:
     paths, errors = tracked_research_files()
     checks = (
@@ -231,6 +278,7 @@ def main() -> int:
         check_interviews(paths),
         check_syntheses(paths),
         check_candidates(paths),
+        check_evidence_references(paths),
     )
     errors.extend(error for group in checks for error in group)
     if errors:
@@ -252,7 +300,8 @@ def main() -> int:
     print(
         f"Research verification passed: {markdown_count} tracked Markdown files, "
         f"{interview_count} interviews, {candidate_count} candidates; "
-        "no tracked private paths, blocked media, or obvious contact fields."
+        "no tracked private paths, blocked media, obvious contact fields, "
+        "or unresolved E/O evidence references."
     )
     return 0
 

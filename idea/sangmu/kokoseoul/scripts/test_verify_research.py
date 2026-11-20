@@ -146,6 +146,52 @@ class ResearchArtifactShapeTest(unittest.TestCase):
 
             self.assertTrue(any("evidence participant P02" in error for error in errors))
 
+    def test_interview_rejects_duplicate_evidence_definitions(self) -> None:
+        with isolated_research_tree() as (_, research):
+            interviews = research / "interviews"
+            interviews.mkdir()
+            path = interviews / "P01.md"
+            path.write_text(
+                "# Interview P01\n\n"
+                "- 참여자 코드: P01\n"
+                "- 메모 동의: 예\n"
+                "- evidence ID: E-P01-01\n"
+                "- evidence ID: E-P01-01\n"
+                "## 최근 실제 사건\n"
+                "## 안내 예시 관찰\n"
+                "## 근거와 해석 분리\n"
+                "### 반대 증거\n"
+                "### 아직 모르는 점\n",
+                encoding="utf-8",
+            )
+
+            errors = verifier.check_interviews([path])
+
+            self.assertTrue(any("is defined 2 times" in error for error in errors))
+
+    def test_synthesis_reference_must_resolve_to_interview_definition(self) -> None:
+        with isolated_research_tree() as (_, research):
+            interviews = research / "interviews"
+            synthesis = research / "synthesis"
+            interviews.mkdir()
+            synthesis.mkdir()
+            interview = interviews / "P01.md"
+            interview.write_text(
+                "# Interview\n\n- evidence ID: E-P01-01\n",
+                encoding="utf-8",
+            )
+            result = synthesis / "2026-11-round-01.md"
+            result.write_text(
+                "# Synthesis\n\nE-P01-01\nE-P02-01\n",
+                encoding="utf-8",
+            )
+
+            errors = verifier.check_evidence_references([interview, result])
+
+            self.assertEqual(len(errors), 1)
+            self.assertIn("E-P02-01", errors[0])
+            self.assertIn("not defined", errors[0])
+
     def test_synthesis_requires_filename_sections_and_evidence_ids(self) -> None:
         with isolated_research_tree() as (_, research):
             synthesis = research / "synthesis"
