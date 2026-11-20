@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from contextlib import contextmanager
 from pathlib import Path
+from subprocess import CompletedProcess
 from unittest import mock
 
 from scripts import verify_research as verifier
@@ -32,6 +33,26 @@ class ResearchSafetyTest(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(verifier.check_tracked_safety(paths), [])
         self.assertEqual(verifier.check_sensitive_text(paths), [])
+
+    def test_nonignored_untracked_research_fails_without_printing_path(self) -> None:
+        tracked = CompletedProcess(
+            args=["git"], returncode=0, stdout=b"research/README.md\0", stderr=b""
+        )
+        untracked = CompletedProcess(
+            args=["git"],
+            returncode=0,
+            stdout=b"research/interviews/private-person-name.md\0",
+            stderr=b"",
+        )
+        with mock.patch.object(
+            verifier.subprocess, "run", side_effect=[tracked, untracked]
+        ):
+            paths, errors = verifier.tracked_research_files()
+
+        self.assertEqual(paths, [verifier.ROOT / "research/README.md"])
+        self.assertEqual(len(errors), 1)
+        self.assertIn("1 non-ignored untracked file", errors[0])
+        self.assertNotIn("private-person-name", errors[0])
 
     def test_private_directory_and_media_are_rejected(self) -> None:
         with isolated_research_tree() as (_, research):

@@ -57,21 +57,48 @@ SENSITIVE_FIELD = re.compile(
 
 
 def tracked_research_files() -> tuple[list[Path], list[str]]:
-    result = subprocess.run(
+    tracked = subprocess.run(
         ["git", "ls-files", "-z", "--", "research"],
         cwd=ROOT,
         check=False,
         capture_output=True,
     )
-    if result.returncode != 0:
-        message = result.stderr.decode("utf-8", errors="replace").strip()
+    if tracked.returncode != 0:
+        message = tracked.stderr.decode("utf-8", errors="replace").strip()
         return [], [f"git ls-files failed: {message or 'unknown error'}"]
     paths = [
         ROOT / item.decode("utf-8")
-        for item in result.stdout.split(b"\0")
+        for item in tracked.stdout.split(b"\0")
         if item
     ]
-    return sorted(paths), []
+
+    untracked = subprocess.run(
+        [
+            "git",
+            "ls-files",
+            "-z",
+            "--others",
+            "--exclude-standard",
+            "--",
+            "research",
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+    )
+    if untracked.returncode != 0:
+        message = untracked.stderr.decode("utf-8", errors="replace").strip()
+        return sorted(paths), [
+            f"git untracked research check failed: {message or 'unknown error'}"
+        ]
+    untracked_count = sum(bool(item) for item in untracked.stdout.split(b"\0"))
+    errors = []
+    if untracked_count:
+        errors.append(
+            f"research has {untracked_count} non-ignored untracked file(s); "
+            "stage intended artifacts or move private material to an ignored path"
+        )
+    return sorted(paths), errors
 
 
 def relative(path: Path) -> str:
