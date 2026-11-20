@@ -50,6 +50,16 @@ PAGINATION_REFERENCE_FILES = (
     ROOT / "docs" / "INPUT_VALIDATION_v0.1.md",
     ROOT / "docs" / "TEST_PLAN_v0.1.md",
 )
+VISITOR_SESSION_CONTRACT = ROOT / "docs" / "VISITOR_SESSION_LIFECYCLE_v0.1.md"
+VISITOR_SESSION_REFERENCE_FILES = (
+    ROOT / "docs" / "API_CONTRACT_INDEX_v0.1.md",
+    ROOT / "docs" / "B2C_SPEC_v0.1.md",
+    ROOT / "docs" / "CONFIGURATION_SECRETS_v0.1.md",
+    ROOT / "docs" / "DATA_CONSTRAINTS_v0.1.md",
+    ROOT / "docs" / "SECURITY_PRIVACY_v0.1.md",
+    ROOT / "docs" / "STATE_MACHINES_v0.1.md",
+    ROOT / "docs" / "TEST_PLAN_v0.1.md",
+)
 HTTP_METHODS = "GET|POST|PUT|PATCH|DELETE"
 UUID_PATH_SEGMENT = re.compile(
     r"/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
@@ -358,6 +368,95 @@ def check_pagination_contract() -> list[str]:
     return errors
 
 
+def check_visitor_session_contract() -> list[str]:
+    errors: list[str] = []
+    text = VISITOR_SESSION_CONTRACT.read_text(encoding="utf-8")
+    required_fragments = (
+        "32 random bytes",
+        "HMAC-SHA-256",
+        "2,592,000 seconds",
+        "Max-Age=2592000",
+        "HttpOnly",
+        "Secure",
+        "SameSite=Lax",
+        "Path=/",
+        "SESSION_REQUIRED",
+    )
+    for fragment in required_fragments:
+        if fragment not in text:
+            errors.append(
+                f"{VISITOR_SESSION_CONTRACT.relative_to(ROOT)}: "
+                f"missing session invariant {fragment}"
+            )
+
+    for path in VISITOR_SESSION_REFERENCE_FILES:
+        if VISITOR_SESSION_CONTRACT.resolve() not in resolved_link_targets(path):
+            errors.append(
+                f"{path.relative_to(ROOT)}: missing visitor session contract reference"
+            )
+
+    config_path = ROOT / "docs" / "CONFIGURATION_SECRETS_v0.1.md"
+    config_text = config_path.read_text(encoding="utf-8")
+    for variable in ("SESSION_TOKEN_PEPPERS", "SESSION_TOKEN_ACTIVE_VERSION"):
+        if variable not in config_text:
+            errors.append(
+                f"{config_path.relative_to(ROOT)}: "
+                f"missing visitor session configuration {variable}"
+            )
+
+    legacy_name = re.compile(r"\bSESSION_TOKEN_PEPPER\b")
+    for path in markdown_files():
+        if legacy_name.search(path.read_text(encoding="utf-8")):
+            errors.append(
+                f"{path.relative_to(ROOT)}: legacy unversioned SESSION_TOKEN_PEPPER"
+            )
+
+    data_path = ROOT / "docs" / "DATA_CONSTRAINTS_v0.1.md"
+    data_text = data_path.read_text(encoding="utf-8")
+    for field in ("token_hash_version", "token_hash", "expires_at > created_at"):
+        if field not in data_text:
+            errors.append(
+                f"{data_path.relative_to(ROOT)}: missing visitor session field {field}"
+            )
+
+    examples = API_EXAMPLE_FILES[0].read_text(encoding="utf-8")
+    common_cookie_attributes = ("Path=/", "HttpOnly", "Secure", "SameSite=Lax")
+    session_cookie_lines = [
+        line
+        for line in examples.splitlines()
+        if line.startswith("Set-Cookie: digiman_visitor=")
+    ]
+    if not session_cookie_lines:
+        errors.append("docs/API_EXAMPLES_B2C_v0.1.md: missing visitor Set-Cookie example")
+    create_cookie_count = 0
+    delete_cookie_count = 0
+    for line in session_cookie_lines:
+        is_delete = "Max-Age=0" in line
+        create_cookie_count += not is_delete
+        delete_cookie_count += is_delete
+        missing = [value for value in common_cookie_attributes if value not in line]
+        if not is_delete and "Max-Age=2592000" not in line:
+            missing.append("Max-Age=2592000")
+        if missing:
+            errors.append(
+                "docs/API_EXAMPLES_B2C_v0.1.md: visitor Set-Cookie missing "
+                f"{', '.join(missing)}"
+            )
+        if "Domain=" in line:
+            errors.append(
+                "docs/API_EXAMPLES_B2C_v0.1.md: visitor cookie must remain host-only"
+            )
+    if create_cookie_count != 1:
+        errors.append(
+            "docs/API_EXAMPLES_B2C_v0.1.md: expected one visitor cookie creation example"
+        )
+    if delete_cookie_count != 1:
+        errors.append(
+            "docs/API_EXAMPLES_B2C_v0.1.md: expected one visitor cookie deletion example"
+        )
+    return errors
+
+
 def main() -> int:
     files = markdown_files()
     checks = (
@@ -372,6 +471,7 @@ def main() -> int:
         check_readme_index(),
         check_api_contract_index(),
         check_pagination_contract(),
+        check_visitor_session_contract(),
     )
     errors = [error for group in checks for error in group]
     if errors:
@@ -385,7 +485,7 @@ def main() -> int:
         f"Documentation verification passed: {len(files)} Markdown files, "
         f"{json_block_count} JSON blocks, {len(example_endpoints())} API endpoints, "
         f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
-        "canonical H1/date metadata, balanced fences, pagination invariants, "
+        "canonical H1/date metadata, balanced fences, pagination/session invariants, "
         "AC01-AC20 and D01-D13 covered."
     )
     return 0
