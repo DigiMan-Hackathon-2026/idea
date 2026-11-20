@@ -13,6 +13,15 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 
 스펙에는 사용자 흐름, 화면, 데이터 모델, API 계약, 콘텐츠 운영, B2B 확장 지점과 20개 검수 시나리오가 포함되어 있습니다. 개발 계약의 기준은 이 저장소의 문서입니다.
 
+## 사용자 조사
+
+- [조사 작업공간과 기록 규칙](research/README.md)
+- [인터뷰 기록 양식](research/interviews/TEMPLATE.md)
+- [조사 합성 양식](research/synthesis/TEMPLATE.md)
+- [퀘스트 후보 양식](research/quest-candidates/TEMPLATE.md)
+
+익명화한 텍스트 기록만 커밋하며 연락처, 녹음, 영상과 원본 사진은 저장소에 넣지 않습니다.
+
 ## 첫 구현 범위
 
 1. 일본어로 퀘스트 탐색과 상세 안내 확인

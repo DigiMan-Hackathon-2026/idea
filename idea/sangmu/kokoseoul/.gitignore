@@ -26,3 +26,14 @@ coverage/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# User research material that must stay local
+research/private/
+research/recordings/
+research/raw-media/
+research/**/contacts.*
+research/**/*.m4a
+research/**/*.mp3
+research/**/*.wav
+research/**/*.mp4
+research/**/*.mov
