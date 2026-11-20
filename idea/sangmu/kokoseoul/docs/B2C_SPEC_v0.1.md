@@ -198,7 +198,7 @@ AI는 콘텐츠·번역 초안 작성에 선택적으로 활용한다. 공개 �
 | feedback | id, run_id, joy_score, felt_new_experience, comment, updated_at | run_id 유일, 완료한 기록만 허용 |
 | reports | id, visitor_id, quest_id, version_id, client_request_id, category, comment, status, created_at, anonymized_at | 활성 신고는 visitor_id·client_request_id 유일, 익명화 후 사용자 연결·멱등 키·자유 입력 null |
 | audit_logs | id, admin_id, action, entity_id, before_summary, after_summary, created_at | 공개·중지·보관·편집 기록 |
-| analytics_events | event_id, event_name, visitor_id, quest_id, run_id, environment, created_at | event_id 유일, 사용자 원문·위치 저장 금지 |
+| analytics_events | event_id, event_name, dedupe_key, visitor_id, quest_id, run_id, environment, properties, created_at | event_id·dedupe_key 유일, 사용자 원문·위치 저장 금지 |
 
 place_snapshot에는 당시 주소·이용 조건·지도 대상·근거·확인일을 보관한다. 장소 원본이 수정돼도 이미 시작한 퀘스트의 안내를 조용히 바꾸지 않는다. 긴급 이용 불가 변경은 퀘스트 중지로 처리한다.
 
@@ -426,7 +426,7 @@ publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. pau
 
 분모가 0이면 0%가 아니라 데이터 없음으로 표시한다. 실내 시연과 실제 방문·사용자 테스트는 environment로 분리한다. 완료 여부는 실제 방문을 인증하지 않으므로 ‘완료 기록’으로 표현하고 방문 실적이나 매출 효과로 해석하지 않는다.
 
-분석 이벤트는 detail_viewed, quest_started, step_completed, quest_completed, feedback_submitted를 사용한다. 시작·완료의 집계 원본은 서버 DB이고, 클라이언트 이벤트 중복을 완료 수에 더하지 않는다. 사용자가 삭제한 원시 기록은 분석 대상에서도 제거한다.
+분석 이벤트는 detail_viewed, quest_started, step_completed, quest_completed, feedback_submitted를 사용한다. 시작·완료의 집계 원본은 서버 DB이고, 클라이언트 이벤트 중복을 완료 수에 더하지 않는다. 사용자가 삭제한 원시 기록은 분석 대상에서도 제거한다. 발생 조건, 중복 방지와 지표 계산은 [분석 이벤트와 지표 계약](ANALYTICS_EVENT_CONTRACT_v0.1.md)을 따른다.
 
 시연은 1~2분 안에 핵심 가치를 이해할 수 있게 준비한다. 조건 선택 → 선택 이유 확인 → 일본어 행동 안내·한국어 요청 카드 → 완료 카드 순으로 보여준다. 시연용 퀘스트는 실제 이동이 필요 없는 가상 체험임을 명시한다. 실제 지역 체험의 가치 검증은 별도 사용자 사례로 설명한다.
 

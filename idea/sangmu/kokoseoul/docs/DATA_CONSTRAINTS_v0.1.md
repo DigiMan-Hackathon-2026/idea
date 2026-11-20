@@ -224,12 +224,15 @@ step 소속 검증은 run의 version과 step의 version을 함께 비교한다. 
 
 ### analytics_events
 
+이벤트 의미, dedupe key, 허용 properties와 집계 원본은 [분석 이벤트와 지표 계약](ANALYTICS_EVENT_CONTRACT_v0.1.md)을 따른다.
+
 | 제약 | 계약 |
 | --- | --- |
 | unique | `event_id` |
+| semantic unique | 서버가 만든 `dedupe_key` |
 | event name | 정의된 분석 이벤트만 허용 |
 | environment | demo·test·production |
-| payload | 자유 입력·주소·토큰·원시 위치 금지 |
+| properties | 이벤트별 허용 키만, 1KB 이하; 자유 입력·주소·토큰·원시 위치 금지 |
 | indexes | `(environment, event_name, created_at)`, visitor·quest·run 참조 |
 
 분석 이벤트 저장 실패로 사용자 run 트랜잭션을 rollback하지 않는다. 시작·완료 수의 최종 기준은 runs다.
