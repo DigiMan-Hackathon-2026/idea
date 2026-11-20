@@ -3,8 +3,15 @@ import { expect, test } from "@playwright/test";
 test("renders the Japanese landing page without horizontal overflow", async ({
   page,
 }) => {
-  await page.goto("/");
+  const response = await page.goto("/");
 
+  expect(response).not.toBeNull();
+  expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
+  expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(response?.headers()["x-frame-options"]).toBe("DENY");
+  expect(response?.headers()["permissions-policy"]).toBe(
+    "camera=(), microphone=(), geolocation=()",
+  );
   await expect(page.getByRole("heading", { name: /ソウルで/ })).toBeVisible();
   await expect(page.getByText("登録なしで探せる")).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(

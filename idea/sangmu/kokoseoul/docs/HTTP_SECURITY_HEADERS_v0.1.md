@@ -1,6 +1,6 @@
 # HTTP 보안·캐시 header 계약 v0.1
 
-작성일: 2026-11-21 · 상태: 배포 환경 확정 전 구현 기준
+작성일: 2026-11-21 · 상태: 기본 referrer·framing·MIME·권한 header 구현, CSP·HSTS 배포 검증 전
 
 이 문서는 DigiMan의 HTML·API·static asset·OIDC route에 적용할 CSP, cache, cookie, referrer, framing과 browser 권한 header를 정의한다. 실제 Next.js·Auth.js version과 배포 provider에서 response를 캡처해 검증하기 전 완료로 표시하지 않는다.
 

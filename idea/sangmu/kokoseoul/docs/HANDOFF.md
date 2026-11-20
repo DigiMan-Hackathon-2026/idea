@@ -25,6 +25,7 @@
 - B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
 - demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류에 일본어 복구 행동을 제공한다. 네트워크·서버 장애 주입은 실제 API 연결 뒤 검수한다.
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
+- 모든 경로에 `Referrer-Policy: no-referrer`, MIME sniffing·iframe 차단과 camera·microphone·geolocation 비활성 header를 적용하고 Chromium 응답에서 검수한다. CSP nonce와 production HSTS는 배포 환경 확인 뒤 남아 있다.
 - Playwright는 Pixel 5와 Desktop Chrome 두 project에서 6개 핵심 흐름, 총 12개 E2E를 실행한다. 개발 서버 초기 compile이 겹치는 병렬 실행을 고려해 test 45초·expect 10초 한계를 명시했다.
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않으며 manifest·SVG app icon은 demo 식별용으로만 사용한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
