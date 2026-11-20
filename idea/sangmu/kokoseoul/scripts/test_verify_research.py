@@ -158,6 +158,7 @@ class ResearchArtifactShapeTest(unittest.TestCase):
             path.write_text(
                 "# Interview P01\n\n"
                 "- 참여자 코드: P01\n"
+                "- 일시: 2026-11-22T14:00:00+09:00\n"
                 "- 메모 동의: 예\n\n"
                 "## 최근 실제 사건\n- evidence ID: E-P01-01\n"
                 "## 안내 예시 관찰\n- evidence ID: O-P01-01\n"
@@ -182,6 +183,7 @@ class ResearchArtifactShapeTest(unittest.TestCase):
             errors = verifier.check_interviews([path])
 
             self.assertTrue(any("does not match filename" in error for error in errors))
+            self.assertTrue(any("valid ISO 8601" in error for error in errors))
             self.assertTrue(any("explicit memo consent" in error for error in errors))
             self.assertTrue(any("missing required section" in error for error in errors))
 

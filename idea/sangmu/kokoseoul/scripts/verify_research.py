@@ -6,6 +6,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 
@@ -31,6 +32,7 @@ BLOCKED_SUFFIXES = {
 PARTICIPANT_FILE = re.compile(r"P\d{2}\.md")
 SYNTHESIS_FILE = re.compile(r"\d{4}-\d{2}-round-\d{2}\.md")
 PARTICIPANT_CODE = re.compile(r"^- 참여자 코드:\s*(P\d{2})\s*$", re.MULTILINE)
+INTERVIEW_TIME = re.compile(r"^- 일시:\s*(\S+)\s*$", re.MULTILINE)
 INTERVIEW_EVIDENCE = re.compile(r"\b[EO]-P\d{2}-\d{2}\b")
 INTERVIEW_EVIDENCE_DEFINITION = re.compile(
     r"^- evidence ID:\s*([EO]-(P\d{2})-\d{2})\s*$", re.MULTILINE
@@ -61,6 +63,18 @@ REVIEW_EVIDENCE = re.compile(r"^일본어 검수 근거: (.+)$", re.MULTILINE)
 REVIEW_EVIDENCE_VALUE = re.compile(r"^JR\d{2} @ [0-9a-f]{7,40}$")
 RESEARCH_README = RESEARCH / "README.md"
 READINESS = ROOT / "docs" / "READINESS_STATUS.md"
+
+
+def valid_iso_8601_time(value: str) -> bool:
+    if not re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})", value
+    ):
+        return False
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None and parsed.utcoffset() is not None
 
 
 def tracked_research_files() -> tuple[list[Path], list[str]]:
@@ -168,6 +182,11 @@ def check_interviews(paths: list[Path]) -> list[str]:
         elif match.group(1) != expected_code:
             errors.append(
                 f"{relative(path)}: participant code {match.group(1)} does not match filename"
+            )
+        time_match = INTERVIEW_TIME.search(text)
+        if not time_match or not valid_iso_8601_time(time_match.group(1)):
+            errors.append(
+                f"{relative(path)}: interview time must be valid ISO 8601 with timezone"
             )
         evidence_definitions = INTERVIEW_EVIDENCE_DEFINITION.findall(text)
         if not evidence_definitions:
