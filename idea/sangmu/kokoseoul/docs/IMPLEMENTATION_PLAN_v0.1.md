@@ -4,6 +4,8 @@
 
 첫 배포는 퀘스트 하나를 실제 PostgreSQL에 연결해 탐색, 시작, 단계 수행, 완료, 기록까지 통과시키는 세로 흐름을 먼저 만든다. 각 작업 단위는 독립적으로 검수하고 커밋하며, 화면만 연결된 것처럼 보이게 만드는 임시 상태를 `main`에 남기지 않는다.
 
+역할 묶음, handoff, reviewer와 checkpoint 운영은 [팀 실행·인수인계 계획](TEAM_EXECUTION_v0.1.md)을 따른다.
+
 B2C 화면 mock과 서버 계약 테스트의 구체적인 필드·상태 예시는 [B2C API 요청과 응답 예시 v0.1](API_EXAMPLES_B2C_v0.1.md), 운영 화면과 서버 계약은 [운영 API 요청과 응답 예시 v0.1](API_EXAMPLES_ADMIN_v0.1.md)을 따른다.
 
 B2C 경로별 로딩·빈 상태·오류·주요 행동과 일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)을 따른다.
