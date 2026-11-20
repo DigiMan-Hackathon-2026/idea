@@ -186,6 +186,8 @@ commit 전 연결 종료 사례도 별도로 실행해 미완료 상태와 안�
 
 자동 axe 계열 검사는 보조 수단이며 키보드·screen reader 수동 검수를 대체하지 않는다.
 
+구체적인 화면별 검사와 증거 형식은 [모바일 접근성 구현·검수](ACCESSIBILITY_VERIFICATION_v0.1.md)를 따른다.
+
 ### AC19 demo와 실제 콘텐츠
 
 - 계층: HTTP + Playwright

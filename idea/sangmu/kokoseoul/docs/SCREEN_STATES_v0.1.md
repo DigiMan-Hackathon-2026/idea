@@ -331,6 +331,8 @@
 
 ## 접근성 검수
 
+화면별 keyboard·screen reader·focus·확대 검수와 증거는 [모바일 접근성 구현·검수](ACCESSIBILITY_VERIFICATION_v0.1.md)를 따른다.
+
 - heading 순서가 화면 구조와 일치한다.
 - 모든 입력에 programmatic label과 오류 연결이 있다.
 - 주요 행동과 보조 행동의 focus 순서가 시각 순서와 일치한다.

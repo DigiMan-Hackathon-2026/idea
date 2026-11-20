@@ -22,6 +22,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [의존성·에셋·AI 출처 관리 v0.1](docs/DEPENDENCY_ATTRIBUTION_v0.1.md)
 - [B2C 화면 상태와 일본어 문구 계약 v0.1](docs/SCREEN_STATES_v0.1.md)
 - [일본어 문구 검수 절차 v0.1](docs/JAPANESE_COPY_REVIEW_v0.1.md)
+- [모바일 접근성 구현·검수 v0.1](docs/ACCESSIBILITY_VERIFICATION_v0.1.md)
 - [B2C 검수와 테스트 계획 v0.1](docs/TEST_PLAN_v0.1.md)
 - [보안과 개인정보 위협 모델 v0.1](docs/SECURITY_PRIVACY_v0.1.md)
 - [배포와 복구 운영 런북 v0.1](docs/OPERATIONS_RUNBOOK_v0.1.md)
