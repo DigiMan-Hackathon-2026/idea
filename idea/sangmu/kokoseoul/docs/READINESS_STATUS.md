@@ -46,6 +46,7 @@
 | 첫 퀘스트 | 대기 | 후보 미작성 | 검수 가능한 후보 1개와 예비 2개 |
 | 일본어 검수자 | 대기 | 미배정 | 화면·콘텐츠 검수자 코드와 일정 |
 | 콘텐츠 사실·권리 검수 | 준비됨 | [콘텐츠 검수 계약](CONTENT_VERIFICATION_v0.1.md) | 첫 후보의 출처·권리 register 작성 |
+| 콘텐츠 편집·공개 | 준비됨 | [authoring 계약](CONTENT_AUTHORING_v0.1.md) | F7 UI·transaction·revision conflict 구현 |
 | 정보 오류 신고 운영 | 준비됨 | [신고 처리 런북](REPORT_TRIAGE_v0.1.md) | 운영 UI 구현과 pause·부분 실패 훈련 |
 | Neon·Vercel | 준비됨 | [외부 서비스 평가](EXTERNAL_SERVICES_EVALUATION_v0.1.md) | 계정·plan 승인, Singapore 배치와 지연 측정 |
 | Google OIDC | 대기 | 구현 기준만 결정 | 환경별 client·callback·허용 principal 준비 |

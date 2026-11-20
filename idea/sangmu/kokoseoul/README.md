@@ -43,6 +43,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [해커톤 사전 개발 범위 확인서](docs/EVENT_RULES_CHECKLIST.md)
 - [일본인 사용자 검증 계획 v0.1](docs/USER_RESEARCH_v0.1.md)
 - [퀘스트 콘텐츠 사실과 권리 검수 v0.1](docs/CONTENT_VERIFICATION_v0.1.md)
+- [콘텐츠 편집·공개 계약 v0.1](docs/CONTENT_AUTHORING_v0.1.md)
 - [정보 오류 신고 처리 런북 v0.1](docs/REPORT_TRIAGE_v0.1.md)
 - [맥북 Codex 인수인계](docs/HANDOFF.md)
 

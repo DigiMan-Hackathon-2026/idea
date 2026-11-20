@@ -4,6 +4,8 @@
 
 내부 운영자가 퀘스트를 초안으로 만들고, 검수·공개·중지·재개·보관하며 정보 오류 신고를 처리하는 API 계약이다. [B2C 설계 스펙](B2C_SPEC_v0.1.md)의 권한·버전·감사 규칙을 실제 JSON으로 구체화한다.
 
+편집 UI, review 무효화, 공개 transaction과 공개 뒤 검수는 [콘텐츠 편집·공개 계약](CONTENT_AUTHORING_v0.1.md)을 따른다.
+
 예시 ID와 시각은 가상 값이다. 운영 API 기본 경로는 `/api/v1/admin`이며 모든 응답은 `Cache-Control: no-store`를 사용한다.
 
 ## 인증과 공통 헤더

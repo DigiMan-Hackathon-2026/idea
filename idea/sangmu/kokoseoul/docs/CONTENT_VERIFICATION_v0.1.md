@@ -6,6 +6,8 @@
 
 사용자 정보 오류 신고의 위험도 판단, 우선 중지, 재검증과 새 version 공개·재개 절차는 [신고 처리 런북](REPORT_TRIAGE_v0.1.md)을 따른다.
 
+검수 결과를 draft와 revision에 연결하고 immutable version으로 공개하는 절차는 [콘텐츠 편집·공개 계약](CONTENT_AUTHORING_v0.1.md)을 따른다.
+
 ## 검수 대상
 
 | 정보 | 필요한 근거 | 갱신 기준 |
