@@ -73,6 +73,11 @@ class DocumentationVerifierHelpersTest(unittest.TestCase):
 
 
 class DocumentationContractsTest(unittest.TestCase):
+    def test_reported_verification_counts_match_repository(self) -> None:
+        self.assertEqual(
+            verifier.check_reported_verification_counts(verifier.markdown_files()), []
+        )
+
     def test_api_examples_and_index_have_the_same_endpoints(self) -> None:
         self.assertEqual(verifier.example_endpoints(), verifier.indexed_endpoints())
         self.assertEqual(len(verifier.example_endpoints()), 21)

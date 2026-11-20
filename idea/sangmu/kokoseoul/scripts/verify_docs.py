@@ -618,6 +618,40 @@ def check_module_boundaries_contract() -> list[str]:
     return errors
 
 
+def verification_counts(files: list[Path]) -> tuple[int, int, int, int]:
+    return (
+        len(files),
+        sum(len(json_blocks(path)) for path in files),
+        len(example_endpoints()),
+        len(EXPECTED_ERROR_CODES),
+    )
+
+
+def check_reported_verification_counts(files: list[Path]) -> list[str]:
+    markdown_count, json_count, endpoint_count, error_count = verification_counts(files)
+    expected = (
+        (
+            ROOT / "docs" / "HANDOFF.md",
+            (
+                f"Markdown {markdown_count}개",
+                f"JSON block {json_count}개",
+                f"API endpoint {endpoint_count}개",
+                f"오류 code {error_count}개",
+            ),
+        ),
+        (ROOT / "docs" / "READINESS_STATUS.md", (f"JSON block {json_count}개",)),
+    )
+    errors: list[str] = []
+    for path, markers in expected:
+        text = path.read_text(encoding="utf-8")
+        for marker in markers:
+            if marker not in text:
+                errors.append(
+                    f"{path.relative_to(ROOT)}: expected verification count {marker!r}"
+                )
+    return errors
+
+
 def main() -> int:
     files = markdown_files()
     checks = (
@@ -636,6 +670,7 @@ def main() -> int:
         check_visitor_session_contract(),
         check_background_jobs_contract(),
         check_module_boundaries_contract(),
+        check_reported_verification_counts(files),
     )
     errors = [error for group in checks for error in group]
     if errors:
@@ -644,11 +679,13 @@ def main() -> int:
         print(f"Documentation verification failed with {len(errors)} error(s).")
         return 1
 
-    json_block_count = sum(len(json_blocks(path)) for path in files)
+    markdown_count, json_block_count, endpoint_count, error_count = (
+        verification_counts(files)
+    )
     print(
-        f"Documentation verification passed: {len(files)} Markdown files, "
-        f"{json_block_count} JSON blocks, {len(example_endpoints())} API endpoints, "
-        f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
+        f"Documentation verification passed: {markdown_count} Markdown files, "
+        f"{json_block_count} JSON blocks, {endpoint_count} API endpoints, "
+        f"{error_count} error codes, reachable Markdown graph, "
         "canonical H1/date metadata, balanced fences, "
         "pagination/session/error/job/module invariants, "
         "AC01-AC20 and D01-D13 covered."
