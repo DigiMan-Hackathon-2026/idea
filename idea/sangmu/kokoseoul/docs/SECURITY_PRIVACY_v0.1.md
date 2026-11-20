@@ -60,6 +60,8 @@ cookie 탈취에 대비한 기기 복구·강제 로그아웃은 P0에 없으므
 
 ## 운영자 인증과 권한
 
+identity, callback, principal lifecycle, session 폐기와 검수 matrix는 [운영자 인증·인가 계약](ADMIN_AUTHORIZATION_v0.1.md)을 따른다.
+
 - Auth.js가 검증한 Google OIDC callback만 사용한다.
 - production callback URL과 secret을 preview·local과 공유하지 않는다.
 - 로그인 성공 후 issuer·subject가 active `admin_principals`에 있는지 매 운영 요청에서 확인한다.
