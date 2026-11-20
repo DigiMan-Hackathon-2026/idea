@@ -16,11 +16,13 @@ export type QuestRunRecord = {
   status: "in_progress" | "completed";
   startedAt: string;
   completedAt: string | null;
+  nextStepId: string | null;
 };
 
 export type StartQuestRunResult =
   | { outcome: "created" | "existing"; run: QuestRunRecord }
-  | { outcome: "not_found" | "unavailable" };
+  | { outcome: "not_found" }
+  | { outcome: "unavailable" };
 
 type QuestLockRow = {
   status: string;
@@ -36,7 +38,24 @@ type RunRow = {
   completed_at: Date | null;
 };
 
-function toRunRecord(row: RunRow): QuestRunRecord {
+async function toRunRecord(
+  client: Pick<PoolClient, "query">,
+  row: RunRow,
+): Promise<QuestRunRecord> {
+  let nextStepId: string | null = null;
+  if (row.status === "in_progress") {
+    const nextStep = await client.query<{ id: string }>(
+      `select qs.id
+       from quest_steps qs
+       left join run_steps rs
+         on rs.run_id = $1 and rs.step_id = qs.id
+       where qs.version_id = $2 and rs.step_id is null
+       order by qs.position
+       limit 1`,
+      [row.id, row.version_id],
+    );
+    nextStepId = nextStep.rows[0]?.id ?? null;
+  }
   return {
     id: row.id,
     questId: row.quest_id,
@@ -44,6 +63,7 @@ function toRunRecord(row: RunRow): QuestRunRecord {
     status: row.status,
     startedAt: row.started_at.toISOString(),
     completedAt: row.completed_at?.toISOString() ?? null,
+    nextStepId,
   };
 }
 
@@ -83,7 +103,10 @@ export async function startQuestRunWithClient(
     ],
   );
   if (inserted.rowCount === 1) {
-    return { outcome: "created", run: toRunRecord(inserted.rows[0]) };
+    return {
+      outcome: "created",
+      run: await toRunRecord(client, inserted.rows[0]),
+    };
   }
 
   const existing = await client.query<RunRow>(
@@ -95,7 +118,10 @@ export async function startQuestRunWithClient(
   if (existing.rowCount !== 1) {
     throw new Error("Run uniqueness conflict did not resolve to an existing row");
   }
-  return { outcome: "existing", run: toRunRecord(existing.rows[0]) };
+  return {
+    outcome: "existing",
+    run: await toRunRecord(client, existing.rows[0]),
+  };
 }
 
 export function startQuestRun(

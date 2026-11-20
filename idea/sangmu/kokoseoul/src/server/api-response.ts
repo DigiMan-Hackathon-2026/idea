@@ -5,7 +5,10 @@ const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{16,64}$/;
 
 export type PublicErrorCode =
   | "VALIDATION_ERROR"
+  | "SESSION_REQUIRED"
   | "ORIGIN_FORBIDDEN"
+  | "NOT_FOUND"
+  | "QUEST_UNAVAILABLE"
   | "SERVICE_UNAVAILABLE";
 
 const ERROR_DEFINITIONS: Record<
@@ -17,10 +20,25 @@ const ERROR_DEFINITIONS: Record<
     retryable: false,
     messageJa: "入力内容を確認してください。",
   },
+  SESSION_REQUIRED: {
+    status: 401,
+    retryable: false,
+    messageJa: "このブラウザの進行記録を確認できません。",
+  },
   ORIGIN_FORBIDDEN: {
     status: 403,
     retryable: false,
     messageJa: "この操作を続けることができません。",
+  },
+  NOT_FOUND: {
+    status: 404,
+    retryable: false,
+    messageJa: "対象を見つけることができませんでした。",
+  },
+  QUEST_UNAVAILABLE: {
+    status: 409,
+    retryable: false,
+    messageJa: "現在、このクエストを開始できません。",
   },
   SERVICE_UNAVAILABLE: {
     status: 503,

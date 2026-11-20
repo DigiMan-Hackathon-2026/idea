@@ -177,6 +177,9 @@ describe("PostgreSQL concurrency serialization", () => {
         questId: fixture.questId,
       });
       expect(firstStart.outcome).toBe("created");
+      if (firstStart.outcome === "created") {
+        expect(firstStart.run.nextStepId).toBe(fixture.stepIds[0]);
+      }
 
       const competingInsert = startQuestRunWithClient(second, {
         runId: secondRunId,
@@ -190,6 +193,7 @@ describe("PostgreSQL concurrency serialization", () => {
       expect(competingResult.outcome).toBe("existing");
       if (competingResult.outcome === "existing") {
         expect(competingResult.run.id).toBe(firstRunId);
+        expect(competingResult.run.nextStepId).toBe(fixture.stepIds[0]);
       }
       const existing = await second.query(
         "select id from runs where visitor_id = $1 and quest_id = $2",
