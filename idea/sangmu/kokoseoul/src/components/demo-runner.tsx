@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { DemoReportButton } from "@/components/demo-report-button";
 import {
   saveDemoRunStorage,
   useDemoRunStorage,
@@ -135,6 +136,9 @@ export function DemoRunner() {
           <button type="button" onClick={handleComplete} disabled={isSaving} className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.25)] disabled:cursor-wait disabled:opacity-65">
             {isSaving ? "保存しています…" : currentStep.completionLabelJa}
           </button>
+          <div className="mt-2">
+            <DemoReportButton />
+          </div>
         </div>
       </section>
 

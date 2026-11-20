@@ -110,3 +110,24 @@ test("resumes and deletes the browser-only demo record", async ({ page }) => {
     page.getByRole("heading", { name: "まだ記録がありません" }),
   ).toBeVisible();
 });
+
+test("saves a clearly local-only demo information report", async ({ page }) => {
+  await page.goto(
+    "/quests/11111111-1111-4111-8111-111111111111",
+  );
+  await page
+    .getByRole("button", { name: "情報の誤りを報告" })
+    .click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByLabel("どの情報ですか。").selectOption("japanese_copy");
+  await page
+    .getByLabel("詳しい内容（任意）")
+    .fill("二つ目の文をもっと短くしてほしい");
+  await page.getByRole("button", { name: "報告を保存する" }).click();
+  await expect(
+    page.getByRole("heading", { name: "報告を保存しました" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("運営者には送信されません"),
+  ).toBeVisible();
+});

@@ -14,6 +14,7 @@ import {
   isDemoRunComplete,
   parseDemoRun,
 } from "@/modules/progress/demo-run";
+import { DEMO_REPORTS_STORAGE_KEY } from "@/modules/feedback/demo-report";
 
 export function MyDemoRecord() {
   const storedProgress = useDemoRunStorage();
@@ -48,6 +49,7 @@ export function MyDemoRecord() {
   function handleDelete() {
     clearDemoRunStorage();
     localStorage.removeItem(DEMO_FEEDBACK_STORAGE_KEY);
+    localStorage.removeItem(DEMO_REPORTS_STORAGE_KEY);
     setIsConfirmingDelete(false);
   }
 
