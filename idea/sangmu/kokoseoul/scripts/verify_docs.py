@@ -72,6 +72,13 @@ BACKGROUND_JOBS_REFERENCE_FILES = (
     ROOT / "docs" / "OPERATIONS_RUNBOOK_v0.1.md",
     ROOT / "docs" / "VISITOR_SESSION_LIFECYCLE_v0.1.md",
 )
+MODULE_BOUNDARIES_CONTRACT = ROOT / "docs" / "MODULE_BOUNDARIES_v0.1.md"
+MODULE_BOUNDARIES_REFERENCE_FILES = (
+    ROOT / "docs" / "CONFIGURATION_SECRETS_v0.1.md",
+    ROOT / "docs" / "F0_BOOTSTRAP_PLAN_v0.1.md",
+    ROOT / "docs" / "IMPLEMENTATION_PLAN_v0.1.md",
+    ROOT / "docs" / "TECH_DECISIONS_v0.1.md",
+)
 HTTP_METHODS = "GET|POST|PUT|PATCH|DELETE"
 UUID_PATH_SEGMENT = re.compile(
     r"/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
@@ -581,6 +588,36 @@ def check_background_jobs_contract() -> list[str]:
     return errors
 
 
+def check_module_boundaries_contract() -> list[str]:
+    errors: list[str] = []
+    text = MODULE_BOUNDARIES_CONTRACT.read_text(encoding="utf-8")
+    required_fragments = (
+        "src/modules/privacy/",
+        "src/modules/analytics/",
+        "src/server/http/",
+        "src/server/config/",
+        "src/server/jobs/",
+        "최상위 application service 하나만 transaction을 시작한다",
+        "SQL·Drizzle query 직접 작성",
+        "DB select type을 그대로 API response type으로 export하지 않는다",
+        "server-only",
+        "background job → public HTTP endpoint를 loopback 호출",
+    )
+    for fragment in required_fragments:
+        if fragment not in text:
+            errors.append(
+                f"{MODULE_BOUNDARIES_CONTRACT.relative_to(ROOT)}: "
+                f"missing module boundary {fragment}"
+            )
+
+    for path in MODULE_BOUNDARIES_REFERENCE_FILES:
+        if MODULE_BOUNDARIES_CONTRACT.resolve() not in resolved_link_targets(path):
+            errors.append(
+                f"{path.relative_to(ROOT)}: missing module boundaries reference"
+            )
+    return errors
+
+
 def main() -> int:
     files = markdown_files()
     checks = (
@@ -598,6 +635,7 @@ def main() -> int:
         check_pagination_contract(),
         check_visitor_session_contract(),
         check_background_jobs_contract(),
+        check_module_boundaries_contract(),
     )
     errors = [error for group in checks for error in group]
     if errors:
@@ -612,7 +650,7 @@ def main() -> int:
         f"{json_block_count} JSON blocks, {len(example_endpoints())} API endpoints, "
         f"{len(EXPECTED_ERROR_CODES)} error codes, reachable Markdown graph, "
         "canonical H1/date metadata, balanced fences, "
-        "pagination/session/error/job invariants, "
+        "pagination/session/error/job/module invariants, "
         "AC01-AC20 and D01-D13 covered."
     )
     return 0
