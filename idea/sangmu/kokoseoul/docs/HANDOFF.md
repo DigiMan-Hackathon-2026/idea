@@ -24,6 +24,7 @@
 - preview·production 배포, rollback, 긴급 중지와 backup 복구 순서는 [배포와 복구 운영 런북 v0.1](OPERATIONS_RUNBOOK_v0.1.md)에 정리했다.
 - 운영자 권한·revision·콘텐츠 상태·신고 처리 JSON은 [운영 API 요청과 응답 예시 v0.1](API_EXAMPLES_ADMIN_v0.1.md)에 정리했다.
 - 행사 전 제품 코드·scaffold·DB·배포 허용 여부는 [사전 개발 범위 확인서](EVENT_RULES_CHECKLIST.md)로 질문하고 답변 전까지 제품 코드를 보류한다.
+- 실제 퀘스트의 장소·가격·혼자 이용·일본어·asset 권리는 [콘텐츠 사실과 권리 검수 v0.1](CONTENT_VERIFICATION_v0.1.md)에 따라 기록한다.
 - 운영자 인증은 Auth.js와 Google OIDC의 DB 세션, 지도는 Google Maps 범용 URL과 한국어 주소 복사를 우선 검증한다. 외부 서비스 프로비저닝과 제품 코드는 아직 없다.
 - 비밀값이나 로그인 세션은 저장소로 이전하지 않는다. 맥북의 GitHub 인증과 도구 가용성은 그 기기에서 확인한다.
 

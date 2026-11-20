@@ -20,6 +20,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [배포와 복구 운영 런북 v0.1](docs/OPERATIONS_RUNBOOK_v0.1.md)
 - [해커톤 사전 개발 범위 확인서](docs/EVENT_RULES_CHECKLIST.md)
 - [일본인 사용자 검증 계획 v0.1](docs/USER_RESEARCH_v0.1.md)
+- [퀘스트 콘텐츠 사실과 권리 검수 v0.1](docs/CONTENT_VERIFICATION_v0.1.md)
 - [맥북 Codex 인수인계](docs/HANDOFF.md)
 
 스펙에는 사용자 흐름, 화면, 데이터 모델, API 계약, 콘텐츠 운영, B2B 확장 지점과 20개 검수 시나리오가 포함되어 있습니다. 개발 계약의 기준은 이 저장소의 문서입니다.

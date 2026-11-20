@@ -22,6 +22,7 @@ REQUIRED_README_LINKS = {
     "docs/EXTERNAL_SERVICES_EVALUATION_v0.1.md",
     "docs/IMPLEMENTATION_PLAN_v0.1.md",
     "docs/USER_RESEARCH_v0.1.md",
+    "docs/CONTENT_VERIFICATION_v0.1.md",
     "docs/TEST_PLAN_v0.1.md",
     "docs/SECURITY_PRIVACY_v0.1.md",
     "docs/OPERATIONS_RUNBOOK_v0.1.md",

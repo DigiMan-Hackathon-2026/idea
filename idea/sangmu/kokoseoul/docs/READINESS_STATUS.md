@@ -35,6 +35,7 @@
 | 첫 지역 | 대기 | 후보 미선정 | 사례·현장 검증 기준을 통과한 지역 1곳 |
 | 첫 퀘스트 | 대기 | 후보 미작성 | 검수 가능한 후보 1개와 예비 2개 |
 | 일본어 검수자 | 대기 | 미배정 | 화면·콘텐츠 검수자 코드와 일정 |
+| 콘텐츠 사실·권리 검수 | 준비됨 | [콘텐츠 검수 계약](CONTENT_VERIFICATION_v0.1.md) | 첫 후보의 출처·권리 register 작성 |
 | Neon·Vercel | 준비됨 | [외부 서비스 평가](EXTERNAL_SERVICES_EVALUATION_v0.1.md) | 계정·plan 승인, Singapore 배치와 지연 측정 |
 | Google OIDC | 대기 | 구현 기준만 결정 | 환경별 client·callback·허용 principal 준비 |
 | 지도 연결 | 준비됨 | Google Maps URL·주소 복사 작업 기준 | 일본어 iOS·Android 서울 경로 실제 검수 |
