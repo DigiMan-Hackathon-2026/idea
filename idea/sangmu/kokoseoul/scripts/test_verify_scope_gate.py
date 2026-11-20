@@ -75,12 +75,20 @@ class ScopeGateVerifierTest(unittest.TestCase):
             "게이트 근거: 2026-11-22 주최 측 공개 답변 요약\n"
             "허용 시작 시각: 2026-11-22T09:00:00+09:00\n"
         )
+        impossible = (
+            "사전 코드 게이트: `PRODUCT_ALLOWED`\n"
+            "게이트 근거: 2026-11-22 주최 측 공개 답변 요약\n"
+            "허용 시작 시각: 2026-02-30T25:00:00+09:00\n"
+        )
 
         self.assertEqual(
             len(verifier.check_open_gate_metadata("F0_ONLY", missing)), 2
         )
         self.assertEqual(
             verifier.check_open_gate_metadata("PRODUCT_ALLOWED", recorded), []
+        )
+        self.assertEqual(
+            len(verifier.check_open_gate_metadata("PRODUCT_ALLOWED", impossible)), 1
         )
 
     def test_closed_gate_still_requires_single_metadata_fields(self) -> None:

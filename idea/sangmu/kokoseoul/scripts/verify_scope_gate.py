@@ -7,6 +7,7 @@ import ast
 import re
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 
@@ -102,6 +103,16 @@ def parse_gate(text: str) -> tuple[str | None, list[str]]:
     return matches[0], []
 
 
+def valid_iso_8601_start(value: str) -> bool:
+    if not ISO_8601_PATTERN.fullmatch(value):
+        return False
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None and parsed.utcoffset() is not None
+
+
 def check_open_gate_metadata(gate: str, text: str) -> list[str]:
     evidence = EVIDENCE_PATTERN.findall(text)
     starts = START_PATTERN.findall(text)
@@ -120,7 +131,7 @@ def check_open_gate_metadata(gate: str, text: str) -> list[str]:
         errors.append(
             "docs/EVENT_RULES_CHECKLIST.md: an open gate requires recorded evidence"
         )
-    if not ISO_8601_PATTERN.fullmatch(starts[0].strip()):
+    if not valid_iso_8601_start(starts[0].strip()):
         errors.append(
             "docs/EVENT_RULES_CHECKLIST.md: an open gate requires an ISO 8601 start time"
         )
