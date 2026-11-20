@@ -282,6 +282,7 @@ F2와 F3은 F1 이후 병렬로 진행할 수 있다. F7은 공개 콘텐츠가 
 ### 포함
 
 - Playwright Chromium·WebKit 모바일 흐름
+- [B2C 검수와 테스트 계획](TEST_PLAN_v0.1.md)에 따른 AC01~AC20 실행과 증거
 - 20명 동시 이용·5분 검수 시나리오
 - 요청 ID, API 지연, DB 오류, 단계 실패 모니터링
 - preview와 production 분리
