@@ -1,5 +1,7 @@
 # 사용자 조사 합성
 
+사건·관찰 ID, 독립성·반대 evidence와 pattern 승격은 [evidence coding 가이드](../EVIDENCE_CODING_GUIDE.md)를 따른다.
+
 - 조사 기간:
 - 참여자 코드:
 - 인터뷰 수:

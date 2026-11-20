@@ -31,6 +31,7 @@ BLOCKED_SUFFIXES = {
 PARTICIPANT_FILE = re.compile(r"P\d{2}\.md")
 SYNTHESIS_FILE = re.compile(r"\d{4}-\d{2}-round-\d{2}\.md")
 PARTICIPANT_CODE = re.compile(r"^- 참여자 코드:\s*(P\d{2})\s*$", re.MULTILINE)
+INTERVIEW_EVIDENCE = re.compile(r"\b[EO]-(P\d{2})-\d{2}\b")
 EMAIL = re.compile(r"(?<![\w.+-])[\w.+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?![\w.-])")
 PHONE = re.compile(
     r"(?<![\d+])(?:"
@@ -131,6 +132,15 @@ def check_interviews(paths: list[Path]) -> list[str]:
             errors.append(
                 f"{relative(path)}: participant code {match.group(1)} does not match filename"
             )
+        evidence_codes = INTERVIEW_EVIDENCE.findall(text)
+        if not evidence_codes:
+            errors.append(f"{relative(path)}: interview does not define an E/O evidence ID")
+        for evidence_code in evidence_codes:
+            if evidence_code != expected_code:
+                errors.append(
+                    f"{relative(path)}: evidence participant {evidence_code} "
+                    f"does not match filename {expected_code}"
+                )
         if not re.search(r"^- 메모 동의:\s*예\s*$", text, re.MULTILINE):
             errors.append(f"{relative(path)}: committed notes require explicit memo consent")
         errors.extend(

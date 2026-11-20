@@ -98,8 +98,8 @@ class ResearchArtifactShapeTest(unittest.TestCase):
                 "# Interview P01\n\n"
                 "- 참여자 코드: P01\n"
                 "- 메모 동의: 예\n\n"
-                "## 최근 실제 사건\n"
-                "## 안내 예시 관찰\n"
+                "## 최근 실제 사건\n- evidence ID: E-P01-01\n"
+                "## 안내 예시 관찰\n- evidence ID: O-P01-01\n"
                 "## 근거와 해석 분리\n"
                 "### 반대 증거\n"
                 "### 아직 모르는 점\n",
@@ -123,6 +123,28 @@ class ResearchArtifactShapeTest(unittest.TestCase):
             self.assertTrue(any("does not match filename" in error for error in errors))
             self.assertTrue(any("explicit memo consent" in error for error in errors))
             self.assertTrue(any("missing required section" in error for error in errors))
+
+    def test_interview_rejects_evidence_for_another_participant(self) -> None:
+        with isolated_research_tree() as (_, research):
+            interviews = research / "interviews"
+            interviews.mkdir()
+            path = interviews / "P01.md"
+            path.write_text(
+                "# Interview P01\n\n"
+                "- 참여자 코드: P01\n"
+                "- 메모 동의: 예\n"
+                "- evidence ID: E-P02-01\n"
+                "## 최근 실제 사건\n"
+                "## 안내 예시 관찰\n"
+                "## 근거와 해석 분리\n"
+                "### 반대 증거\n"
+                "### 아직 모르는 점\n",
+                encoding="utf-8",
+            )
+
+            errors = verifier.check_interviews([path])
+
+            self.assertTrue(any("evidence participant P02" in error for error in errors))
 
     def test_synthesis_requires_filename_sections_and_evidence_ids(self) -> None:
         with isolated_research_tree() as (_, research):

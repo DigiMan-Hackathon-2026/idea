@@ -65,6 +65,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [조사 작업공간과 기록 규칙](research/README.md)
 - [일본인 사용자 인터뷰 모집 문안](research/RECRUITMENT_MESSAGES.md)
 - [사용자 인터뷰 세션 진행 가이드](research/INTERVIEW_SESSION_GUIDE.md)
+- [인터뷰 사건·관찰 evidence coding 가이드](research/EVIDENCE_CODING_GUIDE.md)
 - [인터뷰용 가상 안내 예시와 사용 규칙](research/stimuli/README.md)
 - [인터뷰 기록 양식](research/interviews/TEMPLATE.md)
 - [조사 합성 양식](research/synthesis/TEMPLATE.md)
