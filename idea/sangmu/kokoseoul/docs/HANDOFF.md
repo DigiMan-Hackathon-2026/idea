@@ -31,6 +31,7 @@
 - F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 local·CI capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 constraint 통합 테스트 36개를 통과했다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. provider login mapping과 실제 repository 연결은 남아 있다.
 - runtime DB pool은 server-only로 지연 생성되며 local/test `digiman_runtime*` role만 허용한다. transaction은 statement 5초·lock 3초·idle 5초 제한을 사용하고 오류 시 rollback 뒤 원래 오류를 다시 던진다. production provider host와 login mapping은 아직 열지 않았다.
 - 첫 progress repository `startQuestRun`은 quest를 `FOR UPDATE`로 잠그고 현재 published version만 고정한다. 같은 visitor·quest 동시 시작은 `created` 한 번과 같은 run의 `existing`으로 수렴하며, 없는 quest와 paused quest는 각각 `not_found`, `unavailable`을 반환한다.
+- `completeQuestStep`은 quest share lock→run update lock 순서로 pause와 단계 완료를 직렬화한다. 소유자·pinned version·position을 다시 확인하고 마지막 step과 run 완료를 한 transaction에 기록하며, 중복 단계는 최초 `completedAt`을 그대로 반환한다.
 - CI는 같은 PostgreSQL digest의 `digiman_test_ci` service에 marker와 migration을 적용한 뒤 전체 constraint 통합 테스트를 실행한다. Actions run `44818613781`에서 reports까지 DB 검사와 Pixel 5·Desktop Chrome 12개 브라우저 흐름이 `2m 19s`에 모두 통과했다. `ci-local-only`는 격리된 Actions service의 비운영 값이며 repository·production secret이 아니다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.

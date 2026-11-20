@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
+import { completeQuestStepWithClient } from "../../src/modules/progress/complete-step.server";
 import { startQuestRunWithClient } from "../../src/modules/progress/start-run.server";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
@@ -235,6 +236,79 @@ describe("PostgreSQL concurrency serialization", () => {
     }
   });
 
+  it("returns stable step outcomes before mutating progress", async () => {
+    const fixture = await createConcurrentFixture();
+    const runId = randomUUID();
+    await setupClient.query(
+      `insert into runs (id, visitor_id, quest_id, version_id)
+       values ($1, $2, $3, $4)`,
+      [runId, fixture.visitorId, fixture.questId, fixture.versionId],
+    );
+
+    await setupClient.query("begin");
+    const wrongOrder = await completeQuestStepWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      stepId: fixture.stepIds[1],
+    });
+    await setupClient.query("commit");
+    expect(wrongOrder).toEqual({ outcome: "order_conflict" });
+
+    await setupClient.query("begin");
+    const missingRun = await completeQuestStepWithClient(setupClient, {
+      visitorId: randomUUID(),
+      runId,
+      stepId: fixture.stepIds[0],
+    });
+    await setupClient.query("commit");
+    expect(missingRun).toEqual({ outcome: "not_found" });
+
+    await setupClient.query("begin");
+    const missingStep = await completeQuestStepWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      stepId: randomUUID(),
+    });
+    await setupClient.query("commit");
+    expect(missingStep).toEqual({ outcome: "step_not_found" });
+
+    await setupClient.query("begin");
+    const completed = await completeQuestStepWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      stepId: fixture.stepIds[0],
+    });
+    const repeated = await completeQuestStepWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      stepId: fixture.stepIds[0],
+    });
+    await setupClient.query("commit");
+    expect(completed.outcome).toBe("step_completed");
+    expect(repeated.outcome).toBe("existing");
+    if (
+      "completedAt" in completed &&
+      "completedAt" in repeated
+    ) {
+      expect(repeated.completedAt).toBe(completed.completedAt);
+    }
+
+    await setupClient.query(
+      `update quests
+       set status = 'paused', pause_reason_ja = $2, revision = revision + 1
+       where id = $1`,
+      [fixture.questId, "利用条件を確認しています。"],
+    );
+    await setupClient.query("begin");
+    const unavailable = await completeQuestStepWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      runId,
+      stepId: fixture.stepIds[1],
+    });
+    await setupClient.query("commit");
+    expect(unavailable).toEqual({ outcome: "unavailable" });
+  });
+
   it("converges simultaneous final-step requests to one completion", async () => {
     const fixture = await createConcurrentFixture();
     const runId = randomUUID();
@@ -253,26 +327,22 @@ describe("PostgreSQL concurrency serialization", () => {
 
     try {
       await Promise.all([first.query("begin"), second.query("begin")]);
-      await first.query(
-        "insert into run_steps (run_id, step_id) values ($1, $2)",
-        [runId, fixture.stepIds[2]],
-      );
-      await first.query(
-        `update runs set status = 'completed', completed_at = now()
-         where id = $1`,
-        [runId],
-      );
+      const firstCompletion = await completeQuestStepWithClient(first, {
+        visitorId: fixture.visitorId,
+        runId,
+        stepId: fixture.stepIds[2],
+      });
+      expect(firstCompletion.outcome).toBe("run_completed");
 
-      const competingInsert = second.query(
-        `insert into run_steps (run_id, step_id)
-         values ($1, $2)
-         on conflict (run_id, step_id) do nothing`,
-        [runId, fixture.stepIds[2]],
-      );
+      const competingInsert = completeQuestStepWithClient(second, {
+        visitorId: fixture.visitorId,
+        runId,
+        stepId: fixture.stepIds[2],
+      });
       await new Promise((resolve) => setTimeout(resolve, 50));
       await first.query("commit");
       const competingResult = await competingInsert;
-      expect(competingResult.rowCount).toBe(0);
+      expect(competingResult.outcome).toBe("existing");
 
       const completed = await second.query(
         "select status, completed_at is not null as has_time from runs where id = $1",
