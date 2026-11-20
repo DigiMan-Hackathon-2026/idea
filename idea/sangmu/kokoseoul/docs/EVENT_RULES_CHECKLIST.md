@@ -136,3 +136,5 @@ Next.js scaffold, DB schema, 화면, API, 테스트 코드는 행사 시작까�
 6. 다음 커밋부터 허용된 구현을 시작한다.
 
 주최 측 답변 없이 추정으로 제품 코드 게이트를 해제하지 않는다.
+
+오픈소스·template·AI 도구 사용이 허용돼도 출처·license·검토 기록은 [의존성·에셋·AI 출처 관리](DEPENDENCY_ATTRIBUTION_v0.1.md)에 남긴다.

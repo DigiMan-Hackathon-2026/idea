@@ -56,6 +56,8 @@
 
 `latest` 범위나 caret만으로 도구 버전을 설명하지 않는다. manifest와 lockfile의 실제 결과를 clean clone에서 확인한다.
 
+package·template·font·icon과 AI 보조 결과의 검토·기록은 [의존성·에셋·AI 출처 관리](DEPENDENCY_ATTRIBUTION_v0.1.md)를 따른다.
+
 ## 실행 순서
 
 ### 1. 규칙 gate commit
