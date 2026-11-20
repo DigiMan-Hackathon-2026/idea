@@ -123,7 +123,8 @@ F0 종료 시 다음 script 이름을 제공한다.
 | `DATABASE_URL` | secret | F1 runtime DB |
 | `DATABASE_DIRECT_URL` | secret | F1 migration 필요 시 |
 | `TEST_DATABASE_URL` | secret | F1 PostgreSQL integration |
-| `SESSION_TOKEN_PEPPER` | secret | F3 visitor session |
+| `SESSION_TOKEN_PEPPERS` | secret | F3 visitor session lookup·rotation |
+| `SESSION_TOKEN_ACTIVE_VERSION` | server only | F3 신규 session hash version |
 | `AUTH_SECRET` | secret | F7 admin session |
 | `AUTH_GOOGLE_ID` | secret | F7 OIDC |
 | `AUTH_GOOGLE_SECRET` | secret | F7 OIDC |

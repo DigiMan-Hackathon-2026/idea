@@ -45,6 +45,8 @@ P0에서 수집하지 않는다.
 
 ## 방문자 세션
 
+token encoding, HMAC 저장, 발급 transaction, pepper 전환, 만료·삭제 경합의 repository 동작은 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
+
 ### 필수 통제
 
 - token은 CSPRNG로 최소 32바이트 생성한다.

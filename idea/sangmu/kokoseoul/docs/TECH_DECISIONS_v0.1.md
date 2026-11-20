@@ -124,10 +124,11 @@ AUTH_SECRET
 AUTH_GOOGLE_ID
 AUTH_GOOGLE_SECRET
 APP_ORIGIN
-SESSION_TOKEN_PEPPER
+SESSION_TOKEN_PEPPERS
+SESSION_TOKEN_ACTIVE_VERSION
 ```
 
-`SESSION_TOKEN_PEPPER` 교체 정책을 정하기 전에는 방문자 토큰 해시 방식을 구현 완료로 보지 않는다. preview는 운영 DB와 운영 OIDC callback을 공유하지 않는다.
+`SESSION_TOKEN_PEPPERS`는 current·previous의 제한된 key ring이고 `SESSION_TOKEN_ACTIVE_VERSION`은 신규 hash에만 사용한다. 전환·폐기 정책은 [visitor session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다. preview는 운영 DB와 운영 OIDC callback을 공유하지 않는다.
 
 ## 구현 착수 게이트
 

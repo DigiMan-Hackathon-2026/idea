@@ -201,7 +201,7 @@ X-Request-Id: 01KAMESESSION0000000000000
 }
 ```
 
-유효한 쿠키로 다시 호출하면 새 방문자를 만들지 않고 200을 반환한다. 기존 `expiresAt`도 연장하지 않는다. 응답 본문이나 로그에 원문 토큰을 넣지 않는다.
+유효한 쿠키로 다시 호출하면 새 방문자를 만들지 않고 200을 반환한다. 기존 `expiresAt`도 연장하지 않고 새 `Set-Cookie`를 보내지 않는다. 응답 본문이나 로그에 원문 토큰을 넣지 않는다. 생성·lookup·rotation·만료 상세는 [visitor session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
 
 ## 퀘스트 시작
 

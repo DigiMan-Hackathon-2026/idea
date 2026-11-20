@@ -71,6 +71,8 @@ stale 개인·운영 응답은 offline fallback으로 표시하지 않는다. P0
 
 `POST /visitor-sessions`는 기존 유효 cookie면 200, 신규면 201이다.
 
+token·cookie 재사용, invalid cookie 교체, response 유실과 pepper rotation의 server 기준은 [visitor session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
+
 - 시작·신고 의도가 생기기 전 자동 생성하지 않는다.
 - 요청 중 button을 비활성화한다.
 - 응답 전에 연결이 끊기면 cookie 수신 여부를 확인한다.

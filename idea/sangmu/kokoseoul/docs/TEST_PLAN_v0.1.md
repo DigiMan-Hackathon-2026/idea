@@ -57,6 +57,7 @@ seed helper는 production build에서 import할 수 없는 test 전용 경로에
 - cookie Max-Age, expiresAt, cleanup cutoff를 같은 clock에서 계산한다.
 - 타임존 표시는 Asia/Seoul로 별도 테스트하고 DB 값은 UTC인지 확인한다.
 - 실제 30일을 기다리는 테스트를 만들지 않는다.
+- token·HMAC·cookie·pepper rotation·만료/삭제 경합은 [visitor session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)의 matrix로 검수한다.
 
 ## 동시성 테스트 방식
 

@@ -71,6 +71,8 @@ admin_principals ──< quests
 
 ### visitors와 visitor_sessions
 
+token binary shape, HMAC version, DB clock expiry와 rotation rehash는 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
+
 | 제약 | 계약 |
 | --- | --- |
 | visitors primary key | `visitors.id` |

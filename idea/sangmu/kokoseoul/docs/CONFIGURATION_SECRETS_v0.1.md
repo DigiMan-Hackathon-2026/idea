@@ -51,7 +51,8 @@ OAuth client ID처럼 본질적으로 browser에 보일 수 있는 값도 다른
 | `DATABASE_URL` | credential | F1 이후 | runtime pooled connection | 허용 DB·role, password 출력 금지 |
 | `DATABASE_DIRECT_URL` | credential | migration 환경만 | migration command | runtime 사용 금지, DDL role 분리 |
 | `TEST_DATABASE_URL` | credential | local·CI test | integration test | production host·marker 차단 |
-| `SESSION_TOKEN_PEPPER` | key material | F3 이후 | visitor token hash | 전용 key, version 필요 |
+| `SESSION_TOKEN_PEPPERS` | key material | F3 이후 | visitor token hash lookup | versioned key ring, current·bounded previous만 |
+| `SESSION_TOKEN_ACTIVE_VERSION` | server config | F3 이후 | 신규 visitor token hash | key ring에 존재하는 bounded identifier |
 | `CURSOR_SIGNING_KEYS` | key material | 목록 API 이후 | cursor 발급·검증 | versioned key ring, current·bounded previous만 |
 | `CURSOR_SIGNING_ACTIVE_VERSION` | server config | 목록 API 이후 | cursor 발급 | key ring에 존재하는 bounded identifier |
 | `AUTH_SECRET` | key material | F7 이후 | Auth.js server session | 환경별 분리, version 호환 검수 |
@@ -152,6 +153,8 @@ secret manager 위치의 내부 URL이나 계정 ID도 public repository에 적�
 ### visitor session pepper
 
 DB의 token hash에 `hash_version`을 둔다. 계획 rotation은 current·previous version을 bounded 기간 검증하고, 새 session은 current만 사용한다. 유효 요청에서 raw cookie가 들어올 때 안전하게 current hash로 전환할 수 있지만 token을 log·queue에 저장하지 않는다.
+
+HMAC algorithm, 32-byte token, 조건부 rehash와 expiry 불변식은 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
 
 이전 pepper 노출 가능성이 있으면 overlap으로 유효성을 유지하지 않고 해당 version session을 폐기한다. 최대 30일 보존이 compromise된 session을 계속 허용할 이유가 아니다. 사용자에게 기기 기록을 다시 연결할 수 없다는 영향도 함께 판단한다.
 

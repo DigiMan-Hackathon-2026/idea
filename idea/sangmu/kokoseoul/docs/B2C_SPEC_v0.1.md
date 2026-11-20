@@ -187,7 +187,7 @@ AI는 콘텐츠·번역 초안 작성에 선택적으로 활용한다. 공개 �
 | --- | --- | --- |
 | supplier_orgs | id, name, kind, status | 초기에는 내부 운영 공급자 1개 |
 | visitors | id, created_at, expires_at | 익명 기록 소유자, 실명·이메일 없음 |
-| visitor_sessions | id, visitor_id, token_hash, expires_at | 원문 토큰 저장 금지 |
+| visitor_sessions | id, visitor_id, token_hash_version, token_hash, created_at, expires_at | 원문 토큰 저장 금지, version·hash 유일 |
 | admin_principals | id, issuer, subject, role, status | issuer·subject 유일, 내부 운영자만 |
 | places | id, address_ko, lat, lng, source_ref, verified_at | 위도 -90~90, 경도 -180~180 |
 | quests | id, supplier_org_id, created_by, create_request_id, status, published_version_id, revision, pause_reason_ja, created_at, updated_at, first_published_at | 운영자별 create_request_id 유일, 공급자·생성자 서버 결정, 최초 공개 시각 불변 |
@@ -340,7 +340,7 @@ publish는 draft가 있으면 새 버전 공개, 없으면 검증 오류다. pau
 
 # 세션과 개인정보 및 운영 품질
 
-익명 세션 원문은 암호학적으로 안전한 난수로 만들고 서버에는 해시만 보관한다. 쿠키는 HttpOnly·Secure·SameSite=Lax와 Path=/를 사용하며 운영 HTTPS 환경에 적용한다. 개인 데이터 응답에는 Cache-Control: no-store를 적용한다.
+익명 세션 원문은 암호학적으로 안전한 난수로 만들고 서버에는 keyed hash만 보관한다. token·HMAC·cookie·pepper rotation의 상세는 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다. 쿠키는 HttpOnly·Secure·SameSite=Lax와 Path=/를 사용하며 운영 HTTPS 환경에 적용한다. 개인 데이터 응답에는 Cache-Control: no-store를 적용한다.
 
 세션과 개인 기록의 보존 기간은 생성 후 30일을 초안으로 채택한다. 사용 중 자동 연장하지 않는다. UI에 실제 expiresAt을 표시한다. 만료 세션은 즉시 접근을 차단하고, 개인 기록·피드백·신고의 연결 정보와 식별 가능한 분석 이벤트는 만료 후 24시간 이내 정리한다. 신고 내용이 운영상 필요하면 사용자 연결을 제거하고 개인정보가 없는 요약만 유지한다.
 

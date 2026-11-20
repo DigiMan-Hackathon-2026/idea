@@ -4,6 +4,8 @@
 
 이 문서는 익명 visitor session, run, feedback, report와 analytics의 30일 보존, 사용자 전체 삭제, 만료 cleanup과 backup 복구 시 재노출 방지를 정의한다. P0에는 계정 동기화나 외부 삭제 원장이 없으므로, 삭제 전 backup을 production으로 승격할 때 개인 진행 기록을 보존한다고 약속하지 않는다.
 
+token·cookie·HMAC lookup, 고정 expiry 계산과 pepper rotation은 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
+
 ## 핵심 정책
 
 - visitor session과 연결 기록의 보존 기준은 생성 시점부터 30일이며 일반 사용으로 연장하지 않는다.

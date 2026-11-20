@@ -148,6 +148,8 @@ OIDC가 referrer를 필요로 한다고 가정하지 않고 state·redirect URI 
 
 ### visitor
 
+생성·재사용·삭제·rotation과 host scope는 [visitor session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
+
 ```text
 Set-Cookie: digiman_visitor=<opaque>; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=<fixed>
 ```

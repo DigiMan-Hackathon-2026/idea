@@ -19,6 +19,8 @@ P0에서 역할 차이를 실제로 사용하지 않으므로 `editor`와 `admin
 
 OIDC identity, server session, active principal과 환경별 callback 경계는 [운영자 인증·인가 계약](ADMIN_AUTHORIZATION_v0.1.md)에 고정한다.
 
+visitor cookie의 생성·HMAC lookup·고정 만료·pepper rotation과 삭제 경합은 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)에 고정한다.
+
 route 유형별 cache·CSP·cookie·CORS와 browser header는 [HTTP 보안·캐시 header 계약](HTTP_SECURITY_HEADERS_v0.1.md)을 따른다.
 
 모든 응답에는 서버가 확정한 `X-Request-Id`가 있다. JSON 요청의 알 수 없는 필드, 서버 결정 필드와 잘못된 Content-Type은 400 `VALIDATION_ERROR`다. 인증 실패와 소유권 실패는 대상 존재 여부를 노출하지 않는다.

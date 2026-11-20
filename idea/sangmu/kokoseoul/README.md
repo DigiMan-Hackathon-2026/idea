@@ -39,6 +39,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [성능·부하 검수 계약 v0.1](docs/PERFORMANCE_LOAD_TEST_v0.1.md)
 - [보안과 개인정보 위협 모델 v0.1](docs/SECURITY_PRIVACY_v0.1.md)
 - [운영자 인증·인가 계약 v0.1](docs/ADMIN_AUTHORIZATION_v0.1.md)
+- [익명 방문자 session 수명주기 계약 v0.1](docs/VISITOR_SESSION_LIFECYCLE_v0.1.md)
 - [방문자 데이터 보존·삭제·복구 계약 v0.1](docs/DATA_RETENTION_ERASURE_v0.1.md)
 - [로그·지표·오류 관측 계약 v0.1](docs/OBSERVABILITY_CONTRACT_v0.1.md)
 - [운영 감사 로그 계약 v0.1](docs/AUDIT_LOG_CONTRACT_v0.1.md)

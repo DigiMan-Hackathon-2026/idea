@@ -135,6 +135,8 @@ visitor 삭제·만료로 report를 익명화해도 운영 status와 제한된 i
 
 ## visitor session 수명
 
+각 전이의 token·cookie·DB transaction·pepper rotation과 경합 처리는 [익명 방문자 session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md)을 따른다.
+
 ```text
 absent ── explicit start/report intent ──► active
 active ── expiresAt 도달 ────────────────► expired ── cleanup ──► removed
