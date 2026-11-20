@@ -21,6 +21,7 @@
 | 영역 | 상태 | 근거 | 다음 완료 조건 |
 | --- | --- | --- | --- |
 | B2C 제품 범위 | 완료 | [B2C 스펙](B2C_SPEC_v0.1.md) | 사용자 조사 결과에 따른 변경 반영 |
+| 도메인 용어·명명 | 준비됨 | [용어 계약](DOMAIN_GLOSSARY_v0.1.md) | schema·API type·일본어 검수에 실제 적용 |
 | 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md) | 팀 동의와 실제 package version 고정 |
 | 환경 설정·secret | 준비됨 | [환경·secret 계약](CONFIGURATION_SECRETS_v0.1.md) | D09·D10 뒤 provider 설정과 rotation 훈련 |
 | 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | 행사 규칙 확인 뒤 F0 착수 |

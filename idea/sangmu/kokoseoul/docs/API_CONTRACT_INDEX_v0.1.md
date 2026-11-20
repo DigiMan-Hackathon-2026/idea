@@ -4,6 +4,8 @@
 
 이 문서는 [B2C API 예시](API_EXAMPLES_B2C_v0.1.md)와 [운영 API 예시](API_EXAMPLES_ADMIN_v0.1.md)를 인증·캐시·동시성·재시도 관점에서 한 번에 대조하기 위한 인덱스다. JSON 필드와 실제 응답 예시는 원본 문서를 따르며, 이 표와 원본이 다르면 구현 전에 문서를 함께 수정한다.
 
+resource·상태·revision/version과 API camelCase·DB snake_case의 canonical 의미는 [도메인 용어·명명 계약](DOMAIN_GLOSSARY_v0.1.md)을 따른다.
+
 ## 공통 경계
 
 | 구분 | 인증·소유권 | Origin | 응답 캐시 |

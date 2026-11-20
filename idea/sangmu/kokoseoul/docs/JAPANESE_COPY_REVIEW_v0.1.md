@@ -4,6 +4,8 @@
 
 이 문서는 모집·인터뷰·저충실도 자극물·제품 화면·퀘스트 콘텐츠의 일본어 초안을 같은 기준으로 검수하고, 언어 자연스러움과 제품 동작 의미를 함께 보존하기 위한 절차다. 이 문서의 일본어 용어도 확정 번역이 아니라 모어 화자와 확인할 작업 용어다.
 
+내부 entity·상태와 일본어 화면 후보의 의미 매핑은 [도메인 용어·명명 계약](DOMAIN_GLOSSARY_v0.1.md)을 따른다.
+
 runtime string source, `lang` 경계, KST 날짜·KRW 비용·한국어 phrase 표시와 누락 fallback은 [locale·표시 형식 계약](LOCALIZATION_FORMATTING_v0.1.md)을 따른다.
 
 ## 검수 목표

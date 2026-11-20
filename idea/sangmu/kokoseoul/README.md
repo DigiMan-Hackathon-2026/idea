@@ -9,6 +9,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [현재 구현 준비도](docs/READINESS_STATUS.md)
 - [열린 결정과 우선순위](docs/DECISION_QUEUE.md)
 - [B2C 설계 스펙 v0.1](docs/B2C_SPEC_v0.1.md)
+- [도메인 용어·명명 계약 v0.1](docs/DOMAIN_GLOSSARY_v0.1.md)
 - [B2C API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_B2C_v0.1.md)
 - [운영 API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_ADMIN_v0.1.md)
 - [API 인증·캐시·재시도 계약 인덱스 v0.1](docs/API_CONTRACT_INDEX_v0.1.md)

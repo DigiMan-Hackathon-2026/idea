@@ -4,6 +4,8 @@
 
 이 문서는 quest·version·run·step·feedback·report·visitor session의 허용 상태와 전이를 한 곳에서 정의한다. 화면은 이 표를 복제해 추측하지 않고 API가 반환한 `canStart`, `canContinue`, `nextStepId`와 상태를 사용하며, 서버는 매 mutation에서 전이를 다시 검증한다.
 
+entity·상태·파생 능력·삭제 동사의 의미는 [도메인 용어·명명 계약](DOMAIN_GLOSSARY_v0.1.md)을 따른다.
+
 ## 공통 원칙
 
 - 상태는 DB에 저장된 현재 값과 같은 transaction의 제약을 기준으로 한다.
