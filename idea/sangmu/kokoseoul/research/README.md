@@ -7,7 +7,7 @@
 1. [모집 문안](RECRUITMENT_MESSAGES.md)을 일본어 검수한 뒤 참여자를 모집한다.
 2. [세션 진행 가이드](INTERVIEW_SESSION_GUIDE.md)로 조사 목적, 메모·녹음 여부, 중단 가능성과 진행 역할을 확인한다.
 3. `interviews/TEMPLATE.md`를 복사해 `P01.md`처럼 참여자 코드로 기록한다.
-4. 최근 실제 사건과 안내 예시 관찰을 분리해 기록한다.
+4. 최근 실제 사건 질문을 끝낸 뒤 [가상 안내 예시와 사용 규칙](stimuli/README.md)으로 안내 이해를 관찰하고 두 근거를 분리해 기록한다.
 5. 인터뷰 3~5개가 모이면 `synthesis/TEMPLATE.md`로 공통 패턴과 반대 사례를 합성한다.
 6. 선택한 문제와 연결된 퀘스트만 `quest-candidates/TEMPLATE.md`로 구체화하고 [콘텐츠 검수 계약](../docs/CONTENT_VERIFICATION_v0.1.md)에 따라 출처·일본어·asset 권리를 기록한다.
 7. 타깃·지역·퀘스트 결정이 바뀌면 B2C 스펙의 변경 기록도 갱신한다.
