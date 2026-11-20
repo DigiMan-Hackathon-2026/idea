@@ -26,7 +26,8 @@ export type ReportRecord = {
 
 export type SubmitReportResult =
   | { outcome: "created" | "existing"; report: ReportRecord }
-  | { outcome: "not_found" | "request_conflict" };
+  | { outcome: "not_found" }
+  | { outcome: "request_conflict" };
 
 type ReportRow = {
   id: string;

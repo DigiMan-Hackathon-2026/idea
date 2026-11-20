@@ -11,6 +11,7 @@ export type PublicErrorCode =
   | "QUEST_UNAVAILABLE"
   | "STEP_ORDER_CONFLICT"
   | "RUN_NOT_COMPLETED"
+  | "REQUEST_CONFLICT"
   | "SERVICE_UNAVAILABLE";
 
 const ERROR_DEFINITIONS: Record<
@@ -51,6 +52,11 @@ const ERROR_DEFINITIONS: Record<
     status: 409,
     retryable: false,
     messageJa: "クエストを完了してから感想を保存してください。",
+  },
+  REQUEST_CONFLICT: {
+    status: 409,
+    retryable: false,
+    messageJa: "同じ送信IDで異なる内容を受け付けることはできません。",
   },
   SERVICE_UNAVAILABLE: {
     status: 503,

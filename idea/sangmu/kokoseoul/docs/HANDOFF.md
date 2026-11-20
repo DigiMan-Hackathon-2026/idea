@@ -39,6 +39,7 @@
 - `POST /api/v1/quests/:questId/runs`는 visitor cookie를 검증한 뒤 기존 `startQuestRun` transaction을 호출한다. 신규 201·기존 200, 첫 미완료 step, 완료 경로와 `Location`을 반환하고 malformed ID, session 없음, Origin 불일치, 미공개·중지 quest를 공개 error catalog에 맞춰 분리한다.
 - `PUT /api/v1/runs/:runId/steps/:stepId`는 exact `{completed:true}`와 visitor·Origin을 확인하고 순서형 `completeQuestStep` transaction을 호출한다. 정상·반복은 최초 step 완료 시각과 다음 step을 200으로 반환하며, 마지막 step은 같은 transaction의 run 완료 시각과 completion path로 수렴한다. 타인·없는 step은 404, pause와 순서 위반은 분리된 409다.
 - `PUT /api/v1/runs/:runId/feedback`은 점수 1~5 정수, boolean, 선택 500자 comment와 unknown field를 경계에서 검사한다. 완료·소유 run만 한 행으로 upsert하고, 미완료는 `RUN_NOT_COMPLETED`, 타인·없음은 `NOT_FOUND`로 분리한다.
+- `POST /api/v1/quests/:questId/reports`는 공개 version·category·500자 comment·client request UUID를 검사해 최초 201, 동일 재전송 200을 반환한다. 같은 visitor의 같은 key에 다른 canonical 요청은 `REQUEST_CONFLICT`, 미공개·불일치 version은 `NOT_FOUND`다.
 - CI는 같은 PostgreSQL digest의 `digiman_test_ci` service에 marker와 migration을 적용한 뒤 전체 constraint 통합 테스트를 실행한다. Actions run `44818613781`에서 reports까지 DB 검사와 Pixel 5·Desktop Chrome 12개 브라우저 흐름이 `2m 19s`에 모두 통과했다. `ci-local-only`는 격리된 Actions service의 비운영 값이며 repository·production secret이 아니다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.
