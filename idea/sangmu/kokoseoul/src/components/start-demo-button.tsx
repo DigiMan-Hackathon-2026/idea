@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   useClientReady,
   useDemoRunStorage,
 } from "@/hooks/use-demo-run-storage";
+import { useModalDialog } from "@/hooks/use-modal-dialog";
 import {
   DEMO_RUN_ID,
   isDemoRunComplete,
@@ -21,16 +22,14 @@ export function StartDemoButton() {
   );
   const [isOpen, setIsOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    closeButtonRef.current?.focus();
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setIsOpen(false);
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  useModalDialog(
+    isOpen,
+    () => setIsOpen(false),
+    dialogRef,
+    closeButtonRef,
+  );
 
   if (progress) {
     const completed = isDemoRunComplete(progress);
@@ -68,6 +67,7 @@ export function StartDemoButton() {
           }}
         >
           <section
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="progress-dialog-title"

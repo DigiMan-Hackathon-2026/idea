@@ -39,6 +39,10 @@ test("filters the demo and opens its start notice", async ({ page }) => {
     page.getByRole("heading", { name: "進行記録について" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "閉じる" })).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.getByRole("button", { name: "戻る" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "閉じる" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toBeHidden();
 });

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useModalDialog } from "@/hooks/use-modal-dialog";
 import {
   clearDemoRunStorage,
   useDemoRunStorage,
@@ -24,16 +25,14 @@ export function MyDemoRecord() {
   );
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const cancelDeleteRef = useRef<HTMLButtonElement>(null);
+  const deleteDialogRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (!isConfirmingDelete) return;
-    cancelDeleteRef.current?.focus();
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setIsConfirmingDelete(false);
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isConfirmingDelete]);
+  useModalDialog(
+    isConfirmingDelete,
+    () => setIsConfirmingDelete(false),
+    deleteDialogRef,
+    cancelDeleteRef,
+  );
 
   if (!progress) {
     return (
@@ -99,7 +98,7 @@ export function MyDemoRecord() {
             }
           }}
         >
-          <section role="dialog" aria-modal="true" aria-labelledby="delete-record-title" className="w-full max-w-lg rounded-[2rem] border border-slate-900/10 bg-white p-6 shadow-2xl">
+          <section ref={deleteDialogRef} role="dialog" aria-modal="true" aria-labelledby="delete-record-title" className="w-full max-w-lg rounded-[2rem] border border-slate-900/10 bg-white p-6 shadow-2xl">
             <h2 id="delete-record-title" className="text-xl font-black text-slate-950">このブラウザの記録を削除しますか。</h2>
             <p className="mt-3 leading-7 text-slate-600">進行中と完了済みの記録、フィードバックが削除され、元に戻せません。</p>
             <div className="mt-6 grid gap-3">

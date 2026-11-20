@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { useModalDialog } from "@/hooks/use-modal-dialog";
 import {
   DEMO_REPORTS_STORAGE_KEY,
   REPORT_CATEGORY_LABELS,
@@ -12,16 +13,9 @@ export function DemoReportButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    closeButtonRef.current?.focus();
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") close();
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  useModalDialog(isOpen, close, dialogRef, closeButtonRef);
 
   function close() {
     setIsOpen(false);
@@ -55,7 +49,7 @@ export function DemoReportButton() {
 
       {isOpen ? (
         <div className="fixed inset-0 z-50 grid place-items-end bg-slate-950/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) close(); }}>
-          <section role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" className="w-full max-w-lg rounded-t-[2rem] bg-[#f7f3eb] p-6 shadow-2xl sm:rounded-[2rem] sm:p-8">
+          <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" className="w-full max-w-lg rounded-t-[2rem] bg-[#f7f3eb] p-6 shadow-2xl sm:rounded-[2rem] sm:p-8">
             <div className="flex items-start justify-between gap-5">
               <div>
                 <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">DEMO REPORT</p>
