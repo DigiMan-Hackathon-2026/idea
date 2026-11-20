@@ -93,6 +93,15 @@ F0_ONLY_PREFIXES = (
 F0_ONLY_SUFFIXES = (".sql",)
 F0_ONLY_CONFIG_PREFIXES = ("drizzle.config.",)
 
+SECRET_PATTERNS = (
+    ("AWS access key", re.compile(rb"\bAKIA[0-9A-Z]{16}\b")),
+    ("GitHub token", re.compile(rb"\bgh[pousr]_[A-Za-z0-9]{30,}\b")),
+    (
+        "PEM private key",
+        re.compile(rb"-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----"),
+    ),
+)
+
 REQUIRED_PR_TEMPLATE_TOKENS = (
     "python3 scripts/verify_all.py",
     "사전 코드 게이트 전/후",
@@ -217,6 +226,23 @@ def check_scope(gate: str, paths: list[str]) -> list[str]:
     ]
 
 
+def check_secret_patterns(paths: list[str]) -> list[str]:
+    errors: list[str] = []
+    for relative_path in paths:
+        path = ROOT / relative_path
+        if not path.is_file():
+            continue
+        try:
+            content = path.read_bytes()
+        except OSError:
+            errors.append(f"{relative_path}: could not read file for secret scan")
+            continue
+        for label, pattern in SECRET_PATTERNS:
+            if pattern.search(content):
+                errors.append(f"{relative_path}: possible {label}")
+    return errors
+
+
 def check_contribution_templates() -> list[str]:
     errors: list[str] = []
     for path, tokens in (
@@ -276,7 +302,9 @@ def main() -> int:
         errors.extend(check_open_gate_commit(gate, rules_text))
     if not errors and gate is not None:
         try:
-            errors.extend(check_scope(gate, candidate_files()))
+            paths = candidate_files()
+            errors.extend(check_scope(gate, paths))
+            errors.extend(check_secret_patterns(paths))
         except RuntimeError as error:
             errors.append(str(error))
     if gate is not None:

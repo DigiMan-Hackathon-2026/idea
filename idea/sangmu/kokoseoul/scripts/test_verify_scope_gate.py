@@ -121,9 +121,17 @@ class ScopeGateVerifierTest(unittest.TestCase):
             probe = Path(directory) / "unexpected.ts"
             probe.write_text("export {};\n", encoding="utf-8")
             relative = probe.relative_to(verifier.ROOT).as_posix()
+            secret_probe = Path(directory) / "notes.txt"
+            secret_probe.write_text("AKIA" + "A" * 16 + "\n", encoding="utf-8")
+            secret_relative = secret_probe.relative_to(verifier.ROOT).as_posix()
 
-            self.assertIn(relative, verifier.candidate_files())
+            candidates = verifier.candidate_files()
+            self.assertIn(relative, candidates)
+            self.assertIn(secret_relative, candidates)
             self.assertTrue(verifier.is_closed_forbidden(relative))
+            secret_errors = verifier.check_secret_patterns(candidates)
+            self.assertEqual(len(secret_errors), 1)
+            self.assertIn("possible AWS access key", secret_errors[0])
 
     def test_contribution_templates_keep_scope_gate_contract(self) -> None:
         self.assertEqual(verifier.check_contribution_templates(), [])
