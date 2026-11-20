@@ -218,6 +218,8 @@ commit 전 연결 종료 사례도 별도로 실행해 미완료 상태와 안�
 
 [B2C API 예시](API_EXAMPLES_B2C_v0.1.md)와 [운영 API 예시](API_EXAMPLES_ADMIN_v0.1.md)의 JSON block을 fixture source로 직접 복사하기보다 schema와 builder에서 생성해 drift를 테스트한다.
 
+log field allowlist·request ID·자유 입력 canary 검사는 [로그·지표·오류 관측 계약](OBSERVABILITY_CONTRACT_v0.1.md)을 따른다.
+
 ## 일본어 검수
 
 일본어 모어 화자에게 다음을 별도 확인받는다.

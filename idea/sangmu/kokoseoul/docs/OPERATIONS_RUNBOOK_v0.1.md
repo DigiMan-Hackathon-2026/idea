@@ -4,6 +4,8 @@
 
 preview와 production의 배포, DB migration, 장애 확인, backup 복구와 개인정보 정리를 같은 순서로 실행하기 위한 런북이다. Neon·Vercel을 실제 채택한 뒤 명령과 화면 경로를 확정한다.
 
+request ID, log allowlist, 기술 지표와 alert 기준은 [로그·지표·오류 관측 계약](OBSERVABILITY_CONTRACT_v0.1.md)을 따른다.
+
 ## 환경
 
 | 환경 | 용도 | 데이터 원칙 |

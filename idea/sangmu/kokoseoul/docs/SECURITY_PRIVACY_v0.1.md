@@ -155,6 +155,8 @@ report 자유 입력은 HTML로 렌더링하지 않고 운영 화면에서도 te
 
 ## 로그와 모니터링
 
+구조화 필드 allowlist, metric label, canary와 보존 검수는 [로그·지표·오류 관측 계약](OBSERVABILITY_CONTRACT_v0.1.md)을 따른다.
+
 ### 기록 가능
 
 - request ID, route template, status, latency

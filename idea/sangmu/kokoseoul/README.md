@@ -25,6 +25,7 @@ B2C 모바일 웹을 먼저 구현하고, 사용자와 공급자의 요구가 �
 - [모바일 접근성 구현·검수 v0.1](docs/ACCESSIBILITY_VERIFICATION_v0.1.md)
 - [B2C 검수와 테스트 계획 v0.1](docs/TEST_PLAN_v0.1.md)
 - [보안과 개인정보 위협 모델 v0.1](docs/SECURITY_PRIVACY_v0.1.md)
+- [로그·지표·오류 관측 계약 v0.1](docs/OBSERVABILITY_CONTRACT_v0.1.md)
 - [배포와 복구 운영 런북 v0.1](docs/OPERATIONS_RUNBOOK_v0.1.md)
 - [2분 제품 시연 런북 v0.1](docs/DEMO_RUNBOOK_v0.1.md)
 - [해커톤 사전 개발 범위 확인서](docs/EVENT_RULES_CHECKLIST.md)
