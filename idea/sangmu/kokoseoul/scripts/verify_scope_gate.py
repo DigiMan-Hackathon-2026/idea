@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import re
 import subprocess
 import sys
@@ -194,6 +195,32 @@ def check_readiness_alignment(gate: str) -> list[str]:
     return []
 
 
+def test_method_count() -> int:
+    count = 0
+    for path in sorted((ROOT / "scripts").glob("test_*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        count += sum(
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name.startswith("test_")
+            for node in ast.walk(tree)
+        )
+    return count
+
+
+def check_reported_test_count(count: int) -> list[str]:
+    expected = (
+        (ROOT / "docs" / "HANDOFF.md", f"{count}개 tooling 회귀 테스트"),
+        (READINESS_PATH, f"{count}개 회귀 테스트"),
+    )
+    errors: list[str] = []
+    for path, marker in expected:
+        if marker not in path.read_text(encoding="utf-8"):
+            errors.append(
+                f"{path.relative_to(ROOT)}: expected current test count marker {marker!r}"
+            )
+    return errors
+
+
 def main() -> int:
     rules_text = RULES_PATH.read_text(encoding="utf-8")
     gate, errors = parse_gate(rules_text)
@@ -206,6 +233,7 @@ def main() -> int:
             errors.append(str(error))
     if gate is not None:
         errors.extend(check_readiness_alignment(gate))
+    errors.extend(check_reported_test_count(test_method_count()))
     errors.extend(check_contribution_templates())
 
     if errors:

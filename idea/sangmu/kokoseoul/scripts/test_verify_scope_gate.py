@@ -117,6 +117,12 @@ class ScopeGateVerifierTest(unittest.TestCase):
         self.assertIsNotNone(gate)
         self.assertEqual(verifier.check_readiness_alignment(gate), [])
 
+    def test_handoff_and_readiness_report_current_test_count(self) -> None:
+        count = verifier.test_method_count()
+
+        self.assertEqual(count, 33)
+        self.assertEqual(verifier.check_reported_test_count(count), [])
+
 
 if __name__ == "__main__":
     unittest.main()
