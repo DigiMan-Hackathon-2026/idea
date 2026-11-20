@@ -39,7 +39,7 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - quest row lock에서 pause가 먼저면 신규 run 0개, start가 먼저면 기존 run 1개를 보존한 paused 상태로 직렬화됐다. 같은 report 멱등 키 동시 제출은 한 행으로 수렴했고, 잘못된 audit insert는 같은 transaction의 quest 상태·revision까지 rollback했다. 전체 PostgreSQL 통합 테스트는 36개다.
 - application runtime URL은 local/test namespace와 `digiman_runtime*` role만 허용하고 migration role을 거절한다. server-only pool은 최초 사용 때 만들며 transaction마다 statement 5초·lock 3초·idle-in-transaction 5초 제한과 rollback 후 원래 오류 보존을 적용한다.
 
-local·CI 기준 F1 schema·권한·대표 경합·실패 rollback은 구현됐다. 실제 배포 provider의 login-role mapping과 application repository transaction 연결은 외부 서비스 결정 뒤 남아 있다. draft 저장 revision 경합과 publish·start 경합은 repository 기능 단위에서 같은 quest row lock 순서를 사용해 추가 검수한다.
+local·CI 기준 F1 schema·권한·대표 경합·실패 rollback은 구현됐다. 첫 application transaction인 `startQuestRun`은 quest row lock, 현재 공개 version pinning, 중복 시 기존 run 반환과 `not_found`·`unavailable` 분기를 실제 두 연결 테스트에 사용하며 PostgreSQL 통합 검사는 37개다. 실제 배포 provider의 login-role mapping과 나머지 repository transaction 연결은 외부 서비스 결정 뒤 남아 있다. draft 저장 revision 경합과 publish·start 경합은 repository 기능 단위에서 같은 quest row lock 순서를 사용해 추가 검수한다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 

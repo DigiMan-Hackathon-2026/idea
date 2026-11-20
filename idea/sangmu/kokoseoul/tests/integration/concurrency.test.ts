@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
+import { startQuestRunWithClient } from "../../src/modules/progress/start-run.server";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 assertSafeDatabaseTarget("test", testDatabaseUrl);
@@ -122,6 +123,38 @@ describe("PostgreSQL concurrency serialization", () => {
     await setupClient.end();
   });
 
+  it("distinguishes missing and unavailable quests before run creation", async () => {
+    const fixture = await createConcurrentFixture();
+
+    await setupClient.query("begin");
+    const missing = await startQuestRunWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      questId: randomUUID(),
+    });
+    await setupClient.query("commit");
+    expect(missing).toEqual({ outcome: "not_found" });
+
+    await setupClient.query(
+      `update quests
+       set status = 'paused', pause_reason_ja = $2, revision = revision + 1
+       where id = $1`,
+      [fixture.questId, "利用条件を確認しています。"],
+    );
+    await setupClient.query("begin");
+    const unavailable = await startQuestRunWithClient(setupClient, {
+      visitorId: fixture.visitorId,
+      questId: fixture.questId,
+    });
+    await setupClient.query("commit");
+    expect(unavailable).toEqual({ outcome: "unavailable" });
+
+    const runs = await setupClient.query(
+      "select count(*)::int as count from runs where visitor_id = $1",
+      [fixture.visitorId],
+    );
+    expect(runs.rows[0].count).toBe(0);
+  });
+
   it("converges two simultaneous starts to one run", async () => {
     const fixture = await createConcurrentFixture();
     const firstRunId = randomUUID();
@@ -130,24 +163,26 @@ describe("PostgreSQL concurrency serialization", () => {
 
     try {
       await Promise.all([first.query("begin"), second.query("begin")]);
-      await first.query(
-        `insert into runs (id, visitor_id, quest_id, version_id)
-         values ($1, $2, $3, $4)`,
-        [firstRunId, fixture.visitorId, fixture.questId, fixture.versionId],
-      );
+      const firstStart = await startQuestRunWithClient(first, {
+        runId: firstRunId,
+        visitorId: fixture.visitorId,
+        questId: fixture.questId,
+      });
+      expect(firstStart.outcome).toBe("created");
 
-      const competingInsert = second.query(
-        `insert into runs (id, visitor_id, quest_id, version_id)
-         values ($1, $2, $3, $4)
-         on conflict (visitor_id, quest_id) do nothing
-         returning id`,
-        [secondRunId, fixture.visitorId, fixture.questId, fixture.versionId],
-      );
+      const competingInsert = startQuestRunWithClient(second, {
+        runId: secondRunId,
+        visitorId: fixture.visitorId,
+        questId: fixture.questId,
+      });
       await new Promise((resolve) => setTimeout(resolve, 50));
       await first.query("commit");
 
       const competingResult = await competingInsert;
-      expect(competingResult.rowCount).toBe(0);
+      expect(competingResult.outcome).toBe("existing");
+      if (competingResult.outcome === "existing") {
+        expect(competingResult.run.id).toBe(firstRunId);
+      }
       const existing = await second.query(
         "select id from runs where visitor_id = $1 and quest_id = $2",
         [fixture.visitorId, fixture.questId],
