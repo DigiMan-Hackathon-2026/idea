@@ -1,6 +1,6 @@
 # F1 PostgreSQL 구현·검수 계획 v0.1
 
-작성일: 2026-11-21 · 상태: 전체 domain schema 구현·실DB 검증 완료, 역할 분리·동시성 검증 진행 중
+작성일: 2026-11-21 · 상태: 전체 domain schema·local/CI 역할 분리 실DB 검증 완료, 동시성 검증 진행 중
 
 이 문서는 [데이터 정합성 계약](DATA_CONSTRAINTS_v0.1.md)을 첫 Drizzle schema와 SQL migration으로 옮길 때의 생성 순서, 계정 경계, 테스트 격리와 증거를 정의한다. F0가 통과하기 전에는 migration을 생성하거나 DB를 변경하지 않는다. 행사 규칙 미확인은 구현 차단 조건이 아니라 제출 전 위험이다.
 
@@ -34,8 +34,9 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 - run의 한 visitor·quest 유일성, 고정 version 소속, 순서대로 단계 완료, 모든 단계 뒤 완료 전환, 완료 후 불변성과 완료 run feedback만 허용하는 규칙을 named constraint·trigger로 강제한다.
 - report의 활성 멱등 키 유일성, quest-version 소속, 운영 상태 전이·revision 증가, 익명화 뒤 사용자 재연결 금지를 named constraint·trigger로 강제한다.
 - audit action별 summary exact key·active actor·entity 존재·update 금지와 analytics event별 property·run 소속·demo environment·update 금지를 named constraint·trigger로 강제한다.
+- `digiman_runtime`, `digiman_retention`, `digiman_readonly`, `digiman_integration_test`는 password 없는 `NOLOGIN` capability role이다. marker DB에서 역할 구성 재적용과 `SET ROLE` 실제 DDL·audit 변경 거부를 포함한 PostgreSQL 통합 테스트 29개가 성공했다.
 
-이는 F1 전체 완료가 아니다. runtime·migration·retention 역할 분리와 동시성·실패 주입은 남아 있다.
+이는 F1 전체 완료가 아니다. 배포 provider의 login-role mapping과 동시성·실패 주입은 남아 있다.
 
 가상 seed의 ID·clock·profile·production 차단과 expected count는 [테스트 fixture·seed 계약](TEST_FIXTURES_v0.1.md)을 따른다.
 
@@ -49,6 +50,8 @@ F1은 화면, 실제 OIDC, production 데이터와 외부 지도 연결을 포�
 | read-only diagnostics | 제한된 select와 설명 계획 | 사용자 원문 export, mutation |
 
 Neon을 채택하면 pooled runtime URL과 direct migration URL의 용도를 분리한다. URL 문자열을 로그에 출력하지 않고 host·database·role의 허용 여부만 제한된 형태로 표시한다.
+
+local·CI에서는 `scripts/db/configure_roles.sql`을 migration 뒤 owner로 실행한다. 이 파일은 로그인이나 password를 만들지 않으며, 실제 배포에서는 provider가 만든 login에 필요한 capability role만 grant한다. runtime은 schema create와 audit update·delete를 할 수 없고, retention은 `visitor_sessions`, `analytics_events`, `audit_logs`의 제한된 select·delete만 가진다.
 
 ## migration 전 안전 검사
 

@@ -60,6 +60,11 @@ jobs:
           docker exec "${{ job.services.postgres.id }}" psql -U digiman_migration -d postgres -c "comment on database digiman_test_ci is 'digiman:test'"
           pnpm db:migrate
 
+      - name: Configure database capability roles
+        run: |
+          docker cp scripts/db/configure_roles.sql "${{ job.services.postgres.id }}:/tmp/configure_roles.sql"
+          docker exec "${{ job.services.postgres.id }}" psql -v ON_ERROR_STOP=1 -U digiman_migration -d digiman_test_ci -f /tmp/configure_roles.sql
+
       - name: Test PostgreSQL constraints
         env:
           TEST_DATABASE_URL: postgresql://digiman_migration:ci-local-only@127.0.0.1:5432/digiman_test_ci
