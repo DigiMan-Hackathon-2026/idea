@@ -33,12 +33,14 @@ class ScopeGateVerifierTest(unittest.TestCase):
             "package.json",
             "Dockerfile",
             ".node-version",
+            "index.js",
+            "styles.css",
             "src/app/page.tsx",
         ]
 
         errors = verifier.check_scope("CLOSED", paths)
 
-        self.assertEqual(len(errors), 5)
+        self.assertEqual(len(errors), 7)
         self.assertTrue(all("gate is CLOSED" in error for error in errors))
 
     def test_f0_only_gate_allows_scaffold_but_rejects_product_layers(self) -> None:

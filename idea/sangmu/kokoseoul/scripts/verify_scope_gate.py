@@ -67,7 +67,18 @@ CLOSED_CONFIG_PREFIXES = (
     "tailwind.config.",
     "vitest.config.",
 )
-CLOSED_SUFFIXES = (".sql", ".ts", ".tsx")
+CLOSED_SUFFIXES = (
+    ".cjs",
+    ".css",
+    ".html",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".scss",
+    ".sql",
+    ".ts",
+    ".tsx",
+)
 
 F0_ONLY_PREFIXES = (
     "app/api/",
