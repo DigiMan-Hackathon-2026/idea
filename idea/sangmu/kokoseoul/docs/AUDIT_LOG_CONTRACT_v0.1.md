@@ -1,6 +1,6 @@
 # 운영 감사 로그 계약 v0.1
 
-작성일: 2026-11-21 · 상태: schema·운영 mutation 구현 전 기준
+작성일: 2026-11-21 · 상태: schema·실DB 제약 검증 완료, 운영 mutation 연결 전 기준
 
 이 문서는 콘텐츠와 신고 운영 변경의 actor·action·대상·revision을 재구성하면서도 request body, 사용자 원문, OIDC identity와 secret을 복제하지 않는 감사 로그 schema와 검수 기준을 정의한다. 감사 로그는 application 관측 로그나 제품 analytics가 아니라 운영 domain transaction의 일부다.
 
