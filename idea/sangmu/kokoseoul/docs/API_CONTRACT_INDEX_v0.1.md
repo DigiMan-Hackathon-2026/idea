@@ -85,6 +85,8 @@ Origin 실패는 visitor·admin 모두 `ORIGIN_FORBIDDEN`으로 매핑하고 허
 
 ## 클라이언트 재시도 규칙
 
+화면 request 상태, endpoint별 confirmation 조회, 입력 보존과 접근성은 [클라이언트 요청·복구 계약](CLIENT_RECOVERY_v0.1.md)을 따른다.
+
 | 상황 | 허용 행동 |
 | --- | --- |
 | GET timeout·503 | 지수 backoff로 제한 재시도, 같은 cursor 유지 |

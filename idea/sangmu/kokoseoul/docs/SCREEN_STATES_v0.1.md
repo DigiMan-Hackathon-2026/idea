@@ -314,6 +314,8 @@
 
 ## 전역 오류 매핑
 
+pending·응답 유실·idempotency key·revision과 자동 재시도 금지는 [클라이언트 요청·복구 계약](CLIENT_RECOVERY_v0.1.md)을 따른다.
+
 | API code | 화면 행동 |
 | --- | --- |
 | VALIDATION_ERROR | 해당 입력 근처 일본어 오류와 summary |
