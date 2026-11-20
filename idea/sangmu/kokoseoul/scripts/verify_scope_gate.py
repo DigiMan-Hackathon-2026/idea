@@ -102,6 +102,12 @@ SECRET_PATTERNS = (
         "PEM private key",
         re.compile(rb"-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----"),
     ),
+    ("local macOS user path", re.compile(rb"/" + rb"Users/[^/\s]+/")),
+    ("local Linux user path", re.compile(rb"/" + rb"home/[^/\s]+/")),
+    (
+        "local Windows user path",
+        re.compile(rb"\b[A-Za-z]:\\Users\\[^\\\s]+\\"),
+    ),
 )
 
 REQUIRED_PR_TEMPLATE_TOKENS = (
