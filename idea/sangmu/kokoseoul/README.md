@@ -107,7 +107,8 @@ python3 scripts/verify_all.py
 개별 실패를 진단할 때는 같은 검사를 나눠 실행할 수 있습니다.
 
 ```bash
-python3 -m unittest scripts/test_verify_docs.py scripts/test_verify_research.py
+python3 -m unittest scripts/test_verify_docs.py scripts/test_verify_research.py scripts/test_verify_scope_gate.py
 python3 scripts/verify_docs.py
 python3 scripts/verify_research.py
+python3 scripts/verify_scope_gate.py
 ```
