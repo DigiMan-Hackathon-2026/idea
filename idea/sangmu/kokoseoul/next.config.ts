@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   cacheComponents: true,
   partialPrefetching: true,
+  poweredByHeader: false,
   async headers() {
     const securityHeaders = [
       { key: "Referrer-Policy", value: "no-referrer" },

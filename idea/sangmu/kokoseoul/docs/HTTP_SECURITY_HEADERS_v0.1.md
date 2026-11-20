@@ -12,6 +12,7 @@
 - CSP를 끄거나 넓은 `unsafe-*`를 추가해 framework 오류를 숨기지 않는다.
 - OIDC callback·지도 link의 요구를 전체 site 정책 완화로 해결하지 않는다.
 - header 값에 secret, 내부 host, 사용자 입력과 raw URL을 넣지 않는다.
+- framework 식별용 `X-Powered-By`는 보내지 않는다.
 
 ## response 유형
 

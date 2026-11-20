@@ -10,6 +10,7 @@ test("renders the Japanese landing page without horizontal overflow", async ({
   expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
   expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
   expect(response?.headers()["x-frame-options"]).toBe("DENY");
+  expect(response?.headers()["x-powered-by"]).toBeUndefined();
   expect(response?.headers()["permissions-policy"]).toBe(
     "camera=(), microphone=(), geolocation=()",
   );
