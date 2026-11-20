@@ -16,6 +16,8 @@
 - 신규 dependency·asset·AI 보조 출처:
 - 사전 코드 게이트 전/후 (`CLOSED` / `F0_ONLY` / `PRODUCT_ALLOWED`):
 - gate 변경 시 공식 근거·허용 시작 시각을 기록한 선행 commit:
+- 조사 실행 게이트 전/후 (`DRAFT_ONLY` / `INTERVIEWS_ALLOWED` / 해당 없음):
+- 인터뷰 기록이 있으면 `JRxx @ commit` 검수 근거와 완료 시각:
 
 ## 검증
 
@@ -59,6 +61,7 @@ python3 scripts/verify_all.py
 
 - [ ] 기능 단위이며 무관한 포맷 변경을 섞지 않았다.
 - [ ] `docs/EVENT_RULES_CHECKLIST.md`의 사전 코드 게이트가 이 변경 범위를 허용한다.
+- [ ] 실제 인터뷰 기록은 조사 실행 게이트가 `INTERVIEWS_ALLOWED`인 뒤의 것만 포함한다.
 - [ ] 관련 계약 문서와 변경 기록을 갱신했다.
 - [ ] 신규·중복·응답 유실·권한·충돌 경로를 검수했다.
 - [ ] 문서·tooling 검증 통과를 제품 AC·build·E2E 통과로 표현하지 않았다.

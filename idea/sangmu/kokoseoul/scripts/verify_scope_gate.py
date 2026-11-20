@@ -97,6 +97,8 @@ REQUIRED_PR_TEMPLATE_TOKENS = (
     "사전 코드 게이트 전/후",
     "docs/EVENT_RULES_CHECKLIST.md",
     "제품 AC·build·E2E",
+    "조사 실행 게이트 전/후",
+    "INTERVIEWS_ALLOWED",
 )
 REQUIRED_FEATURE_TEMPLATE_TOKENS = (
     "EVENT_RULES_CHECKLIST",
