@@ -52,11 +52,13 @@ OAuth client ID처럼 본질적으로 browser에 보일 수 있는 값도 다른
 | `DATABASE_DIRECT_URL` | credential | migration 환경만 | migration command | runtime 사용 금지, DDL role 분리 |
 | `TEST_DATABASE_URL` | credential | local·CI test | integration test | production host·marker 차단 |
 | `SESSION_TOKEN_PEPPER` | key material | F3 이후 | visitor token hash | 전용 key, version 필요 |
+| `CURSOR_SIGNING_KEYS` | key material | 목록 API 이후 | cursor 발급·검증 | versioned key ring, current·bounded previous만 |
+| `CURSOR_SIGNING_ACTIVE_VERSION` | server config | 목록 API 이후 | cursor 발급 | key ring에 존재하는 bounded identifier |
 | `AUTH_SECRET` | key material | F7 이후 | Auth.js server session | 환경별 분리, version 호환 검수 |
 | `AUTH_GOOGLE_ID` | identity config | F7 이후 | Google OIDC | 환경별 client, callback 일치 |
 | `AUTH_GOOGLE_SECRET` | credential | F7 이후 | Google OIDC | client와 같은 환경 |
 
-rate limiter IP HMAC, cursor 서명, monitoring DSN, backup credential을 추가하면 session·Auth secret을 재사용하지 않고 inventory에 별도 purpose·rotation·consumer를 먼저 정의한다.
+rate limiter IP HMAC, monitoring DSN, backup credential을 추가하면 session·Auth·cursor secret을 재사용하지 않고 inventory에 별도 purpose·rotation·consumer를 먼저 정의한다.
 
 P0에 browser가 직접 호출할 secret API가 없으므로 `NEXT_PUBLIC_` secret은 없다. public 변수가 필요하면 공개돼도 안전한 값인지, 사용자가 바꿔도 권한·환경을 선택하지 못하는지 검토한다.
 
@@ -156,6 +158,12 @@ DB의 token hash에 `hash_version`을 둔다. 계획 rotation은 current·previo
 ### Auth.js secret
 
 채택 version이 dual-key rotation을 지원한다고 가정하지 않는다. 공식 동작을 확인하고, 지원되지 않거나 노출 사고면 운영 session 전체 폐기와 재로그인을 기본으로 한다. callback·CSRF·session cookie·active principal을 재검수한다.
+
+### cursor signing key ring
+
+새 cursor는 `CURSOR_SIGNING_ACTIVE_VERSION`의 key로만 발급한다. verifier는 current와 제한된 previous key를 최대 cursor TTL 30분과 rollback window 동안만 읽는다. 새 key·version 배포, 발급 canary, 이전 cursor 검증, 30분 경과와 rollback 종료 확인 순서로 이전 key를 제거한다.
+
+노출 사고면 해당 version을 즉시 제거하고 cursor 400 뒤 첫 page 재탐색을 안내한다. cursor는 세션이나 저장 데이터가 아니므로 노출된 key를 유지해 pagination을 보존하지 않는다. key ring 값·key 수·version 목록을 browser, log와 오류 details에 출력하지 않는다.
 
 ### Google OIDC client secret
 

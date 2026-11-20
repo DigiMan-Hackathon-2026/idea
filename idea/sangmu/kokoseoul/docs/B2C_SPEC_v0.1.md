@@ -190,7 +190,7 @@ AI는 콘텐츠·번역 초안 작성에 선택적으로 활용한다. 공개 �
 | visitor_sessions | id, visitor_id, token_hash, expires_at | 원문 토큰 저장 금지 |
 | admin_principals | id, issuer, subject, role, status | issuer·subject 유일, 내부 운영자만 |
 | places | id, address_ko, lat, lng, source_ref, verified_at | 위도 -90~90, 경도 -180~180 |
-| quests | id, supplier_org_id, created_by, create_request_id, status, published_version_id, revision, pause_reason_ja | 운영자별 create_request_id 유일, 공급자·생성자 서버 결정 |
+| quests | id, supplier_org_id, created_by, create_request_id, status, published_version_id, revision, pause_reason_ja, created_at, updated_at, first_published_at | 운영자별 create_request_id 유일, 공급자·생성자 서버 결정, 최초 공개 시각 불변 |
 | quest_versions | id, quest_id, version_no, state, title_ja, summary_ja, body_ja, area_code, tags, duration_minutes, cost_min, cost_max, solo_status, solo_evidence, verified_at, is_demo, reviewed_by, reviewed_at | quest_id·version_no 유일, 공개 후 내용 불변 |
 | quest_steps | id, version_id, position, body_ja, phrase_ko, phrase_ja, place_id, place_snapshot | version_id·position 유일, 공개 버전에 속하면 불변 |
 | runs | id, visitor_id, quest_id, version_id, status, started_at, completed_at | visitor_id·quest_id 유일 |
@@ -232,7 +232,7 @@ BR10. 콘텐츠 공개 전에 필수 일본어, 단계 순서, 비용 범위, �
 
 기본 경로는 /api/v1이고 JSON을 사용한다. 아래 ID는 UUID 문자열이다. 공개 목록·상세는 인증 없이 접근하며, 개인 기록과 변경 API는 익명 세션이 필요하다. 운영 API는 별도 운영자 인증 세션이 필요하다.
 
-목록 요청은 limit 기본 20·최대 50과 불투명 cursor를 사용한다. 필터가 바뀌면 기존 cursor를 폐기한다. 응답은 items, nextCursor이며 다음 페이지가 없으면 nextCursor는 null이다. 잘못된 필터·cursor는 400으로 반환한다.
+목록 요청은 limit 기본 20·최대 50과 불투명 cursor를 사용한다. 필터가 바뀌면 기존 cursor를 폐기한다. 응답은 items, nextCursor이며 다음 페이지가 없으면 nextCursor는 null이다. 잘못된 필터·cursor는 400으로 반환한다. route별 불변 정렬 tuple, filter·limit 결합, 동시 변경과 token 보안은 [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)을 따른다.
 
 | 상태 | 의미 |
 | --- | --- |

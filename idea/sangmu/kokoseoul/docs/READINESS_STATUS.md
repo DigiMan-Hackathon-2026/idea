@@ -27,6 +27,7 @@
 | 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
+| 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
 | DB 정합성 설계 | 완료 | [데이터 계약](DATA_CONSTRAINTS_v0.1.md), [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | 실제 migration·PostgreSQL 동시성 테스트 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
 | 화면 상태·문구 | 준비됨 | [화면 계약](SCREEN_STATES_v0.1.md), [일본어 검수 절차](JAPANESE_COPY_REVIEW_v0.1.md), [접근성 검수](ACCESSIBILITY_VERIFICATION_v0.1.md) | 일본어 모어 화자 검수와 UI 관찰 |

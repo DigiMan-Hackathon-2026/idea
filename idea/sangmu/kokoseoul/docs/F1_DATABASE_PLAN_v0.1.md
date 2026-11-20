@@ -59,6 +59,8 @@ host만 검사하지 않는다. 같은 관리형 host에 여러 환경이 있을
 
 `quests`와 `quest_versions` 사이의 순환을 단순 UUID 외래키 하나로 약화하지 않는다. 공개 version은 `(quest_id, published_version_id)`가 같은 quest의 `(quest_id, id)`를 참조하게 한다.
 
+`quests.first_published_at`은 최초 공개 transaction에서만 설정하고 이후 version 공개·중지·재개로 바꾸지 않는다. 목록 index와 정렬 tuple은 [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)에 맞춰 migration·repository 통합 테스트에서 함께 검수한다.
+
 ## 명시적으로 이름 붙일 제약
 
 이름은 API 오류로 그대로 노출하지 않지만 repository에서 PostgreSQL 오류를 안정적으로 분류하고 운영 진단에 사용한다.

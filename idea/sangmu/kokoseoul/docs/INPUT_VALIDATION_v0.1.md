@@ -124,6 +124,8 @@ tags 순서는 필터 의미에 영향이 없으므로 unique canonical code로 
 
 cursor는 사용자가 구조를 의존하지 않는 versioned opaque token이다.
 
+route별 immutable 정렬 tuple, `limit + 1`, 동시 insert·제외 의미, TTL·key rotation과 client 복구는 [목록 pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)을 따른다. 이 절은 token input과 canonical 비교의 공통 경계를 정의한다.
+
 최소 payload:
 
 - version
@@ -134,7 +136,7 @@ cursor는 사용자가 구조를 의존하지 않는 versioned opaque token이�
 
 payload는 길이 상한이 있는 base64url 등 transport-safe 형식과 server 검증을 사용한다. 변조·다른 filter·다른 endpoint cursor는 400이다. cursor에 visitor ID, session, 자유 입력과 secret을 넣지 않는다.
 
-서명 방식을 채택하면 전용 secret과 교체 version을 사용하고 Auth·session secret을 재사용하지 않는다. 단순 server-side cursor store를 선택하면 보존·cleanup·장애 fallback을 결정한다. 구현 선택 전까지 cursor는 외부 client가 해석하거나 조립할 수 있다고 약속하지 않는다.
+P0는 [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)의 stateless authenticated token, 전용 secret과 교체 version을 사용한다. Auth·session secret을 재사용하지 않으며 외부 client가 cursor를 해석하거나 조립할 수 있다고 약속하지 않는다.
 
 ## canonical idempotency 비교
 

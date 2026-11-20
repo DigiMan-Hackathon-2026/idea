@@ -116,10 +116,12 @@ place 수정은 앞으로 만들 draft에만 반영한다. 공개 버전 단계�
 | 외래키 | `supplier_org_id`·`created_by` 필수, 모두 restrict delete |
 | create idempotency | `create_request_id` UUID 필수, `(created_by, create_request_id)` unique |
 | revision | 1 이상 정수, 모든 콘텐츠·상태 변경 때 증가 |
+| timestamps | `created_at`·`updated_at` 필수, `created_at`은 불변 |
+| first published | 최초 공개 전 null, 최초 공개 transaction에서 `first_published_at` 기록 후 불변 |
 | published version | null 또는 같은 quest의 published version |
 | pause reason | paused면 trim한 일본어 1~300자 필수, 나머지는 null |
 | archived | archived면 종료 시각 필수 |
-| index | `(status, updated_at desc, id)` |
+| indexes | 공개 목록 `(status, first_published_at desc, id)`, 운영 목록 `(created_at desc, id)`, 운영 최근 변경 `(status, updated_at desc, id)` |
 
 `published_version_id`가 같은 quest를 가리키는지는 단순 외래키만으로 보장되지 않는다. `(quest_id, id)` 후보키와 복합 외래키 또는 공개 트랜잭션의 잠금·검증을 함께 사용한다.
 
@@ -211,7 +213,7 @@ step 소속 검증은 run의 version과 step의 version을 함께 비교한다. 
 | revision | 1 이상 정수, 운영 status·내부 메모 변경 때 증가 |
 | internal note | null 또는 최대 2000자, 방문자 원문·식별자 복사 금지 |
 | anonymization | anonymized_at이 있으면 visitor_id·client_request_id·comment는 null |
-| index | `(status, created_at, id)` |
+| index | `(status, created_at desc, id)` |
 
 같은 멱등 키의 기존 행을 찾으면 quest, version, category, comment의 [canonical 값](INPUT_VALIDATION_v0.1.md)이 모두 같은지 비교한다. 다르면 `REQUEST_CONFLICT`다.
 

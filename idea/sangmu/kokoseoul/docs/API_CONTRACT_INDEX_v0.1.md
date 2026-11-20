@@ -23,7 +23,7 @@ route 유형별 cache·CSP·cookie·CORS와 browser header는 [HTTP 보안·캐�
 
 모든 응답에는 서버가 확정한 `X-Request-Id`가 있다. JSON 요청의 알 수 없는 필드, 서버 결정 필드와 잘못된 Content-Type은 400 `VALIDATION_ERROR`다. 인증 실패와 소유권 실패는 대상 존재 여부를 노출하지 않는다.
 
-JSON·query·Unicode·UUID·body 크기·cursor와 idempotency canonical 비교는 [입력 검증·정규화 계약](INPUT_VALIDATION_v0.1.md)을 따른다.
+JSON·query·Unicode·UUID·body 크기와 idempotency canonical 비교는 [입력 검증·정규화 계약](INPUT_VALIDATION_v0.1.md)을 따른다. 목록의 route별 정렬 tuple, filter fingerprint, 동시 변경과 cursor 서명·만료·복구는 [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)을 따른다.
 
 ## B2C endpoint
 
@@ -109,4 +109,5 @@ Origin 실패는 visitor·admin 모두 `ORIGIN_FORBIDDEN`으로 매핑하고 허
 - [ ] run·step unique 제약 오류가 500이나 중복 행으로 끝나지 않는다.
 - [ ] 404가 다른 visitor 또는 미공개 대상의 존재를 누설하지 않는다.
 - [ ] 503 뒤 mutation 상태 조회 경로가 화면에 연결돼 있다.
+- [ ] 목록 route별 immutable 정렬, filter·limit 결합과 cursor 변조·만료 테스트가 있다.
 - [ ] API 예시의 모든 JSON block이 parser를 통과한다.

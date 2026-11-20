@@ -214,6 +214,7 @@ known run 읽기는 격리된 복구 DB의 무결성 검사다. production 승�
 - Content-Type과 JSON parsing
 - unknown field 거절
 - UUID·cursor·limit·문자 수·enum 범위
+- 목록 cursor의 tie boundary·filter/limit 결합·변조/만료·동시 insert/update/exclude는 [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md)의 matrix로 검수
 - Origin 검사와 cookie 속성
 - CSP·cache·HSTS·referrer·Permissions Policy header snapshot
 - 개인 응답 `Cache-Control: no-store`, `Vary: Cookie`
