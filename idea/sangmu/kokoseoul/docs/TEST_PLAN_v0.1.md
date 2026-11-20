@@ -243,10 +243,11 @@ log field allowlist·request ID·자유 입력 canary 검사는 [로그·지표�
 
 부하 시나리오:
 
-1. 공개 목록 50%, 상세 25%, run 조회 15%, 단계 완료 10%
-2. 같은 run 중복 mutation과 서로 다른 run mutation 분리
-3. 외부 지도 로딩 제외
-4. 오류율, p50·p95·max, DB connection, lock wait, timeout 기록
+1. L1 cookie 없는 공개 읽기 20명, 목록·상세 shared cache 금지 확인
+2. L2 목록 30%, 상세 25%, run 조회 15%, 시작 10%, step 15%, 완료·feedback 5%의 stateful 혼합 여정
+3. L3 같은 공유 IP의 독립 visitor 20명과 정상 429 여부
+4. L4 barrier 기반 중복·동시 mutation 정합성 검수
+5. 외부 지도 로딩 제외, client·server·DB 지연과 error·lock·pool 기록
 
 로컬 고성능 환경 결과를 production 보장으로 표현하지 않는다. cold start와 DB 지역 지연을 preview에서 별도로 확인한다.
 

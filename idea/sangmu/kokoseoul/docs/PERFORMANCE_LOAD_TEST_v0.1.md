@@ -32,7 +32,7 @@
 | limiter | provider, region, limit version, 공유 IP key 방식 |
 | schema·seed | migration version, fixture version |
 | client | 부하 발생 region, 도구·version, connection 재사용 |
-| cache | CDN·application cache 상태, warm-up 여부 |
+| cache | API shared cache 우회·application 내부 cache 상태, warm-up 여부 |
 | observability | server duration과 client duration의 수집 위치 |
 
 preview와 production DB가 같은지 host·database·marker 중 두 가지 이상으로 검사한다. production endpoint나 실제 운영 DB이면 destructive·write load test를 즉시 중단한다.
@@ -64,8 +64,8 @@ cold probe와 warm steady 결과를 합쳐 하나의 percentile로 만들지 않
 
 | 행동 | 전체 요청 비중 후보 | think time | cache 기대 |
 | --- | ---: | ---: | --- |
-| 목록 GET | 30% | 2~5초 | public 정책에 따른 cache 가능 |
-| 상세 GET | 25% | 3~8초 | public 정책에 따른 cache 가능 |
+| 목록 GET | 30% | 2~5초 | `private, no-store`, CDN shared cache 금지 |
+| 상세 GET | 25% | 3~8초 | `private, no-store`, CDN shared cache 금지 |
 | run GET | 15% | 2~5초 | `no-store` |
 | session·run 시작 | 10% | 여정당 1회 | mutation, 중복 검수 분리 |
 | step PUT | 15% | 5~12초 | mutation, 순서 유지 |
@@ -85,7 +85,8 @@ cold probe와 warm steady 결과를 합쳐 하나의 percentile로 만들지 않
 
 - cookie 없는 20명이 목록·상세를 5분간 탐색한다.
 - visitor·session·run 행이 생성되지 않는지 확인한다.
-- cold·cache hit·cache miss 비중과 p50·p95·p99·max를 기록한다.
+- cold·warm 비중과 p50·p95·p99·max를 기록한다.
+- 모든 응답이 `private, no-store`·`Vary: Cookie`이고 CDN shared cache hit·Age가 없는지 확인한다.
 
 ### L2 혼합 여정 20명
 
@@ -173,7 +174,7 @@ max 한 건만으로 무조건 실패시키거나 무시하지 않는다. cold s
 - DB는 낮고 cold request만 높으면 serverless startup과 bundle을 본다.
 - 429가 shared IP에서만 발생하면 IP 보조 limit과 session churn 방어 균형을 재검토한다.
 - latency가 낮아도 409·503·중복 행이 증가하면 성능 통과가 아니다.
-- cache hit로 목록이 빨라도 개인 `no-store` route 결과를 대신하지 않는다.
+- hash static asset의 CDN hit가 빨라도 개인 `no-store` 목록·상세 route 결과를 대신하지 않는다.
 
 한 번의 양호한 결과로 SLA를 만들지 않는다. provider plan·region·pool·schema가 바뀌면 기준선을 다시 측정한다.
 
@@ -224,6 +225,7 @@ raw HTTP trace, cookie jar, DB dump와 provider credential은 증거에 첨부�
 - [ ] L4 barrier 검수에서 중복·부분 commit이 없다.
 - [ ] cold와 warm percentile을 분리했다.
 - [ ] client·server·DB 시간을 같은 시간 구간으로 비교했다.
+- [ ] 목록·상세가 CDN shared cache에 저장되지 않고 Cookie별 상태가 섞이지 않았다.
 - [ ] shared IP 정상 사용자가 429로 막히지 않았다.
 - [ ] fault 제거 뒤 pool·queue가 회복됐다.
 - [ ] token·식별자·자유 입력이 결과·log·metric에 없다.
