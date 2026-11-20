@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useLocale } from "@/components/locale-provider";
+import { pickLocale } from "@/lib/locale";
 import {
-  AREA_LABELS,
-  TAG_LABELS,
   formatWonRange,
+  getAreaLabel,
   getMatchReasons,
+  getTagLabel,
   type DemoQuest,
   type QuestFilters,
 } from "@/modules/content/demo-quests";
@@ -15,7 +19,8 @@ export function QuestCard({
   quest: DemoQuest;
   filters: QuestFilters;
 }) {
-  const reasons = getMatchReasons(quest, filters);
+  const { locale } = useLocale();
+  const reasons = getMatchReasons(quest, filters, locale);
 
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-slate-900/8 bg-white shadow-[0_20px_60px_rgba(41,37,31,0.08)]">
@@ -27,10 +32,10 @@ export function QuestCard({
         </div>
         <div className="relative flex items-start justify-between gap-4">
           <span className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#c93418] shadow-sm">
-            デモ体験
+            {pickLocale(locale, "デモ体験", "데모 체험")}
           </span>
           <span className="rounded-full bg-slate-950/85 px-3 py-1.5 text-xs font-bold text-white">
-            {AREA_LABELS[quest.areaCode]}
+            {getAreaLabel(quest.areaCode, locale)}
           </span>
         </div>
         <div className="relative mt-20 flex items-end justify-between">
@@ -46,20 +51,20 @@ export function QuestCard({
 
       <div className="p-6 sm:p-7">
         <div className="flex flex-wrap gap-2 text-xs font-bold text-slate-600">
-          <span>{quest.durationMinutes}分</span>
+          <span>{pickLocale(locale, `${quest.durationMinutes}分`, `${quest.durationMinutes}분`)}</span>
           <span aria-hidden="true">·</span>
-          <span>{formatWonRange(quest)}</span>
+          <span>{formatWonRange(quest, locale)}</span>
           <span aria-hidden="true">·</span>
-          <span>{quest.tags.map((tag) => TAG_LABELS[tag]).join("・")}</span>
+          <span>{quest.tags.map((tag) => getTagLabel(tag, locale)).join(" · ")}</span>
         </div>
         <h2 className="mt-3 text-2xl font-black leading-snug tracking-[-0.035em] text-slate-950">
-          {quest.titleJa}
+          {pickLocale(locale, quest.titleJa, quest.titleKo)}
         </h2>
-        <p className="mt-3 leading-7 text-slate-600">{quest.summaryJa}</p>
+        <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
 
         <div className="mt-5 rounded-2xl bg-[#f5f1e8] p-4">
           <p className="text-xs font-black tracking-[0.08em] text-teal-800">
-            おすすめの理由
+            {pickLocale(locale, "おすすめの理由", "추천하는 이유")}
           </p>
           <ul className="mt-2 grid gap-1.5 text-sm font-semibold text-slate-700">
             {reasons.map((reason) => (
@@ -73,13 +78,13 @@ export function QuestCard({
 
         <div className="mt-6 flex items-center justify-between gap-4">
           <span className="text-xs font-bold text-slate-500">
-            {quest.solo.labelJa}
+            {pickLocale(locale, quest.solo.labelJa, quest.solo.labelKo)}
           </span>
           <Link
             href={`/quests/${quest.id}`}
             className="shrink-0 rounded-full bg-[#ff5a36] px-5 py-3 text-sm font-black text-white shadow-[0_8px_22px_rgba(255,90,54,0.25)] transition hover:-translate-y-0.5 hover:bg-[#df4223]"
           >
-            詳しく見る
+            {pickLocale(locale, "詳しく見る", "자세히 보기")}
           </Link>
         </div>
       </div>

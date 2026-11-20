@@ -33,12 +33,12 @@
 | 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
 | DB 정합성 설계 | local·CI 완료 | 전체 domain 14 tables migration, capability roles, 동시성·rollback, visitor repositories, HMAC session core와 HTTP 세로 흐름, PostgreSQL 17.12 통합 테스트 46개, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | provider login mapping·나머지 visitor/admin adapter 연결 |
 | migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
-| 화면 상태·문구 | 진행 중 | [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI와 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
+| 화면 상태·문구 | 진행 중 | [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI, 한국어·일본어 전환과 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
 | 웹 접근성 구현 | 진행 중 | skip link, focus-visible, reduced-motion, modal 초기 초점·focus trap·Escape와 Chromium E2E | screen reader·실제 기기 수동 검수 |
-| locale·표시 형식 | 준비됨 | [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 실제 formatter·font·screen reader 검수 |
+| locale·표시 형식 | 진행 중 | 한국어·일본어 UI, locale cookie, 날짜·금액 formatter와 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 일본어 모어 화자·font·screen reader 검수 |
 | client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
 | 보안·개인정보 | 진행 중 | 사용자 HTML `no-store`, 기본 `no-referrer`·`nosniff`·frame deny·camera/microphone/geolocation 차단과 Chromium 검수, [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | provider의 `private` 직렬화·CSP·HSTS·cookie 삭제·출시 전 gate 실행 |
-| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 83개 unit·46개 PostgreSQL integration·12개 Chromium E2E | admin 경합·실기기에서 AC01~AC20 전체 증거 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 84개 unit·46개 PostgreSQL integration·14개 Chromium E2E | admin 경합·실기기에서 AC01~AC20 전체 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
 | 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |
@@ -68,7 +68,7 @@
 
 ## 현재 사실
 
-- F0 품질 gate와 명시적 가상 demo의 일본어 랜딩·조건 탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있다. demo 기록과 신고는 이 브라우저에만 저장되며 실제 콘텐츠·API·DB schema는 아직 없다.
+- F0 품질 gate와 명시적 가상 demo의 일본어 기본 화면, 한국어 전환, 조건 탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있다. demo 기록과 신고는 이 브라우저에만 저장된다. 별도로 14개 table DB schema와 visitor session·진행·피드백·신고 API가 구현돼 있으며 demo UI의 실제 API 연결은 남아 있다.
 - 현재 사전 코드 게이트는 `UNRESTRICTED`다. 코드 파일 생성·검증에 제한이나 경고를 적용하지 않는다.
 - 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.

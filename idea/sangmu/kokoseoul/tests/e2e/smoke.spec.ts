@@ -31,6 +31,31 @@ test("renders the Japanese landing page without horizontal overflow", async ({
   );
 });
 
+test("switches to Korean and keeps the language across navigation", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "ko");
+  await expect(
+    page.getByRole("heading", { name: /서울에서/ }),
+  ).toBeVisible();
+  await expect(page.getByText("가입 없이 찾을 수 있어요")).toBeVisible();
+
+  await page.getByRole("link", { name: "퀘스트" }).click();
+  await expect(
+    page.getByRole("heading", { name: "나에게 맞는 퀘스트" }),
+  ).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "ko");
+
+  await page.getByRole("button", { name: "日本語に切り替える" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  await expect(
+    page.getByRole("heading", { name: "あなたに合うクエスト" }),
+  ).toBeVisible();
+});
+
 test("filters the demo and opens its start notice", async ({ page }) => {
   await page.goto("/");
 

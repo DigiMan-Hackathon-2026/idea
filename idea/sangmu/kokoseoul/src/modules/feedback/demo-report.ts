@@ -7,6 +7,16 @@ export const REPORT_CATEGORY_LABELS = {
   other: "その他",
 } as const;
 
+export const REPORT_CATEGORY_LABELS_KO: Record<
+  keyof typeof REPORT_CATEGORY_LABELS,
+  string
+> = {
+  place_information: "장소 정보가 달라요",
+  price_information: "가격·이용 조건이 달라요",
+  japanese_copy: "일본어 안내가 이해하기 어려워요",
+  other: "기타",
+};
+
 export type DemoReportCategory = keyof typeof REPORT_CATEGORY_LABELS;
 
 export type DemoReport = {

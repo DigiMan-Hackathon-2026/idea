@@ -55,4 +55,19 @@ describe("demo quest discovery", () => {
       "120分以内で体験できます",
     ]);
   });
+
+  it("formats Korean quest labels and match reasons", () => {
+    expect(formatWonRange(DEMO_QUESTS[0], "ko")).toBe("₩12,000〜18,000");
+    expect(
+      getMatchReasons(
+        DEMO_QUESTS[0],
+        { area: "seongsu", tags: ["craft"], durationMax: 90 },
+        "ko",
+      ),
+    ).toEqual([
+      "선택한 지역에 있어요",
+      "선택한 관심사와 맞아요",
+      "90분 안에 체험할 수 있어요",
+    ]);
+  });
 });

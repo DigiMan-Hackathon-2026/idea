@@ -12,7 +12,7 @@
 - 기본 브랜치: `main`
 - Windows 작업 위치: `D:\dev\digiman`
 - 맥북 작업본도 `origin/main`과 기능 단위로 동기화한다. 새 기기에서는 원하는 로컬 경로에 복제하고 Windows 경로를 그대로 사용하지 않는다.
-- F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. demo 기록과 신고는 브라우저 localStorage에만 저장되며 서버 접수로 표현하지 않는다.
+- F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. 우상단 언어 버튼으로 한국어·일본어를 현재 화면에서 전환하며 선택은 1년 locale cookie로 페이지 이동 뒤에도 유지된다. demo 기록과 신고는 브라우저 localStorage에만 저장되며 서버 접수로 표현하지 않는다.
 - 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
 - 현재 통합 검증은 `python3 scripts/verify_all.py`다. 37개 tooling 회귀 테스트, Markdown 63개, JSON block 44개, API endpoint 21개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
@@ -27,7 +27,7 @@
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
 - 모든 경로에 `Referrer-Policy: no-referrer`, MIME sniffing·iframe 차단과 camera·microphone·geolocation 비활성 header를 적용하고 Chromium 응답에서 검수한다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.
 - production 응답의 `X-Powered-By`는 비활성화했다. framework·provider version을 공개 header나 오류 body로 추가하지 않는다.
-- Playwright는 Pixel 5와 Desktop Chrome 두 project에서 6개 핵심 흐름, 총 12개 E2E를 실행한다. 개발 서버 초기 compile이 겹치는 병렬 실행을 고려해 test 45초·expect 10초 한계를 명시했다.
+- Playwright는 Pixel 5와 Desktop Chrome 두 project에서 언어 전환을 포함한 7개 핵심 흐름, 총 14개 E2E를 실행한다. 개발 서버 초기 compile이 겹치는 병렬 실행을 고려해 test 45초·expect 10초 한계를 명시했다.
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않으며 manifest·SVG app icon은 demo 식별용으로만 사용한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
 - F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 통합 테스트 46개를 통과했다. 별도 test-only login이 runtime capability에 연결돼 세션 생성→시작→조회→3단계 완료→피드백→신고 HTTP 흐름과 세션·run·step·신고 재전송 멱등성을 실제 DB로 검수한다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. production provider login mapping과 나머지 HTTP adapter 연결은 남아 있다.
