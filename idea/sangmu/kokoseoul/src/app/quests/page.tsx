@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { FilterForm } from "@/components/filter-form";
 import { QuestCard } from "@/components/quest-card";
@@ -13,6 +14,11 @@ import {
 type SearchParams = Promise<
   Record<string, string | string[] | undefined>
 >;
+
+export const metadata: Metadata = {
+  title: "クエストを探す",
+  description: "エリア、興味、時間からソウルのデモクエストを探します。",
+};
 
 async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
   const filters = parseQuestFilters(await searchParams);

@@ -3,8 +3,16 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DigiMan",
+  title: {
+    default: "DigiMan",
+    template: "%s | DigiMan",
+  },
   description: "ソウルで、ひとりでも迷わず始められるローカル体験。",
+  applicationName: "DigiMan",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export const viewport: Viewport = {

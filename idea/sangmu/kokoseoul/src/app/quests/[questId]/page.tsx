@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { DemoReportButton } from "@/components/demo-report-button";
@@ -13,6 +14,19 @@ import {
 
 export function generateStaticParams() {
   return DEMO_QUESTS.map((quest) => ({ questId: quest.id }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ questId: string }>;
+}): Promise<Metadata> {
+  const { questId } = await params;
+  const quest = findDemoQuest(questId);
+  return {
+    title: quest?.titleJa ?? "クエストが見つかりません",
+    description: quest?.summaryJa,
+  };
 }
 
 export default async function QuestDetailPage({

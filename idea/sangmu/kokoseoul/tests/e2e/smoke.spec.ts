@@ -7,6 +7,14 @@ test("renders the Japanese landing page without horizontal overflow", async ({
 
   await expect(page.getByRole("heading", { name: /ソウルで/ })).toBeVisible();
   await expect(page.getByText("登録なしで探せる")).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    /noindex/,
+  );
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+    "href",
+    "/manifest.webmanifest",
+  );
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "本文へスキップ" })).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(

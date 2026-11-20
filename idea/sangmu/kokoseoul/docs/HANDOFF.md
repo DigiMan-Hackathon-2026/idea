@@ -26,6 +26,7 @@
 - demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류에 일본어 복구 행동을 제공한다. 네트워크·서버 장애 주입은 실제 API 연결 뒤 검수한다.
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
 - Playwright는 Pixel 5와 Desktop Chrome 두 project에서 6개 핵심 흐름, 총 12개 E2E를 실행한다. 개발 서버 초기 compile이 겹치는 병렬 실행을 고려해 test 45초·expect 10초 한계를 명시했다.
+- 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않으며 manifest·SVG app icon은 demo 식별용으로만 사용한다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.
 - 익명·운영 세션, 소유권, 입력·출력, 로그·secret과 삭제 통제는 [보안과 개인정보 위협 모델 v0.1](SECURITY_PRIVACY_v0.1.md)에 정리했다.

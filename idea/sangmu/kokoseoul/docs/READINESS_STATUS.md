@@ -41,7 +41,7 @@
 | 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 20개 unit·12개 Chromium E2E | 실제 API·PostgreSQL·실기기에서 AC01~AC20 증거 |
 | test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
 | 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
-| 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md) | 서비스 확정 후 명령·계정·복구 훈련 |
+| 배포·복구 | 준비됨 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex` | 서비스 확정 후 계정·복구 훈련과 index 명시 승인 |
 | 장애 대응 | 준비됨 | [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md) | 역할·연락 경로 확정과 P0·P1 tabletop 훈련 |
 | 로그·관측성 | 준비됨 | [관측 계약](OBSERVABILITY_CONTRACT_v0.1.md) | provider 설정과 canary·alert 검수 |
 | 운영 감사 로그 | 준비됨 | [audit 계약](AUDIT_LOG_CONTRACT_v0.1.md) | schema·원자성·append-only 권한 구현 |

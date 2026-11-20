@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { MyDemoRecord } from "@/components/my-demo-record";
 import { SiteHeader } from "@/components/site-header";
+
+export const metadata: Metadata = {
+  title: "わたしの記録",
+  description: "このブラウザに保存したデモクエストの進行記録。",
+};
 
 export default function MyPage() {
   return (
