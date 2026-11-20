@@ -76,6 +76,25 @@ describe("POST /api/v1/visitor-sessions", () => {
     expect(sessionMocks.createVisitorSession).not.toHaveBeenCalled();
   });
 
+  it.each([
+    "digiman_visitor=first; digiman_visitor=second",
+    `digiman_visitor=${"x".repeat(4_100)}`,
+  ])("does not verify ambiguous or oversized cookie input", async (cookie) => {
+    sessionMocks.createVisitorSession.mockResolvedValue({
+      visitorId: "visitor-2",
+      token: "replacement-token",
+      expiresAt,
+    });
+
+    const response = await POST(request({ cookie }));
+
+    expect(response.status).toBe(201);
+    expect(sessionMocks.verifyVisitorSession).not.toHaveBeenCalled();
+    expect(response.headers.get("set-cookie")).toContain(
+      "digiman_visitor=replacement-token",
+    );
+  });
+
   it("rejects a cross-origin request before session access", async () => {
     const response = await POST(request({ origin: "https://attacker.invalid" }));
 

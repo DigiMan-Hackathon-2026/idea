@@ -18,28 +18,28 @@ export async function parseJsonObject(
   request: NextRequest,
   maxBytes: number,
 ): Promise<Record<string, unknown> | null> {
-  const mediaType = request.headers
-    .get("content-type")
-    ?.split(";", 1)[0]
-    .trim()
-    .toLowerCase();
-  if (mediaType !== "application/json") return null;
-
-  const contentLength = request.headers.get("content-length");
-  if (contentLength !== null) {
-    const declaredBytes = Number(contentLength);
-    if (
-      !Number.isSafeInteger(declaredBytes) ||
-      declaredBytes < 0 ||
-      declaredBytes > maxBytes
-    ) {
-      return null;
-    }
-  }
-  const text = await request.text();
-  if (new TextEncoder().encode(text).byteLength > maxBytes) return null;
-
   try {
+    const mediaType = request.headers
+      .get("content-type")
+      ?.split(";", 1)[0]
+      .trim()
+      .toLowerCase();
+    if (mediaType !== "application/json") return null;
+
+    const contentLength = request.headers.get("content-length");
+    if (contentLength !== null) {
+      const declaredBytes = Number(contentLength);
+      if (
+        !Number.isSafeInteger(declaredBytes) ||
+        declaredBytes < 0 ||
+        declaredBytes > maxBytes
+      ) {
+        return null;
+      }
+    }
+    const text = await request.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) return null;
+
     const value: unknown = JSON.parse(text);
     return typeof value === "object" && value !== null && !Array.isArray(value)
       ? (value as Record<string, unknown>)

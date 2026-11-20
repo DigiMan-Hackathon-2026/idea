@@ -12,6 +12,7 @@ import {
 import { getApplicationOrigin } from "../../../../server/http-config";
 import { hasExactEmptyJsonBody } from "../../../../server/http-validation";
 import {
+  getVisitorCookieValue,
   visitorResponse,
   VISITOR_COOKIE_NAME,
 } from "../../../../server/visitor-http";
@@ -48,9 +49,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const cookies = request.cookies.getAll(VISITOR_COOKIE_NAME);
-    if (cookies.length === 1) {
-      const verified = await verifyVisitorSession(cookies[0].value);
+    const token = getVisitorCookieValue(request);
+    if (token) {
+      const verified = await verifyVisitorSession(token);
       if (verified.outcome === "valid") {
         return visitorResponse(
           jsonResponse(
