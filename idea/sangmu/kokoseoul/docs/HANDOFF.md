@@ -12,7 +12,8 @@
 - 기본 브랜치: `main`
 - Windows 작업 위치: `D:\dev\digiman`
 - 맥북 작업본도 `origin/main`과 기능 단위로 동기화한다. 새 기기에서는 원하는 로컬 경로에 복제하고 Windows 경로를 그대로 사용하지 않는다.
-- 제품 코드는 아직 없고 code scope는 `UNRESTRICTED`다. scaffold·workflow·화면·API·DB 파일 생성과 검증을 제한하거나 경고하지 않는다.
+- F0 중립 Next.js scaffold와 품질 workflow가 있고 code scope는 `UNRESTRICTED`다. 제품 화면·API·DB 파일 생성과 검증을 제한하거나 경고하지 않는다.
+- 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
 - 현재 통합 검증은 `python3 scripts/verify_all.py`다. 37개 tooling 회귀 테스트, Markdown 63개, JSON block 44개, API endpoint 21개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
@@ -32,7 +33,7 @@
 - 행사 전 제품 코드·scaffold·DB·배포 허용 여부는 [사전 개발 범위 확인서](EVENT_RULES_CHECKLIST.md)에 위험으로 남기되 구현을 차단하지 않는다. 제출·공개 전에는 공식 답변을 확인한다.
 - 실제 퀘스트의 장소·가격·혼자 이용·일본어·asset 권리는 [콘텐츠 사실과 권리 검수 v0.1](CONTENT_VERIFICATION_v0.1.md)에 따라 기록한다.
 - 첫 타깃·지역·quest는 [evidence coding 가이드](../research/EVIDENCE_CODING_GUIDE.md)와 [후보 선택 가이드](../research/CANDIDATE_SELECTION_GUIDE.md)에 따라 실제 사건·반대 근거·현장 사실 ID로 고른다.
-- 운영자 인증은 Auth.js와 Google OIDC의 DB 세션, 지도는 Google Maps 범용 URL과 한국어 주소 복사를 우선 검증한다. 외부 서비스 프로비저닝과 제품 코드는 아직 없다.
+- 운영자 인증은 Auth.js와 Google OIDC의 DB 세션, 지도는 Google Maps 범용 URL과 한국어 주소 복사를 우선 검증한다. 외부 서비스 프로비저닝과 실제 DigiMan 제품 세로 흐름은 아직 없다.
 - 비밀값이나 로그인 세션은 저장소로 이전하지 않는다. 맥북의 GitHub 인증과 도구 가용성은 그 기기에서 확인한다.
 
 ## 사용자가 확정한 방향
@@ -95,7 +96,7 @@
 3. D02 일본어 검수자와 일정이 정해지면 모집·동의·stimulus P0 문구를 검수하고, 그전에는 모집을 공개 게시하지 않는다.
 4. 검수 뒤 [사용자 검증 계획](USER_RESEARCH_v0.1.md)에 따라 최근 실제 사건 3~5개를 익명 기록한다. 각 인터뷰는 `E/O` evidence ID, 반대 사례와 도움 전/후 관찰을 가진다.
 5. 3개 시점 합성에서 D04 문제 가설을 먼저 판단하고, 통과한 사건에서만 D05 지역·D06 quest 후보를 현장 사실과 함께 고른다. 가상 demo를 실제 후보 근거로 세지 않는다.
-6. [F0 계획](F0_BOOTSTRAP_PLAN_v0.1.md)의 exact version·clean clone으로 지금 scaffold한다. 이어 F1 DB·공통 API, F2 탐색·F3 session, F4 진행 세로 흐름 순서로 구현한다.
+6. 완료된 [F0 계획](F0_BOOTSTRAP_PLAN_v0.1.md)의 품질 명령을 유지하면서 F1 DB·공통 API, F2 탐색·F3 session, F4 진행 세로 흐름 순서로 구현한다.
 7. AC01~AC20은 아직 제품 구현에서 실행·통과한 테스트가 아니다. 문서·tooling 검증 통과를 제품 검수 통과로 표현하지 않는다.
 
 ## 문서 전달 관련 주의

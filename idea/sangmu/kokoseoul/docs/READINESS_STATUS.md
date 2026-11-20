@@ -22,10 +22,10 @@
 | --- | --- | --- | --- |
 | B2C 제품 범위 | 완료 | [B2C 스펙](B2C_SPEC_v0.1.md) | 사용자 조사 결과에 따른 변경 반영 |
 | 도메인 용어·명명 | 준비됨 | [용어 계약](DOMAIN_GLOSSARY_v0.1.md) | schema·API type·일본어 검수에 실제 적용 |
-| 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md) | 팀 동의와 실제 package version 고정 |
+| 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md), `package.json`·`pnpm-lock.yaml` | 팀 동의와 F1 PostgreSQL 연결 |
 | module·import 경계 | 준비됨 | [module 경계 계약](MODULE_BOUNDARIES_v0.1.md) | F0/F1 lint·build canary·integration에 적용 |
 | 환경 설정·secret | 준비됨 | [환경·secret 계약](CONFIGURATION_SECRETS_v0.1.md) | D09·D10 뒤 provider 설정과 rotation 훈련 |
-| 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | 행사 규칙 확인 뒤 F0 착수 |
+| 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | F1 공통 기반과 명시적 demo 세로 흐름 착수 |
 | 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
 | B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
 | 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
@@ -62,12 +62,12 @@
 | 익명 visitor session | 준비됨 | [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | token·cookie·rotation·만료/삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
 | 지도 연결 | 준비됨 | [지도·주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md) | 일본어 iOS·Android 실제 장소·앱 fallback 검수 |
-| 제품 코드 F0~F8 | 진행 가능 | 사용자 지시로 code scope 제한 해제 | F0부터 기능별 구현·검증 |
+| 제품 코드 F0~F8 | 진행 중 | F0 scaffold·lockfile `4a33be9`, CI 수정 `5622316`, Actions run `44809901153` 통과 | F1부터 기능별 구현·검증 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
 ## 현재 사실
 
-- 제품 코드는 없다.
+- F0 중립 Next.js scaffold와 로컬·CI 품질 gate가 있다. 실제 DigiMan 화면·API·DB schema는 아직 없다.
 - 현재 사전 코드 게이트는 `UNRESTRICTED`다. 코드 파일 생성·검증에 제한이나 경고를 적용하지 않는다.
 - 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.
@@ -91,14 +91,14 @@
 2. 익명화한 인터뷰 기록을 `research/interviews`에 추가한다.
 3. 조사 합성으로 타깃·지역·퀘스트 결정을 갱신한다.
 4. 외부 서비스의 비용·지역·복구 조건을 공식 문서로 비교한다.
-5. 허용 범위가 확인되면 F0부터 구현한다.
+5. F1 공통 기반과 명시적 demo 탐색 세로 흐름을 기능 단위로 구현한다.
 
 ## 첫 구현 착수 조건
 
 다음 조건을 모두 충족하기 전에는 제품 코드가 준비됐다고 표시하지 않는다.
 
 - [ ] 행사 제출·공개 전에는 사전 코드 허용 범위의 공식 근거와 조건을 다시 확인한다.
-- [ ] Node·pnpm과 package version을 lockfile로 고정한다.
+- [x] Node·pnpm과 package version을 lockfile로 고정했다.
 - [ ] 개발 PostgreSQL과 production 분리 방법을 확인한다.
 - [ ] 팀이 기술 작업 기준과 기능 분담에 동의한다.
 - [ ] 첫 퀘스트가 실제 또는 명시적인 demo로 구분돼 있다.

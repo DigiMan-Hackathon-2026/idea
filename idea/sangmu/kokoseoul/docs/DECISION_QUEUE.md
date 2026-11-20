@@ -45,7 +45,7 @@ D06 첫 quest + D09 외부 환경 + D11 복구·보존 + D12 release 근거
 | D04 | 첫 타깃과 해결할 문제 가설 유지·수정·보류 | blocked | 최근 실제 사건 3~5개·반대 사례·합성 | 인터뷰 3개 이후 1차, 5개 이후 확정 후보 | 현재 문구를 가설로만 유지 |
 | D05 | 첫 지역 1곳과 예비 지역 1곳 | blocked | 독립 사용자 사례·현장 검증·혼자 수행·콘텐츠 안정성 점수 | D04 뒤 현장 확인 가능성 비교 | 감이나 demo 예시로 선택하지 않음 |
 | D06 | 첫 실제 quest 1개와 후보 2개 | blocked | 3~5단계·주소·가격·혼자 이용·권리·일본어 근거 | D05 뒤 register 통과 | 명시적 가상 demo만 사용 |
-| D07 | Node·pnpm·Next·Auth·test package exact version | blocked | D01 허용 + 공식 호환 범위 + 팀 환경 | F0 첫 commit | 현재 Mac version을 프로젝트 표준으로 간주하지 않음 |
+| D07 | Node·pnpm·Next·test package exact version | decided | `package.json`·lockfile, clean clone `4a33be9`; Auth는 D10에서 결정 | F0 첫 commit | Node 24.19.0, pnpm 12.21.0, Next 16.4.6, Vitest 5.1.1, Playwright 1.65.1 |
 | D08 | 팀 역할·reviewer·merge checkpoint | collecting | 팀 인원·숙련도·가용 시간 | kickoff | 역할 책임을 제거하지 않고 한 사람이 겸임 |
 | D09 | Vercel·Neon plan·region·preview/prod 분리 | waiting | D01 배포 허용·예산·현재 plan·latency 측정 | 외부 project 생성 전 | 계정 생성 보류, 후보로만 표시 |
 | D10 | Google OIDC client·callback·admin principal 절차 | blocked | D07 Auth 조합·D09 domain·권한 owner | F7 착수 전 | 운영 API 공개·우회 로그인 금지 |
@@ -124,4 +124,4 @@ D06 첫 quest + D09 외부 환경 + D11 복구·보존 + D12 release 근거
 - 마감이 지나도 근거가 없으면 `decided`가 아니라 `deferred`와 안전한 축소 범위를 기록한다.
 - 준비도 표의 상태와 다르면 같은 commit에서 맞춘다.
 
-현재 가장 높은 leverage는 F0 착수와 D02·D03이다. D01은 구현을 막지 않지만 행사 제출·공개 전 공식 작업 범위를 확인해야 한다.
+현재 가장 높은 leverage는 F1 기반과 명시적 demo 세로 흐름, D02·D03이다. D01은 구현을 막지 않지만 행사 제출·공개 전 공식 작업 범위를 확인해야 한다.

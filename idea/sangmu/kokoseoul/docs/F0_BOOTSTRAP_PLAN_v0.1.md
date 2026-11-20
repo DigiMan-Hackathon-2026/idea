@@ -1,23 +1,23 @@
 # F0 개발 환경 착수 계획 v0.1
 
-작성일: 2026-11-21 · 상태: 실행 게이트 대기
+작성일: 2026-11-21 · 상태: 완료
 
 이 문서는 [구현 계획](IMPLEMENTATION_PLAN_v0.1.md)의 F0를 재현 가능하게 시작하기 위한 실행 순서다. 사용자 지시에 따라 code scope 제한은 해제됐으며 제품 파일, package manifest, lockfile과 CI workflow를 지금 생성할 수 있다. 행사 규칙 불확실성은 구현을 막지 않되 제출·공개 전 별도로 확인한다. F0 검증 뒤 F1로 진행한다.
 
 ## 현재 로컬 도구 관찰
 
-2026-11-21 이 Mac에서 읽기 전용으로 확인한 값이다.
+2026-11-21 이 Mac에서 F0 구현과 clean clone 검증에 사용한 값이다.
 
 | 도구 | 관찰 값 | 판정 |
 | --- | --- | --- |
-| Node.js | `v24.19.0` | 설치됨; 프로젝트 채택 버전은 아직 아님 |
-| Corepack | `0.35.0` | 설치됨 |
-| pnpm | 명령 없음 | 활성화·버전 고정 전 |
+| Node.js | `v24.19.0` | `.node-version`·`engines`에 고정 |
+| Corepack | `0.35.0` | pnpm 활성화에 사용 |
+| pnpm | `12.21.0` | `packageManager`·lockfile에 고정 |
 | Docker | `29.9.2` | 설치됨; daemon과 PostgreSQL 실행은 미확인 |
 | Git | `2.55.0` | 설치됨 |
 | GitHub CLI | `2.103.3` | 설치됨 |
 
-이 표는 팀 환경이나 호스팅 호환성을 보장하지 않는다. Node 24를 그대로 채택하지 않고, 착수 당일 선택한 Next.js·Auth.js·Playwright가 공식 지원하는 LTS line과 팀 환경을 대조해 정확한 patch를 고정한다.
+Node 24.19.0은 Next.js 16.4.6의 최소 Node 20.9 조건과 설치 패키지의 engine 검사를 통과해 F0 표준으로 채택했다. 팀원 환경과 실제 호스팅 호환성은 별도 확인하며 Auth.js는 F7 결정 전까지 추가하지 않는다.
 
 ## F0가 만드는 것과 만들지 않는 것
 
@@ -194,6 +194,8 @@ F0 완료 후보 commit을 새 임시 디렉터리에 clone해 다음을 확인�
 
 검증에 사용한 임시 디렉터리와 browser cache는 저장소에 복사하지 않는다.
 
+2026-11-21 `4a33be9`를 `/private/tmp`의 새 디렉터리에 clone해 Node `v24.19.0`, Corepack `0.35.0`, pnpm `12.21.0`을 확인했다. `pnpm install --frozen-lockfile`, `pnpm verify`, `pnpm test:e2e`가 성공했고 마지막 `git status --short`는 비어 있었다. 최초 CI는 pnpm 활성화 전 cache 조회 순서 문제로 실패해 `5622316`에서 cache 의존을 제거했다. 수정된 GitHub Actions run `44809901153`은 frozen install, 전체 검사, Chromium 설치와 mobile smoke를 1분 19초에 모두 통과했다.
+
 ## 커밋 단위
 
 | 순서 | 권장 commit | 포함 |
@@ -208,14 +210,14 @@ F0 완료 후보 commit을 새 임시 디렉터리에 clone해 다음을 확인�
 
 ## F0 종료 판정
 
-- [ ] 허용 범위와 시작 시각이 gate commit에 있다.
-- [ ] Node·pnpm exact version이 manifest·version file·CI에서 일치한다.
-- [ ] lockfile frozen install이 새 clone에서 성공한다.
-- [ ] lint, typecheck, unit test, build, 문서 검증이 성공한다.
-- [ ] 360px Playwright smoke가 성공한다.
-- [ ] 환경 누락이 secret 노출 없이 명확히 실패한다.
-- [ ] CI가 최소 권한이며 production secret·DB를 사용하지 않는다.
-- [ ] 실제 제품 화면·API·schema가 F0 commit에 없다.
-- [ ] 실행 증거와 알려진 제한이 준비도 문서에 반영됐다.
+- [x] 사용자 지시로 해제한 코드 범위와 시작 상태가 gate commit `0d4fbd6`에 있다. 주최 측 공식 허용 범위는 제출·공개 전 별도 확인한다.
+- [x] Node·pnpm exact version이 manifest·version file·CI에서 일치한다.
+- [x] lockfile frozen install이 새 clone에서 성공한다.
+- [x] lint, typecheck, unit test, build, 문서 검증이 성공한다.
+- [x] 360px Playwright smoke가 성공한다.
+- [x] 환경 누락이 secret 노출 없이 명확히 실패한다.
+- [x] CI가 최소 권한이며 production secret·DB를 사용하지 않는다.
+- [x] 실제 제품 화면·API·schema가 F0 commit에 없다.
+- [x] 실행 증거와 알려진 제한이 준비도 문서에 반영됐다.
 
 하나라도 확인하지 못하면 F0를 완료로 바꾸지 않고 구체적인 미확인 항목을 남긴다.
