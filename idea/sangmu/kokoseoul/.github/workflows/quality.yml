@@ -17,6 +17,20 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17.12-alpine3.24@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32
+        env:
+          POSTGRES_DB: digiman_test_ci
+          POSTGRES_USER: digiman_migration
+          POSTGRES_PASSWORD: ci-local-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U digiman_migration -d digiman_test_ci"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -38,8 +52,21 @@ jobs:
       - name: Audit moderate-or-higher dependency vulnerabilities
         run: pnpm audit:dependencies
 
+      - name: Mark and migrate integration database
+        env:
+          APP_ENV: test
+          DATABASE_DIRECT_URL: postgresql://digiman_migration:ci-local-only@127.0.0.1:5432/digiman_test_ci
+        run: |
+          docker exec "${{ job.services.postgres.id }}" psql -U digiman_migration -d postgres -c "comment on database digiman_test_ci is 'digiman:test'"
+          pnpm db:migrate
+
+      - name: Test PostgreSQL constraints
+        env:
+          TEST_DATABASE_URL: postgresql://digiman_migration:ci-local-only@127.0.0.1:5432/digiman_test_ci
+        run: pnpm test:integration
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Run mobile smoke test
+      - name: Run responsive browser flows
         run: pnpm test:e2e

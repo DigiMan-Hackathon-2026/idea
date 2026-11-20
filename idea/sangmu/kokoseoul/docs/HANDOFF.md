@@ -29,6 +29,7 @@
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않으며 manifest·SVG app icon은 demo 식별용으로만 사용한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
 - F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. base identity 5 tables migration은 빈 DB·재적용과 실제 constraint 통합 테스트 4개를 통과했지만 전체 도메인 schema와 runtime/migration 역할 분리는 남아 있다.
+- CI는 같은 PostgreSQL digest의 `digiman_test_ci` service에 marker와 migration을 적용한 뒤 4개 constraint 통합 테스트를 실행한다. `ci-local-only`는 격리된 Actions service의 비운영 값이며 repository·production secret이 아니다.
 - 내부 entity·상태·시각·삭제 동사는 [도메인 용어 계약](DOMAIN_GLOSSARY_v0.1.md), `lang`·KST·KRW 표시는 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md)에 정리했다.
 - AC01~AC20의 자동·수동 계층, 동시성 절차와 증거 형식은 [B2C 검수와 테스트 계획 v0.1](TEST_PLAN_v0.1.md)에 정리했다.
 - 익명·운영 세션, 소유권, 입력·출력, 로그·secret과 삭제 통제는 [보안과 개인정보 위협 모델 v0.1](SECURITY_PRIVACY_v0.1.md)에 정리했다.
