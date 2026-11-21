@@ -521,6 +521,13 @@ test("finds the beauty consultation and respects a short time limit", async ({ p
   await expect(page.getByRole("heading", { name: "条件を変えて、もう一度探してみましょう" })).toBeVisible();
 });
 
+test("finds the Seongsu solo meal with the operator's map pin", async ({ page }) => {
+  await page.goto("/quests?area=seongsu&purpose=food&time=60&party=solo&budget=under30000");
+  await expect(page.getByText("平日のみ営業 · 牛肉クッパ 12,000ウォン")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "NAVERマップを開く（別タブ）" })).toHaveAttribute("href", "https://map.naver.com/p/entry/place/2057338165");
+});
+
 test("finds the recurring exchange meetup in Yeouido", async ({ page }) => {
   await page.goto("/quests?area=yeouido&purpose=discovery");
   await expect(page.getByRole("heading", { name: "汝矣島の日韓交流会「いろとも」に初めて参加する" })).toBeVisible();

@@ -18,6 +18,7 @@ import museumRoom from "@/modules/content/museum-room-of-contemplation.json";
 import oliveyoungShopping from "@/modules/content/seongsu-oliveyoung-shopping.json";
 import oliveyoungSkin from "@/modules/content/seongsu-oliveyoung-skin-consulting.json";
 import irotomo from "@/modules/content/yeouido-irotomo-first-meetup.json";
+import somugwan from "@/modules/content/seongsu-somugwan-solo-gukbap.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -61,6 +62,14 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.timeAvailable !== "30" &&
     (!filters.party || filters.party === "solo") &&
     (!filters.budget || filters.budget === "unlimited");
+  const showSomugwan =
+    (filters.area === "all" || filters.area === "seongsu") &&
+    (!filters.purpose || filters.purpose === "food") &&
+    filters.tags.every((tag) => tag === "food") &&
+    (filters.durationMax === null || filters.durationMax >= somugwan.durationMinutes) &&
+    filters.timeAvailable !== "30" &&
+    (!filters.party || filters.party === "solo") &&
+    (!filters.budget || filters.budget === "under30000" || filters.budget === "unlimited");
   const showMuseumRoom =
     (filters.area === "all" || filters.area === "yongsan") &&
     (!filters.purpose || filters.purpose === "culture") &&
@@ -99,6 +108,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/myeongdong-kyoja",
       label: pickLocale(locale, "明洞 · グルメ", "명동 · 식도락"),
       detail: myeongdongKyoja.place.addressKo,
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showSomugwan ? [{
+      quest: somugwan,
+      href: "/quests/seongsu-somugwan-solo-gukbap",
+      label: pickLocale(locale, "聖水 · グルメ", "성수 · 식도락"),
+      detail: pickLocale(locale, "平日のみ営業 · 牛肉クッパ 12,000ウォン", "평일 영업 · 소고기국밥 12,000원"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showMuseumRoom ? [{

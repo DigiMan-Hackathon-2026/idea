@@ -25,6 +25,7 @@
     "db:seed:oliveyoung-shopping": "node --env-file-if-exists=.env.local scripts/db/seed-seongsu-oliveyoung-shopping.mjs",
     "db:seed:oliveyoung-skin": "node --env-file-if-exists=.env.local scripts/db/seed-seongsu-oliveyoung-skin-consulting.mjs",
     "db:seed:irotomo": "node --env-file-if-exists=.env.local scripts/db/seed-yeouido-irotomo-first-meetup.mjs",
+    "db:seed:somugwan": "node --env-file-if-exists=.env.local scripts/db/seed-seongsu-somugwan-solo-gukbap.mjs",
     "audit:dependencies": "pnpm audit --audit-level moderate",
     "verify:docs": "python3 scripts/verify_all.py",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:docs"

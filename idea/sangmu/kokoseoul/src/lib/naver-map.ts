@@ -2,6 +2,12 @@ import type { Locale } from "@/lib/locale";
 
 const NAVER_MAP_SCRIPT_ORIGIN = "https://oapi.map.naver.com";
 
+export function buildNaverPlaceUrl(place: { addressKo: string; naverMapPlaceId?: string }): string {
+  return place.naverMapPlaceId && /^\d+$/.test(place.naverMapPlaceId)
+    ? `https://map.naver.com/p/entry/place/${place.naverMapPlaceId}`
+    : `https://map.naver.com/p/search/${encodeURIComponent(place.addressKo)}`;
+}
+
 export const SEOUL_MAP_BOUNDS = {
   south: 37.413,
   west: 126.734,

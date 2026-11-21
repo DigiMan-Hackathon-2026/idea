@@ -4,14 +4,16 @@ import { ReportButton } from "@/components/report-button";
 import { SiteHeader } from "@/components/site-header";
 import { StartDemoButton } from "@/components/start-demo-button";
 import { pickLocale, type Locale } from "@/lib/locale";
+import { buildNaverPlaceUrl } from "@/lib/naver-map";
 import { getPublicQuest } from "@/modules/content/get-public-quest.server";
+
 type VisitGuide = {
   id: string;
   titleJa: string;
   titleKo: string;
   bodyJa: string;
   bodyKo: string;
-  place: { addressKo: string };
+  place: Parameters<typeof buildNaverPlaceUrl>[0];
   steps: { id: string; titleJa: string; titleKo: string }[];
 };
 
@@ -71,7 +73,7 @@ export function VisitGuidePage({
           <div className="mt-5 border-t border-[var(--border)] pt-4 text-sm text-slate-600">
             <p lang="ko" className="select-all font-bold">{guide.place.addressKo}</p>
             <div className="flex flex-wrap gap-x-5">
-              <a href={`https://map.naver.com/p/search/${encodeURIComponent(guide.place.addressKo)}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-bold underline">
+              <a href={buildNaverPlaceUrl(guide.place)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-bold underline">
                 {pickLocale(locale, "NAVERマップを開く（別タブ）", "네이버 지도 열기 (새 탭)")}
               </a>
               <a href={sourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-bold underline">

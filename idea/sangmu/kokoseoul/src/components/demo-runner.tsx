@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ReportButton } from "@/components/report-button";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
+import { buildNaverPlaceUrl } from "@/lib/naver-map";
 import {
   DIGIMAN_HACKATHON_ENDED_JA,
   DIGIMAN_HACKATHON_ENDED_KO,
@@ -102,11 +103,7 @@ export function DemoRunner({ runId }: { runId: string }) {
   const phrase = currentStep.phrase;
   const place = currentStep.place;
   const guideUrl = place ? pickLocale(locale, place.guideUrlJa, place.guideUrlKo) : undefined;
-  const placeMapUrl = place && !run.isDemo
-    ? place.naverMapPlaceId && /^\d+$/.test(place.naverMapPlaceId)
-      ? `https://map.naver.com/p/entry/place/${place.naverMapPlaceId}`
-      : `https://map.naver.com/p/search/${encodeURIComponent(place.addressKo)}`
-    : null;
+  const placeMapUrl = place && !run.isDemo ? buildNaverPlaceUrl(place) : null;
 
   async function handleComplete() {
     if (isSaving || !run?.canContinue) return;
