@@ -28,6 +28,7 @@ import cityModel from "@/modules/content/gwanghwamun-seoul-museum-city-model.jso
 import ssamziegil from "@/modules/content/insadong-ssamziegil-craft-gift.json";
 import amoreFoundation from "@/modules/content/yongsan-amore-custom-foundation.json";
 import bookbogo from "@/modules/content/jamsil-seoul-bookbogo-first-book-talk.json";
+import sonmat from "@/modules/content/tongin-market-sonmat-gimbap.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -86,6 +87,12 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     (filters.durationMax === null || filters.durationMax >= soonhee.durationMinutes) &&
     filters.timeAvailable !== "30" &&
     (!filters.party || filters.party === "solo") &&
+    (!filters.budget || filters.budget === "unlimited");
+  const showSonmat =
+    (filters.area === "all" || filters.area === "jongno") &&
+    (!filters.purpose || filters.purpose === "food") &&
+    filters.tags.every((tag) => tag === "food") &&
+    (filters.durationMax === null || filters.durationMax >= sonmat.durationMinutes) &&
     (!filters.budget || filters.budget === "unlimited");
   const showMuseumRoom =
     (filters.area === "all" || filters.area === "yongsan") &&
@@ -191,6 +198,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/gwangjang-soonhee-bindaetteok",
       label: pickLocale(locale, "鍾路 · グルメ", "종로 · 식도락"),
       detail: pickLocale(locale, "広蔵市場 · 持ち帰り可 · 値段は店頭で確認", "광장시장 · 포장 가능 · 가격은 매장 확인"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showSonmat ? [{
+      quest: sonmat,
+      href: "/quests/tongin-market-sonmat-gimbap",
+      label: pickLocale(locale, "鍾路 · グルメ", "종로 · 식도락"),
+      detail: pickLocale(locale, "通仁市場 · 支払い方法と値段は店頭で確認", "통인시장 · 결제 방법과 가격은 매장 확인"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showMuseumRoom ? [{

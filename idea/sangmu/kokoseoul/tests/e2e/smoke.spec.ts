@@ -553,11 +553,21 @@ test("finds the Seongsu solo meal with the operator's map pin", async ({ page })
 
 test("finds the Gwangjang Market takeout guide with the Japanese source", async ({ page }) => {
   await page.goto("/quests?area=jongno&purpose=food&time=60&party=solo");
-  await expect(page.getByText("広蔵市場 · 持ち帰り可 · 値段は店頭で確認")).toBeVisible();
-  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  const gwangjangGuide = page.getByRole("article").filter({ hasText: "広蔵市場 · 持ち帰り可 · 値段は店頭で確認" });
+  await gwangjangGuide.getByRole("link", { name: "訪問ガイドを見る" }).click();
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
     "href",
     "https://japanese.visitkorea.or.kr/svc/contents/contentsView.do?vcontsId=194105",
+  );
+});
+
+test("finds the Tongin Market payment guide for a short visit", async ({ page }) => {
+  await page.goto("/quests?area=jongno&purpose=food&time=30&party=solo");
+  await expect(page.getByText("通仁市場 · 支払い方法と値段は店頭で確認")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://english.visitseoul.net/area/Sonmat-Gimbap/ENP024905",
   );
 });
 
