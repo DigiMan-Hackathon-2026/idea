@@ -20,6 +20,7 @@ import oliveyoungSkin from "@/modules/content/seongsu-oliveyoung-skin-consulting
 import irotomo from "@/modules/content/yeouido-irotomo-first-meetup.json";
 import somugwan from "@/modules/content/seongsu-somugwan-solo-gukbap.json";
 import changdeokgung from "@/modules/content/changdeokgung-japanese-tour.json";
+import kyobo from "@/modules/content/gwanghwamun-kyobo-find-book.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -95,6 +96,12 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.durationMax === null &&
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
     (!filters.budget || filters.budget === "unlimited");
+  const showKyobo =
+    (filters.area === "all" || filters.area === "jongno") &&
+    (!filters.purpose || filters.purpose === "shopping") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= kyobo.durationMinutes) &&
+    (!filters.budget || filters.budget === "unlimited");
   const showIrotomo =
     (filters.area === "all" || filters.area === "yeouido") &&
     (!filters.purpose || filters.purpose === "discovery") &&
@@ -143,6 +150,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/seongsu-oliveyoung-shopping",
       label: pickLocale(locale, "聖水 · ショッピング", "성수 · 쇼핑"),
       detail: oliveyoungShopping.place.addressKo,
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showKyobo ? [{
+      quest: kyobo,
+      href: "/quests/gwanghwamun-kyobo-find-book",
+      label: pickLocale(locale, "鍾路 · ショッピング", "종로 · 쇼핑"),
+      detail: pickLocale(locale, "教保生命ビル 地下1階", "교보생명빌딩 지하 1층"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showOliveyoungSkin ? [{

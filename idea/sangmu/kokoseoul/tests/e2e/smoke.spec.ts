@@ -535,6 +535,13 @@ test("finds the Changdeokgung tour with the official schedule", async ({ page })
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://royal.khs.go.kr/ROYAL/contents/R706020000.do?schGroupCode=cdg");
 });
 
+test("finds the Gwanghwamun book quest with the correct branch", async ({ page }) => {
+  await page.goto("/quests?area=jongno&purpose=shopping&time=30");
+  await expect(page.getByText("教保生命ビル 地下1階", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://store.kyobobook.co.kr/store-info/001");
+});
+
 test("finds the recurring exchange meetup in Yeouido", async ({ page }) => {
   await page.goto("/quests?area=yeouido&purpose=discovery");
   await expect(page.getByRole("heading", { name: "汝矣島の日韓交流会「いろとも」に初めて参加する" })).toBeVisible();
