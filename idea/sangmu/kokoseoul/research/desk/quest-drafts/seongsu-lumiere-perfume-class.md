@@ -25,6 +25,23 @@
 
 예약 페이지 확인일은 2026-11-22다. Fever는 예약 판매 플랫폼이며 공방의 공식 웹사이트·SNS는 확인하지 못했다(출처 등급 B). 공개 전 업체에 직접 확인한다.
 
+## 출처 기록
+
+등급은 [콘텐츠 검수 계약](../../../docs/CONTENT_VERIFICATION_v0.1.md)의 A~D 기준이다. 확인일은 모두 2026-11-22다.
+
+| ID | 출처 | 등급 | 확인한 내용 | 비고 |
+| --- | --- | --- | --- | --- |
+| S01 | [Fever 한국어 예약 페이지](https://feverup.com/m/136419/ja) | B | 주소, 가격, 소요 시간, 시간대, 환불 불가, 피부 반응·주차 안내 | 예약 판매 플랫폼. `/ja` 주소지만 내용은 한국어 |
+| S02 | [Fever 영어 예약 페이지](https://feverup.com/m/136419/en?thm=76) | B | S01과 같은 내용 | 진행 언어·1인 예약은 적혀 있지 않음 |
+| S03 | Fever 영어 페이지의 이용 후기 | C | 영어 자료를 받았다는 후기, 지각 시 추가 요금 언급 | 업체 정책 근거로 쓰지 않음 |
+| S04 | [Klook 뤼미에르 퍼퓸 예약 페이지](https://www.klook.com/activity/169902-lumiere-perfume-create-your-own-perfume) | - | 읽지 못함 | 접속 거부(403) |
+| S05 | [Klook 성수 도자기 원데이](https://www.klook.com/activity/241433-seongsu-ceramic-workshop-one-day-experience/) | C | 완성품을 체험 3일 뒤 수령 | 후보 제외 근거 |
+| S06 | [디뮤지엄 공식 사이트](https://www.daelimmuseum.org/) | - | 읽지 못함 | 자바스크립트로만 열림 |
+| S07 | [ktriptips 디뮤지엄 성수](https://www.ktriptips.com/kor/culture/2704340) | C | 운영 시간·요금 안내(2025-10 갱신) | 공식 근거 아님. 후보 제외 근거 |
+| S08 | [NOL 티켓 디뮤지엄 전시](https://nol.yanolja.com/ticket/products/25009106) | C | 전시 기간 표기가 판매 페이지마다 다름 | 현재 전시를 확정할 수 없어 제외 |
+
+공방의 공식 웹사이트·SNS는 찾지 못했다. 공개 전 업체 답변이나 현장 확인(A등급)으로 S01·S02의 내용을 다시 확인한다.
+
 ## 한·일 안내 초안
 
 ### 1. 클래스 예약하기 · クラスを予約する
