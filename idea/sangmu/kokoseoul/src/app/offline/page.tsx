@@ -75,6 +75,9 @@ export default function OfflinePage() {
         >
           再読み込み · 다시 불러오기
         </Link>
+        <a href="/subway" style={{ display: "inline-flex", alignItems: "center", minHeight: "44px", marginTop: "12px", color: "#941e34" }}>
+          地下鉄の保存情報を開く · 저장한 지하철 안내 열기
+        </a>
       </section>
     </main>
   );

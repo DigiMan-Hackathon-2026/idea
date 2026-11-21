@@ -536,6 +536,43 @@ test("keeps the transfer instruction when arriving from the Seongsu branch", asy
   await expect(page.getByRole("status").filter({ hasText: "210 トゥクソム" })).toBeVisible();
 });
 
+test("restores a subway ride after reload and shows the last confirmed stop offline", async ({ page, context }) => {
+  await page.goto("/subway");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await page.getByRole("textbox", { name: "今いる駅" }).fill("211");
+  await page.getByRole("button", { name: /211 聖水/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("208");
+  await page.getByRole("button", { name: /208 往十里/ }).click();
+  await page.getByRole("button", { name: "乗車中", exact: true }).click();
+  await page.getByLabel("案内で確認した次の駅").selectOption("210");
+  await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "乗車中", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("status").filter({ hasText: "209 漢陽大" })).toBeVisible();
+  await page.getByLabel("案内で確認した次の駅").selectOption("211");
+
+  try {
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByRole("heading", { name: /오프라인 지하철 안내/ })).toBeVisible();
+    const saved = page.getByRole("region", { name: /저장된 이동 정보/ });
+    await expect(saved.getByText("210 トゥクソム · 뚝섬 · Ttukseom")).toBeVisible();
+    await expect(saved.getByText("209 漢陽大 · 한양대 · Hanyang Univ.")).toBeVisible();
+    await expect(saved.getByText("왕십리역에 가고 싶어요. 어느 방향으로 가야 하나요?")).toBeVisible();
+
+    await context.setOffline(false);
+    await page.getByRole("link", { name: /지하철 안내 다시 불러오기/ }).click();
+    await expect(page.getByRole("button", { name: "乗車中", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "移動情報を消す" }).click();
+    await expect(page.getByRole("textbox", { name: "今いる駅" })).toBeVisible();
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByText(/저장된 이동 정보를 찾지 못했어요/)).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
+});
+
 test("finds the beauty consultation and respects a short time limit", async ({ page }) => {
   await page.goto("/");
 
