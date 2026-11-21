@@ -21,6 +21,7 @@ import irotomo from "@/modules/content/yeouido-irotomo-first-meetup.json";
 import somugwan from "@/modules/content/seongsu-somugwan-solo-gukbap.json";
 import changdeokgung from "@/modules/content/changdeokgung-japanese-tour.json";
 import kyobo from "@/modules/content/gwanghwamun-kyobo-find-book.json";
+import moodcollect from "@/modules/content/myeongdong-moodcollect-personal-color.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -96,6 +97,14 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.durationMax === null &&
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
     (!filters.budget || filters.budget === "unlimited");
+  const showMoodcollect =
+    (filters.area === "all" || filters.area === "myeongdong") &&
+    (!filters.purpose || filters.purpose === "beauty") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= moodcollect.durationMinutes) &&
+    filters.timeAvailable !== "30" &&
+    (!filters.party || filters.party === "solo") &&
+    (!filters.budget || filters.budget === "unlimited");
   const showKyobo =
     (filters.area === "all" || filters.area === "jongno") &&
     (!filters.purpose || filters.purpose === "shopping") &&
@@ -164,6 +173,17 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/seongsu-oliveyoung-skin-consulting",
       label: pickLocale(locale, "聖水 · ビューティー", "성수 · 뷰티"),
       detail: pickLocale(locale, "店頭受付 · 待ち時間は店頭で確認", "현장 접수 · 대기 시간은 매장 확인"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showMoodcollect ? [{
+      quest: moodcollect,
+      href: "/quests/myeongdong-moodcollect-personal-color",
+      label: pickLocale(locale, "明洞 · ビューティー", "명동 · 뷰티"),
+      detail: pickLocale(
+        locale,
+        "要予約 · 1人50分 · 日本語通訳込み20万ウォン",
+        "사전 예약 · 1인 50분 · 일본어 통역 포함 20만 원",
+      ),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showIrotomo ? [{

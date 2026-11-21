@@ -510,15 +510,28 @@ test("finds the beauty consultation and respects a short time limit", async ({ p
   await page.getByRole("button", { name: "おすすめクエストを見る" }).click();
 
   await expect(page).toHaveURL(/purpose=beauty/);
-  await expect(
-    page.getByRole("heading", { name: "オリーブヤングN聖水で肌のコンサルティングを受ける" }),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "訪問ガイドを見る" })).toHaveAttribute(
+  const skinGuide = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "オリーブヤングN聖水で肌のコンサルティングを受ける" }),
+  });
+  await expect(skinGuide.getByRole("link", { name: "訪問ガイドを見る" })).toHaveAttribute(
     "href",
     "/quests/seongsu-oliveyoung-skin-consulting",
   );
   await page.goto("/quests?purpose=beauty&time=30");
   await expect(page.getByRole("heading", { name: "条件を変えて、もう一度探してみましょう" })).toBeVisible();
+});
+
+test("finds the Myeongdong personal color consultation and filters by budget", async ({ page }) => {
+  await page.goto("/quests?area=myeongdong&purpose=beauty&time=60&party=solo&budget=under30000");
+  await expect(page.getByRole("heading", { name: "明洞で自分に似合う色を見つける" })).toHaveCount(0);
+
+  await page.goto("/quests?area=myeongdong&purpose=beauty&time=60&party=solo&budget=unlimited");
+  await expect(page.getByText("要予約 · 1人50分 · 日本語通訳込み20万ウォン")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://www.moodcollect.com/booking-prices-locations",
+  );
 });
 
 test("finds the Seongsu solo meal with the operator's map pin", async ({ page }) => {

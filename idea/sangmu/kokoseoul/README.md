@@ -171,3 +171,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 창덕궁 일본어 해설 퀘스트는 `pnpm db:seed:changdeokgung`으로 로컬에 넣고 `/quests?area=jongno&purpose=culture`에서 시작합니다.
 
 광화문 교보문고 책 찾기 퀘스트는 `pnpm db:seed:kyobo`로 로컬에 넣고 `/quests?area=jongno&purpose=shopping`에서 시작합니다.
+
+명동 무드컬렉트 퍼스널컬러 퀘스트는 `pnpm db:seed:moodcollect`로 로컬에 넣고 `/quests?area=myeongdong&purpose=beauty`에서 시작합니다.
