@@ -529,26 +529,81 @@ test("resumes and deletes the browser-only demo record", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("saves a clearly local-only demo information report", async ({ page }) => {
+test("sends an information report once and retries with the same request ID", async ({
+  page,
+}) => {
+  const versionId = "22222222-2222-4222-8222-222222222222";
+  const reportBodies: Record<string, unknown>[] = [];
+  let sessions = 0;
   await installWalkingRouteMock(page);
-  await page.goto(
-    "/quests/11111111-1111-4111-8111-111111111111",
-  );
-  await page
-    .getByRole("button", { name: "情報の誤りを報告" })
-    .click();
+  await page.route("**/api/v1/**", async (route) => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+    if (pathname === `/api/v1/quests/${demoQuestId}` && request.method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        json: { id: demoQuestId, versionId, canStart: true, ownRunId: null },
+      });
+      return;
+    }
+    if (pathname === "/api/v1/visitor-sessions" && request.method() === "POST") {
+      sessions += 1;
+      await route.fulfill({ status: sessions === 1 ? 201 : 200, json: {} });
+      return;
+    }
+    if (pathname === `/api/v1/quests/${demoQuestId}/reports` && request.method() === "POST") {
+      reportBodies.push(request.postDataJSON());
+      if (reportBodies.length === 1) {
+        await route.fulfill({
+          status: 503,
+          json: { error: { code: "SERVICE_UNAVAILABLE", retryable: true } },
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 201,
+        json: { id: "88888888-8888-4888-8888-888888888888", status: "new" },
+      });
+      return;
+    }
+    await route.fallback();
+  });
+
+  await page.goto(`/quests/${demoQuestId}`);
+  await page.getByRole("button", { name: "情報の誤りを報告" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByLabel("どの情報ですか。").selectOption("japanese_copy");
+  expect(sessions).toBe(0);
+  await page.getByLabel("どの情報ですか。").selectOption("information");
   await page
     .getByLabel("詳しい内容（任意）")
     .fill("二つ目の文をもっと短くしてほしい");
-  await page.getByRole("button", { name: "報告を保存する" }).click();
+  await page.getByRole("button", { name: "運営者に報告を送る" }).click();
+
+  await expect(page.getByText("送信できたか確認できませんでした")).toBeVisible();
+  await expect(page.getByLabel("詳しい内容（任意）")).toHaveValue(
+    "二つ目の文をもっと短くしてほしい",
+  );
+  await page.getByRole("button", { name: "運営者に報告を送る" }).click();
   await expect(
-    page.getByRole("heading", { name: "報告を保存しました" }),
+    page.getByRole("heading", { name: "報告を受け付けました" }),
   ).toBeVisible();
+
+  expect(reportBodies).toHaveLength(2);
+  expect(reportBodies[0]).toEqual({
+    versionId,
+    category: "information",
+    comment: "二つ目の文をもっと短くしてほしい",
+    clientRequestId: expect.stringMatching(/^[0-9a-f-]{36}$/),
+  });
+  expect(reportBodies[1].clientRequestId).toBe(reportBodies[0].clientRequestId);
+
+  await page.getByRole("button", { name: "閉じる" }).last().click();
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await page.getByRole("button", { name: "잘못된 정보 신고" }).click();
+  await expect(page.getByLabel("어떤 정보인가요?")).toHaveValue("");
   await expect(
-    page.getByText("運営者には送信されません"),
-  ).toBeVisible();
+    page.getByRole("option", { name: "장소·가격 등 정보가 달라요" }),
+  ).toBeAttached();
 });
 
 test("shows recoverable empty and missing quest states", async ({ page }) => {

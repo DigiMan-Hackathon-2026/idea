@@ -63,12 +63,12 @@
 | 익명 visitor session | 진행 중 | HMAC token repository, `POST /api/v1/visitor-sessions` 생성과 visitor 인증을 거친 퀘스트 시작 API의 Origin·JSON·cookie·no-store 계약, [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | rate limit·실DB HTTP/browser·삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
 | 지도·이동 안내 | 진행 중 | `/quests` 목록·Naver 지도 전환, 서울 `maxBounds`, 역/출구 표기, TMAP 보행자 경로, NAVER 앱 길찾기, 개찰구 전·승강장·탑승·오방향 상황별 판단/복구 demo와 한국어 도움 카드, [지도 계약](MAP_ADDRESS_HANDOFF_v0.1.md), [현장 안내 가설](SUBWAY_FIELD_GUIDE_v0.1.md) | 실제 일본인 비교 검증, 역별 동선·사진 검수, 배포 domain과 iOS·Android 앱 fallback 검수 |
-| 제품 코드 F0~F8 | 진행 중 | 가상 demo seed, 익명 session, 실제 UUID run 시작·조회·순서형 단계 완료·완료 카드·피드백·내 기록·전체 삭제의 DB/API/UI/E2E 연결 | 정보 신고 UI의 실제 API 연결과 운영 화면 구현 |
+| 제품 코드 F0~F8 | 진행 중 | 가상 demo seed, 익명 session, 실제 UUID run 시작·조회·순서형 단계 완료·완료 카드·피드백·내 기록·전체 삭제·공개 상세·정보 신고의 DB/API/UI/E2E 연결 | 운영 화면 구현 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 
 ## 현재 사실
 
-- F0 품질 gate와 명시적 가상 demo의 일본어 기본 화면, 한국어 전환, 목적→시간→지역 3단계 시작 흐름, 선택 조건 조정, 상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있다. 설치 가능한 PWA shell과 이중 언어 offline fallback이 있으며 개인화 HTML·API는 service worker에 저장하지 않는다. 진행·완료·피드백·내 기록·삭제는 이 브라우저의 익명 session과 PostgreSQL을 최종 기준으로 사용하고, 정보 신고 화면만 아직 localStorage demo다. 서울 방문 경험은 완료 뒤 선택적으로 묻고 feedback에 저장한다. 시작 화면에서 지역 판정에 쓰는 현재 위치와 NAVER 앱 대중교통 길찾기의 현재 위치 모두 서비스 URL·저장소·서버에 좌표를 남기지 않는다.
+- F0 품질 gate와 명시적 가상 demo의 일본어 기본 화면, 한국어 전환, 목적→시간→지역 3단계 시작 흐름, 선택 조건 조정, 상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있다. 설치 가능한 PWA shell과 이중 언어 offline fallback이 있으며 개인화 HTML·API는 service worker에 저장하지 않는다. 진행·완료·피드백·내 기록·삭제는 이 브라우저의 익명 session과 PostgreSQL을 최종 기준으로 사용하고, 정보 신고도 실제 API로 접수하고 재전송은 같은 `clientRequestId`로 한 건에 수렴한다. 서울 방문 경험은 완료 뒤 선택적으로 묻고 feedback에 저장한다. 시작 화면에서 지역 판정에 쓰는 현재 위치와 NAVER 앱 대중교통 길찾기의 현재 위치 모두 서비스 URL·저장소·서버에 좌표를 남기지 않는다.
 - 현재 사전 코드 게이트는 `UNRESTRICTED`다. 코드 파일 생성·검증에 제한이나 경고를 적용하지 않는다.
 - 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
 - 외부 서비스 계정과 secret은 저장소에 없다.

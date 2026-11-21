@@ -158,6 +158,8 @@ Accept: application/json
 }
 ```
 
+`stepOverview`는 단계 제목 필드가 생길 때까지 현재 구현 응답에서 생략한다. 정보 신고 화면은 이 응답의 `versionId`를 신고 대상 version으로 사용한다.
+
 유효한 본인 run이 있으면 `ownRunId`를 반환한다. 진행 중이면 `canStart`는 false이고 화면은 이어하기를 표시한다. 완료된 run이면 상세에서 완료 기록 보기를 제공한다.
 
 중지된 기존 공개본의 직접 링크 예시는 다음과 같다.

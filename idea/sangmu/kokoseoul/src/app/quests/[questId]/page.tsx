@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
-import { DemoReportButton } from "@/components/demo-report-button";
+import { ReportButton } from "@/components/report-button";
 import { StartDemoButton } from "@/components/start-demo-button";
 import { SubwayFieldGuide } from "@/components/subway-field-guide";
 import { QuestTransitGuide } from "@/components/transit-guide-card";
@@ -135,7 +135,7 @@ export default async function QuestDetailPage({
             </div>
             <p className="mt-4 text-center text-xs font-semibold leading-5 text-slate-500">{pickLocale(locale, "登録は不要です。この画面は仮想デモです。", "가입은 필요 없습니다. 이 화면은 가상 데모입니다.")}</p>
             <div className="mt-2 border-t border-slate-900/8 pt-2">
-              <DemoReportButton />
+              <ReportButton questId={quest.id} />
             </div>
           </aside>
         </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { DemoReportButton } from "@/components/demo-report-button";
+import { ReportButton } from "@/components/report-button";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import {
@@ -188,7 +188,7 @@ export function DemoRunner({ runId }: { runId: string }) {
               {pickLocale(locale, "保存状態を確認しました。画面の案内に沿ってもう一度お試しください。", "저장 상태를 다시 확인했어요. 화면 안내에 따라 다시 시도해 주세요.")}
             </p>
           ) : null}
-          <div className="mt-2"><DemoReportButton /></div>
+          <div className="mt-2"><ReportButton questId={run.questId} versionId={run.questVersionId} /></div>
         </div>
       </section>
 
