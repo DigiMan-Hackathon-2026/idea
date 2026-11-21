@@ -17,6 +17,7 @@ const runId = "66666666-6666-4666-8666-666666666666";
 const validBody = {
   joyScore: 4,
   feltNewExperience: true,
+  visitExperience: "repeat_2_4",
   comment: "次にすることが分かりやすかったです。",
 };
 
@@ -84,6 +85,7 @@ describe("PUT /api/v1/runs/:runId/feedback", () => {
     [{ ...validBody, joyScore: 6 }],
     [{ ...validBody, joyScore: 3.5 }],
     [{ ...validBody, comment: "あ".repeat(501) }],
+    [{ ...validBody, visitExperience: "sometimes" }],
     [{ ...validBody, unexpected: true }],
   ])("rejects invalid feedback before session access", async (body) => {
     const response = await PUT(request({ body }), context);

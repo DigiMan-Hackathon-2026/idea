@@ -604,6 +604,7 @@ describe("PostgreSQL concurrency serialization", () => {
       runId,
       joyScore: 5,
       feltNewExperience: true,
+      visitExperience: null,
       comment: null,
     });
     await setupClient.query("commit");
@@ -626,6 +627,7 @@ describe("PostgreSQL concurrency serialization", () => {
       runId,
       joyScore: 5,
       feltNewExperience: true,
+      visitExperience: "repeat_2_4",
       comment: "分かりやすかったです。",
     });
     const updatedFeedback = await submitFeedbackWithClient(setupClient, {
@@ -633,6 +635,7 @@ describe("PostgreSQL concurrency serialization", () => {
       runId,
       joyScore: 4,
       feltNewExperience: false,
+      visitExperience: null,
       comment: null,
     });
     await setupClient.query("commit");

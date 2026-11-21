@@ -281,7 +281,7 @@ BR10. 콘텐츠 공개 전에 필수 일본어, 단계 순서, 비용 범위, �
 | PUT /runs/:runId/steps/:stepId | completed는 true만 허용 | 최신 run 상태, completedAt, nextStepId |
 | GET /me/runs | status 선택, limit, cursor | 본인의 진행·완료 목록 |
 | GET /runs/:runId/completion | 없음 | 완료 카드 데이터, 미완료면 409 |
-| PUT /runs/:runId/feedback | joyScore 1~5 정수, feltNewExperience 선택 boolean, comment 선택 최대 500자 | 저장된 피드백 |
+| PUT /runs/:runId/feedback | joyScore 1~5 정수, feltNewExperience boolean, visitExperience 선택 enum, comment 선택 최대 500자 | 저장된 피드백 |
 | POST /quests/:questId/reports | versionId, category, comment 최대 500자, clientRequestId | 201 신고 또는 200 중복 접수 |
 | DELETE /me/data | 빈 JSON | 204, 본인 기록 삭제와 쿠키 만료 |
 

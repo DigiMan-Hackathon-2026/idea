@@ -8,6 +8,7 @@ export type SubmitFeedbackInput = {
   runId: string;
   joyScore: number;
   feltNewExperience: boolean;
+  visitExperience: string | null;
   comment: string | null;
   feedbackId?: string;
 };
@@ -16,6 +17,7 @@ export type FeedbackRecord = {
   runId: string;
   joyScore: number;
   feltNewExperience: boolean;
+  visitExperience: string | null;
   comment: string | null;
   updatedAt: string;
 };
@@ -30,6 +32,7 @@ type FeedbackRow = {
   run_id: string;
   joy_score: number;
   felt_new_experience: boolean;
+  visit_experience: string | null;
   comment: string | null;
   updated_at: Date;
 };
@@ -54,19 +57,21 @@ export async function submitFeedbackWithClient(
 
   const saved = await client.query<FeedbackRow>(
     `insert into feedback
-      (id, run_id, joy_score, felt_new_experience, comment)
-     values ($1, $2, $3, $4, $5)
+      (id, run_id, joy_score, felt_new_experience, visit_experience, comment)
+     values ($1, $2, $3, $4, $5, $6)
      on conflict (run_id) do update
      set joy_score = excluded.joy_score,
        felt_new_experience = excluded.felt_new_experience,
+       visit_experience = excluded.visit_experience,
        comment = excluded.comment,
        updated_at = now()
-     returning run_id, joy_score, felt_new_experience, comment, updated_at`,
+     returning run_id, joy_score, felt_new_experience, visit_experience, comment, updated_at`,
     [
       input.feedbackId ?? randomUUID(),
       input.runId,
       input.joyScore,
       input.feltNewExperience,
+      input.visitExperience,
       input.comment,
     ],
   );
@@ -77,6 +82,7 @@ export async function submitFeedbackWithClient(
       runId: row.run_id,
       joyScore: row.joy_score,
       feltNewExperience: row.felt_new_experience,
+      visitExperience: row.visit_experience,
       comment: row.comment,
       updatedAt: row.updated_at.toISOString(),
     },

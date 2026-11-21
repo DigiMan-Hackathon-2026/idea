@@ -43,6 +43,13 @@
       "when": 1795210677010,
       "tag": "0005_hard_gambit",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795255911507,
+      "tag": "0006_moaning_gideon",
+      "breakpoints": true
     }
   ]
 }

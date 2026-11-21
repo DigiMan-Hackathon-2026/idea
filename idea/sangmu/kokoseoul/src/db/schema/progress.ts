@@ -99,6 +99,7 @@ export const feedback = pgTable(
       .references(() => runs.id, { onDelete: "cascade" }),
     joyScore: integer("joy_score").notNull(),
     feltNewExperience: boolean("felt_new_experience").notNull(),
+    visitExperience: varchar("visit_experience", { length: 16 }),
     comment: varchar("comment", { length: 500 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -116,6 +117,10 @@ export const feedback = pgTable(
     check(
       "feedback_comment_ck",
       sql`${table.comment} is null or char_length(btrim(${table.comment})) between 1 and 500`,
+    ),
+    check(
+      "feedback_visit_experience_ck",
+      sql`${table.visitExperience} is null or ${table.visitExperience} in ('first', 'repeat_2_4', 'repeat_5_plus', 'resident')`,
     ),
     check(
       "feedback_timestamps_ck",

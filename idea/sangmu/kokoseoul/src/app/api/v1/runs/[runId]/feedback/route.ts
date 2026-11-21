@@ -21,6 +21,7 @@ import {
 type FeedbackBody = {
   joyScore: number;
   feltNewExperience: boolean;
+  visitExperience: string | null;
   comment: string | null;
 };
 
@@ -38,14 +39,29 @@ async function parseFeedbackBody(request: NextRequest): Promise<FeedbackBody | n
   const body = await parseJsonObject(request, 2_048);
   if (!body) return null;
   try {
-    const allowed = new Set(["joyScore", "feltNewExperience", "comment"]);
+    const allowed = new Set([
+      "joyScore",
+      "feltNewExperience",
+      "visitExperience",
+      "comment",
+    ]);
     if (!hasOnlyKeys(body, allowed)) return null;
     const comment = body.comment ?? null;
+    const visitExperience = body.visitExperience ?? null;
+    const visitExperienceValues = new Set([
+      "first",
+      "repeat_2_4",
+      "repeat_5_plus",
+      "resident",
+    ]);
     if (
       !Number.isInteger(body.joyScore) ||
       (body.joyScore as number) < 1 ||
       (body.joyScore as number) > 5 ||
       typeof body.feltNewExperience !== "boolean" ||
+      (visitExperience !== null &&
+        (typeof visitExperience !== "string" ||
+          !visitExperienceValues.has(visitExperience))) ||
       (comment !== null &&
         (typeof comment !== "string" || comment.length > 500))
     ) {
@@ -54,6 +70,7 @@ async function parseFeedbackBody(request: NextRequest): Promise<FeedbackBody | n
     return {
       joyScore: body.joyScore as number,
       feltNewExperience: body.feltNewExperience,
+      visitExperience: visitExperience as string | null,
       comment,
     };
   } catch {
