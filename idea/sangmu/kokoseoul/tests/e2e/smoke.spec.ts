@@ -403,13 +403,20 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "迷わないための行き方" })).toBeVisible();
   await expect(page.getByText("下車後、3番出口方面へ進む")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "地下鉄で迷ったとき、今どこにいますか？" }),
+    page.getByRole("heading", { name: "今いる場所から3番出口まで案内します" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "方向を間違えたかもしれない" }).click();
-  await expect(page.getByText("성수역 · Seongsu · 聖水駅 · 211")).toBeVisible();
+  await page.getByRole("button", { name: "3Fのホームで降りた" }).click();
+  await expect(page.getByRole("img", { name: "3Fの概念図" })).toBeVisible();
+  await expect(page.getByText("Way out · 出口")).toBeVisible();
+  await page.getByRole("button", { name: "2F 改札・コンコース" }).click();
+  await expect(page.getByRole("img", { name: "2Fの概念図" })).toBeVisible();
+  await page.getByRole("button", { name: "違うホームにいる" }).click();
   await expect(
-    page.getByText("반대 방향 열차를 탄 것 같아요. 성수역에 가려면 어디로 가야 하나요?"),
+    page.getByText("다른 승강장으로 온 것 같아요. 3번 출구로 가려면 어디로 가야 하나요?"),
   ).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+    await page.evaluate(() => document.documentElement.clientWidth),
+  );
   await page
     .getByRole("button", { name: "このデモクエストを始める" })
     .click();
