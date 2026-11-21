@@ -68,13 +68,23 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
         <section className="seoul-surface mt-8 max-w-2xl rounded-xl border-dashed px-6 py-16 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-xl bg-[#f7ecee] text-2xl text-[#941e34]" aria-hidden="true">↺</span>
           <h2 className="mt-5 text-2xl font-black tracking-tight text-[#504e49]">
-            {pickLocale(locale, "条件を変えて、もう一度探してみましょう", "조건을 바꿔 다시 찾아보세요")}
+            {filters.purpose === "beauty"
+              ? pickLocale(locale, "ビューティー体験を準備しています", "뷰티 경험을 준비하고 있어요")
+              : pickLocale(locale, "条件を変えて、もう一度探してみましょう", "조건을 바꿔 다시 찾아보세요")}
           </h2>
           <p className="mx-auto mt-3 max-w-md leading-7 text-slate-600">
-            {pickLocale(locale, "今の条件に合うクエストはありません。条件を減らすと見つけやすくなります。", "현재 조건과 맞는 퀘스트가 없어요. 조건을 줄이면 더 쉽게 찾을 수 있어요.")}
+            {filters.purpose === "beauty"
+              ? pickLocale(
+                  locale,
+                  "メイク、ネイル、香りなど、利用条件を確認できた体験から順に追加します。今は別の目的を選べます。",
+                  "메이크업, 네일, 향처럼 이용 조건을 확인한 경험부터 추가할게요. 지금은 다른 카테고리를 골라주세요.",
+                )
+              : pickLocale(locale, "今の条件に合うクエストはありません。条件を減らすと見つけやすくなります。", "현재 조건과 맞는 퀘스트가 없어요. 조건을 줄이면 더 쉽게 찾을 수 있어요.")}
           </p>
-          <Link href="/quests" className="seoul-button-dark mt-6 inline-flex min-h-12 items-center rounded-lg px-6 text-sm font-black">
-            {pickLocale(locale, "条件を変更する", "조건 변경하기")}
+          <Link href={filters.purpose === "beauty" ? "/" : "/quests"} className="seoul-button-dark mt-6 inline-flex min-h-12 items-center rounded-lg px-6 text-sm font-black">
+            {filters.purpose === "beauty"
+              ? pickLocale(locale, "別の目的を選ぶ", "다른 카테고리 고르기")
+              : pickLocale(locale, "条件を変更する", "조건 변경하기")}
           </Link>
         </section>
       )}

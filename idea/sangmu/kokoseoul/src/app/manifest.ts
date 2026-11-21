@@ -8,14 +8,14 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   return {
     name: pickLocale(
       locale,
-      `${brandName} — 今日のソウルを選ぶ`,
-      `${brandName} — 오늘의 서울을 고르기`,
+      `${brandName} — 今日のソウルを六つから選ぶ`,
+      `${brandName} — 오늘의 서울을 여섯 가지로 고르기`,
     ),
     short_name: brandName,
     description: pickLocale(
       locale,
-      "グルメ、文化、買い物、散歩、日常の発見から、今日のソウルを選ぶ。",
-      "식도락, 문화, 쇼핑, 산책, 일상의 발견에서 오늘의 서울을 고르세요.",
+      "グルメ、文化、ビューティー、買い物、散歩、日常の発見から、今日のソウルを選ぶ。",
+      "식도락, 문화, 뷰티, 쇼핑, 산책, 일상의 발견에서 오늘의 서울을 고르세요.",
     ),
     start_url: "/",
     scope: "/",

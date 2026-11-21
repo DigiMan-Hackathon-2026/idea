@@ -113,6 +113,13 @@ describe("demo quest discovery", () => {
     ).toEqual([]);
   });
 
+  it("accepts beauty as a purpose without inventing demo content", () => {
+    const filters = parseQuestFilters({ purpose: "beauty" });
+
+    expect(filters.purpose).toBe("beauty");
+    expect(filterDemoQuests(DEMO_QUESTS, filters)).toEqual([]);
+  });
+
   it("uses location only to choose the nearest supported demo area", () => {
     expect(resolveDemoAreaFromCoordinates(37.5446, 127.0557)).toBe("seongsu");
     expect(resolveDemoAreaFromCoordinates(37.5665, 126.978)).toBe("all");

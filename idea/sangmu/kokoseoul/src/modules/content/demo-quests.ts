@@ -23,6 +23,7 @@ export const TAG_LABELS_KO: Record<keyof typeof TAG_LABELS, string> = {
 export const PURPOSE_LABELS = {
   food: "グルメ",
   culture: "観光・文化体験",
+  beauty: "ビューティー",
   shopping: "ショッピング",
   rest: "休憩・散歩",
   discovery: "日常の中の新しい体験",
@@ -31,6 +32,7 @@ export const PURPOSE_LABELS = {
 export const PURPOSE_LABELS_KO: Record<keyof typeof PURPOSE_LABELS, string> = {
   food: "식도락",
   culture: "관광·문화 체험",
+  beauty: "뷰티",
   shopping: "쇼핑",
   rest: "휴식·산책",
   discovery: "일상 속 새로운 경험",

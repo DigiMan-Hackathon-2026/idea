@@ -499,6 +499,26 @@ test("uses current location without putting coordinates in the URL", async ({
   expect(page.url()).not.toContain("127.0557");
 });
 
+test("shows an honest preparation state for beauty content", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("radio", { name: /^ビューティー/ }).locator("..").click();
+  await page.getByRole("button", { name: "使える時間を選ぶ" }).click();
+  await page.getByRole("radio", { name: "まだ決めていない" }).locator("..").click();
+  await page.getByRole("button", { name: "エリアを選ぶ" }).click();
+  await page.getByRole("radio", { name: "まだ分からない" }).locator("..").click();
+  await page.getByRole("button", { name: "おすすめクエストを見る" }).click();
+
+  await expect(page).toHaveURL(/purpose=beauty/);
+  await expect(
+    page.getByRole("heading", { name: "ビューティー体験を準備しています" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "別の目的を選ぶ" })).toHaveAttribute(
+    "href",
+    "/",
+  );
+});
+
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
   await installServerRunMock(page);
   await page.goto(
