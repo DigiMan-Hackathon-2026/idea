@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from "react";
 import { DemoReportButton } from "@/components/demo-report-button";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
-import { DEMO_RUN_STEPS } from "@/modules/progress/demo-run";
 import {
   completeQuestRunStep,
   fetchQuestRun,
@@ -96,9 +95,8 @@ export function DemoRunner({ runId }: { runId: string }) {
     run.steps.find((step) => step.completedAt === null);
   if (!currentStep) return null;
 
-  const displayStep = DEMO_RUN_STEPS[currentStep.position - 1];
-  const phrase = currentStep.phrase ?? displayStep?.phrase;
-  const place = displayStep?.place;
+  const phrase = currentStep.phrase;
+  const place = currentStep.place;
 
   async function handleComplete() {
     if (isSaving || !run?.canContinue) return;
@@ -145,10 +143,10 @@ export function DemoRunner({ runId }: { runId: string }) {
         <div className="p-6 sm:p-8">
           <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">{pickLocale(locale, "次のステップ", "다음 단계")}</p>
           <h2 className="mt-3 text-3xl font-black leading-tight tracking-[-0.04em] text-slate-950">
-            {displayStep ? pickLocale(locale, displayStep.titleJa, displayStep.titleKo) : `STEP ${currentStep.position}`}
+            {pickLocale(locale, currentStep.titleJa, currentStep.titleKo)}
           </h2>
           <p className="mt-4 text-base font-medium leading-8 text-slate-600">
-            {locale === "ko" && displayStep ? displayStep.bodyKo : currentStep.bodyJa}
+            {pickLocale(locale, currentStep.bodyJa, currentStep.bodyKo)}
           </p>
 
           {place ? (
@@ -183,9 +181,7 @@ export function DemoRunner({ runId }: { runId: string }) {
           <button type="button" onClick={handleComplete} disabled={isSaving || !run.canContinue} className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.25)] disabled:cursor-wait disabled:opacity-65">
             {isSaving
               ? pickLocale(locale, "保存しています…", "저장하는 중…")
-              : displayStep
-                ? pickLocale(locale, displayStep.completionLabelJa, displayStep.completionLabelKo)
-                : pickLocale(locale, "完了する", "완료하기")}
+              : pickLocale(locale, currentStep.completionLabelJa, currentStep.completionLabelKo)}
           </button>
           {saveFailed ? (
             <p className="mt-3 text-sm font-bold leading-6 text-[#9d2d18]" role="alert">
@@ -200,13 +196,12 @@ export function DemoRunner({ runId }: { runId: string }) {
         <p className="text-xs font-black tracking-[0.15em] text-slate-400">{pickLocale(locale, "全体の流れ", "전체 진행")}</p>
         <ol className="mt-4 grid gap-3">
           {run.steps.map((step) => {
-            const labels = DEMO_RUN_STEPS[step.position - 1];
             const isCompleted = step.completedAt !== null;
             const isCurrent = step.id === currentStep.id;
             return (
               <li key={step.id} className={`grid grid-cols-[2.5rem_1fr] items-center gap-3 rounded-2xl p-3 ${isCurrent ? "bg-[#fff0eb]" : ""}`}>
                 <span className={`grid size-10 place-items-center rounded-full text-sm font-black ${isCompleted ? "bg-teal-700 text-white" : isCurrent ? "bg-[#ff5a36] text-white" : "bg-slate-100 text-slate-400"}`}>{isCompleted ? "✓" : step.position}</span>
-                <span className={`text-sm font-bold leading-5 ${isCurrent ? "text-slate-950" : "text-slate-500"}`}>{labels ? pickLocale(locale, labels.titleJa, labels.titleKo) : `STEP ${step.position}`}</span>
+                <span className={`text-sm font-bold leading-5 ${isCurrent ? "text-slate-950" : "text-slate-500"}`}>{pickLocale(locale, step.titleJa, step.titleKo)}</span>
               </li>
             );
           })}

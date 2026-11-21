@@ -1,9 +1,19 @@
 export type QuestRunStepDto = {
   id: string;
   position: number;
+  titleJa: string;
+  titleKo: string;
   bodyJa: string;
+  bodyKo: string;
+  completionLabelJa: string;
+  completionLabelKo: string;
   phrase: { ko: string; ja: string } | null;
-  place: Record<string, unknown> | null;
+  place: {
+    nameJa: string;
+    nameKo: string;
+    addressKo: string;
+    verifiedAt?: string;
+  } | null;
   completedAt: string | null;
 };
 
@@ -12,6 +22,7 @@ export type QuestRunDto = {
   questId: string;
   questVersionId: string;
   titleJa: string;
+  titleKo: string;
   isDemo: boolean;
   status: "in_progress" | "completed";
   startedAt: string;
@@ -32,6 +43,7 @@ export type MyRunSummaryDto = {
   id: string;
   questId: string;
   titleJa: string;
+  titleKo: string;
   isDemo: boolean;
   status: "in_progress" | "completed";
   startedAt: string;
@@ -39,6 +51,8 @@ export type MyRunSummaryDto = {
   completedStepCount: number;
   totalStepCount: number;
   nextStepPosition: number | null;
+  nextStepTitleJa: string | null;
+  nextStepTitleKo: string | null;
 };
 
 export class QuestRunApiError extends Error {

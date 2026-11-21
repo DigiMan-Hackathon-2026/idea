@@ -7,6 +7,32 @@ const demoStepIds = [
   "44444444-4444-4444-8444-444444444444",
   "55555555-5555-4555-8555-555555555555",
 ];
+const demoStepCopy = [
+  {
+    titleJa: "場所と利用条件を確認する",
+    titleKo: "장소와 이용 조건 확인하기",
+    bodyJa: "デモ手順 1",
+    bodyKo: "데모 단계 1",
+    completionLabelJa: "案内を確認しました",
+    completionLabelKo: "안내를 확인했어요",
+  },
+  {
+    titleJa: "韓国語カードを見せて注文する",
+    titleKo: "한국어 카드를 보여 주고 주문하기",
+    bodyJa: "デモ手順 2",
+    bodyKo: "데모 단계 2",
+    completionLabelJa: "韓国語カードを使いました",
+    completionLabelKo: "한국어 카드를 사용했어요",
+  },
+  {
+    titleJa: "今日の小さな発見を残す",
+    titleKo: "오늘의 작은 발견 남기기",
+    bodyJa: "デモ手順 3",
+    bodyKo: "데모 단계 3",
+    completionLabelJa: "クエストを完了する",
+    completionLabelKo: "퀘스트 완료하기",
+  },
+];
 
 async function installServerRunMock(page: Page) {
   let started = false;
@@ -19,6 +45,7 @@ async function installServerRunMock(page: Page) {
       questId: demoQuestId,
       questVersionId: "22222222-2222-4222-8222-222222222222",
       titleJa: "ひとりで楽しむ聖水クラフト散歩",
+      titleKo: "혼자 즐기는 성수 크래프트 산책",
       isDemo: true,
       status: completed ? "completed" : "in_progress",
       startedAt: "2026-11-21T09:00:00.000Z",
@@ -29,7 +56,7 @@ async function installServerRunMock(page: Page) {
       steps: demoStepIds.map((id, index) => ({
         id,
         position: index + 1,
-        bodyJa: `デモ手順 ${index + 1}`,
+        ...demoStepCopy[index],
         phrase: index < 2 ? { ko: "이걸 하나 주세요.", ja: "これを一つください。" } : null,
         place: null,
         completedAt: index < completedSteps ? "2026-11-21T09:30:00.000Z" : null,
@@ -93,6 +120,7 @@ async function installServerRunMock(page: Page) {
                 id: demoRunId,
                 questId: demoQuestId,
                 titleJa: detail.titleJa,
+                titleKo: detail.titleKo,
                 isDemo: true,
                 status: detail.status,
                 startedAt: detail.startedAt,
@@ -100,6 +128,8 @@ async function installServerRunMock(page: Page) {
                 completedStepCount: completedSteps,
                 totalStepCount: 3,
                 nextStepPosition: completedSteps < 3 ? completedSteps + 1 : null,
+                nextStepTitleJa: completedSteps < 3 ? demoStepCopy[completedSteps].titleJa : null,
+                nextStepTitleKo: completedSteps < 3 ? demoStepCopy[completedSteps].titleKo : null,
               }]
             : [],
           nextCursor: null,

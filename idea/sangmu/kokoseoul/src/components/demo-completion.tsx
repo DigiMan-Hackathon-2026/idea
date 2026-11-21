@@ -98,7 +98,7 @@ export function DemoCompletion({ runId }: { runId: string }) {
         </div>
         <div className="mt-14 grid size-28 place-items-center rounded-full bg-[#ffcd57] text-5xl text-slate-950 shadow-[0_15px_50px_rgba(255,205,87,0.25)]" aria-hidden="true">✦</div>
         <h1 className="mt-8 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">{pickLocale(locale, "クエスト完了", "퀘스트 완료")}</h1>
-        <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, run.titleJa, "혼자 즐기는 성수 크래프트 산책")}</p>
+        <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, run.titleJa, run.titleKo)}</p>
         <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/55">{pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")}</p>
       </section>
 

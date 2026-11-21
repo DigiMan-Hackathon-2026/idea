@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { useModalDialog } from "@/hooks/use-modal-dialog";
 import { pickLocale } from "@/lib/locale";
-import { DEMO_RUN_STEPS } from "@/modules/progress/demo-run";
 import {
   deleteMyData,
   fetchMyRuns,
@@ -113,9 +112,6 @@ export function MyDemoRecord() {
   }
 
   const completed = run.status === "completed";
-  const nextStep = run.nextStepPosition
-    ? DEMO_RUN_STEPS[run.nextStepPosition - 1]
-    : null;
   const destination = completed
     ? `/runs/${run.id}/completion`
     : `/runs/${run.id}`;
@@ -142,8 +138,8 @@ export function MyDemoRecord() {
             </span>
             <span className="text-xs font-bold text-slate-400">{pickLocale(locale, "開始", "시작")}: {startedDate}</span>
           </div>
-          <h2 className="mt-4 text-2xl font-black leading-snug tracking-[-0.035em] text-slate-950">{pickLocale(locale, run.titleJa, "혼자 즐기는 성수 크래프트 산책")}</h2>
-          {!completed && nextStep ? <p className="mt-3 text-sm font-semibold text-slate-600">{pickLocale(locale, "次", "다음")}: {pickLocale(locale, nextStep.titleJa, nextStep.titleKo)}</p> : null}
+          <h2 className="mt-4 text-2xl font-black leading-snug tracking-[-0.035em] text-slate-950">{pickLocale(locale, run.titleJa, run.titleKo)}</h2>
+          {!completed && run.nextStepTitleJa && run.nextStepTitleKo ? <p className="mt-3 text-sm font-semibold text-slate-600">{pickLocale(locale, "次", "다음")}: {pickLocale(locale, run.nextStepTitleJa, run.nextStepTitleKo)}</p> : null}
           <Link href={destination} className="mt-6 flex min-h-13 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-5 text-sm font-black text-white">
             {completed ? pickLocale(locale, "完了した記録を見る", "완료 기록 보기") : pickLocale(locale, "続きから始める", "이어서 시작하기")}
           </Link>

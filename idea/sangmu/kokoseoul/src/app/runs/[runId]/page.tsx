@@ -16,10 +16,10 @@ async function DemoRunContent({ params }: { params: Promise<{ runId: string }> }
     <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8 sm:pt-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#c93418] shadow-sm">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
-            <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl">{pickLocale(locale, "ひとりで楽しむ聖水クラフト散歩", "혼자 즐기는 성수 크래프트 산책")}</h1>
+            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#c93418] shadow-sm">{pickLocale(locale, "クエスト進行", "퀘스트 진행")}</span>
+            <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl">{pickLocale(locale, "次の体験へ進みましょう", "다음 체험으로 진행해요")}</h1>
           </div>
-          <Link href="/quests/11111111-1111-4111-8111-111111111111" className="rounded-full px-4 py-2 text-sm font-black text-slate-600">{pickLocale(locale, "詳細に戻る", "상세 화면으로 돌아가기")}</Link>
+          <Link href="/quests" className="rounded-full px-4 py-2 text-sm font-black text-slate-600">{pickLocale(locale, "クエスト一覧へ", "퀘스트 목록으로")}</Link>
         </div>
         <DemoRunner runId={runId} />
     </div>
