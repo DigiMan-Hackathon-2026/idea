@@ -1,5 +1,6 @@
 import type { AreaCode, QuestFilters, QuestPurpose, WalkingChoice } from "./demo-quests";
 import food from "./visit-guides/food.json";
+import culture from "./visit-guides/culture.json";
 
 type VisitGuide = {
   id: string;
@@ -23,6 +24,7 @@ type VisitGuide = {
 
 const visitGuides: VisitGuide[] = [
   ...food as VisitGuide[],
+  ...culture as VisitGuide[],
 ];
 
 const budgetLimits = { free: 0, under10000: 10_000, under30000: 30_000 };
