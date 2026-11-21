@@ -159,3 +159,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 명동교자 퀘스트는 DB 설정 후 `pnpm db:seed:myeongdong-kyoja`로 로컬에 넣고 `/quests?area=myeongdong&purpose=food`에서 시작합니다.
 
 사유의 방 퀘스트는 `pnpm db:seed:museum-room`으로 로컬에 넣고 `/quests?area=yongsan&purpose=culture`에서 시작합니다.
+
+올리브영N 성수 쇼핑 퀘스트는 `pnpm db:seed:oliveyoung-shopping`으로 로컬에 넣고 `/quests?area=seongsu&purpose=shopping`에서 시작합니다.

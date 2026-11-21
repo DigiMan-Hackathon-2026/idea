@@ -15,6 +15,7 @@ import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import myeongdongKyoja from "@/modules/content/myeongdong-kyoja.json";
 import museumRoom from "@/modules/content/museum-room-of-contemplation.json";
+import oliveyoungShopping from "@/modules/content/seongsu-oliveyoung-shopping.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -63,6 +64,12 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     (!filters.purpose || filters.purpose === "culture") &&
     filters.tags.length === 0 &&
     (filters.durationMax === null || filters.durationMax >= museumRoom.durationMinutes);
+  const showOliveyoungShopping =
+    (filters.area === "all" || filters.area === "seongsu") &&
+    (!filters.purpose || filters.purpose === "shopping") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= oliveyoungShopping.durationMinutes) &&
+    (!filters.budget || filters.budget === "unlimited");
   const featured = [
     ...(showHackathon ? [{
       quest: event,
@@ -83,6 +90,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/museum-room-of-contemplation",
       label: pickLocale(locale, "龍山 · 文化体験", "용산 · 문화 체험"),
       detail: pickLocale(locale, "国立中央博物館2階 · 無料", "국립중앙박물관 2층 · 무료"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showOliveyoungShopping ? [{
+      quest: oliveyoungShopping,
+      href: "/quests/seongsu-oliveyoung-shopping",
+      label: pickLocale(locale, "聖水 · ショッピング", "성수 · 쇼핑"),
+      detail: oliveyoungShopping.place.addressKo,
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
   ];
