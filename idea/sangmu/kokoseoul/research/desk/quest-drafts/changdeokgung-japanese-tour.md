@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | 주소·교통 | 서울 종로구 율곡로 99. 3호선 안국역 3번 출구 | [오시는 길](https://royal.khs.go.kr/ROYAL/contents/R707000000.do?schGroupCode=cdg) |
 | 출입구 | 돈화문 보수 기간에는 금호문으로 입장한다. 방문일 공지와 현장 표지를 확인한다. | [보수 안내](https://royal.khs.go.kr/ROYAL/contents/R402000000.do?id=20241125093054576568&schBcid=normal1&schM=view) · [금호문 입장 안내](https://royal.khs.go.kr/ROYAL/contents/R601000000.do?pageType=more&resIdx=202611110530&schGroupCode=cdg&schM=view) |
-| 표·비용 | 전각은 현장 매표 가능. 외국인 일반 성인(만 19~64세) 3,000원. 해설은 무료. 감면 대상은 공식 요금표 확인. | [요금표](https://royal.khs.go.kr/ROYAL/contents/R703000000.do?schGroupCode=cdg) · [공식 FAQ](https://royal.khs.go.kr/ROYAL/contents/R404000000.do?schGroupCode=cdg) |
+| 표·비용 | 전각은 현장 매표 가능. 외국인 일반 성인(만 19~64세) 3,000원. 매주 수요일 ‘문화가 있는 날’에는 전각이 무료다(경복궁·창덕궁 후원 제외). 해설은 무료. 감면 대상은 공식 요금표 확인. | [요금표](https://royal.khs.go.kr/ROYAL/contents/R703000000.do?schGroupCode=cdg) · [공식 FAQ](https://royal.khs.go.kr/ROYAL/contents/R404000000.do?schGroupCode=cdg) |
 | 해설 | 수·금·일 11:00. 인정문 맞은편 호위청 쪽 안내지도판 앞. 공식 안내끼리 50분과 50~60분으로 표기되어 약 50~60분으로 안내. | [정규 해설 안내](https://royal.khs.go.kr/ROYAL/contents/R706020000.do?schGroupCode=cdg) · [공식 FAQ](https://royal.khs.go.kr/ROYAL/contents/R404000000.do?schGroupCode=cdg) |
 | 참여 조건 | 외국어 해설은 외국인 대상. 외국인을 동반한 내국인은 최대 2명까지 참여 가능. 월요일은 정기 휴궁일이며 공휴일과 겹치면 다음 비공휴일에 휴궁. | [공식 FAQ](https://royal.khs.go.kr/ROYAL/contents/R404000000.do?schGroupCode=cdg) · [관람 정보](https://royal.khs.go.kr/ROYAL/contents/R601000000.do?pageType=more&resIdx=202401090245&schGroupCode=cdg&schM=view) |
 
