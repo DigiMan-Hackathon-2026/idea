@@ -146,6 +146,12 @@ test("switches between the quest list and Seoul-scoped map", async ({
 
   if (result === "map") {
     await expect(page.getByRole("link", { name: "詳細を見る" })).toBeVisible();
+    await expect(page.getByTestId("transit-guide")).toContainText(
+      "2号線 · 聖水駅 3番出口",
+    );
+    await expect(page.getByTestId("transit-guide")).toContainText(
+      "徒歩約5分 · 350m",
+    );
     await expect
       .poll(async () => (await mapCanvas.boundingBox())?.height ?? 0)
       .toBeGreaterThanOrEqual(400);

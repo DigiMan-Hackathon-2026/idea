@@ -16,16 +16,19 @@ import {
 
 type NaverMapInstance = { fitBounds(bounds: unknown, padding?: number): void };
 type NaverMarkerInstance = { setMap(map: null): void };
+type NaverPolylineInstance = { setMap(map: null): void };
 
 type NaverMapsApi = {
   Map: new (element: HTMLElement, options: Record<string, unknown>) => NaverMapInstance;
   Marker: new (options: Record<string, unknown>) => NaverMarkerInstance;
+  Polyline: new (options: Record<string, unknown>) => NaverPolylineInstance;
   LatLng: new (latitude: number, longitude: number) => unknown;
   LatLngBounds: new (
     southWest?: unknown,
     northEast?: unknown,
   ) => { extend(point: unknown): void };
   Point: new (x: number, y: number) => unknown;
+  PointingIcon: { OPEN_ARROW: number };
   Event: {
     addListener(target: unknown, event: string, listener: () => void): void;
   };
@@ -59,6 +62,7 @@ export function NaverQuestMap({
 
     let cancelled = false;
     let markers: NaverMarkerInstance[] = [];
+    const routeLines: NaverPolylineInstance[] = [];
     const existingScript = document.querySelector<HTMLScriptElement>(
       "script[data-digiman-naver-map]",
     );
@@ -100,7 +104,7 @@ export function NaverQuestMap({
       });
       const bounds = new maps.LatLngBounds();
 
-      markers = quests.map((quest, index) => {
+      markers = quests.flatMap((quest, index) => {
         const position = new maps.LatLng(
           quest.mapPoint.latitude,
           quest.mapPoint.longitude,
@@ -116,10 +120,47 @@ export function NaverQuestMap({
           },
         });
         maps.Event.addListener(marker, "click", () => setSelectedQuest(quest));
-        return marker;
+
+        const stationPosition = new maps.LatLng(
+          quest.transitGuide.stationPoint.latitude,
+          quest.transitGuide.stationPoint.longitude,
+        );
+        bounds.extend(stationPosition);
+        const stationMarker = new maps.Marker({
+          map,
+          position: stationPosition,
+          title: pickLocale(
+            locale,
+            `${quest.transitGuide.stationJa} ${quest.transitGuide.exitJa}`,
+            `${quest.transitGuide.stationKo} ${quest.transitGuide.exitKo}`,
+          ),
+          icon: {
+            content: `<div style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#152238;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:#00a84d;color:white;font-size:14px">2</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
+            anchor: new maps.Point(19, 19),
+          },
+        });
+
+        routeLines.push(
+          new maps.Polyline({
+            map,
+            path: quest.transitGuide.walkingPath.map(
+              (point) => new maps.LatLng(point.latitude, point.longitude),
+            ),
+            strokeColor: "#ff5a36",
+            strokeOpacity: 0.95,
+            strokeStyle: "shortdash",
+            strokeWeight: 5,
+            strokeLineCap: "round",
+            strokeLineJoin: "round",
+            endIcon: maps.PointingIcon.OPEN_ARROW,
+            endIconSize: 18,
+            zIndex: 20,
+          }),
+        );
+        return [marker, stationMarker];
       });
 
-      if (quests.length > 1) map.fitBounds(bounds, 56);
+      map.fitBounds(bounds, 56);
       setLoadState("ready");
     });
 
@@ -128,6 +169,7 @@ export function NaverQuestMap({
     return () => {
       cancelled = true;
       markers.forEach((marker) => marker.setMap(null));
+      routeLines.forEach((line) => line.setMap(null));
       script.remove();
       if (window.navermap_authFailure === fail) delete window.navermap_authFailure;
     };
@@ -179,6 +221,28 @@ export function NaverQuestMap({
           <p className="mt-4 leading-7 text-slate-600">
             {pickLocale(locale, selectedQuest.summaryJa, selectedQuest.summaryKo)}
           </p>
+          <div className="mt-5 rounded-2xl bg-[#eef8f2] p-4" data-testid="transit-guide">
+            <div className="flex items-start gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#00a84d] text-sm font-black text-white" aria-hidden="true">
+                2
+              </span>
+              <div>
+                <p className="text-sm font-black text-slate-950">
+                  {pickLocale(locale, selectedQuest.transitGuide.lineJa, selectedQuest.transitGuide.lineKo)} · {pickLocale(locale, selectedQuest.transitGuide.stationJa, selectedQuest.transitGuide.stationKo)} {pickLocale(locale, selectedQuest.transitGuide.exitJa, selectedQuest.transitGuide.exitKo)}
+                </p>
+                <p className="mt-1 text-sm font-bold text-slate-600">
+                  {pickLocale(
+                    locale,
+                    `徒歩約${selectedQuest.transitGuide.walkingMinutes}分 · ${selectedQuest.transitGuide.walkingMeters}m`,
+                    `도보 약 ${selectedQuest.transitGuide.walkingMinutes}분 · ${selectedQuest.transitGuide.walkingMeters}m`,
+                  )}
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 text-xs font-bold leading-5 text-slate-500">
+              {pickLocale(locale, "方向を確認するためのデモ経路です。", "방향을 확인하기 위한 데모 경로예요.")}
+            </p>
+          </div>
           <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-full bg-[#ff5a36] px-5 text-sm font-black text-white">
             {pickLocale(locale, "詳細を見る", "자세히 보기")}
           </Link>

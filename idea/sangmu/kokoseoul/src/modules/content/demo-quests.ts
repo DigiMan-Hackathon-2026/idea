@@ -131,6 +131,18 @@ export type DemoQuest = {
   durationMinutes: number;
   cost: { min: number; max: number; currency: "KRW" };
   mapPoint: { latitude: number; longitude: number };
+  transitGuide: {
+    lineJa: string;
+    lineKo: string;
+    stationJa: string;
+    stationKo: string;
+    exitJa: string;
+    exitKo: string;
+    walkingMinutes: number;
+    walkingMeters: number;
+    stationPoint: { latitude: number; longitude: number };
+    walkingPath: Array<{ latitude: number; longitude: number }>;
+  };
   solo: {
     status: "confirmed";
     labelJa: string;
@@ -164,7 +176,24 @@ export const DEMO_QUESTS: DemoQuest[] = [
     walkingLevel: "moderate",
     durationMinutes: 90,
     cost: { min: 12000, max: 18000, currency: "KRW" },
-    mapPoint: { latitude: 37.5446, longitude: 127.0557 },
+    mapPoint: { latitude: 37.54292, longitude: 127.05445 },
+    transitGuide: {
+      lineJa: "2号線",
+      lineKo: "2호선",
+      stationJa: "聖水駅",
+      stationKo: "성수역",
+      exitJa: "3番出口",
+      exitKo: "3번 출구",
+      walkingMinutes: 5,
+      walkingMeters: 350,
+      stationPoint: { latitude: 37.54418, longitude: 127.05632 },
+      walkingPath: [
+        { latitude: 37.54418, longitude: 127.05632 },
+        { latitude: 37.54378, longitude: 127.05573 },
+        { latitude: 37.54332, longitude: 127.05506 },
+        { latitude: 37.54292, longitude: 127.05445 },
+      ],
+    },
     solo: {
       status: "confirmed",
       labelJa: "一人で利用できることを確認済み",

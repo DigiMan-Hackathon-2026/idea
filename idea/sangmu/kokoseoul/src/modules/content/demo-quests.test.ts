@@ -129,4 +129,18 @@ describe("demo quest discovery", () => {
       ),
     ).toBe(true);
   });
+
+  it("connects each demo transit route from its station to its quest", () => {
+    for (const quest of DEMO_QUESTS) {
+      const { stationPoint, walkingPath } = quest.transitGuide;
+
+      expect(walkingPath[0]).toEqual(stationPoint);
+      expect(walkingPath.at(-1)).toEqual(quest.mapPoint);
+      expect(
+        walkingPath.every((point) =>
+          isPointWithinSeoulMapBounds(point.latitude, point.longitude),
+        ),
+      ).toBe(true);
+    }
+  });
 });
