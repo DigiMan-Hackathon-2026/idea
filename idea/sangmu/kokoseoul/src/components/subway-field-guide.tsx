@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale, type Locale } from "@/lib/locale";
-import type { DemoQuest } from "@/modules/content/demo-quests";
 import type { SeoulMetroStationSnapshot } from "@/modules/transit/seoul-metro";
 import {
   decodeElevatorStatus,
@@ -624,7 +623,7 @@ function SignCard({ floor, locale }: { floor: FloorId; locale: Locale }) {
   );
 }
 
-export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest; stationSnapshot: SeoulMetroStationSnapshot }) {
+export function SubwayFieldGuide({ stationSnapshot }: { stationSnapshot: SeoulMetroStationSnapshot }) {
   const { locale } = useLocale();
   const [arrivalId, setArrivalId] = useState<ArrivalId | null>(null);
   const [mobilityId, setMobilityId] = useState<MobilityId | null>(null);
@@ -651,9 +650,9 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
   }
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby={`field-guide-${quest.id}`}>
+    <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="seongsu-guide-heading">
       <p className="text-sm font-black text-[#941e34]">{pickLocale(locale, "駅構内サポート · デモ", "역 안 이동 지원 · 데모")}</p>
-      <h2 id={`field-guide-${quest.id}`} className="mt-2 text-2xl font-black tracking-tight text-[#504e49]">{pickLocale(locale, "今いる場所から3番出口まで案内します", "지금 있는 곳에서 3번 출구까지 안내할게요")}</h2>
+      <h2 id="seongsu-guide-heading" className="mt-2 text-2xl font-black tracking-tight text-[#504e49]">{pickLocale(locale, "今いる場所から3番出口まで案内します", "지금 있는 곳에서 3번 출구까지 안내할게요")}</h2>
       <p className="mt-3 text-base font-semibold leading-7 text-slate-600">
         {pickLocale(locale, "現在地を選ぶと、公式案内図から単純化した階・出口方向と次に探す表示が変わります。駅工事で動線が変わる場合は現地表示を優先してください。", "현재 위치를 고르면 공식 안내도에서 단순화한 층·출구 방향과 다음에 찾을 표지가 바뀌어요. 역 공사로 동선이 달라졌다면 현장 표지를 우선해 주세요.")}
       </p>
@@ -741,7 +740,7 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
           </div>
 
           <p className="mt-4 text-sm font-bold leading-6 text-slate-500">
-            {pickLocale(locale, `公式駅利用案内図の公開日 2026-08-24・画像内基準 2024-04-16・閲覧日 2026-11-22。${quest.transitGuide.stationJa}の階と出口方向を単純化したもので、正確な通路形状ではありません。`, `공식 역이용안내도 게시일 2026-08-24·이미지 내부 기준 2024-04-16·열람일 2026-11-22. ${quest.transitGuide.stationKo}의 층과 출구 방향을 단순화한 것으로 정확한 통로 모양은 아니에요.`)}
+            {pickLocale(locale, "公式駅利用案内図の公開日 2026-08-24・画像内基準 2024-04-16・閲覧日 2026-11-22。聖水駅の階と出口方向を単純化したもので、正確な通路形状ではありません。", "공식 역이용안내도 게시일 2026-08-24·이미지 내부 기준 2024-04-16·열람일 2026-11-22. 성수역의 층과 출구 방향을 단순화한 것으로 정확한 통로 모양은 아니에요.")}
           </p>
         </div>
       ) : (

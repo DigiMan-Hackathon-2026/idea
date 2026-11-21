@@ -114,7 +114,7 @@ export default async function QuestDetailPage({
                 <QuestTransitGuide quest={quest} />
               </div>
               <div className="mt-8 max-w-2xl">
-                <SubwayFieldGuide quest={quest} stationSnapshot={stationSnapshot} />
+                <SubwayFieldGuide stationSnapshot={stationSnapshot} />
               </div>
             </div>
 

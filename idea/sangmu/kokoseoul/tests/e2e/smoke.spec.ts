@@ -499,6 +499,42 @@ test("uses current location without putting coordinates in the URL", async ({
   expect(page.url()).not.toContain("127.0557");
 });
 
+test("checks the next Line 2 station and recovers from a different direction", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/");
+  await page.getByRole("link", { name: "地下鉄", exact: true }).click();
+  await page.getByRole("textbox", { name: "今いる駅" }).fill("ソンス");
+  await page.getByRole("button", { name: /211 聖水/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("Wangsimni");
+  await page.getByRole("button", { name: /208 往十里/ }).click();
+  await expect(page.getByRole("status").filter({ hasText: "210 トゥクソム" })).toBeVisible();
+  await page.getByRole("button", { name: "乗車中", exact: true }).click();
+  await page.getByLabel("案内で確認した次の駅").selectOption("212");
+  await expect(page.getByText(/選んだ方向と異なります/)).toBeVisible();
+  await page.getByRole("button", { name: "降りた駅から調べ直す" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "211 聖水" })).toBeVisible();
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await page.getByRole("button", { name: "개찰구·출구", exact: true }).click();
+  await page.getByRole("button", { name: "다른 개찰구로 나왔어요" }).click();
+  await expect(page.getByRole("heading", { name: "교통카드를 다시 찍기 전에 연결 통로를 물어봐요" })).toBeVisible();
+  await expect(page.getByText("다른 개찰구로 나왔어요. 교통카드를 다시 찍지 않고 목표 출구로 갈 수 있나요?")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
+});
+
+test("keeps the transfer instruction when arriving from the Seongsu branch", async ({ page }) => {
+  await page.goto("/subway");
+  await page.getByRole("button", { name: "乗車中", exact: true }).click();
+  await page.getByRole("textbox", { name: "最後に停車した駅" }).fill("용답");
+  await page.getByRole("button", { name: /211-1 龍踏/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("208");
+  await page.getByRole("button", { name: /208 往十里/ }).click();
+  await expect(page.getByText("2号線の乗り換え駅 · 211 聖水")).toBeVisible();
+  await page.getByLabel("案内で確認した次の駅").selectOption("211");
+  await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();
+  await expect(page.getByText("211 聖水で乗り換えます。乗り換え案内に従って次のホームを確認しましょう。")).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "210 トゥクソム" })).toBeVisible();
+});
+
 test("finds the beauty consultation and respects a short time limit", async ({ page }) => {
   await page.goto("/");
 
