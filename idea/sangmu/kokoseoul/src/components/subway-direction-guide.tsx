@@ -33,6 +33,11 @@ const stationAliases: Record<string, string[]> = {
   "736": ["총신대입구", "チョンシンデイック", "Chongshin Univ."],
 };
 
+// Keep early input from arriving before React can update the station results.
+function subscribeToHydration() {
+  return () => {};
+}
+
 function StationPicker({ id, label, code, onSelect, readings }: {
   id: string;
   label: string;
@@ -41,6 +46,7 @@ function StationPicker({ id, label, code, onSelect, readings }: {
   readings: Record<string, string>;
 }) {
   const { locale } = useLocale();
+  const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [query, setQuery] = useState("");
   const selected = getSubwayStation(code);
   const field = useRef<HTMLInputElement>(null);
@@ -76,6 +82,7 @@ function StationPicker({ id, label, code, onSelect, readings }: {
             id={id}
             ref={field}
             aria-labelledby={`${id}-label`}
+            readOnly={!hydrated}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={pickLocale(locale, "駅名・駅番号", "역 이름·역번호")}
