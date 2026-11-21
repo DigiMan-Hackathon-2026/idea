@@ -6,15 +6,29 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "DigiMan",
     description: "ソウルで、ひとりでも迷わず始められるローカル体験。",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#f7f3eb",
     theme_color: "#f7f3eb",
     lang: "ja",
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/pwa-icon-192",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/pwa-icon-512",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/pwa-icon-512",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };

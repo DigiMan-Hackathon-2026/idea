@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { LocaleProvider } from "@/components/locale-provider";
+import { PwaLifecycle } from "@/components/pwa-lifecycle";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import "./globals.css";
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang={locale}>
       <body>
         <LocaleProvider initialLocale={locale}>
+          <PwaLifecycle />
           <a
             href="#main-content"
             className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white transition focus:translate-y-0"

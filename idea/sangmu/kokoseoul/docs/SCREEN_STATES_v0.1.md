@@ -53,6 +53,18 @@
 
 날짜는 일본어 화면에서 `2026年11月21日`처럼 표시하되 API 값은 UTC ISO 8601을 유지한다.
 
+## 설치와 오프라인 복구
+
+- 일반 웹과 홈 화면 설치 앱은 같은 URL·코드·배포 버전을 사용한다.
+- manifest는 standalone 표시, 192·512px PNG icon과 maskable icon을 제공한다. iOS에는 Apple touch icon을 제공한다.
+- service worker는 offline fallback, manifest와 설치 icon만 precache한다. quest·run·`/my` HTML, API response, 사용자 좌표와 browser 기록은 cache storage에 넣지 않는다.
+- navigation은 network-first다. 연결할 수 없을 때만 일본어·한국어를 함께 표시한 offline 화면을 반환한다.
+- offline 제목: `オフラインです` / `인터넷에 연결되지 않았어요`
+- 복구 행동: `再読み込み · 다시 불러오기`
+- service worker 자체의 새 버전이 대기 중이면 `新しいバージョンを利用できます。` / `새 버전을 사용할 수 있어요.`와 명시적 적용 버튼을 표시한다. 진행 중 화면을 예고 없이 새로고침하지 않는다.
+
+검수는 manifest icon·worker 보안 header·개인 route 비캐시·mobile/desktop offline fallback을 포함한다. 실제 HTTPS 환경의 Android 설치 prompt와 iOS 홈 화면 추가는 출시 전 실기기에서 확인한다.
+
 ## 시작 화면 `/`
 
 ### 목적

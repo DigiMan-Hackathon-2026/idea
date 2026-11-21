@@ -31,6 +31,62 @@ test("renders the Japanese landing page without horizontal overflow", async ({
   );
 });
 
+test("installs the PWA shell and shows a bilingual offline fallback", async ({
+  page,
+  context,
+}) => {
+  const manifestResponse = await page.request.get("/manifest.webmanifest");
+  expect(manifestResponse.ok()).toBe(true);
+  const manifest = await manifestResponse.json();
+  expect(manifest.display).toBe("standalone");
+  expect(manifest.scope).toBe("/");
+  expect(manifest.icons).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ sizes: "192x192", type: "image/png" }),
+      expect.objectContaining({ sizes: "512x512", purpose: "maskable" }),
+    ]),
+  );
+
+  const workerResponse = await page.request.get("/sw.js");
+  expect(workerResponse.ok()).toBe(true);
+  expect(workerResponse.headers()["content-type"]).toContain(
+    "application/javascript",
+  );
+  expect(workerResponse.headers()["cache-control"]).toContain("no-store");
+  expect(await workerResponse.text()).not.toContain('"/quests"');
+
+  for (const path of ["/pwa-icon-192", "/pwa-icon-512"]) {
+    const iconResponse = await page.request.get(path);
+    expect(iconResponse.ok()).toBe(true);
+    expect(iconResponse.headers()["content-type"]).toContain("image/png");
+    expect((await iconResponse.body()).byteLength).toBeGreaterThan(1_000);
+  }
+
+  await page.goto("/");
+  const scope = await page.evaluate(async () => {
+    const registration = await navigator.serviceWorker.ready;
+    return registration.scope;
+  });
+  expect(scope).toBe("http://127.0.0.1:3000/");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+
+  await context.setOffline(true);
+  try {
+    await page.goto("/quests");
+    await expect(
+      page.getByRole("heading", { name: "オフラインです" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "인터넷에 연결되지 않았어요" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "再読み込み · 다시 불러오기" }),
+    ).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
+});
+
 test("switches to Korean and keeps the language across navigation", async ({
   page,
 }) => {

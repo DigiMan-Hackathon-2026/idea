@@ -49,6 +49,18 @@ X-Request-Id: <validated-server-id>
 
 HSTS는 production domain과 모든 대상 subdomain의 HTTPS를 검증한 뒤 켠다. 첫 배포에서 preload를 즉시 요청하지 않는다. local HTTP와 provider preview 전체 parent domain에는 무분별하게 적용하지 않는다.
 
+### service worker
+
+`/sw.js`는 같은 origin과 root scope에서만 등록한다. browser가 worker script 변경을 매번 확인하도록 다음 header를 고정한다.
+
+```text
+Content-Type: application/javascript; charset=utf-8
+Cache-Control: no-cache, no-store, must-revalidate
+Content-Security-Policy: default-src 'self'; script-src 'self'
+```
+
+worker는 offline fallback과 공개 설치 asset만 precache한다. `quests`, `runs`, `my`, API response와 locale·visitor별 HTML은 Cache Storage에 저장하지 않는다. navigation은 network-first이며 network 오류에서만 offline fallback을 반환한다.
+
 ## CSP 목표
 
 초기 production 목표:
@@ -260,6 +272,8 @@ remote CSP report endpoint는 P0에 필수 아님이다. 도입하면 report bod
 - [ ] mutation exact Origin과 same-origin CORS 정책을 검수했다.
 - [ ] camera·microphone이 비활성이고 geolocation은 명시적 선택 뒤 same-origin에서만 동작하며 지역 선택 fallback이 있다.
 - [ ] referrer에 개인 path·query가 나가지 않는다.
+- [ ] `/sw.js`가 no-store·same-origin CSP를 가지며 개인 HTML·API를 cache하지 않는다.
+- [ ] offline fallback과 worker update가 진행 기록을 삭제하거나 예고 없이 새로고침하지 않는다.
 - [ ] header snapshot을 Chromium·WebKit·provider edge에서 확인했다.
 
 연결 검수: AC01, AC05, AC10, AC15~AC19
