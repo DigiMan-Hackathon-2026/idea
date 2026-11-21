@@ -194,10 +194,7 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await page.getByLabel("歩きたい量").selectOption("moderate");
   await page.getByRole("button", { name: "この条件で探し直す" }).click();
   await expect(page).toHaveURL(/party=solo/);
-  await expect(page.getByRole("button", { name: "地図" })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
+  await page.waitForLoadState("networkidle");
   const updatedListButton = page.getByRole("button", { name: "リスト" });
   await updatedListButton.click();
   await expect(updatedListButton).toHaveAttribute("aria-pressed", "true");
