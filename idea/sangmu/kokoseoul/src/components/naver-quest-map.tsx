@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import {
   buildNaverMapScriptUrl,
+  buildNaverWalkRouteUrl,
   SEOUL_MAP_BOUNDS,
 } from "@/lib/naver-map";
 import {
@@ -16,19 +17,16 @@ import {
 
 type NaverMapInstance = { fitBounds(bounds: unknown, padding?: number): void };
 type NaverMarkerInstance = { setMap(map: null): void };
-type NaverPolylineInstance = { setMap(map: null): void };
 
 type NaverMapsApi = {
   Map: new (element: HTMLElement, options: Record<string, unknown>) => NaverMapInstance;
   Marker: new (options: Record<string, unknown>) => NaverMarkerInstance;
-  Polyline: new (options: Record<string, unknown>) => NaverPolylineInstance;
   LatLng: new (latitude: number, longitude: number) => unknown;
   LatLngBounds: new (
     southWest?: unknown,
     northEast?: unknown,
   ) => { extend(point: unknown): void };
   Point: new (x: number, y: number) => unknown;
-  PointingIcon: { OPEN_ARROW: number };
   Event: {
     addListener(target: unknown, event: string, listener: () => void): void;
   };
@@ -62,7 +60,6 @@ export function NaverQuestMap({
 
     let cancelled = false;
     let markers: NaverMarkerInstance[] = [];
-    const routeLines: NaverPolylineInstance[] = [];
     const existingScript = document.querySelector<HTMLScriptElement>(
       "script[data-digiman-naver-map]",
     );
@@ -140,23 +137,6 @@ export function NaverQuestMap({
           },
         });
 
-        routeLines.push(
-          new maps.Polyline({
-            map,
-            path: quest.transitGuide.walkingPath.map(
-              (point) => new maps.LatLng(point.latitude, point.longitude),
-            ),
-            strokeColor: "#ff5a36",
-            strokeOpacity: 0.95,
-            strokeStyle: "shortdash",
-            strokeWeight: 5,
-            strokeLineCap: "round",
-            strokeLineJoin: "round",
-            endIcon: maps.PointingIcon.OPEN_ARROW,
-            endIconSize: 18,
-            zIndex: 20,
-          }),
-        );
         return [marker, stationMarker];
       });
 
@@ -169,7 +149,6 @@ export function NaverQuestMap({
     return () => {
       cancelled = true;
       markers.forEach((marker) => marker.setMap(null));
-      routeLines.forEach((line) => line.setMap(null));
       script.remove();
       if (window.navermap_authFailure === fail) delete window.navermap_authFailure;
     };
@@ -231,17 +210,41 @@ export function NaverQuestMap({
                   {pickLocale(locale, selectedQuest.transitGuide.lineJa, selectedQuest.transitGuide.lineKo)} · {pickLocale(locale, selectedQuest.transitGuide.stationJa, selectedQuest.transitGuide.stationKo)} {pickLocale(locale, selectedQuest.transitGuide.exitJa, selectedQuest.transitGuide.exitKo)}
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-600">
-                  {pickLocale(
-                    locale,
-                    `徒歩約${selectedQuest.transitGuide.walkingMinutes}分 · ${selectedQuest.transitGuide.walkingMeters}m`,
-                    `도보 약 ${selectedQuest.transitGuide.walkingMinutes}분 · ${selectedQuest.transitGuide.walkingMeters}m`,
-                  )}
+                  {pickLocale(locale, "正確な徒歩ルートはNAVERマップで確認できます。", "정확한 도보 경로는 네이버 지도에서 확인할 수 있어요.")}
                 </p>
               </div>
             </div>
             <p className="mt-3 text-xs font-bold leading-5 text-slate-500">
-              {pickLocale(locale, "方向を確認するためのデモ経路です。", "방향을 확인하기 위한 데모 경로예요.")}
+              {pickLocale(locale, "NAVERマップアプリが開きます。", "네이버 지도 앱이 열립니다.")}
             </p>
+            <button
+              type="button"
+              onClick={() => {
+                const stationName = pickLocale(
+                  locale,
+                  `${selectedQuest.transitGuide.stationJa} ${selectedQuest.transitGuide.exitJa}`,
+                  `${selectedQuest.transitGuide.stationKo} ${selectedQuest.transitGuide.exitKo}`,
+                );
+                window.location.href = buildNaverWalkRouteUrl({
+                  start: {
+                    ...selectedQuest.transitGuide.stationPoint,
+                    name: stationName,
+                  },
+                  destination: {
+                    ...selectedQuest.mapPoint,
+                    name: pickLocale(
+                      locale,
+                      selectedQuest.titleJa,
+                      selectedQuest.titleKo,
+                    ),
+                  },
+                  appName: window.location.origin,
+                });
+              }}
+              className="mt-4 min-h-11 w-full rounded-full border border-[#00a84d]/25 bg-white px-4 text-sm font-black text-[#087735]"
+            >
+              {pickLocale(locale, "NAVERマップで徒歩ルートを見る", "네이버 지도에서 도보 길찾기")}
+            </button>
           </div>
           <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-full bg-[#ff5a36] px-5 text-sm font-black text-white">
             {pickLocale(locale, "詳細を見る", "자세히 보기")}

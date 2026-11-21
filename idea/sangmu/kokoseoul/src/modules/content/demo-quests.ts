@@ -138,10 +138,7 @@ export type DemoQuest = {
     stationKo: string;
     exitJa: string;
     exitKo: string;
-    walkingMinutes: number;
-    walkingMeters: number;
     stationPoint: { latitude: number; longitude: number };
-    walkingPath: Array<{ latitude: number; longitude: number }>;
   };
   solo: {
     status: "confirmed";
@@ -184,17 +181,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
       stationKo: "성수역",
       exitJa: "3番出口",
       exitKo: "3번 출구",
-      walkingMinutes: 5,
-      walkingMeters: 350,
       stationPoint: { latitude: 37.54418, longitude: 127.05632 },
-      walkingPath: [
-        { latitude: 37.54418, longitude: 127.05632 },
-        { latitude: 37.54375, longitude: 127.05645 },
-        { latitude: 37.54365, longitude: 127.05565 },
-        { latitude: 37.54315, longitude: 127.0557 },
-        { latitude: 37.54305, longitude: 127.05475 },
-        { latitude: 37.54292, longitude: 127.05445 },
-      ],
     },
     solo: {
       status: "confirmed",

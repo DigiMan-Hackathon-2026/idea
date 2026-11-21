@@ -149,9 +149,9 @@ test("switches between the quest list and Seoul-scoped map", async ({
     await expect(page.getByTestId("transit-guide")).toContainText(
       "2号線 · 聖水駅 3番出口",
     );
-    await expect(page.getByTestId("transit-guide")).toContainText(
-      "徒歩約5分 · 350m",
-    );
+    await expect(
+      page.getByRole("button", { name: "NAVERマップで徒歩ルートを見る" }),
+    ).toBeVisible();
     await expect
       .poll(async () => (await mapCanvas.boundingBox())?.height ?? 0)
       .toBeGreaterThanOrEqual(400);

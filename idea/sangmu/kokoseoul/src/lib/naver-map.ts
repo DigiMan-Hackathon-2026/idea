@@ -29,3 +29,23 @@ export function buildNaverMapScriptUrl(keyId: string, locale: Locale): string {
   url.searchParams.set("language", locale);
   return url.toString();
 }
+
+export function buildNaverWalkRouteUrl({
+  start,
+  destination,
+  appName,
+}: {
+  start: { latitude: number; longitude: number; name: string };
+  destination: { latitude: number; longitude: number; name: string };
+  appName: string;
+}): string {
+  const url = new URL("nmap://route/walk");
+  url.searchParams.set("slat", String(start.latitude));
+  url.searchParams.set("slng", String(start.longitude));
+  url.searchParams.set("sname", start.name);
+  url.searchParams.set("dlat", String(destination.latitude));
+  url.searchParams.set("dlng", String(destination.longitude));
+  url.searchParams.set("dname", destination.name);
+  url.searchParams.set("appname", appName);
+  return url.toString();
+}
