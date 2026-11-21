@@ -526,8 +526,8 @@ test("finds the Myeongdong personal color consultation and filters by budget", a
   await expect(page.getByRole("heading", { name: "明洞で自分に似合う色を見つける" })).toHaveCount(0);
 
   await page.goto("/quests?area=myeongdong&purpose=beauty&time=60&party=solo&budget=unlimited");
-  await expect(page.getByText("要予約 · 1人50分 · 日本語通訳込み20万ウォン")).toBeVisible();
-  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  const colorConsultation = page.getByRole("article").filter({ hasText: "要予約 · 1人50分 · 日本語通訳込み20万ウォン" });
+  await colorConsultation.getByRole("link", { name: "訪問ガイドを見る" }).click();
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
     "href",
     "https://www.moodcollect.com/booking-prices-locations",
@@ -580,12 +580,27 @@ test("finds the Changdeokgung tour with the official schedule", async ({ page })
 
 test("finds the free Seoul city model for a 30-minute visit", async ({ page }) => {
   await page.goto("/quests?area=jongno&purpose=culture&time=30&budget=free");
-  await expect(page.getByText("ソウル歴史博物館3階 · 無料")).toBeVisible();
-  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  const cityModel = page.getByRole("article").filter({ hasText: "ソウル歴史博物館3階 · 無料" });
+  await cityModel.getByRole("link", { name: "訪問ガイドを見る" }).click();
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
     "href",
     "https://museum.seoul.go.kr/jpn/jpn-guide/jpn-facilities/jpn-floor3rd.jsp",
   );
+});
+
+test("shows five ongoing visit guides in each category", async ({ page }) => {
+  for (const purpose of ["food", "culture", "shopping", "beauty", "rest", "discovery"]) {
+    await page.goto(`/quests?purpose=${purpose}`);
+    await expect(page.getByRole("link", { name: "訪問ガイドを見る", exact: true })).toHaveCount(5);
+  }
+});
+
+test("opens the bilingual forest walk from a short free search", async ({ page }) => {
+  await page.goto("/quests?area=seongsu&purpose=rest&time=30&budget=free&walking=light");
+  await page.getByRole("link", { name: "訪問ガイドを見る", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "ソウルの森をゆっくり歩く" })).toBeVisible();
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "서울숲에서 천천히 한 바퀴 걷기" })).toBeVisible();
 });
 
 test("finds the Gwanghwamun book quest with the correct branch", async ({ page }) => {

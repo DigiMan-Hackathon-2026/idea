@@ -19,6 +19,7 @@ for (const file of files) {
       durationMinutes: guide.durationMinutes,
       tags: guide.purpose === "food" ? ["food"] : [],
       cost: guide.costMin ?? null,
+      soloEvidence: guide.seed.soloEvidence ?? "공개 안내를 확인했다. 1인 이용 조건은 현장 또는 주최 측 확인이 필요하다.",
     });
   }
 }
