@@ -6,6 +6,12 @@ import {
 } from "./config";
 
 const LOCAL_URL = "postgresql://digiman_migration:local@127.0.0.1:55434/digiman_local";
+const PREVIEW_URL = "postgresql://digiman_runtime_preview:fake@preview.example.invalid/digiman_preview?sslmode=verify-full";
+const PREVIEW_ENV = {
+  APP_ENV: "preview",
+  PREVIEW_DATABASE_HOST: "preview.example.invalid",
+  DATABASE_URL: PREVIEW_URL,
+};
 
 describe("database tooling guard", () => {
   it("accepts a namespaced local database without exposing credentials", () => {
@@ -70,5 +76,24 @@ describe("database tooling guard", () => {
         DATABASE_URL: LOCAL_URL,
       }),
     ).toThrow("runtime role");
+  });
+
+  it("allows only the preview runtime to use a dedicated preview database", () => {
+    expect(getSafeRuntimeDatabaseUrl(PREVIEW_ENV)).toBe(PREVIEW_URL);
+    expect(() => getSafeMigrationDatabaseUrl({ ...PREVIEW_ENV, DATABASE_DIRECT_URL: PREVIEW_URL }))
+      .toThrow("limited to local or test");
+    expect(() => getSafeRuntimeDatabaseUrl({ ...PREVIEW_ENV, APP_ENV: "production" }))
+      .toThrow("limited to local or test");
+  });
+
+  it.each([
+    PREVIEW_URL.replace("preview.example.invalid", "production.example.invalid"),
+    PREVIEW_URL.replace("/digiman_preview", "/digiman_production"),
+    PREVIEW_URL.replace("digiman_runtime_preview:", "digiman_migration:"),
+    PREVIEW_URL.replace("verify-full", "no-verify"),
+    `${PREVIEW_URL}&sslmode=no-verify`,
+  ])("rejects preview connections outside the dedicated target contract", (url) => {
+    expect(() => getSafeRuntimeDatabaseUrl({ ...PREVIEW_ENV, DATABASE_URL: url }))
+      .toThrow("requires its dedicated host, database, role, and verified TLS");
   });
 });

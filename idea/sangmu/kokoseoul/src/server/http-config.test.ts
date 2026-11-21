@@ -11,6 +11,16 @@ describe("application origin configuration", () => {
     ).toBe("http://127.0.0.1:3000");
   });
 
+  it("uses the assigned Vercel hostname for preview origins and honors an explicit origin", () => {
+    const preview = { APP_ENV: "preview", VERCEL_ENV: "preview", VERCEL_URL: "test-app.vercel.app" };
+    expect(getApplicationOrigin(preview).origin).toBe("https://test-app.vercel.app");
+    expect(getApplicationOrigin({ ...preview, APP_ORIGIN: "https://test.example.invalid" }).origin)
+      .toBe("https://test.example.invalid");
+    expect(() => getApplicationOrigin({ ...preview, APP_ENV: "production" })).toThrow("APP_ORIGIN is required");
+    expect(() => getApplicationOrigin({ ...preview, VERCEL_URL: "test-app.vercel.app/path" }))
+      .toThrow("must not include");
+  });
+
   it("requires HTTPS outside local and rejects path ambiguity", () => {
     expect(() =>
       getApplicationOrigin({

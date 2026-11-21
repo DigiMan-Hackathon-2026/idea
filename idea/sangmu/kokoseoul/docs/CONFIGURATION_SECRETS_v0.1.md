@@ -47,8 +47,9 @@ OAuth client ID처럼 본질적으로 browser에 보일 수 있는 값도 다른
 | 변수 | 분류 | 환경 | 소비자 | 검증·불변식 |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | server config | 전체 | 환경 guard·log | 허용 enum, 명시적 |
-| `APP_ORIGIN` | server config | 전체 | Origin·cookie·auth | HTTPS 후보, path/query 없음, exact origin |
+| `APP_ORIGIN` | server config | 전체 | Origin·cookie·auth | HTTPS, path/query 없는 exact origin. Vercel Preview에서는 미설정 시 서버의 `VERCEL_URL` 사용 |
 | `DATABASE_URL` | credential | F1 이후 | runtime pooled connection | 허용 DB·role, password 출력 금지 |
+| `PREVIEW_DATABASE_HOST` | server config | preview | PostgreSQL runtime 연결 검증 | 별도 preview endpoint의 정확한 hostname, `digiman_preview` DB와 `digiman_runtime_preview` role 및 `sslmode=verify-full` 요구 |
 | `DATABASE_DIRECT_URL` | credential | migration 환경만 | migration command | runtime 사용 금지, DDL role 분리 |
 | `TEST_DATABASE_URL` | credential | local·CI test | integration test | production host·marker 차단 |
 | `SESSION_TOKEN_PEPPERS` | key material | F3 이후 | visitor token hash lookup | versioned key ring, current·bounded previous만 |

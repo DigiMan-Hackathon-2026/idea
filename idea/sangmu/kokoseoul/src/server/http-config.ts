@@ -4,7 +4,10 @@ export function getApplicationOrigin(
   environment: Readonly<Record<string, string | undefined>>,
 ): URL {
   const appEnvironment = parseAppEnvironment(environment.APP_ENV);
-  const value = environment.APP_ORIGIN;
+  const vercelPreviewHost = appEnvironment === "preview" && environment.VERCEL_ENV === "preview"
+    ? environment.VERCEL_URL
+    : undefined;
+  const value = environment.APP_ORIGIN ?? (vercelPreviewHost ? `https://${vercelPreviewHost}` : undefined);
   if (!value) {
     throw new Error("APP_ORIGIN is required");
   }
