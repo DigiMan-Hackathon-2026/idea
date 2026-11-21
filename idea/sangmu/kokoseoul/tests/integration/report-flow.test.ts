@@ -54,18 +54,21 @@ async function publishQuest(status: "published" | "paused" = "published") {
   );
   await setupClient.query(
     `insert into quest_versions
-      (id, quest_id, version_no, state, title_ja, summary_ja, body_ja,
-       area_code, tags, duration_minutes, cost_min, cost_max,
+      (id, quest_id, version_no, state, title_ja, title_ko, summary_ja,
+       summary_ko, body_ja, body_ko, area_code, tags, duration_minutes, cost_min, cost_max,
        solo_status, solo_evidence)
-     values ($1, $2, 1, 'draft', '報告テスト体験', '概要', '本文', 'seongsu',
+     values ($1, $2, 1, 'draft', '報告テスト体験', '신고 테스트 체험', '概要',
+       '요약', '本文', '본문', 'seongsu',
        array['craft'], 60, 1000, 5000, 'confirmed', '가상 통합 테스트 근거')`,
     [versionId, questId],
   );
   for (const position of [1, 2, 3]) {
     await setupClient.query(
-      `insert into quest_steps (id, version_id, position, body_ja)
-       values ($1, $2, $3, $4)`,
-      [randomUUID(), versionId, position, `報告テスト手順 ${position}`],
+      `insert into quest_steps
+        (id, version_id, position, title_ja, title_ko, body_ja, body_ko,
+         completion_label_ja, completion_label_ko)
+       values ($1, $2, $3, $4, $5, $6, $7, '完了する', '완료하기')`,
+      [randomUUID(), versionId, position, `報告テスト手順 ${position}`, `신고 테스트 단계 ${position}`, `報告テスト案内 ${position}`, `신고 테스트 안내 ${position}`],
     );
   }
   await setupClient.query(
@@ -140,8 +143,16 @@ describe("public quest detail and information report flow", () => {
       availability: "available",
       canStart: true,
       ownRunId: null,
+      titleKo: "신고 테스트 체험",
       cost: { status: "known", currency: "KRW", min: 1000, max: 5000 },
     });
+    expect(body.stepOverview).toEqual(
+      [1, 2, 3].map((position) => ({
+        position,
+        summaryJa: `報告テスト手順 ${position}`,
+        summaryKo: `신고 테스트 단계 ${position}`,
+      })),
+    );
     expect(await countRows("visitors")).toBe(0);
 
     const cookie = await newVisitorCookie();

@@ -120,8 +120,11 @@ Accept: application/json
   "id": "11111111-1111-4111-8111-111111111111",
   "versionId": "22222222-2222-4222-8222-222222222222",
   "titleJa": "ひとりで楽しむ聖水クラフト散歩",
+  "titleKo": "혼자 즐기는 성수 크래프트 산책",
   "summaryJa": "注文に使える韓国語カードを見ながら、三つの小さな体験を進めます。",
+  "summaryKo": "주문할 때 쓸 수 있는 한국어 카드를 보며 세 가지 작은 체험을 진행합니다.",
   "bodyJa": "これは屋内デモ用の仮想クエストです。実際の訪問体験ではありません。",
+  "bodyKo": "실내 데모용 가상 퀘스트입니다. 실제 방문 체험이 아닙니다.",
   "areaCode": "seongsu",
   "tags": ["craft", "food"],
   "durationMinutes": 90,
@@ -140,15 +143,18 @@ Accept: application/json
   "stepOverview": [
     {
       "position": 1,
-      "summaryJa": "最初の場所と利用条件を確認する"
+      "summaryJa": "最初の場所と利用条件を確認する",
+      "summaryKo": "첫 장소와 이용 조건 확인하기"
     },
     {
       "position": 2,
-      "summaryJa": "韓国語カードを見せて注文する"
+      "summaryJa": "韓国語カードを見せて注文する",
+      "summaryKo": "한국어 카드를 보여 주고 주문하기"
     },
     {
       "position": 3,
-      "summaryJa": "最後の行動を確認して記録する"
+      "summaryJa": "最後の行動を確認して記録する",
+      "summaryKo": "마지막 행동을 확인하고 기록하기"
     }
   ],
   "availability": "available",
@@ -158,7 +164,7 @@ Accept: application/json
 }
 ```
 
-`stepOverview`는 단계 제목 필드가 생길 때까지 현재 구현 응답에서 생략한다. 정보 신고 화면은 이 응답의 `versionId`를 신고 대상 version으로 사용한다.
+`stepOverview`의 `summaryJa`·`summaryKo`는 각 단계의 `title_ja`·`title_ko`다. 정보 신고 화면은 이 응답의 `versionId`를 신고 대상 version으로 사용한다.
 
 유효한 본인 run이 있으면 `ownRunId`를 반환한다. 진행 중이면 `canStart`는 false이고 화면은 이어하기를 표시한다. 완료된 run이면 상세에서 완료 기록 보기를 제공한다.
 
