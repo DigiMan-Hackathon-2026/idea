@@ -1,5 +1,6 @@
 import type { AreaCode, QuestFilters, QuestPurpose, WalkingChoice } from "./demo-quests";
 import food from "./visit-guides/food.json";
+import discovery from "./visit-guides/discovery.json";
 import beauty from "./visit-guides/beauty.json";
 import shopping from "./visit-guides/shopping.json";
 import culture from "./visit-guides/culture.json";
@@ -26,6 +27,7 @@ type VisitGuide = {
 
 const visitGuides: VisitGuide[] = [
   ...food as VisitGuide[],
+  ...discovery as VisitGuide[],
   ...beauty as VisitGuide[],
   ...shopping as VisitGuide[],
   ...culture as VisitGuide[],
