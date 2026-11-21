@@ -1,6 +1,6 @@
 # 여기서울 구현 준비도
 
-최종 갱신: 2026-11-21 · 기준 branch: `main`
+최종 갱신: 2026-11-22 · 기준 branch: `main`
 
 이 문서는 계획된 것과 실제 완료된 것을 구분하는 현재 상태판이다. 상세 계약의 원본은 각 링크 문서이며, 상태가 바뀌면 근거 commit·실행 결과와 함께 이 표를 갱신한다.
 
@@ -62,7 +62,7 @@
 | 운영자 인증·인가 | 준비됨 | [운영 인증 계약](ADMIN_AUTHORIZATION_v0.1.md) | D10 결정과 검수 tenant에서 AC13~AC15 실행 |
 | 익명 visitor session | 진행 중 | HMAC token repository, `POST /api/v1/visitor-sessions` 생성과 visitor 인증을 거친 퀘스트 시작 API의 Origin·JSON·cookie·no-store 계약, [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | rate limit·실DB HTTP/browser·삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
-| 지도·이동 안내 | 진행 중 | `/quests` 목록·Naver 지도 전환, 사용자 선택 뒤 browser에만 표시하는 파란 현재 위치 점·정확도 범위·위치 복귀, TMAP 보행자 경로, NAVER 앱 길찾기, 3F·2F·1F 층별 2D 개념도, 현재 위치 선택, 분기점 표지 카드, 오승강장·오개찰구·오출구 복구와 한국어 도움 카드, [지도 계약](MAP_ADDRESS_HANDOFF_v0.1.md), [현장 안내 가설](SUBWAY_FIELD_GUIDE_v0.1.md) | 실제 일본인 비교 검증, 역별 정확한 동선과 촬영일·방향·권리가 확인된 사진, 배포 domain과 iOS·Android 앱 fallback 검수 |
+| 지도·이동 안내 | 진행 중 | `/quests` 목록·Naver 지도 전환, 사용자 선택 뒤 browser에만 표시하는 파란 현재 위치 점·정확도 범위·위치 복귀, TMAP 보행자 경로, NAVER 앱 길찾기, 성수역 공식 3F·2F·1F 층 관계, 직전 역·계단/승강기 선택에 따른 빠른 하차 문, 승강기 상태 코드·1/4번 지상 연결 경계, 오승강장·오개찰구·오출구 복구와 한국어 도움 카드, [지도 계약](MAP_ADDRESS_HANDOFF_v0.1.md), [현장 안내 가설](SUBWAY_FIELD_GUIDE_v0.1.md) | 실제 일본인 비교 검증, 역별 정확한 동선과 촬영일·방향·권리가 확인된 사진, 배포 domain과 iOS·Android 앱 fallback 검수 |
 | 제품 코드 F0~F8 | 진행 중 | 가상 demo seed, 익명 session, 실제 UUID run 시작·조회·순서형 단계 완료·완료 카드·피드백·내 기록·전체 삭제·공개 상세·정보 신고의 DB/API/UI/E2E 연결 | 운영 화면 구현 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 

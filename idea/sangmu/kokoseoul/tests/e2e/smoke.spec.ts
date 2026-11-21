@@ -423,9 +423,20 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "今いる場所から3番出口まで案内します" }),
   ).toBeVisible();
-  await expect(
-    page.getByText("リアルタイムのエレベーター・快速降車情報は接続準備中です。"),
-  ).toBeVisible();
+  const disconnectedTransitData = page.getByText(
+    "公式のエレベーター・快速降車情報は接続準備中です。",
+  );
+  const connectedTransitData = page.getByText("乗ってきた方向に合わせる");
+  await expect(disconnectedTransitData.or(connectedTransitData)).toBeVisible();
+  if (await connectedTransitData.isVisible()) {
+    await page.getByRole("button", { name: "トゥクソムから" }).click();
+    await page.getByRole("button", { name: "エレベーターが必要です" }).click();
+    await expect(page.getByText("4-4ドア", { exact: true })).toBeVisible();
+    await expect(page.getByText("利用可能", { exact: true })).toHaveCount(4);
+    await expect(
+      page.getByText("3番出口には地上連絡エレベーターの公式情報がありません"),
+    ).toBeVisible();
+  }
   await page.getByRole("button", { name: "3Fのホームで降りた" }).click();
   await expect(page.getByRole("img", { name: "3Fの概念図" })).toBeVisible();
   await expect(page.getByText("Way out · 出口")).toBeVisible();

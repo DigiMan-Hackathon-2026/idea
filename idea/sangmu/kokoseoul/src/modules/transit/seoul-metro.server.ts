@@ -14,7 +14,7 @@ async function requestRows<T>(
   path: string,
   serviceKey: string,
   parser: (payload: unknown) => T[],
-): Promise<T[]> {
+): Promise<{ items: T[]; checkedAt: string | null }> {
   const url = new URL(path, API_ORIGIN);
   url.searchParams.set("serviceKey", serviceKey);
   url.searchParams.set("pageNo", "1");
@@ -29,7 +29,10 @@ async function requestRows<T>(
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error("Seoul Metro provider request failed");
-  return parser(await response.json());
+  return {
+    items: parser(await response.json()),
+    checkedAt: response.headers.get("date"),
+  };
 }
 
 export async function getSeongsuStationSnapshot(): Promise<SeoulMetroStationSnapshot> {
@@ -59,10 +62,14 @@ export async function getSeongsuStationSnapshot(): Promise<SeoulMetroStationSnap
 
   return {
     status,
-    checkedAt: new Date().toISOString(),
+    checkedAt: quickExitAvailable
+      ? quickExitResult.value.checkedAt
+      : elevatorAvailable
+        ? elevatorResult.value.checkedAt
+        : null,
     elevatorAvailable,
     quickExitAvailable,
-    elevators: elevatorAvailable ? elevatorResult.value : [],
-    quickExits: quickExitAvailable ? quickExitResult.value : [],
+    elevators: elevatorAvailable ? elevatorResult.value.items : [],
+    quickExits: quickExitAvailable ? quickExitResult.value.items : [],
   };
 }

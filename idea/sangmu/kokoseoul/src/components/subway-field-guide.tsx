@@ -5,6 +5,13 @@ import { useLocale } from "@/components/locale-provider";
 import { pickLocale, type Locale } from "@/lib/locale";
 import type { DemoQuest } from "@/modules/content/demo-quests";
 import type { SeoulMetroStationSnapshot } from "@/modules/transit/seoul-metro";
+import {
+  decodeElevatorStatus,
+  isSurfaceElevator,
+  selectQuickExit,
+  type ArrivalId,
+  type MobilityId,
+} from "@/modules/transit/seoul-metro-display";
 
 type FloorId = "3f" | "2f" | "1f";
 type LocationId = "platform" | "inside_gate" | "outside_gate" | "exit_3";
@@ -87,6 +94,29 @@ const LOCATIONS: LocationGuide[] = [
   },
 ];
 
+const ELEVATOR_LOCATION_GUIDES: Record<LocationId, Pick<LocationGuide, "title" | "action" | "phrase">> = {
+  platform: {
+    title: { ja: "選んだ方向の車両ドア付近でエレベーターを探します", ko: "선택한 방향의 차량 문 근처에서 엘리베이터를 찾아요" },
+    action: { ja: "上の公式案内で表示されたドア番号を確認してください。見つからなければ「出口・Way out」をたどり、駅員にエレベーターの位置を確認します。", ko: "위 공식 안내에 나온 문 번호를 확인해요. 찾지 못했다면 ‘나가는 곳·Way out’을 따라가며 역무원에게 엘리베이터 위치를 확인해 주세요." },
+    phrase: { ja: "2階へ下りるエレベーターはどこですか？", ko: "2층으로 내려가는 엘리베이터는 어디에 있나요?" },
+  },
+  inside_gate: {
+    title: { ja: "改札を出る前に地上エレベーターを確認します", ko: "개찰구를 나가기 전에 지상 엘리베이터를 확인해요" },
+    action: { ja: "3番出口の階段へ進まず、1番・4番出口のどちらが目的地に適しているか駅員に確認してください。", ko: "3번 출구 계단으로 가지 말고, 1번·4번 출구 중 어디가 목적지에 맞는지 역무원에게 확인해 주세요." },
+    phrase: { ja: "地上へ行くエレベーターは、1番と4番出口のどちらですか？", ko: "지상으로 가는 엘리베이터는 1번과 4번 출구 중 어디인가요?" },
+  },
+  outside_gate: {
+    title: { ja: "3番出口の階段ではなく、1番・4番出口を確認します", ko: "3번 출구 계단 대신 1번·4번 출구를 확인해요" },
+    action: { ja: "公式データで地上連絡エレベーターが確認できるのは1番・4番出口です。道路を横断する前に駅員へ目的地側の出口を尋ねてください。", ko: "공식 데이터에서 지상 연결 엘리베이터가 확인되는 곳은 1번·4번 출구예요. 길을 건너기 전에 역무원에게 목적지 쪽 출구를 물어보세요." },
+    phrase: { ja: "この目的地へ行くには、1番と4番出口のどちらのエレベーターがいいですか？", ko: "이 목적지로 가려면 1번과 4번 출구 중 어느 엘리베이터가 좋나요?" },
+  },
+  exit_3: {
+    title: { ja: "階段を使わず、駅員にエレベーター経路を確認します", ko: "계단을 이용하지 말고 엘리베이터 경로를 확인해요" },
+    action: { ja: "3番出口に地上連絡エレベーターの公式情報はありません。無理に進まず、1番・4番出口への安全な移動方法を駅員に確認してください。", ko: "3번 출구에는 지상 연결 엘리베이터 공식 정보가 없어요. 무리해서 이동하지 말고 1번·4번 출구로 안전하게 가는 방법을 역무원에게 확인해 주세요." },
+    phrase: { ja: "階段を使えません。地上へ行くエレベーターまで案内してください。", ko: "계단을 이용하기 어려워요. 지상으로 가는 엘리베이터까지 안내해 주세요." },
+  },
+};
+
 const RECOVERIES: RecoveryGuide[] = [
   {
     id: "wrong_platform",
@@ -143,6 +173,28 @@ const PROVIDER_LABELS: Record<string, LocalizedCopy> = {
   에스컬레이터: { ja: "エスカレーター", ko: "에스컬레이터" },
 };
 
+const ARRIVALS: Array<{ id: ArrivalId; label: LocalizedCopy }> = [
+  { id: "from_ttukseom", label: { ja: "トゥクソムから", ko: "뚝섬에서 왔어요" } },
+  { id: "from_konkuk", label: { ja: "建大入口から", ko: "건대입구에서 왔어요" } },
+  { id: "from_yongdap", label: { ja: "龍踏から", ko: "용답에서 왔어요" } },
+  { id: "unknown", label: { ja: "わかりません", ko: "잘 모르겠어요" } },
+];
+
+const MOBILITY_OPTIONS: Array<{ id: MobilityId; label: LocalizedCopy }> = [
+  { id: "stairs_ok", label: { ja: "階段を使えます", ko: "계단을 이용할 수 있어요" } },
+  { id: "elevator_needed", label: { ja: "エレベーターが必要です", ko: "엘리베이터가 필요해요" } },
+];
+
+const ELEVATOR_STATUS_LABELS: Record<ReturnType<typeof decodeElevatorStatus>, LocalizedCopy> = {
+  available: { ja: "利用可能", ko: "사용 가능" },
+  deleted: { ja: "利用不可", ko: "이용 불가" },
+  maintenance: { ja: "整備中", ko: "보수 중" },
+  stopped: { ja: "停止中", ko: "중지" },
+  inspection: { ja: "点検中", ko: "점검 중" },
+  construction: { ja: "工事中", ko: "공사 중" },
+  unknown: { ja: "現地確認が必要", ko: "현장 확인 필요" },
+};
+
 function providerLabel(locale: Locale, value: string | null) {
   if (!value) return pickLocale(locale, "方向未表示", "방향 정보 없음");
   const match = Object.entries(PROVIDER_LABELS).find(([source]) => value.includes(source));
@@ -151,10 +203,41 @@ function providerLabel(locale: Locale, value: string | null) {
     : pickLocale(locale, "公式情報を確認", "공식 정보 확인");
 }
 
-function StationDataPanel({ snapshot, locale }: { snapshot: SeoulMetroStationSnapshot; locale: Locale }) {
-  const hasAttentionStatus = snapshot.elevators.some(({ operatingStatus }) =>
-    operatingStatus ? /점검|고장|중지|불가/.test(operatingStatus) : false,
-  );
+function formatReferenceDate(value: string | null) {
+  if (!value || !/^\d{8}$/.test(value)) return null;
+  return `${value.slice(0, 4)}.${value.slice(4, 6)}.${value.slice(6, 8)}`;
+}
+
+function elevatorLocation(locale: Locale, entranceNumber: string | null, detailPosition: string | null) {
+  if (entranceNumber && /^\d+$/.test(entranceNumber)) {
+    return pickLocale(locale, `${entranceNumber}番出入口・地上連絡`, `${entranceNumber}번 출입구·지상 연결`);
+  }
+  const door = detailPosition?.match(/\d+-\d+/)?.[0];
+  if (detailPosition?.includes("뚝섬")) {
+    return pickLocale(locale, `トゥクソム方面 ${door ?? ""}`.trim(), `뚝섬 방면 ${door ?? ""}`.trim());
+  }
+  if (detailPosition?.includes("건대입구")) {
+    return pickLocale(locale, `建大入口方面 ${door ?? ""}`.trim(), `건대입구 방면 ${door ?? ""}`.trim());
+  }
+  return pickLocale(locale, "駅構内・位置は現地確認", "역 내부·위치는 현장 확인");
+}
+
+function StationDataPanel({
+  snapshot,
+  locale,
+  arrival,
+  mobility,
+  onArrival,
+  onMobility,
+}: {
+  snapshot: SeoulMetroStationSnapshot;
+  locale: Locale;
+  arrival: ArrivalId | null;
+  mobility: MobilityId | null;
+  onArrival: (arrival: ArrivalId) => void;
+  onMobility: (mobility: MobilityId) => void;
+}) {
+  const [copied, setCopied] = useState(false);
   const checkedAt = snapshot.checkedAt
     ? new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
         month: "short",
@@ -166,39 +249,107 @@ function StationDataPanel({ snapshot, locale }: { snapshot: SeoulMetroStationSna
     : null;
 
   if (snapshot.status === "not_configured") {
-    return <p className="mt-5 rounded-2xl bg-[#fff7e8] p-4 text-sm font-bold leading-6 text-slate-700">{pickLocale(locale, "リアルタイムのエレベーター・快速降車情報は接続準備中です。駅構内の表示と駅員の案内を優先してください。", "실시간 엘리베이터·빠른 하차 정보는 연결 준비 중이에요. 역 안 표지와 역무원 안내를 우선해 주세요.")}</p>;
+    return <p className="mt-5 rounded-2xl bg-[#fff7e8] p-4 text-sm font-bold leading-6 text-slate-700">{pickLocale(locale, "公式のエレベーター・快速降車情報は接続準備中です。駅構内の表示と駅員の案内を優先してください。", "공식 엘리베이터·빠른 하차 정보는 연결 준비 중이에요. 역 안 표지와 역무원 안내를 우선해 주세요.")}</p>;
   }
 
   if (snapshot.status === "unavailable") {
     return <p className="mt-5 rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#852a19]">{pickLocale(locale, "ソウル交通公社の情報を取得できませんでした。車両・設備を推測せず、現地表示を確認してください。", "서울교통공사 정보를 불러오지 못했어요. 차량·설비를 추측하지 말고 현장 표지를 확인해 주세요.")}</p>;
   }
 
+  const quickExit = selectQuickExit(snapshot.quickExits, arrival, mobility);
+  const surfaceElevators = snapshot.elevators.filter(isSurfaceElevator);
+  const sourceDates = Array.from(new Set([
+    ...snapshot.quickExits.map(({ referenceDate }) => formatReferenceDate(referenceDate)),
+    ...snapshot.elevators.map(({ referenceDate }) => formatReferenceDate(referenceDate)),
+  ].filter((value): value is string => value !== null)));
+  const routeUnknown = arrival === "unknown" || arrival === "from_yongdap";
+  const staffPhrase = "엘리베이터로 지상까지 가고 싶어요. 1번과 4번 출구 중 어디로 가야 하나요?";
+
+  async function copyStaffPhrase() {
+    try {
+      await navigator.clipboard.writeText(staffPhrase);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2_000);
+    } catch {
+      setCopied(false);
+    }
+  }
+
   return (
-    <div className="mt-5 border-y border-slate-200 py-4">
+    <div className="mt-5 rounded-2xl border border-slate-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-black text-slate-950">{pickLocale(locale, "ソウル交通公社の公式情報", "서울교통공사 공식 정보")}</p>
+        <p className="text-base font-black text-slate-950">{pickLocale(locale, "乗ってきた方向に合わせる", "타고 온 방향에 맞추기")}</p>
         <p className="text-xs font-bold text-slate-500">{checkedAt ? `${checkedAt} KST` : null}</p>
       </div>
-      <p className={`mt-2 text-sm font-bold ${hasAttentionStatus ? "text-[#a33b25]" : "text-[#087735]"}`}>
-        {snapshot.elevatorAvailable
-          ? hasAttentionStatus
-            ? pickLocale(locale, "エレベーターに確認が必要な状態があります", "엘리베이터 중 확인이 필요한 상태가 있어요")
-            : pickLocale(locale, `エレベーター情報 ${snapshot.elevators.length}件を確認`, `엘리베이터 정보 ${snapshot.elevators.length}건 확인`)
-          : pickLocale(locale, "エレベーター情報は取得できませんでした", "엘리베이터 정보는 불러오지 못했어요")}
-      </p>
-      {snapshot.quickExitAvailable && snapshot.quickExits.length > 0 ? (
-        <ul className="mt-3 grid gap-2">
-          {snapshot.quickExits.slice(0, 4).map((item, index) => (
-            <li key={`${item.direction}-${item.carDoorNumber}-${index}`} className="grid grid-cols-[1fr_auto] gap-3 rounded-xl bg-slate-50 px-3 py-3 text-sm">
-              <span className="font-bold text-slate-700">{providerLabel(locale, item.direction)} · {providerLabel(locale, item.nextStation)} · {providerLabel(locale, item.facility)}</span>
-              <span className="font-black text-slate-950">{item.carDoorNumber ? pickLocale(locale, `${item.carDoorNumber}ドア`, `${item.carDoorNumber} 문`) : "—"}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-2 text-sm font-bold text-slate-500">{pickLocale(locale, "快速降車の車両情報は現地で確認してください。", "빠른 하차 차량 정보는 현장에서 확인해 주세요.")}</p>
-      )}
-      <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{pickLocale(locale, "ドア番号は聖水駅で降りる際の参考情報です。乗車方向と運行状況は別途確認してください。", "문 번호는 성수역에서 내릴 때의 참고 정보예요. 탑승 방향과 운행 상황은 따로 확인해 주세요.")}</p>
+      <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "聖水駅の直前に通った駅を選んでください。覚えていなくても進めます。", "성수역 바로 전에 지나온 역을 골라 주세요. 기억나지 않아도 진행할 수 있어요.")}</p>
+
+      <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label={pickLocale(locale, "直前の駅", "직전 역")}>
+        {ARRIVALS.map((item) => (
+          <button key={item.id} type="button" aria-pressed={arrival === item.id} onClick={() => { onArrival(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${arrival === item.id ? "border-slate-950 bg-slate-950 text-white" : "border-slate-200 bg-white text-slate-700"}`}>
+            {localize(locale, item.label)}
+          </button>
+        ))}
+      </div>
+
+      {arrival ? (
+        <>
+          <p className="mt-5 text-sm font-black text-slate-950">{pickLocale(locale, "移動方法を選んでください", "이동 방법을 골라 주세요")}</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "移動方法", "이동 방법")}>
+            {MOBILITY_OPTIONS.map((item) => (
+              <button key={item.id} type="button" aria-pressed={mobility === item.id} onClick={() => { onMobility(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${mobility === item.id ? "border-[#087735] bg-[#eef8f2] text-[#087735]" : "border-slate-200 bg-white text-slate-700"}`}>
+                {localize(locale, item.label)}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {arrival && mobility ? (
+        <div className="mt-5" aria-live="polite">
+          {quickExit ? (
+            <div className="rounded-2xl bg-[#eef8f2] p-4">
+              <p className="text-sm font-black text-[#087735]">{pickLocale(locale, "聖水駅で降りる位置", "성수역에서 내릴 위치")}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{quickExit.carDoorNumber ? pickLocale(locale, `${quickExit.carDoorNumber}ドア`, `${quickExit.carDoorNumber} 문`) : "—"}</p>
+              <p className="mt-2 text-sm font-bold text-slate-600">{providerLabel(locale, quickExit.nextStation)} · {providerLabel(locale, quickExit.facility)}</p>
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-[#fff7e8] p-4">
+              <p className="font-black text-slate-950">{routeUnknown ? pickLocale(locale, "対応する公式ドア情報がありません", "맞는 공식 문 위치 정보가 없어요") : pickLocale(locale, "公式情報を取得できませんでした", "공식 정보를 불러오지 못했어요")}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "車両番号を推測せず、「出口・Way out」の表示を探してください。分からない場合は駅員に確認します。", "차량 번호를 추측하지 말고 ‘나가는 곳·Way out’ 표지를 찾아요. 모르겠다면 역무원에게 확인해 주세요.")}</p>
+            </div>
+          )}
+
+          {mobility === "elevator_needed" ? (
+            <div className="mt-4">
+              <p className="font-black text-slate-950">{pickLocale(locale, "エレベーターの公式公開状態", "엘리베이터 공식 공개 상태")}</p>
+              {snapshot.elevatorAvailable ? (
+                <ul className="mt-3 grid gap-2">
+                  {snapshot.elevators.map((item, index) => {
+                    const status = decodeElevatorStatus(item.operatingStatus);
+                    const available = status === "available";
+                    return (
+                      <li key={`${item.entranceNumber}-${item.detailPosition}-${index}`} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl bg-slate-50 px-3 py-3 text-sm">
+                        <span><span className="block font-black text-slate-800">{elevatorLocation(locale, item.entranceNumber, item.detailPosition)}</span><span className="mt-1 block font-semibold text-slate-500">{item.startFloor && item.endFloor ? `${item.startFloor}F–${item.endFloor}F` : pickLocale(locale, "階情報なし", "층 정보 없음")}</span></span>
+                        <span className={`rounded-full px-2.5 py-1 font-black ${available ? "bg-[#dff5e8] text-[#087735]" : "bg-[#fff0eb] text-[#9a341f]"}`}>{localize(locale, ELEVATOR_STATUS_LABELS[status])}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : <p className="mt-2 text-sm font-bold text-slate-600">{pickLocale(locale, "エレベーター情報は取得できませんでした。", "엘리베이터 정보를 불러오지 못했어요.")}</p>}
+
+              <div className="mt-4 rounded-2xl border border-[#ffb020]/50 bg-[#fff7e8] p-4">
+                <p className="font-black text-slate-950">{pickLocale(locale, "3番出口には地上連絡エレベーターの公式情報がありません", "3번 출구에는 지상 연결 엘리베이터 공식 정보가 없어요")}</p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{pickLocale(locale, `地上連絡は${surfaceElevators.map(({ entranceNumber }) => entranceNumber).filter(Boolean).join("・") || "1・4"}番出口で確認できます。道路を無理に横断せず、目的地に合う出口を駅員に確認してから徒歩ルートを検索し直してください。`, `지상 연결은 ${surfaceElevators.map(({ entranceNumber }) => entranceNumber).filter(Boolean).join("·") || "1·4"}번 출구에서 확인돼요. 무리하게 길을 건너지 말고 목적지에 맞는 출구를 역무원에게 확인한 뒤 도보 경로를 다시 검색해 주세요.`)}</p>
+                <p className="mt-3 text-lg font-black leading-7 text-slate-950" lang="ko">{staffPhrase}</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">1番と4番出口のうち、どちらへ行けばいいですか？</p>
+                <button type="button" onClick={copyStaffPhrase} className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-3 text-sm font-black text-white">{copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "駅員に見せる韓国語をコピー", "역무원에게 보여 줄 한국어 복사")}</button>
+              </div>
+            </div>
+          ) : null}
+
+          <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{pickLocale(locale, `ソウル交通公社API取得 ${checkedAt ?? "—"} KST・データ基準日 ${sourceDates.join(" / ") || "表示なし"}。現地表示を優先してください。`, `서울교통공사 API 조회 ${checkedAt ?? "—"} KST·데이터 기준일 ${sourceDates.join(" / ") || "표시 없음"}. 현장 표지를 우선해 주세요.`)}</p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -296,13 +447,18 @@ function SignCard({ floor, locale }: { floor: FloorId; locale: Locale }) {
 
 export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest; stationSnapshot: SeoulMetroStationSnapshot }) {
   const { locale } = useLocale();
+  const [arrivalId, setArrivalId] = useState<ArrivalId | null>(null);
+  const [mobilityId, setMobilityId] = useState<MobilityId | null>(null);
   const [locationId, setLocationId] = useState<LocationId | null>(null);
   const [floor, setFloor] = useState<FloorId>("3f");
   const [recoveryId, setRecoveryId] = useState<RecoveryId | null>(null);
   const [copied, setCopied] = useState(false);
   const location = LOCATIONS.find(({ id }) => id === locationId) ?? null;
+  const locationGuide = location && mobilityId === "elevator_needed"
+    ? { ...location, ...ELEVATOR_LOCATION_GUIDES[location.id] }
+    : location;
   const recovery = RECOVERIES.find(({ id }) => id === recoveryId) ?? null;
-  const activeGuide = recovery ?? location;
+  const activeGuide = recovery ?? locationGuide;
 
   async function copyPhrase() {
     if (!activeGuide) return;
@@ -323,7 +479,14 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
         {pickLocale(locale, "現在地を選ぶと、公式案内図から単純化した階・出口方向と次に探す表示が変わります。駅工事で動線が変わる場合は現地表示を優先してください。", "현재 위치를 고르면 공식 안내도에서 단순화한 층·출구 방향과 다음에 찾을 표지가 바뀌어요. 역 공사로 동선이 달라졌다면 현장 표지를 우선해 주세요.")}
       </p>
 
-      <StationDataPanel snapshot={stationSnapshot} locale={locale} />
+      <StationDataPanel
+        snapshot={stationSnapshot}
+        locale={locale}
+        arrival={arrivalId}
+        mobility={mobilityId}
+        onArrival={setArrivalId}
+        onMobility={setMobilityId}
+      />
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "現在地を選択", "현재 위치 선택")}>
         {LOCATIONS.map((item) => {
@@ -354,8 +517,8 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
           <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
             <div>
               <p className="text-sm font-black text-[#087735]">{pickLocale(locale, "次に探す表示", "다음에 찾을 표지")}</p>
-              <h3 className="mt-2 text-xl font-black leading-7 text-slate-950" aria-live="polite">{localize(locale, location.title)}</h3>
-              <p className="mt-4 rounded-2xl border border-[#ff5a36]/20 bg-[#fff0eb] p-4 text-base font-bold leading-7 text-[#852a19]">{localize(locale, location.action)}</p>
+              <h3 className="mt-2 text-xl font-black leading-7 text-slate-950" aria-live="polite">{localize(locale, locationGuide!.title)}</h3>
+              <p className="mt-4 rounded-2xl border border-[#ff5a36]/20 bg-[#fff0eb] p-4 text-base font-bold leading-7 text-[#852a19]">{localize(locale, locationGuide!.action)}</p>
             </div>
             <SignCard floor={location.floor} locale={locale} />
           </div>
@@ -375,8 +538,8 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
 
           <div className="mt-5 rounded-2xl bg-[#f4f7fb] p-4">
             <p className="text-sm font-black text-slate-500">{pickLocale(locale, "駅員に見せる韓国語", "역무원에게 보여 줄 한국어")}</p>
-            <p className="mt-3 text-2xl font-black leading-9 text-slate-950" lang="ko">{(recovery ? recovery.phrase : location.phrase).ko}</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{(recovery ? recovery.phrase : location.phrase).ja}</p>
+            <p className="mt-3 text-2xl font-black leading-9 text-slate-950" lang="ko">{(recovery ? recovery.phrase : locationGuide!.phrase).ko}</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{(recovery ? recovery.phrase : locationGuide!.phrase).ja}</p>
             <button type="button" onClick={copyPhrase} className="mt-4 min-h-12 w-full rounded-2xl bg-slate-950 px-4 text-base font-black text-white">
               {copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "韓国語をコピー", "한국어 문장 복사")}
             </button>
