@@ -102,6 +102,21 @@
 
 현재 `reviewNotesKo`가 남은 카드는 없습니다. 일본어 모어 화자 검수는 아직입니다.
 
+## 원천 데이터 갱신
+
+공식 데이터는 매일 갱신되고 카드는 검수한 고정 콘텐츠이므로, 원문이 바뀌었는지 주기적으로 확인합니다.
+
+```sh
+python3 scripts/refresh_station_origins.py --env-file .env.local          # 변경 보고만
+python3 scripts/refresh_station_origins.py --env-file .env.local --check  # 변경이 있으면 종료 코드 1
+python3 scripts/refresh_station_origins.py --env-file .env.local --write  # 원문 갱신, 바뀐 카드 표시
+```
+
+- 서울 열린데이터광장 일반 인증키 `SEOUL_OPEN_API_KEY`가 필요합니다. 키는 출력하지 않습니다.
+- 새로 생긴 역, 없어진 역, 원문이 바뀐 역, 호선 변경, 다시 검수할 카드, 카드가 없는 역을 보고합니다.
+- `--write`는 `station-origins.json`을 갱신하고, 원문이 바뀐 카드의 `officialOriginKo`를 새 원문으로 바꾼 뒤 `review.facts`를 `origin_changed`로 표시합니다. 일본어 이야기는 자동으로 고치지 않으므로 표시된 카드를 사람이 다시 확인합니다.
+- 호선별 원문이 다른 역은 가장 긴 원문을 쓰고, 길이가 같으면 항상 같은 원문을 고릅니다.
+
 ## 작성 규칙
 
 - 이야기는 원문에 있는 사실만 씁니다. 원문에 없는 한자·설명은 `supplementJa`나 `hanjaSource: supplement`로 분리합니다.
