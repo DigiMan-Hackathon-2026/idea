@@ -356,72 +356,149 @@ function StationDataPanel({
 
 function FloorMap({ floor, location, locale }: { floor: FloorId; location: LocationId; locale: Locale }) {
   const markerFloor = location === "platform" ? "3f" : location === "exit_3" ? "1f" : "2f";
-  const markerX = floor === "3f" ? 70 : floor === "2f" ? (location === "inside_gate" ? 132 : 228) : 74;
-  const markerY = floor === "1f" ? 218 : floor === "3f" ? 84 : 132;
+  const markerX = floor === "3f" ? 76 : floor === "2f" ? (location === "inside_gate" ? 126 : 238) : 96;
+  const markerY = floor === "1f" ? 184 : floor === "3f" ? 146 : 146;
 
   return (
-    <svg viewBox="0 0 360 260" className="h-auto w-full" role="img" aria-label={pickLocale(locale, `${floor.toUpperCase()}の概念図`, `${floor.toUpperCase()} 개념도`)}>
-      <rect width="360" height="260" rx="24" fill="#f7faf9" />
-      <text x="18" y="30" fill="#0f172a" fontSize="17" fontWeight="800">{floor.toUpperCase()}</text>
-      <text x="64" y="30" fill="#64748b" fontSize="11" fontWeight="700">{pickLocale(locale, "概念図・縮尺と方角は実際と異なります", "개념도·축척과 방향은 실제와 달라요")}</text>
+    <svg viewBox="0 0 400 300" className="h-auto w-full" role="img" aria-label={pickLocale(locale, `${floor.toUpperCase()}の案内図`, `${floor.toUpperCase()} 안내도`)}>
+      <defs>
+        <pattern id={`guide-grid-${floor}`} width="16" height="16" patternUnits="userSpaceOnUse">
+          <path d="M16 0H0V16" fill="none" stroke="#0f172a" strokeOpacity="0.035" />
+        </pattern>
+        <filter id={`map-shadow-${floor}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#172033" floodOpacity="0.12" />
+        </filter>
+        <marker id={`route-arrow-${floor}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0L10 5L0 10Z" fill="#008c4a" />
+        </marker>
+      </defs>
+      <rect width="400" height="300" rx="26" fill="#f6f5f1" />
+      <rect width="400" height="300" rx="26" fill={`url(#guide-grid-${floor})`} />
+
+      <g transform="translate(20 18)">
+        <rect width="46" height="30" rx="15" fill="#172033" />
+        <text x="23" y="20" textAnchor="middle" fill="#ffffff" fontSize="14" fontWeight="900">{floor.toUpperCase()}</text>
+        <text x="58" y="12" fill="#172033" fontSize="13" fontWeight="900">{pickLocale(locale, "聖水駅 211", "성수역 211")}</text>
+        <text x="58" y="29" fill="#64748b" fontSize="10" fontWeight="700">{pickLocale(locale, "移動関係を単純化した案内図", "이동 관계를 단순화한 안내도")}</text>
+      </g>
 
       {floor === "3f" ? (
         <>
-          <rect x="18" y="60" width="324" height="36" rx="10" fill="#dbe4ea" />
-          <rect x="18" y="166" width="324" height="36" rx="10" fill="#dbe4ea" />
-          <line x1="18" y1="116" x2="342" y2="116" stroke="#334155" strokeWidth="6" />
-          <line x1="18" y1="146" x2="342" y2="146" stroke="#334155" strokeWidth="6" />
-          <text x="28" y="82" fill="#334155" fontSize="11" fontWeight="800">{pickLocale(locale, "トゥクソム・龍踏方面", "뚝섬·용답 방면")}</text>
-          <text x="28" y="188" fill="#334155" fontSize="11" fontWeight="800">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
-          <path d="M70 84 H256" fill="none" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" strokeDasharray="12 9" />
-          <rect x="256" y="50" width="86" height="68" rx="14" fill="#ffffff" stroke="#00a84d" strokeWidth="3" />
-          <text x="299" y="78" textAnchor="middle" fill="#087735" fontSize="12" fontWeight="900">Way out</text>
-          <text x="299" y="100" textAnchor="middle" fill="#087735" fontSize="12" fontWeight="800">{pickLocale(locale, "2Fへ", "2F로")}</text>
+          <g filter={`url(#map-shadow-${floor})`}>
+            <rect x="20" y="76" width="360" height="160" rx="22" fill="#ffffff" />
+          </g>
+          <rect x="20" y="86" width="360" height="34" rx="10" fill="#293445" />
+          <line x1="32" y1="98" x2="368" y2="98" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
+          <line x1="32" y1="108" x2="368" y2="108" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
+          <rect x="20" y="192" width="360" height="34" rx="10" fill="#293445" />
+          <line x1="32" y1="204" x2="368" y2="204" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
+          <line x1="32" y1="214" x2="368" y2="214" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
+          <rect x="34" y="126" width="332" height="60" rx="18" fill="#e9e6dc" stroke="#d8d3c5" />
+          <rect x="34" y="126" width="8" height="60" rx="4" fill="#00a84d" />
+
+          <g>
+            <rect x="34" y="62" width="154" height="24" rx="12" fill="#eef8f2" />
+            <text x="111" y="78" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="900">{pickLocale(locale, "← トゥクソム・龍踏方面", "← 뚝섬·용답 방면")}</text>
+            <rect x="212" y="236" width="154" height="24" rx="12" fill="#eef8f2" />
+            <text x="289" y="252" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="900">{pickLocale(locale, "建大入口方面 →", "건대입구 방면 →")}</text>
+          </g>
+
+          <path d="M76 146C142 146 188 156 242 156H310" fill="none" stroke="#ffffff" strokeWidth="12" strokeLinecap="round" />
+          <path d="M76 146C142 146 188 156 242 156H310" fill="none" stroke="#008c4a" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
+
+          <g transform="translate(304 127)">
+            <rect width="54" height="58" rx="14" fill="#172033" />
+            <path d="M18 16H36M27 16V39M20 31L27 39L34 31" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            <text x="27" y="51" textAnchor="middle" fill="#ffffff" fontSize="8" fontWeight="900">2F</text>
+          </g>
+          <g transform="translate(218 132)">
+            <rect width="66" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1" />
+            <text x="33" y="16" textAnchor="middle" fill="#172033" fontSize="9" fontWeight="900">Way out</text>
+          </g>
         </>
       ) : null}
 
       {floor === "2f" ? (
         <>
-          <rect x="18" y="62" width="74" height="140" rx="18" fill="#e2e8f0" />
-          <text x="55" y="118" textAnchor="middle" fill="#334155" fontSize="11" fontWeight="900">{pickLocale(locale, "3Fから", "3F에서")}</text>
-          <text x="55" y="139" textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="700">Way out</text>
-          <path d="M92 132 H126" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" />
-          {[0, 1, 2, 3].map((index) => <rect key={index} x={126 + index * 11} y="98" width="6" height="68" rx="3" fill="#334155" />)}
-          <text x="146" y="86" textAnchor="middle" fill="#334155" fontSize="12" fontWeight="800">{pickLocale(locale, "改札", "개찰구")}</text>
-          <path d="M170 132 H208" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" strokeDasharray="12 9" />
-          <rect x="208" y="52" width="134" height="160" rx="18" fill="#ffffff" stroke="#ffb020" strokeWidth="3" />
-          <text x="275" y="78" textAnchor="middle" fill="#64748b" fontSize="10" fontWeight="800">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
-          <text x="275" y="105" textAnchor="middle" fill="#111827" fontSize="12" fontWeight="900">{pickLocale(locale, "2・3番出口", "2·3번 출구")}</text>
-          <line x1="226" y1="124" x2="324" y2="124" stroke="#e2e8f0" strokeWidth="2" />
-          <circle cx="248" cy="160" r="21" fill="#f8d469" />
-          <text x="248" y="168" textAnchor="middle" fill="#111827" fontSize="22" fontWeight="950">2</text>
-          <circle cx="302" cy="160" r="25" fill="#ffb020" stroke="#00a84d" strokeWidth="4" />
-          <text x="302" y="169" textAnchor="middle" fill="#111827" fontSize="25" fontWeight="950">3</text>
-          <text x="275" y="200" textAnchor="middle" fill="#64748b" fontSize="10" fontWeight="800">Exit 2 · Exit 3</text>
+          <g filter={`url(#map-shadow-${floor})`}>
+            <path d="M28 104Q28 82 50 82H142Q158 82 166 96L180 120H348Q372 120 372 144V202Q372 226 348 226H180L166 250Q158 264 142 264H50Q28 264 28 242Z" fill="#ffffff" />
+          </g>
+          <path d="M40 116H132Q144 116 150 128L160 146L150 164Q144 176 132 176H40Z" fill="#e8edf0" />
+          <text x="84" y="139" textAnchor="middle" fill="#172033" fontSize="10" fontWeight="900">{pickLocale(locale, "3Fホームから", "3F 승강장에서")}</text>
+          <text x="84" y="156" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="800">Way out</text>
+
+          <g transform="translate(152 119)">
+            <text x="24" y="-8" textAnchor="middle" fill="#475569" fontSize="9" fontWeight="900">{pickLocale(locale, "改札", "개찰구")}</text>
+            {[0, 1, 2, 3].map((index) => (
+              <g key={index} transform={`translate(${index * 13} 0)`}>
+                <rect width="8" height="54" rx="4" fill="#334155" />
+                <circle cx="4" cy="27" r="2" fill="#93c5fd" />
+              </g>
+            ))}
+          </g>
+
+          <path d="M84 146H140C155 146 162 146 176 146H286" fill="none" stroke="#ffffff" strokeWidth="13" strokeLinecap="round" />
+          <path d="M84 146H140C155 146 162 146 176 146H286" fill="none" stroke="#008c4a" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
+
+          <g transform="translate(220 78)">
+            <rect width="126" height="32" rx="16" fill="#eef8f2" />
+            <text x="63" y="21" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="900">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
+          </g>
+          <g transform="translate(220 174)">
+            <circle cx="24" cy="24" r="21" fill="#f7d67a" />
+            <text x="24" y="31" textAnchor="middle" fill="#172033" fontSize="20" fontWeight="950">2</text>
+            <circle cx="82" cy="24" r="24" fill="#ffb020" stroke="#008c4a" strokeWidth="4" />
+            <text x="82" y="32" textAnchor="middle" fill="#172033" fontSize="22" fontWeight="950">3</text>
+            <text x="53" y="58" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="800">Exit 2 · Exit 3</text>
+          </g>
+          <g transform="translate(48 216)">
+            <rect width="112" height="26" rx="13" fill="#f1f5f9" />
+            <text x="56" y="18" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="900">{pickLocale(locale, "1・4番出口方面", "1·4번 출구 방면")}</text>
+          </g>
         </>
       ) : null}
 
       {floor === "1f" ? (
         <>
-          <rect x="18" y="62" width="116" height="142" rx="20" fill="#ffffff" stroke="#00a84d" strokeWidth="3" />
-          <circle cx="76" cy="106" r="24" fill="#00a84d" />
-          <text x="76" y="115" textAnchor="middle" fill="#ffffff" fontSize="23" fontWeight="950">3</text>
-          <text x="76" y="158" textAnchor="middle" fill="#111827" fontSize="13" fontWeight="900">{pickLocale(locale, "聖水駅", "성수역")}</text>
-          <text x="76" y="181" textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="800">Seongsu · 211</text>
-          <path d="M134 132 H256" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" strokeDasharray="12 9" />
-          <rect x="256" y="76" width="86" height="112" rx="18" fill="#eef8f2" />
-          <text x="299" y="113" textAnchor="middle" fill="#087735" fontSize="12" fontWeight="900">NAVER</text>
-          <text x="299" y="137" textAnchor="middle" fill="#087735" fontSize="12" fontWeight="900">{pickLocale(locale, "徒歩ルート", "도보 경로")}</text>
-          <text x="299" y="162" textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="700">{pickLocale(locale, "約4分", "약 4분")}</text>
+          <g filter={`url(#map-shadow-${floor})`}>
+            <rect x="28" y="82" width="344" height="160" rx="22" fill="#ffffff" />
+          </g>
+          <path d="M28 128H372M154 82V242" stroke="#dce2e6" strokeWidth="20" />
+          <path d="M28 128H372M154 82V242" stroke="#ffffff" strokeWidth="14" />
+          <path d="M161 184C210 184 226 162 270 162H320" fill="none" stroke="#ffffff" strokeWidth="13" strokeLinecap="round" />
+          <path d="M161 184C210 184 226 162 270 162H320" fill="none" stroke="#008c4a" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
+
+          <g transform="translate(58 100)">
+            <rect width="106" height="112" rx="18" fill="#172033" />
+            <circle cx="38" cy="40" r="23" fill="#00a84d" />
+            <text x="38" y="48" textAnchor="middle" fill="#ffffff" fontSize="22" fontWeight="950">211</text>
+            <rect x="70" y="17" width="28" height="46" rx="8" fill="#ffb020" />
+            <text x="84" y="48" textAnchor="middle" fill="#172033" fontSize="24" fontWeight="950">3</text>
+            <text x="14" y="84" fill="#ffffff" fontSize="13" fontWeight="950">{pickLocale(locale, "聖水駅", "성수역")}</text>
+            <text x="14" y="101" fill="#cbd5e1" fontSize="9" fontWeight="800">Seongsu · Exit 3</text>
+          </g>
+
+          <g transform="translate(278 112)">
+            <rect width="78" height="96" rx="18" fill="#eef8f2" stroke="#b8dfc7" />
+            <circle cx="39" cy="28" r="14" fill="#008c4a" />
+            <path d="M32 28H46M39 21V35" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
+            <text x="39" y="57" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="950">NAVER</text>
+            <text x="39" y="73" textAnchor="middle" fill="#087735" fontSize="9" fontWeight="900">{pickLocale(locale, "徒歩へ", "도보로")}</text>
+            <text x="39" y="86" textAnchor="middle" fill="#64748b" fontSize="8" fontWeight="800">{pickLocale(locale, "約4分", "약 4분")}</text>
+          </g>
         </>
       ) : null}
 
       {markerFloor === floor ? (
-        <g>
+        <g filter={`url(#map-shadow-${floor})`}>
           <circle cx={markerX} cy={markerY} r="13" fill="#ff5a36" stroke="#ffffff" strokeWidth="5" />
-          <text x={markerX} y="238" textAnchor="middle" fill="#852a19" fontSize="12" fontWeight="900">{pickLocale(locale, "現在地", "현재 위치")}</text>
+          <circle cx={markerX} cy={markerY} r="3.5" fill="#ffffff" />
+          <rect x={markerX - 30} y={markerY + 17} width="60" height="22" rx="11" fill="#ff5a36" />
+          <text x={markerX} y={markerY + 32} textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="900">{pickLocale(locale, "現在地", "현재 위치")}</text>
         </g>
       ) : null}
+
+      <text x="200" y="286" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="700">{pickLocale(locale, "縮尺・通路形状・方角は実際と異なります", "축척·통로 모양·방향은 실제와 달라요")}</text>
     </svg>
   );
 }
