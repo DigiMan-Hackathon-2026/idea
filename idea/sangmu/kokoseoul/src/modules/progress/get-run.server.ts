@@ -1,6 +1,7 @@
 import "server-only";
 import type { PoolClient } from "pg";
 import { withDatabaseTransaction } from "../../db/runtime.server";
+import { DIGIMAN_HACKATHON_ENDED_JA, hasDigimanHackathonEnded } from "../content/digiman-hackathon";
 
 export type QuestRunStep = {
   id: string;
@@ -16,6 +17,7 @@ export type QuestRunStep = {
     nameJa: string;
     nameKo: string;
     addressKo: string;
+    naverMapPlaceId?: string;
     verifiedAt?: string;
   } | null;
   completedAt: string | null;
@@ -113,7 +115,8 @@ export async function getQuestRunWithClient(
   }));
   const nextStepId =
     stepRecords.find((step) => step.completedAt === null)?.id ?? null;
-  const isAvailable = row.quest_status === "published";
+  const ended = hasDigimanHackathonEnded(row.quest_id);
+  const isAvailable = row.quest_status === "published" && !ended;
   return {
     id: row.id,
     questId: row.quest_id,
@@ -128,7 +131,7 @@ export async function getQuestRunWithClient(
       isAvailable && row.status === "in_progress" && nextStepId !== null,
     unavailableReasonJa: isAvailable
       ? null
-      : row.pause_reason_ja ?? "このクエストは現在利用できません。",
+      : ended ? DIGIMAN_HACKATHON_ENDED_JA : row.pause_reason_ja ?? "このクエストは現在利用できません。",
     nextStepId,
     steps: stepRecords,
   };

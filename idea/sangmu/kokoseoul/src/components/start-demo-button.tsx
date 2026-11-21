@@ -7,15 +7,16 @@ import { useModalDialog } from "@/hooks/use-modal-dialog";
 import { pickLocale } from "@/lib/locale";
 import {
   ensureVisitorSession,
+  QuestRunApiError,
   startQuestRun,
 } from "@/modules/progress/run-api";
 
-export function StartDemoButton({ questId }: { questId: string }) {
+export function StartDemoButton({ questId, isDemo = true }: { questId: string; isDemo?: boolean }) {
   const { locale } = useLocale();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
-  const [startFailed, setStartFailed] = useState(false);
+  const [startError, setStartError] = useState<"unavailable" | "retry" | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
 
@@ -31,13 +32,13 @@ export function StartDemoButton({ questId }: { questId: string }) {
   async function handleStart() {
     if (isStarting) return;
     setIsStarting(true);
-    setStartFailed(false);
+    setStartError(null);
     try {
       await ensureVisitorSession();
       const run = await startQuestRun(questId);
       router.push(run.completionPath ?? `/runs/${run.id}`);
-    } catch {
-      setStartFailed(true);
+    } catch (error) {
+      setStartError(error instanceof QuestRunApiError && error.code === "QUEST_UNAVAILABLE" ? "unavailable" : "retry");
       setIsStarting(false);
     }
   }
@@ -47,12 +48,14 @@ export function StartDemoButton({ questId }: { questId: string }) {
       <button
         type="button"
         onClick={() => {
-          setStartFailed(false);
+          setStartError(null);
           setIsOpen(true);
         }}
         className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#941e34] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(148,30,52,0.28)] transition hover:-translate-y-0.5 hover:bg-[#7f192c] disabled:cursor-wait disabled:opacity-70"
       >
-        {pickLocale(locale, "このデモクエストを始める", "이 데모 퀘스트 시작하기")}
+        {isDemo
+          ? pickLocale(locale, "このデモクエストを始める", "이 데모 퀘스트 시작하기")
+          : pickLocale(locale, "参加ガイドを始める", "참여 안내 시작하기")}
       </button>
 
       {isOpen ? (
@@ -89,33 +92,45 @@ export function StartDemoButton({ questId }: { questId: string }) {
               </button>
             </div>
             <p className="mt-5 leading-7 text-slate-600">
-              {pickLocale(
+              {isDemo ? pickLocale(
                 locale,
                 "このデモでは、匿名の進行記録をこのブラウザ専用のセッションに30日間保存します。他の端末とは共有されません。",
                 "이 데모에서는 익명 진행 기록을 이 브라우저 전용 세션에 30일간 저장합니다. 다른 기기와 공유되지 않습니다.",
+              ) : pickLocale(
+                locale,
+                "匿名の進行記録をこのブラウザ専用のセッションに30日間保存します。他の端末とは共有されません。",
+                "익명 진행 기록을 이 브라우저 전용 세션에 30일간 저장해요. 다른 기기와 공유되지 않아요.",
               )}
             </p>
             <p className="mt-3 rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]">
-              {pickLocale(
+              {isDemo ? pickLocale(
                 locale,
                 "実際の店舗・場所への訪問を案内するものではありません。",
                 "실제 매장이나 장소 방문을 안내하는 화면이 아닙니다.",
+              ) : pickLocale(
+                locale,
+                "主催者から本選の参加案内が届いた方向けです。イベントへの申込や受付は、主催者の案内に従ってください。",
+                "주최 측에서 본선 참가 안내를 받은 분을 위한 안내예요. 행사 신청과 접수는 주최 측 안내를 따라 주세요.",
               )}
             </p>
             <div className="mt-7 grid gap-3">
               <button
                 type="button"
                 onClick={handleStart}
-                disabled={isStarting}
+                disabled={isStarting || startError === "unavailable"}
                 className="flex min-h-14 items-center justify-center rounded-2xl bg-[#504e49] px-6 text-base font-black text-white"
               >
                 {isStarting
                   ? pickLocale(locale, "記録を作成しています…", "기록을 만드는 중…")
                   : pickLocale(locale, "記録を作成して始める", "기록을 만들고 시작하기")}
               </button>
-              {startFailed ? (
+              {startError ? (
                 <p className="rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]" role="alert">
-                  {pickLocale(
+                  {startError === "unavailable" ? pickLocale(
+                    locale,
+                    "このクエストは現在開始できません。詳細ページで最新の案内をご確認ください。",
+                    "지금은 이 퀘스트를 시작할 수 없어요. 상세 페이지에서 최신 안내를 확인해 주세요.",
+                  ) : pickLocale(
                     locale,
                     "記録を作成できませんでした。通信を確認して、もう一度お試しください。",
                     "기록을 만들지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.",

@@ -3,11 +3,13 @@ import { pickLocale, type Locale } from "../../lib/locale";
 export const AREA_LABELS = {
   all: "ソウル全体",
   seongsu: "聖水",
+  sinchon: "新村",
 } as const;
 
 export const AREA_LABELS_KO: Record<keyof typeof AREA_LABELS, string> = {
   all: "서울 전체",
   seongsu: "성수",
+  sinchon: "신촌",
 };
 
 export const TAG_LABELS = {
@@ -248,14 +250,14 @@ function supportedValue<T extends string>(
   value: string | undefined,
   labels: Record<T, string>,
 ): T | null {
-  return value && value in labels ? (value as T) : null;
+  return value && Object.hasOwn(labels, value) ? (value as T) : null;
 }
 
 export function parseQuestFilters(
   query: Record<string, string | string[] | undefined>,
 ): QuestFilters {
   const areaValue = firstValue(query.area);
-  const area = areaValue === "seongsu" ? areaValue : "all";
+  const area = supportedValue(areaValue, AREA_LABELS) ?? "all";
   const tagValues = Array.isArray(query.tags)
     ? query.tags
     : query.tags?.split(",") ?? [];

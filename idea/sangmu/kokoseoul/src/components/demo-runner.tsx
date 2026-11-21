@@ -7,6 +7,10 @@ import { ReportButton } from "@/components/report-button";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import {
+  DIGIMAN_HACKATHON_ENDED_JA,
+  DIGIMAN_HACKATHON_ENDED_KO,
+} from "@/modules/content/digiman-hackathon";
+import {
   completeQuestRunStep,
   fetchQuestRun,
   type QuestRunDto,
@@ -82,7 +86,7 @@ export function DemoRunner({ runId }: { runId: string }) {
   if (run.status === "completed") {
     return (
       <section className="mx-auto mt-10 max-w-2xl rounded-xl bg-white p-7 text-center shadow-sm">
-        <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "このデモは完了済みです", "이 데모는 이미 완료됐습니다")}</p>
+        <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "このクエストは完了済みです", "이 퀘스트는 이미 완료됐어요")}</p>
         <Link href={`/runs/${run.id}/completion`} className="mt-5 inline-flex min-h-12 items-center rounded-full bg-[#504e49] px-6 text-sm font-black text-white">
           {pickLocale(locale, "完了した記録を見る", "완료 기록 보기")}
         </Link>
@@ -154,6 +158,16 @@ export function DemoRunner({ runId }: { runId: string }) {
               <p className="text-xs font-black text-slate-400">{pickLocale(locale, "場所", "장소")}</p>
               <h3 className="mt-1 text-lg font-black text-[#504e49]">{pickLocale(locale, place.nameJa, place.nameKo)}</h3>
               <p className="mt-3 select-all rounded-xl bg-white p-3 font-bold text-slate-700" lang="ko">{place.addressKo}</p>
+              {place.naverMapPlaceId && /^\d+$/.test(place.naverMapPlaceId) ? (
+                <a
+                  className="mt-3 mr-2 inline-flex min-h-11 items-center rounded-full border border-slate-900/10 bg-white px-4 text-sm font-black text-slate-700"
+                  href={`https://map.naver.com/p/entry/place/${place.naverMapPlaceId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {pickLocale(locale, "NAVERマップを開く（別タブ）", "네이버 지도 열기 (새 탭)")}
+                </a>
+              ) : null}
               <button type="button" onClick={() => handleCopy(place.addressKo)} className="mt-3 min-h-11 rounded-full border border-slate-900/10 bg-white px-4 text-sm font-black text-slate-700">
                 {copyStatus === "copied" ? pickLocale(locale, "コピーしました", "복사했습니다") : pickLocale(locale, "住所をコピー", "주소 복사")}
               </button>
@@ -175,7 +189,11 @@ export function DemoRunner({ runId }: { runId: string }) {
 
           {!run.canContinue ? (
             <p className="mt-7 rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]" role="status">
-              {locale === "ja" && run.unavailableReasonJa ? run.unavailableReasonJa : pickLocale(locale, "現在、このクエストを続けることができません。", "현재 이 퀘스트를 계속 진행할 수 없어요.")}
+              {run.unavailableReasonJa === DIGIMAN_HACKATHON_ENDED_JA
+                ? pickLocale(locale, DIGIMAN_HACKATHON_ENDED_JA, DIGIMAN_HACKATHON_ENDED_KO)
+                : locale === "ja" && run.unavailableReasonJa
+                  ? run.unavailableReasonJa
+                  : pickLocale(locale, "現在、このクエストを続けることができません。", "현재 이 퀘스트를 계속 진행할 수 없어요.")}
             </p>
           ) : null}
           <button type="button" onClick={handleComplete} disabled={isSaving || !run.canContinue} className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#941e34] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(148,30,52,0.25)] disabled:cursor-wait disabled:opacity-65">

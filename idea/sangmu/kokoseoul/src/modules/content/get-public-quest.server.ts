@@ -1,6 +1,7 @@
 import "server-only";
 import type { PoolClient } from "pg";
 import { withDatabaseTransaction } from "../../db/runtime.server";
+import { DIGIMAN_HACKATHON_ENDED_JA, hasDigimanHackathonEnded } from "./digiman-hackathon";
 
 export type QuestAvailability = "available" | "paused" | "archived";
 
@@ -97,8 +98,9 @@ export async function getPublicQuestWithClient(
     ownRunId = run.rows[0]?.id ?? null;
   }
 
+  const ended = hasDigimanHackathonEnded(input.questId);
   const availability: QuestAvailability =
-    row.status === "published" ? "available" : row.status;
+    ended ? "archived" : row.status === "published" ? "available" : row.status;
   return {
     id: row.id,
     versionId: row.version_id,
@@ -126,7 +128,7 @@ export async function getPublicQuestWithClient(
     unavailableReasonJa:
       availability === "available"
         ? null
-        : row.pause_reason_ja ?? UNAVAILABLE_FALLBACK_JA,
+        : ended ? DIGIMAN_HACKATHON_ENDED_JA : row.pause_reason_ja ?? UNAVAILABLE_FALLBACK_JA,
     canStart: availability === "available" && ownRunId === null,
     ownRunId,
   };

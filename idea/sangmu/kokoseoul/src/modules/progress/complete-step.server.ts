@@ -1,6 +1,7 @@
 import "server-only";
 import type { PoolClient } from "pg";
 import { withDatabaseTransaction } from "../../db/runtime.server";
+import { hasDigimanHackathonEnded } from "../content/digiman-hackathon";
 
 export type CompleteQuestStepInput = {
   visitorId: string;
@@ -81,7 +82,11 @@ export async function completeQuestStepWithClient(
      for share`,
     [lookup.rows[0].quest_id],
   );
-  if (quest.rowCount !== 1 || quest.rows[0].status !== "published") {
+  if (
+    quest.rowCount !== 1 ||
+    quest.rows[0].status !== "published" ||
+    hasDigimanHackathonEnded(lookup.rows[0].quest_id)
+  ) {
     return { outcome: "unavailable" };
   }
 

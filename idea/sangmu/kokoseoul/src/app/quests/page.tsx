@@ -13,6 +13,11 @@ import {
 } from "@/modules/content/demo-quests";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
+import {
+  DIGIMAN_HACKATHON,
+  DIGIMAN_HACKATHON_PATH,
+  hasDigimanHackathonEnded,
+} from "@/modules/content/digiman-hackathon";
 
 type SearchParams = Promise<
   Record<string, string | string[] | undefined>
@@ -24,8 +29,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: pickLocale(locale, "クエストを探す", "퀘스트 찾기"),
     description: pickLocale(
       locale,
-      "エリア、興味、時間からソウルのデモクエストを探します。",
-      "지역, 관심사, 시간으로 서울의 데모 퀘스트를 찾습니다.",
+      "エリア、興味、時間からソウルのクエストを探します。",
+      "지역, 관심사, 시간으로 서울의 퀘스트를 찾습니다.",
     ),
   };
 }
@@ -34,6 +39,16 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
   const filters = parseQuestFilters(await searchParams);
   const quests = filterDemoQuests(DEMO_QUESTS, filters);
   const locale = await getRequestLocale();
+  const event = DIGIMAN_HACKATHON;
+  const showHackathon =
+    (filters.area === "all" || filters.area === "sinchon") &&
+    (!filters.purpose || filters.purpose === "discovery") &&
+    filters.tags.length === 0 &&
+    filters.durationMax === null &&
+    filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
+    (!filters.budget || filters.budget === "unlimited") &&
+    !hasDigimanHackathonEnded(event.id);
+  const resultCount = quests.length + Number(showHackathon);
 
   return (
     <>
@@ -54,17 +69,30 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
           </h1>
         </div>
         <p className="shrink-0 text-sm font-bold text-slate-500">
-          {pickLocale(locale, `${quests.length}件`, `${quests.length}개`)}
+          {pickLocale(locale, `${resultCount}件`, `${resultCount}개`)}
         </p>
       </div>
 
+      {showHackathon ? (
+        <article className="seoul-surface mt-6 max-w-2xl rounded-xl p-5 sm:p-7">
+          <p className="text-sm font-black text-[#941e34]">
+            {pickLocale(locale, "本選参加者向け · 応募受付終了", "본선 참가자용 · 모집 마감")}
+          </p>
+          <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, event.titleJa, event.titleKo)}</h2>
+          <p className="mt-2 font-bold text-slate-600">{pickLocale(locale, event.scheduleJa, event.scheduleKo)}</p>
+          <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, event.summaryJa, event.summaryKo)}</p>
+          <Link href={DIGIMAN_HACKATHON_PATH} className="seoul-button-primary mt-4 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-black">
+            {pickLocale(locale, "参加ガイドを見る", "참여 안내 보기")}
+          </Link>
+        </article>
+      ) : null}
       {quests.length > 0 ? (
         <QuestResultsView
           quests={quests}
           filters={filters}
           naverMapKeyId={process.env.NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID?.trim() || null}
         />
-      ) : (
+      ) : showHackathon ? null : (
         <section className="seoul-surface mt-8 max-w-2xl rounded-xl border-dashed px-6 py-16 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-xl bg-[#f7ecee] text-2xl text-[#941e34]" aria-hidden="true">↺</span>
           <h2 className="mt-5 text-2xl font-black tracking-tight text-[#504e49]">

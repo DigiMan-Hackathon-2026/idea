@@ -14,7 +14,7 @@ import {
 
 export function MyDemoRecord() {
   const { locale } = useLocale();
-  const [run, setRun] = useState<MyRunSummaryDto | null>(null);
+  const [runs, setRuns] = useState<MyRunSummaryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [deleteFailed, setDeleteFailed] = useState(false);
@@ -29,10 +29,10 @@ export function MyDemoRecord() {
     setLoadFailed(false);
     try {
       const items = await fetchMyRuns();
-      setRun(items[0] ?? null);
+      setRuns(items);
     } catch (error) {
       if (error instanceof QuestRunApiError && error.code === "SESSION_REQUIRED") {
-        setRun(null);
+        setRuns([]);
       } else {
         setLoadFailed(true);
       }
@@ -46,13 +46,13 @@ export function MyDemoRecord() {
     void fetchMyRuns()
       .then((items) => {
         if (!active) return;
-        setRun(items[0] ?? null);
+        setRuns(items);
         setLoadFailed(false);
       })
       .catch((error: unknown) => {
         if (!active) return;
         if (error instanceof QuestRunApiError && error.code === "SESSION_REQUIRED") {
-          setRun(null);
+          setRuns([]);
         } else {
           setLoadFailed(true);
         }
@@ -78,7 +78,7 @@ export function MyDemoRecord() {
     setDeleteFailed(false);
     try {
       await deleteMyData();
-      setRun(null);
+      setRuns([]);
       setIsConfirmingDelete(false);
     } catch {
       setDeleteFailed(true);
@@ -100,7 +100,7 @@ export function MyDemoRecord() {
     );
   }
 
-  if (!run) {
+  if (runs.length === 0) {
     return (
       <section className="mx-auto mt-10 max-w-xl rounded-xl border border-dashed border-slate-900/15 bg-white/65 px-6 py-16 text-center">
         <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#f7ecee] text-2xl" aria-hidden="true">✦</span>
@@ -111,40 +111,45 @@ export function MyDemoRecord() {
     );
   }
 
-  const completed = run.status === "completed";
-  const destination = completed
-    ? `/runs/${run.id}/completion`
-    : `/runs/${run.id}`;
-  const startedDate = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
+  const dateFormat = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(new Date(run.startedAt));
+  });
 
   return (
     <div className="mx-auto mt-8 max-w-2xl">
-      <section className="overflow-hidden rounded-xl bg-white shadow-[0_20px_65px_rgba(41,37,31,0.09)]">
-        <div className="relative min-h-48 overflow-hidden bg-[#d8ccad] p-6">
-          <span className="relative rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#941e34] shadow-sm">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
-          <span className="absolute -bottom-16 right-5 size-52 rounded-full border-[34px] border-white/35" aria-hidden="true" />
-          <span className="absolute bottom-6 left-7 text-4xl font-black tracking-[-0.06em] text-[#504e49]">MY SEOUL<br />STORY</span>
-        </div>
-        <div className="p-6 sm:p-8">
-          <div className="flex items-center justify-between gap-4">
-            <span className={`rounded-full px-3 py-1.5 text-xs font-black ${completed ? "bg-[#edf1ef] text-[#455f54]" : "bg-[#f7ecee] text-[#941e34]"}`}>
-              {completed
-                ? pickLocale(locale, "完了", "완료")
-                : pickLocale(locale, `進行中 · ${run.completedStepCount}/${run.totalStepCount}`, `진행 중 · ${run.completedStepCount}/${run.totalStepCount}`)}
-            </span>
-            <span className="text-xs font-bold text-slate-400">{pickLocale(locale, "開始", "시작")}: {startedDate}</span>
-          </div>
-          <h2 className="mt-4 text-2xl font-black leading-snug tracking-[-0.035em] text-[#504e49]">{pickLocale(locale, run.titleJa, run.titleKo)}</h2>
-          {!completed && run.nextStepTitleJa && run.nextStepTitleKo ? <p className="mt-3 text-sm font-semibold text-slate-600">{pickLocale(locale, "次", "다음")}: {pickLocale(locale, run.nextStepTitleJa, run.nextStepTitleKo)}</p> : null}
-          <Link href={destination} className="mt-6 flex min-h-13 w-full items-center justify-center rounded-2xl bg-[#941e34] px-5 text-sm font-black text-white">
-            {completed ? pickLocale(locale, "完了した記録を見る", "완료 기록 보기") : pickLocale(locale, "続きから始める", "이어서 시작하기")}
-          </Link>
-        </div>
-      </section>
+      <div className="grid gap-5">
+        {runs.map((run) => {
+          const completed = run.status === "completed";
+          const destination = completed ? `/runs/${run.id}/completion` : `/runs/${run.id}`;
+          const startedDate = dateFormat.format(new Date(run.startedAt));
+          return (
+            <section key={run.id} className="overflow-hidden rounded-xl bg-white shadow-[0_20px_65px_rgba(41,37,31,0.09)]">
+              <div className="relative min-h-48 overflow-hidden bg-[#d8ccad] p-6">
+                <span className="relative rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#941e34] shadow-sm">{run.isDemo ? pickLocale(locale, "デモ体験", "데모 체험") : pickLocale(locale, "進行記録", "진행 기록")}</span>
+                <span className="absolute -bottom-16 right-5 size-52 rounded-full border-[34px] border-white/35" aria-hidden="true" />
+                <span className="absolute bottom-6 left-7 text-4xl font-black tracking-[-0.06em] text-[#504e49]">MY SEOUL<br />STORY</span>
+              </div>
+              <div className="p-6 sm:p-8">
+                <div className="flex items-center justify-between gap-4">
+                  <span className={`rounded-full px-3 py-1.5 text-xs font-black ${completed ? "bg-[#edf1ef] text-[#455f54]" : "bg-[#f7ecee] text-[#941e34]"}`}>
+                    {completed
+                      ? pickLocale(locale, "完了", "완료")
+                      : pickLocale(locale, `進行中 · ${run.completedStepCount}/${run.totalStepCount}`, `진행 중 · ${run.completedStepCount}/${run.totalStepCount}`)}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400">{pickLocale(locale, "開始", "시작")}: {startedDate}</span>
+                </div>
+                <h2 className="mt-4 text-2xl font-black leading-snug tracking-[-0.035em] text-[#504e49]">{pickLocale(locale, run.titleJa, run.titleKo)}</h2>
+                {!completed && run.nextStepTitleJa && run.nextStepTitleKo ? <p className="mt-3 text-sm font-semibold text-slate-600">{pickLocale(locale, "次", "다음")}: {pickLocale(locale, run.nextStepTitleJa, run.nextStepTitleKo)}</p> : null}
+                <Link href={destination} className="mt-6 flex min-h-13 w-full items-center justify-center rounded-2xl bg-[#941e34] px-5 text-sm font-black text-white">
+                  {completed ? pickLocale(locale, "完了した記録を見る", "완료 기록 보기") : pickLocale(locale, "続きから始める", "이어서 시작하기")}
+                </Link>
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       <button type="button" onClick={() => { setDeleteFailed(false); setIsConfirmingDelete(true); }} className="mx-auto mt-8 flex min-h-11 items-center px-4 text-sm font-black text-[#941e34]">{pickLocale(locale, "このブラウザの記録を削除する", "이 브라우저의 기록 삭제")}</button>
 

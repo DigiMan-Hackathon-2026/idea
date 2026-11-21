@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { withDatabaseTransaction } from "../../db/runtime.server";
+import { hasDigimanHackathonEnded } from "../content/digiman-hackathon";
 
 export type StartQuestRunInput = {
   visitorId: string;
@@ -85,7 +86,8 @@ export async function startQuestRunWithClient(
   const lockedQuest = quest.rows[0];
   if (
     lockedQuest.status !== "published" ||
-    lockedQuest.version_id === null
+    lockedQuest.version_id === null ||
+    hasDigimanHackathonEnded(input.questId)
   ) {
     return { outcome: "unavailable" };
   }

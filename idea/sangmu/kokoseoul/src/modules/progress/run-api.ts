@@ -12,6 +12,7 @@ export type QuestRunStepDto = {
     nameJa: string;
     nameKo: string;
     addressKo: string;
+    naverMapPlaceId?: string;
     verifiedAt?: string;
   } | null;
   completedAt: string | null;

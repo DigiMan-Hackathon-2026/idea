@@ -93,13 +93,15 @@ export function DemoCompletion({ runId }: { runId: string }) {
     <div className="mx-auto mt-8 grid max-w-4xl gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
       <section className="overflow-hidden rounded-2xl bg-[#504e49] p-7 text-white shadow-[0_30px_90px_rgba(15,23,42,0.22)] sm:p-10">
         <div className="flex items-start justify-between gap-4">
-          <span className="rounded-full bg-white/12 px-3 py-1.5 text-xs font-black">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
+          <span className="rounded-full bg-white/12 px-3 py-1.5 text-xs font-black">{run.isDemo ? pickLocale(locale, "デモ体験", "데모 체험") : pickLocale(locale, "進行記録", "진행 기록")}</span>
           <span className="text-sm font-bold text-[#e5b560]">{completedDate}</span>
         </div>
         <div className="mt-14 grid size-28 place-items-center rounded-full bg-[#e5b560] text-5xl text-[#504e49] shadow-[0_15px_50px_rgba(255,205,87,0.25)]" aria-hidden="true">✦</div>
         <h1 className="mt-8 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">{pickLocale(locale, "クエスト完了", "퀘스트 완료")}</h1>
         <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, run.titleJa, run.titleKo)}</p>
-        <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/55">{pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")}</p>
+        <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/55">{run.isDemo
+          ? pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")
+          : pickLocale(locale, "案内を完了した記録です。出席は主催者の受付で確認してください。", "참여 안내를 완료한 기록이에요. 출석은 주최 측 접수처에서 확인해 주세요.")}</p>
       </section>
 
       <form onSubmit={handleFeedback} className="rounded-xl bg-white p-6 shadow-sm">

@@ -11,8 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: pickLocale(locale, "わたしの記録", "내 기록"),
     description: pickLocale(
       locale,
-      "このブラウザに保存したデモクエストの進行記録。",
-      "이 브라우저에 저장된 데모 퀘스트 진행 기록.",
+      "このブラウザで確認できるクエストの進行記録。",
+      "이 브라우저에서 확인할 수 있는 퀘스트 진행 기록.",
     ),
   };
 }
