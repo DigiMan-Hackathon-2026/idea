@@ -6,7 +6,7 @@ export function createPwaIcon(size: number) {
       <div
         style={{
           alignItems: "center",
-          background: "#ff5a36",
+          background: "#941e34",
           display: "flex",
           height: "100%",
           justifyContent: "center",
@@ -16,33 +16,43 @@ export function createPwaIcon(size: number) {
         <div
           style={{
             alignItems: "center",
-            background: "#fffaf2",
-            borderRadius: "24%",
+            background: "#dfdfdd",
+            borderRadius: "20%",
             display: "flex",
             height: "72%",
             justifyContent: "center",
-          position: "relative",
+            position: "relative",
             width: "72%",
           }}
         >
-        <div
-          style={{
-            background: "#c93418",
-            borderRadius: 999,
-            height: "18%",
-            position: "absolute",
-            width: "58%",
-          }}
-        />
-        <div
-          style={{
-            background: "#c93418",
-            borderRadius: 999,
-            height: "58%",
-            position: "absolute",
-            width: "18%",
-          }}
-        />
+          <div
+            style={{
+              background: "#e5b560",
+              height: "13%",
+              position: "absolute",
+              top: "17%",
+              width: "68%",
+            }}
+          />
+          <div
+            style={{
+              background: "#504e49",
+              height: "16%",
+              position: "absolute",
+              top: "37%",
+              width: "68%",
+            }}
+          />
+          <div
+            style={{
+              background: "#455f54",
+              borderRadius: 999,
+              bottom: "16%",
+              height: "22%",
+              position: "absolute",
+              width: "22%",
+            }}
+          />
         </div>
       </div>
     ),

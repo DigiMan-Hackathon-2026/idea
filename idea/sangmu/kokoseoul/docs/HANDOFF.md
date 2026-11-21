@@ -15,7 +15,7 @@
 - F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. 우상단 언어 버튼으로 한국어·일본어를 현재 화면에서 전환하며 선택은 1년 locale cookie로 페이지 이동 뒤에도 유지된다. 진행·완료·피드백·내 기록·삭제·정보 신고는 익명 visitor session과 PostgreSQL API에 연결됐다. 신고는 공개 상세 API의 `versionId`로 보내고 재전송은 같은 `clientRequestId`로 한 건에 수렴한다.
 - 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
-- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 37개 tooling 회귀 테스트, Markdown 65개, JSON block 45개, API endpoint 22개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
+- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 37개 tooling 회귀 테스트, Markdown 66개, JSON block 45개, API endpoint 22개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
 - 외부 서비스의 현재 region·복구·비용 제약과 Singapore 배치 후보는 [외부 서비스 평가 v0.1](EXTERNAL_SERVICES_EVALUATION_v0.1.md)에 정리했다.
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.
@@ -23,7 +23,7 @@
 - 화면 mock과 서버 계약 테스트에 사용할 공개·진행 API JSON은 [B2C API 요청과 응답 예시 v0.1](API_EXAMPLES_B2C_v0.1.md)에 정리했다.
 - 공통 error envelope·request ID·405/500·14개 code는 [API 오류 catalog](API_ERROR_CATALOG_v0.1.md), 목록 정렬·cursor·rotation은 [pagination 계약](PAGINATION_CURSOR_v0.1.md)에 정리했다.
 - B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
-- 사용자 화면은 [여기서울 UX 원칙 v0.1](UX_PRINCIPLES_v0.1.md)의 한 화면 한 핵심 행동, 예측 가능한 버튼 문구, 쉬운 말, 선택권 존중, 오류 예방·복구 기준을 따른다. 토스 공개 자료의 원칙을 참고하지만 토스 브랜드와 외형은 복제하지 않는다.
+- 사용자 화면은 [여기서울 UX 원칙 v0.1](UX_PRINCIPLES_v0.1.md)의 한 화면 한 핵심 행동, 예측 가능한 버튼 문구, 쉬운 말, 선택권 존중, 오류 예방·복구 기준을 따른다. [여기서울 서울색 UI 체계](SEOUL_COLOR_SYSTEM_v0.1.md)의 서울 대표색 10 원색 토큰과 의미 규칙을 사용하며, 토스나 서울시의 로고·외형은 복제하지 않는다.
 - demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류와 진행 API 실패에 일본어·한국어 복구 행동을 제공한다. 응답 유실 뒤에는 run을 다시 조회해 저장 상태를 복구한다.
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
 - 기본 경로는 `Referrer-Policy: no-referrer`, Naver 지도 도메인 인증이 필요한 `/quests`만 `origin`을 적용한다. 모든 경로에 MIME sniffing·iframe 차단과 camera·microphone 차단 header를 적용했다. geolocation은 same-origin만 허용하고 시작 화면의 현재 위치 선택 또는 탐색 지도의 위치 버튼 뒤에만 요청한다. 탐색 지도는 파란 위치 점·정확도 범위·현재 위치 복귀를 제공하지만 좌표는 browser client overlay와 지원 지역 판정에만 쓰며 URL·저장소·서버 요청·NAVER SDK 요청에 넣지 않는다. 화면을 떠나면 추적을 중단하고 GPS로 실내 층·개찰구를 추정하지 않는다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.

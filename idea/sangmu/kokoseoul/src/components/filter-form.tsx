@@ -43,7 +43,7 @@ function SelectField({
       <select
         name={name}
         defaultValue={defaultValue}
-        className="min-h-12 rounded-2xl border border-slate-900/10 bg-white px-4 text-base font-semibold text-slate-900 shadow-sm"
+        className="min-h-12 rounded-xl border border-[var(--border)] bg-white px-4 text-base font-semibold text-slate-900 shadow-sm"
       >
         {children}
       </select>
@@ -56,9 +56,9 @@ export function FilterForm({ filters }: { filters: QuestFilters }) {
 
   return (
     <details className="group">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 rounded-2xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#6789ca]">
         <span>
-          <span className="block text-lg font-black text-slate-950">
+          <span className="block text-lg font-black text-[#504e49]">
             {pickLocale(locale, "条件をもっと合わせる", "추천 조건 더 맞추기")}
           </span>
           <span className="mt-1 block text-sm font-semibold text-slate-500">
@@ -69,7 +69,7 @@ export function FilterForm({ filters }: { filters: QuestFilters }) {
             )}
           </span>
         </span>
-        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-lg font-black text-slate-600 group-open:rotate-45" aria-hidden="true">
+        <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#dfdfdd] text-lg font-black text-[#504e49] group-open:rotate-45" aria-hidden="true">
           +
         </span>
       </summary>
@@ -168,7 +168,7 @@ export function FilterForm({ filters }: { filters: QuestFilters }) {
 
         <button
           type="submit"
-          className="min-h-13 rounded-2xl bg-slate-950 px-6 text-base font-black text-white shadow-[0_10px_30px_rgba(15,23,42,0.18)] transition hover:bg-[#ff5a36] sm:justify-self-start"
+          className="seoul-button-primary min-h-13 rounded-xl px-6 text-base font-black transition sm:justify-self-start"
         >
           {pickLocale(locale, "この条件で探し直す", "이 조건으로 다시 찾기")}
         </button>

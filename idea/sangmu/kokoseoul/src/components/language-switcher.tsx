@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
       onClick={switchLocale}
       disabled={isPending}
       aria-label={accessibleLabel}
-      className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-slate-900/10 bg-white/80 px-3 text-sm font-black text-slate-800 shadow-sm backdrop-blur transition hover:bg-white disabled:cursor-wait disabled:opacity-65"
+      className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-white/80 px-3 text-sm font-black text-slate-800 shadow-sm transition hover:bg-[var(--surface-muted)] disabled:cursor-wait disabled:opacity-65"
     >
       <span aria-hidden="true">◎</span>
       {nextLabel}

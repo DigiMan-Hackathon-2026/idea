@@ -5,8 +5,8 @@ export default function OfflinePage() {
     <main
       style={{
         alignItems: "center",
-        background: "#f7f3eb",
-        color: "#0f172a",
+        background: "#f4f0e7",
+        color: "#504e49",
         display: "flex",
         fontFamily: "system-ui, sans-serif",
         minHeight: "100vh",
@@ -29,7 +29,7 @@ export default function OfflinePage() {
           aria-hidden="true"
           style={{
             alignItems: "center",
-            background: "#ff5a36",
+            background: "#941e34",
             borderRadius: "16px",
             color: "white",
             display: "flex",
@@ -45,20 +45,20 @@ export default function OfflinePage() {
         <h1 style={{ fontSize: "28px", lineHeight: 1.25, margin: "24px 0 0" }}>
           オフラインです
         </h1>
-        <p style={{ color: "#475569", lineHeight: 1.7, margin: "12px 0 0" }}>
+        <p style={{ color: "#594743", lineHeight: 1.7, margin: "12px 0 0" }}>
           接続を確認して、もう一度お試しください。進行記録はこのブラウザに残っています。
         </p>
-        <hr style={{ border: 0, borderTop: "1px solid #e2e8f0", margin: "28px 0" }} />
+        <hr style={{ border: 0, borderTop: "1px solid #a4a199", margin: "28px 0" }} />
         <h2 style={{ fontSize: "22px", lineHeight: 1.3, margin: 0 }}>
           인터넷에 연결되지 않았어요
         </h2>
-        <p style={{ color: "#475569", lineHeight: 1.7, margin: "12px 0 0" }}>
+        <p style={{ color: "#594743", lineHeight: 1.7, margin: "12px 0 0" }}>
           연결 상태를 확인하고 다시 시도해 주세요. 진행 기록은 이 브라우저에 남아 있어요.
         </p>
         <Link
           href="/"
           style={{
-            background: "#0f172a",
+            background: "#504e49",
             borderRadius: "16px",
             color: "white",
             cursor: "pointer",

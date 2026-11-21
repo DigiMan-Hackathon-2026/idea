@@ -115,10 +115,10 @@ export function NaverQuestMap({
           map: mapRef.current,
           center: point,
           radius: accuracy,
-          strokeColor: "#1677ff",
+          strokeColor: "#6789ca",
           strokeOpacity: 0.35,
           strokeWeight: 1,
-          fillColor: "#3b82f6",
+          fillColor: "#6789ca",
           fillOpacity: 0.14,
         });
       }
@@ -133,7 +133,7 @@ export function NaverQuestMap({
           title: pickLocale(locale, "現在地", "현재 위치"),
           icon: {
             content:
-              '<div data-testid="current-location-marker" style="width:22px;height:22px;border:4px solid white;border-radius:999px;background:#1677ff;box-shadow:0 2px 8px rgba(15,23,42,.35)" aria-hidden="true"></div>',
+              '<div data-testid="current-location-marker" style="width:22px;height:22px;border:4px solid white;border-radius:999px;background:#6789ca;box-shadow:0 2px 8px rgba(15,23,42,.35)" aria-hidden="true"></div>',
             anchor: new maps.Point(11, 11),
           },
         });
@@ -254,7 +254,7 @@ export function NaverQuestMap({
           position,
           title: pickLocale(locale, quest.titleJa, quest.titleKo),
           icon: {
-            content: `<button type="button" aria-label="${index + 1}" style="display:grid;place-items:center;width:38px;height:38px;border:3px solid white;border-radius:999px;background:#ff5a36;color:white;font:900 14px system-ui;box-shadow:0 8px 20px rgba(15,23,42,.24)">${index + 1}</button>`,
+            content: `<button type="button" aria-label="${index + 1}" style="display:grid;place-items:center;width:38px;height:38px;border:3px solid white;border-radius:999px;background:#941e34;color:white;font:900 14px system-ui;box-shadow:0 8px 20px rgba(15,23,42,.24)">${index + 1}</button>`,
             anchor: new maps.Point(19, 19),
           },
         });
@@ -274,7 +274,7 @@ export function NaverQuestMap({
             `${quest.transitGuide.stationKo} ${quest.transitGuide.exitKo}`,
           ),
           icon: {
-            content: `<div style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#152238;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:${quest.transitGuide.lineColor};color:white;font-size:14px">${quest.transitGuide.lineCode}</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
+            content: `<div style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#504e49;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:${quest.transitGuide.lineColor};color:white;font-size:14px">${quest.transitGuide.lineCode}</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
             anchor: new maps.Point(19, 19),
           },
         });
@@ -344,7 +344,7 @@ export function NaverQuestMap({
         routeLineRef.current = new maps.Polyline({
           map: mapRef.current,
           path,
-          strokeColor: "#ff5a36",
+          strokeColor: "#941e34",
           strokeOpacity: 0.92,
           strokeWeight: 6,
           strokeLineCap: "round",
@@ -371,15 +371,15 @@ export function NaverQuestMap({
 
   if (!keyId || loadState === "error") {
     return (
-      <section className="mt-6 max-w-2xl rounded-[2rem] border border-slate-900/10 bg-white p-7 text-center shadow-sm" role="status">
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#fff0eb] text-2xl" aria-hidden="true">⌖</span>
-        <h2 className="mt-4 text-xl font-black text-slate-950">
+      <section className="mt-6 max-w-2xl rounded-xl border border-slate-900/10 bg-white p-7 text-center shadow-sm" role="status">
+        <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#f7ecee] text-2xl" aria-hidden="true">⌖</span>
+        <h2 className="mt-4 text-xl font-black text-[#504e49]">
           {pickLocale(locale, "地図を読み込めませんでした", "지도를 불러오지 못했어요")}
         </h2>
         <p className="mx-auto mt-2 max-w-md leading-7 text-slate-600">
           {pickLocale(locale, "リストからクエストを選べます。現在地の共有は必要ありません。", "목록에서 퀘스트를 고를 수 있어요. 현재 위치를 공유하지 않아도 됩니다.")}
         </p>
-        <button type="button" onClick={onShowList} className="mt-5 min-h-12 rounded-full bg-slate-950 px-6 text-sm font-black text-white">
+        <button type="button" onClick={onShowList} className="mt-5 min-h-12 rounded-full bg-[#504e49] px-6 text-sm font-black text-white">
           {pickLocale(locale, "リストに戻る", "목록으로 돌아가기")}
         </button>
       </section>
@@ -393,7 +393,7 @@ export function NaverQuestMap({
           <div ref={containerRef} className="h-full w-full" data-testid="naver-map" />
         </div>
         {loadState !== "ready" ? (
-          <div className="absolute inset-0 grid place-items-center bg-[#eef5f2]" role="status">
+          <div className="absolute inset-0 grid place-items-center bg-[#edf1ef]" role="status">
             <p className="rounded-xl border border-slate-900/10 bg-white px-4 py-3 text-sm font-black text-slate-700">
               {pickLocale(locale, "地図を読み込んでいます…", "지도를 불러오고 있어요…")}
             </p>
@@ -407,7 +407,7 @@ export function NaverQuestMap({
               disabled={userLocationState === "locating"}
               className="flex min-h-11 max-w-full items-center gap-2 rounded-xl border border-slate-900/15 bg-white px-3.5 text-sm font-black text-slate-900 shadow-sm transition hover:bg-slate-50 disabled:cursor-wait disabled:text-slate-500"
             >
-              <span className="grid size-6 shrink-0 place-items-center text-[#0967d2]" aria-hidden="true">
+              <span className="grid size-6 shrink-0 place-items-center text-[#6789ca]" aria-hidden="true">
                 {userLocationState === "locating" ? "…" : "⌖"}
               </span>
               <span className="truncate">
@@ -437,10 +437,10 @@ export function NaverQuestMap({
 
       {selectedQuest ? (
         <article className="self-start rounded-2xl border border-slate-900/10 bg-white p-5">
-          <p className="text-xs font-black tracking-[0.12em] text-[#c93418]">
+          <p className="text-xs font-black tracking-[0.12em] text-[#941e34]">
             {getAreaLabel(selectedQuest.areaCode, locale).toUpperCase()}
           </p>
-          <h2 className="mt-2 text-xl font-black leading-snug tracking-tight text-slate-950">
+          <h2 className="mt-2 text-xl font-black leading-snug tracking-tight text-[#504e49]">
             {pickLocale(locale, selectedQuest.titleJa, selectedQuest.titleKo)}
           </h2>
           <p className="mt-3 text-sm font-bold text-slate-500">
@@ -452,7 +452,7 @@ export function NaverQuestMap({
           <div className="mt-5">
             <TransitGuideCard quest={selectedQuest} routeState={routeState as TransitRouteStatus} />
           </div>
-          <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-slate-800">
+          <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-[#504e49] px-5 text-sm font-black text-white hover:bg-[#594743]">
             {pickLocale(locale, "詳細を見る", "자세히 보기")}
           </Link>
         </article>

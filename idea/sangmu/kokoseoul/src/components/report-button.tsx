@@ -172,29 +172,29 @@ export function ReportButton({
       </button>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-50 grid place-items-end bg-slate-950/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) close(); }}>
-          <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" className="max-h-dvh w-full max-w-lg overflow-y-auto rounded-t-[2rem] bg-[#f7f3eb] p-6 shadow-2xl sm:rounded-[2rem] sm:p-8">
+        <div className="fixed inset-0 z-50 grid place-items-end bg-[#504e49]/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) close(); }}>
+          <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" className="max-h-dvh w-full max-w-lg overflow-y-auto rounded-t-[2rem] bg-[#f4f0e7] p-6 shadow-2xl sm:rounded-xl sm:p-8">
             <div className="flex items-start justify-between gap-5">
-              <h2 id="report-dialog-title" className="text-2xl font-black tracking-tight text-slate-950">{pickLocale(locale, "情報の誤りを報告", "잘못된 정보 신고")}</h2>
+              <h2 id="report-dialog-title" className="text-2xl font-black tracking-tight text-[#504e49]">{pickLocale(locale, "情報の誤りを報告", "잘못된 정보 신고")}</h2>
               <button ref={closeButtonRef} type="button" onClick={close} disabled={submitting} className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-xl font-bold text-slate-700 shadow-sm disabled:opacity-50" aria-label={pickLocale(locale, "閉じる", "닫기")}>×</button>
             </div>
 
             {state === "succeeded" ? (
               <div className="py-10 text-center" role="status">
-                <span className="mx-auto grid size-16 place-items-center rounded-full bg-teal-700 text-2xl text-white" aria-hidden="true">✓</span>
-                <h3 className="mt-5 text-xl font-black text-slate-950">{pickLocale(locale, "報告を受け付けました", "신고를 접수했어요")}</h3>
+                <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#455f54] text-2xl text-white" aria-hidden="true">✓</span>
+                <h3 className="mt-5 text-xl font-black text-[#504e49]">{pickLocale(locale, "報告を受け付けました", "신고를 접수했어요")}</h3>
                 <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, "運営者が内容を確認して、案内を見直します。個別の返信はしていません。", "운영자가 내용을 확인하고 안내를 점검할게요. 개별 답변은 드리지 않아요.")}</p>
-                <button type="button" onClick={close} className="mt-6 min-h-12 rounded-full bg-slate-950 px-6 text-sm font-black text-white">{pickLocale(locale, "閉じる", "닫기")}</button>
+                <button type="button" onClick={close} className="mt-6 min-h-12 rounded-full bg-[#504e49] px-6 text-sm font-black text-white">{pickLocale(locale, "閉じる", "닫기")}</button>
               </div>
             ) : target.status === "failed" ? (
               <div className="mt-6 grid gap-4" role="alert">
-                <p className="rounded-2xl bg-[#fff0eb] p-4 text-sm font-semibold leading-6 text-[#852a19]">
+                <p className="rounded-2xl bg-[#f7ecee] p-4 text-sm font-semibold leading-6 text-[#941e34]">
                   {target.code === "NOT_FOUND"
                     ? describeReportError("NOT_FOUND", locale)
                     : pickLocale(locale, "報告の準備ができませんでした。接続を確認して、もう一度お試しください。", "신고를 준비하지 못했어요. 연결을 확인하고 다시 시도해 주세요.")}
                 </p>
                 {target.code !== "NOT_FOUND" ? (
-                  <button type="button" onClick={() => void loadTarget()} className="min-h-12 rounded-2xl bg-slate-950 px-6 text-sm font-black text-white">{pickLocale(locale, "報告の準備をやり直す", "신고 준비 다시 하기")}</button>
+                  <button type="button" onClick={() => void loadTarget()} className="min-h-12 rounded-2xl bg-[#504e49] px-6 text-sm font-black text-white">{pickLocale(locale, "報告の準備をやり直す", "신고 준비 다시 하기")}</button>
                 ) : null}
               </div>
             ) : (
@@ -214,14 +214,14 @@ export function ReportButton({
                 </label>
                 <p className="rounded-2xl bg-white p-4 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "名前・連絡先・予約情報などの個人情報は入力しないでください。送信すると運営者に届き、このブラウザ用の匿名記録が作られます。", "이름·연락처·예약 정보 같은 개인정보는 입력하지 마세요. 보내면 운영자에게 전달되고, 이 브라우저용 익명 기록이 만들어져요.")}</p>
                 {error ? (
-                  <div className="rounded-2xl bg-[#fff0eb] p-4 text-sm font-semibold leading-6 text-[#852a19]" role="alert">
+                  <div className="rounded-2xl bg-[#f7ecee] p-4 text-sm font-semibold leading-6 text-[#941e34]" role="alert">
                     <p>{describeReportError(error, locale)}</p>
                     {error === "REQUEST_CONFLICT" ? (
                       <button type="button" onClick={() => void submit(true)} className="mt-3 min-h-11 rounded-full bg-white px-4 text-sm font-black text-slate-800 shadow-sm">{pickLocale(locale, "新しい報告として送信する", "새 신고로 보내기")}</button>
                     ) : null}
                   </div>
                 ) : null}
-                <button type="submit" disabled={submitting || target.status !== "ready"} className="min-h-13 rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white disabled:cursor-wait disabled:opacity-65">
+                <button type="submit" disabled={submitting || target.status !== "ready"} className="min-h-13 rounded-2xl bg-[#941e34] px-6 text-base font-black text-white disabled:cursor-wait disabled:opacity-65">
                   {submitting
                     ? pickLocale(locale, "送信しています…", "보내는 중…")
                     : target.status === "loading"

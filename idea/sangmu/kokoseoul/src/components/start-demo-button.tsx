@@ -50,14 +50,14 @@ export function StartDemoButton({ questId }: { questId: string }) {
           setStartFailed(false);
           setIsOpen(true);
         }}
-        className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.28)] transition hover:-translate-y-0.5 hover:bg-[#df4223] disabled:cursor-wait disabled:opacity-70"
+        className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#941e34] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(148,30,52,0.28)] transition hover:-translate-y-0.5 hover:bg-[#7f192c] disabled:cursor-wait disabled:opacity-70"
       >
         {pickLocale(locale, "このデモクエストを始める", "이 데모 퀘스트 시작하기")}
       </button>
 
       {isOpen ? (
         <div
-          className="fixed inset-0 z-50 grid place-items-end bg-slate-950/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5"
+          className="fixed inset-0 z-50 grid place-items-end bg-[#504e49]/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5"
           role="presentation"
           onMouseDown={(event) => {
             if (!isStarting && event.currentTarget === event.target) setIsOpen(false);
@@ -68,12 +68,12 @@ export function StartDemoButton({ questId }: { questId: string }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="progress-dialog-title"
-            className="w-full max-w-lg rounded-t-[2rem] bg-[#f7f3eb] p-6 shadow-2xl sm:rounded-[2rem] sm:p-8"
+            className="w-full max-w-lg rounded-t-[2rem] bg-[#f4f0e7] p-6 shadow-2xl sm:rounded-xl sm:p-8"
           >
             <div className="flex items-start justify-between gap-6">
               <div>
-                <p className="text-xs font-black tracking-[0.16em] text-[#c93418]">{pickLocale(locale, "開始前に確認", "시작 전 확인")}</p>
-                <h2 id="progress-dialog-title" className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                <p className="text-xs font-black tracking-[0.16em] text-[#941e34]">{pickLocale(locale, "開始前に確認", "시작 전 확인")}</p>
+                <h2 id="progress-dialog-title" className="mt-2 text-2xl font-black tracking-tight text-[#504e49]">
                   {pickLocale(locale, "進行記録について", "진행 기록 안내")}
                 </h2>
               </div>
@@ -95,7 +95,7 @@ export function StartDemoButton({ questId }: { questId: string }) {
                 "이 데모에서는 익명 진행 기록을 이 브라우저 전용 세션에 30일간 저장합니다. 다른 기기와 공유되지 않습니다.",
               )}
             </p>
-            <p className="mt-3 rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#9d2d18]">
+            <p className="mt-3 rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]">
               {pickLocale(
                 locale,
                 "実際の店舗・場所への訪問を案内するものではありません。",
@@ -107,14 +107,14 @@ export function StartDemoButton({ questId }: { questId: string }) {
                 type="button"
                 onClick={handleStart}
                 disabled={isStarting}
-                className="flex min-h-14 items-center justify-center rounded-2xl bg-slate-950 px-6 text-base font-black text-white"
+                className="flex min-h-14 items-center justify-center rounded-2xl bg-[#504e49] px-6 text-base font-black text-white"
               >
                 {isStarting
                   ? pickLocale(locale, "記録を作成しています…", "기록을 만드는 중…")
                   : pickLocale(locale, "記録を作成して始める", "기록을 만들고 시작하기")}
               </button>
               {startFailed ? (
-                <p className="rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#9d2d18]" role="alert">
+                <p className="rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]" role="alert">
                   {pickLocale(
                     locale,
                     "記録を作成できませんでした。通信を確認して、もう一度お試しください。",

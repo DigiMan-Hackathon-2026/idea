@@ -117,7 +117,7 @@ function NaverTransitRouteActions({ quest }: { quest: DemoQuest }) {
             platform,
           )
         }
-        className="min-h-12 rounded-xl bg-slate-950 px-4 text-sm font-black text-white hover:bg-slate-800"
+        className="min-h-12 rounded-xl bg-[#504e49] px-4 text-sm font-black text-white hover:bg-[#594743]"
       >
         {pickLocale(
           locale,
@@ -174,34 +174,34 @@ export function TransitGuideCard({
 
   return (
     <section className="rounded-xl border border-slate-900/10 bg-slate-50 p-4" data-testid="transit-guide" aria-labelledby={`transit-${quest.id}`}>
-      <p className="text-xs font-black tracking-[0.14em] text-[#087735]">
+      <p className="text-xs font-black tracking-[0.14em] text-[#455f54]">
         {pickLocale(locale, "地下鉄＋徒歩", "지하철+도보")}
       </p>
-      <h3 id={`transit-${quest.id}`} className="mt-2 text-xl font-black leading-7 text-slate-950">
+      <h3 id={`transit-${quest.id}`} className="mt-2 text-xl font-black leading-7 text-[#504e49]">
         {pickLocale(locale, "迷わないための行き方", "헤매지 않는 이동 안내")}
       </h3>
 
       <ol className="relative mt-5 grid gap-2 before:absolute before:bottom-7 before:left-[1.15rem] before:top-7 before:w-px before:bg-slate-300">
         <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 p-2">
-          <span className="z-10 grid size-9 place-items-center rounded-full border-2 border-[#00a84d] bg-white text-sm font-black text-[#087735]" aria-hidden="true">1</span>
+          <span className="z-10 grid size-9 place-items-center rounded-full border-2 border-[#455f54] bg-white text-sm font-black text-[#455f54]" aria-hidden="true">1</span>
           <div>
-            <p className="text-sm font-black text-slate-950">{pickLocale(locale, "現在地から出発", "현재 위치에서 출발")}</p>
+            <p className="text-sm font-black text-[#504e49]">{pickLocale(locale, "現在地から出発", "현재 위치에서 출발")}</p>
             <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "乗車駅・乗換・所要時間はNAVERマップで確認", "승차역·환승·소요 시간은 네이버 지도에서 확인")}</p>
           </div>
         </li>
         <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 border-y border-slate-900/8 bg-white p-2 py-3">
           <span className="z-10 grid size-9 place-items-center rounded-full text-sm font-black text-white" style={{ backgroundColor: quest.transitGuide.lineColor }} aria-hidden="true">{quest.transitGuide.lineCode}</span>
           <div>
-            <p className="text-sm font-black text-slate-950">
+            <p className="text-sm font-black text-[#504e49]">
               {pickLocale(locale, quest.transitGuide.lineJa, quest.transitGuide.lineKo)} · {pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}
             </p>
             <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, quest.transitGuide.directionJa, quest.transitGuide.directionKo)}</p>
           </div>
         </li>
         <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 p-2">
-          <span className="z-10 grid size-9 place-items-center rounded-full bg-[#ff5a36] text-sm font-black text-white" aria-hidden="true">3</span>
+          <span className="z-10 grid size-9 place-items-center rounded-full bg-[#941e34] text-sm font-black text-white" aria-hidden="true">3</span>
           <div>
-            <p className="text-sm font-black text-slate-950">
+            <p className="text-sm font-black text-[#504e49]">
               {pickLocale(locale, quest.transitGuide.exitJa, quest.transitGuide.exitKo)} · {walkingSummary}
             </p>
             <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, quest.transitGuide.arrivalTipJa, quest.transitGuide.arrivalTipKo)}</p>

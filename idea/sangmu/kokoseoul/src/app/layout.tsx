@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f7f3eb",
+  themeColor: "#d8ccad",
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <PwaLifecycle />
           <a
             href="#main-content"
-            className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white transition focus:translate-y-0"
+            className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl bg-[var(--seoul-roof-tile)] px-5 py-3 text-sm font-black text-white transition focus:translate-y-0"
           >
             {pickLocale(locale, "本文へスキップ", "본문으로 건너뛰기")}
           </a>

@@ -43,7 +43,7 @@ function Choice({
         onChange={onChange}
         className="peer sr-only"
       />
-      <span className="flex min-h-13 items-center rounded-2xl border border-slate-900/10 bg-white px-4 text-left text-base font-bold leading-6 text-slate-700 shadow-sm transition peer-checked:border-[#ff5a36] peer-checked:bg-[#fff0eb] peer-checked:text-[#a92e18] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-teal-700">
+      <span className="flex min-h-13 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-left text-base font-bold leading-6 text-slate-700 shadow-sm transition peer-checked:border-[#941e34] peer-checked:bg-[#f7ecee] peer-checked:text-[#941e34] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
         {children}
       </span>
     </label>
@@ -111,7 +111,7 @@ export function QuestOnboarding() {
   return (
     <section aria-labelledby="quest-onboarding-title">
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-black text-[#c93418]">
+        <p className="text-sm font-black text-[#941e34]">
           {pickLocale(locale, "おすすめ条件", "추천 조건")}
         </p>
         <p className="text-sm font-bold text-slate-400" aria-label={pickLocale(locale, `全3問の${step + 1}問目`, `총 3개 중 ${step + 1}번째 질문`)}>
@@ -122,7 +122,7 @@ export function QuestOnboarding() {
         {[0, 1, 2].map((index) => (
           <span
             key={index}
-            className={`h-1.5 rounded-full ${index <= step ? "bg-[#ff5a36]" : "bg-slate-200"}`}
+            className={`h-1 ${index <= step ? "bg-[#941e34]" : "bg-[#dfdfdd]"}`}
           />
         ))}
       </div>
@@ -133,7 +133,7 @@ export function QuestOnboarding() {
             ref={headingRef}
             id="quest-onboarding-title"
             tabIndex={-1}
-            className="text-2xl font-black leading-tight tracking-[-0.035em] text-slate-950"
+            className="text-2xl font-black leading-tight tracking-[-0.035em] text-[#504e49]"
           >
             {pickLocale(locale, "今日は何をしたいですか？", "오늘 무엇을 하고 싶어요?")}
           </legend>
@@ -162,7 +162,7 @@ export function QuestOnboarding() {
             ref={headingRef}
             id="quest-onboarding-title"
             tabIndex={-1}
-            className="text-2xl font-black leading-tight tracking-[-0.035em] text-slate-950"
+            className="text-2xl font-black leading-tight tracking-[-0.035em] text-[#504e49]"
           >
             {pickLocale(locale, "今日はどのくらい時間がありますか？", "오늘 얼마나 시간이 있어요?")}
           </legend>
@@ -191,7 +191,7 @@ export function QuestOnboarding() {
             ref={headingRef}
             id="quest-onboarding-title"
             tabIndex={-1}
-            className="text-2xl font-black leading-tight tracking-[-0.035em] text-slate-950"
+            className="text-2xl font-black leading-tight tracking-[-0.035em] text-[#504e49]"
           >
             {pickLocale(locale, "どのエリアで探しますか？", "어느 지역에서 찾아볼까요?")}
           </legend>
@@ -223,7 +223,7 @@ export function QuestOnboarding() {
                   onChange={(event) =>
                     setChosenArea(event.target.value as AreaCode)
                   }
-                  className="min-h-12 rounded-2xl border border-slate-900/10 bg-white px-4 text-base font-semibold text-slate-900 shadow-sm"
+                  className="min-h-12 rounded-xl border border-[var(--border)] bg-white px-4 text-base font-semibold text-slate-900 shadow-sm"
                 >
                   {Object.keys(AREA_LABELS)
                     .filter((area) => area !== "all")
@@ -245,7 +245,7 @@ export function QuestOnboarding() {
             </Choice>
           </div>
           {areaChoice === "current" ? (
-            <p className="mt-3 rounded-2xl bg-teal-50 p-3 text-sm font-semibold leading-6 text-teal-800">
+            <p className="mt-3 rounded-xl border-l-4 border-[#455f54] bg-[#edf1ef] p-3 text-sm font-semibold leading-6 text-[#455f54]">
               {pickLocale(
                 locale,
                 "現在地は近い対応エリアを選ぶためだけに使い、保存・送信しません。",
@@ -254,7 +254,7 @@ export function QuestOnboarding() {
             </p>
           ) : null}
           {locationStatus === "failed" ? (
-            <p className="mt-3 rounded-2xl bg-[#fff0eb] p-3 text-sm font-semibold leading-6 text-[#852a19]" role="alert">
+            <p className="mt-3 rounded-xl border-l-4 border-[#941e34] bg-[#f7ecee] p-3 text-sm font-semibold leading-6 text-[#941e34]" role="alert">
               {pickLocale(
                 locale,
                 "現在地を確認できませんでした。エリアを選ぶか「まだ分からない」を選べます。",
@@ -270,7 +270,7 @@ export function QuestOnboarding() {
           type="button"
           disabled={!canContinue || locationStatus === "loading"}
           onClick={() => (step < 2 ? setStep(step + 1) : finish())}
-          className="min-h-14 rounded-2xl bg-slate-950 px-6 text-base font-black text-white shadow-[0_10px_30px_rgba(15,23,42,0.18)] transition hover:bg-[#ff5a36] disabled:cursor-not-allowed disabled:opacity-45"
+          className="seoul-button-primary min-h-14 rounded-xl px-6 text-base font-black transition disabled:cursor-not-allowed disabled:opacity-45"
         >
           {locationStatus === "loading"
             ? pickLocale(locale, "現在地を確認中…", "현재 위치 확인 중…")
@@ -287,7 +287,7 @@ export function QuestOnboarding() {
               setLocationStatus("idle");
               setStep(step - 1);
             }}
-            className="min-h-11 rounded-2xl text-sm font-black text-slate-500"
+            className="min-h-11 rounded-xl text-sm font-black text-slate-500 hover:bg-[var(--surface-muted)]"
           >
             {pickLocale(locale, "前の質問に戻る", "이전 질문으로 돌아가기")}
           </button>

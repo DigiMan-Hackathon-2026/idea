@@ -324,11 +324,11 @@ function StationDataPanel({
     : null;
 
   if (snapshot.status === "not_configured") {
-    return <p className="mt-5 rounded-2xl bg-[#fff7e8] p-4 text-sm font-bold leading-6 text-slate-700">{pickLocale(locale, "公式のエレベーター・快速降車情報は接続準備中です。駅構内の表示と駅員の案内を優先してください。", "공식 엘리베이터·빠른 하차 정보는 연결 준비 중이에요. 역 안 표지와 역무원 안내를 우선해 주세요.")}</p>;
+    return <p className="mt-5 rounded-2xl bg-[#fbf4e6] p-4 text-sm font-bold leading-6 text-slate-700">{pickLocale(locale, "公式のエレベーター・快速降車情報は接続準備中です。駅構内の表示と駅員の案内を優先してください。", "공식 엘리베이터·빠른 하차 정보는 연결 준비 중이에요. 역 안 표지와 역무원 안내를 우선해 주세요.")}</p>;
   }
 
   if (snapshot.status === "unavailable") {
-    return <p className="mt-5 rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#852a19]">{pickLocale(locale, "ソウル交通公社の情報を取得できませんでした。車両・設備を推測せず、現地表示を確認してください。", "서울교통공사 정보를 불러오지 못했어요. 차량·설비를 추측하지 말고 현장 표지를 확인해 주세요.")}</p>;
+    return <p className="mt-5 rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]">{pickLocale(locale, "ソウル交通公社の情報を取得できませんでした。車両・設備を推測せず、現地表示を確認してください。", "서울교통공사 정보를 불러오지 못했어요. 차량·설비를 추측하지 말고 현장 표지를 확인해 주세요.")}</p>;
   }
 
   const quickExit = selectQuickExit(snapshot.quickExits, arrival, mobility);
@@ -353,14 +353,14 @@ function StationDataPanel({
   return (
     <div className="mt-5 rounded-2xl border border-slate-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-base font-black text-slate-950">{pickLocale(locale, "乗ってきた方向に合わせる", "타고 온 방향에 맞추기")}</p>
+        <p className="text-base font-black text-[#504e49]">{pickLocale(locale, "乗ってきた方向に合わせる", "타고 온 방향에 맞추기")}</p>
         <p className="text-xs font-bold text-slate-500">{checkedAt ? `${checkedAt} KST` : null}</p>
       </div>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "聖水駅の直前に通った駅を選んでください。覚えていなくても進めます。", "성수역 바로 전에 지나온 역을 골라 주세요. 기억나지 않아도 진행할 수 있어요.")}</p>
 
       <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label={pickLocale(locale, "直前の駅", "직전 역")}>
         {ARRIVALS.map((item) => (
-          <button key={item.id} type="button" aria-pressed={arrival === item.id} onClick={() => { onArrival(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${arrival === item.id ? "border-slate-950 bg-slate-950 text-white" : "border-slate-200 bg-white text-slate-700"}`}>
+          <button key={item.id} type="button" aria-pressed={arrival === item.id} onClick={() => { onArrival(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${arrival === item.id ? "border-[#504e49] bg-[#504e49] text-white" : "border-slate-200 bg-white text-slate-700"}`}>
             {localize(locale, item.label)}
           </button>
         ))}
@@ -368,10 +368,10 @@ function StationDataPanel({
 
       {arrival ? (
         <>
-          <p className="mt-5 text-sm font-black text-slate-950">{pickLocale(locale, "移動方法を選んでください", "이동 방법을 골라 주세요")}</p>
+          <p className="mt-5 text-sm font-black text-[#504e49]">{pickLocale(locale, "移動方法を選んでください", "이동 방법을 골라 주세요")}</p>
           <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "移動方法", "이동 방법")}>
             {MOBILITY_OPTIONS.map((item) => (
-              <button key={item.id} type="button" aria-pressed={mobility === item.id} onClick={() => { onMobility(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${mobility === item.id ? "border-[#087735] bg-[#eef8f2] text-[#087735]" : "border-slate-200 bg-white text-slate-700"}`}>
+              <button key={item.id} type="button" aria-pressed={mobility === item.id} onClick={() => { onMobility(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${mobility === item.id ? "border-[#455f54] bg-[#edf1ef] text-[#455f54]" : "border-slate-200 bg-white text-slate-700"}`}>
                 {localize(locale, item.label)}
               </button>
             ))}
@@ -382,21 +382,21 @@ function StationDataPanel({
       {arrival && mobility ? (
         <div className="mt-5" aria-live="polite">
           {quickExit ? (
-            <div className="rounded-2xl bg-[#eef8f2] p-4">
-              <p className="text-sm font-black text-[#087735]">{pickLocale(locale, "聖水駅で降りる位置", "성수역에서 내릴 위치")}</p>
-              <p className="mt-2 text-3xl font-black text-slate-950">{quickExit.carDoorNumber ? pickLocale(locale, `${quickExit.carDoorNumber}ドア`, `${quickExit.carDoorNumber} 문`) : "—"}</p>
+            <div className="rounded-2xl bg-[#edf1ef] p-4">
+              <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "聖水駅で降りる位置", "성수역에서 내릴 위치")}</p>
+              <p className="mt-2 text-3xl font-black text-[#504e49]">{quickExit.carDoorNumber ? pickLocale(locale, `${quickExit.carDoorNumber}ドア`, `${quickExit.carDoorNumber} 문`) : "—"}</p>
               <p className="mt-2 text-sm font-bold text-slate-600">{providerLabel(locale, quickExit.nextStation)} · {providerLabel(locale, quickExit.facility)}</p>
             </div>
           ) : (
-            <div className="rounded-2xl bg-[#fff7e8] p-4">
-              <p className="font-black text-slate-950">{routeUnknown ? pickLocale(locale, "対応する公式ドア情報がありません", "맞는 공식 문 위치 정보가 없어요") : pickLocale(locale, "公式情報を取得できませんでした", "공식 정보를 불러오지 못했어요")}</p>
+            <div className="rounded-2xl bg-[#fbf4e6] p-4">
+              <p className="font-black text-[#504e49]">{routeUnknown ? pickLocale(locale, "対応する公式ドア情報がありません", "맞는 공식 문 위치 정보가 없어요") : pickLocale(locale, "公式情報を取得できませんでした", "공식 정보를 불러오지 못했어요")}</p>
               <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "車両番号を推測せず、「出口・Way out」の表示を探してください。分からない場合は駅員に確認します。", "차량 번호를 추측하지 말고 ‘나가는 곳·Way out’ 표지를 찾아요. 모르겠다면 역무원에게 확인해 주세요.")}</p>
             </div>
           )}
 
           {mobility === "elevator_needed" ? (
             <div className="mt-4">
-              <p className="font-black text-slate-950">{pickLocale(locale, "エレベーターの公式公開状態", "엘리베이터 공식 공개 상태")}</p>
+              <p className="font-black text-[#504e49]">{pickLocale(locale, "エレベーターの公式公開状態", "엘리베이터 공식 공개 상태")}</p>
               {snapshot.elevatorAvailable ? (
                 <ul className="mt-3 grid gap-2">
                   {snapshot.elevators.map((item, index) => {
@@ -405,19 +405,19 @@ function StationDataPanel({
                     return (
                       <li key={`${item.entranceNumber}-${item.detailPosition}-${index}`} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl bg-slate-50 px-3 py-3 text-sm">
                         <span><span className="block font-black text-slate-800">{elevatorLocation(locale, item.entranceNumber, item.detailPosition)}</span><span className="mt-1 block font-semibold text-slate-500">{item.startFloor && item.endFloor ? `${item.startFloor}F–${item.endFloor}F` : pickLocale(locale, "階情報なし", "층 정보 없음")}</span></span>
-                        <span className={`rounded-full px-2.5 py-1 font-black ${available ? "bg-[#dff5e8] text-[#087735]" : "bg-[#fff0eb] text-[#9a341f]"}`}>{localize(locale, ELEVATOR_STATUS_LABELS[status])}</span>
+                        <span className={`rounded-full px-2.5 py-1 font-black ${available ? "bg-[#edf1ef] text-[#455f54]" : "bg-[#f7ecee] text-[#941e34]"}`}>{localize(locale, ELEVATOR_STATUS_LABELS[status])}</span>
                       </li>
                     );
                   })}
                 </ul>
               ) : <p className="mt-2 text-sm font-bold text-slate-600">{pickLocale(locale, "エレベーター情報は取得できませんでした。", "엘리베이터 정보를 불러오지 못했어요.")}</p>}
 
-              <div className="mt-4 rounded-2xl border border-[#ffb020]/50 bg-[#fff7e8] p-4">
-                <p className="font-black text-slate-950">{pickLocale(locale, "3番出口には地上連絡エレベーターの公式情報がありません", "3번 출구에는 지상 연결 엘리베이터 공식 정보가 없어요")}</p>
+              <div className="mt-4 rounded-2xl border border-[#e5b560]/50 bg-[#fbf4e6] p-4">
+                <p className="font-black text-[#504e49]">{pickLocale(locale, "3番出口には地上連絡エレベーターの公式情報がありません", "3번 출구에는 지상 연결 엘리베이터 공식 정보가 없어요")}</p>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{pickLocale(locale, `地上連絡は${surfaceElevators.map(({ entranceNumber }) => entranceNumber).filter(Boolean).join("・") || "1・4"}番出口で確認できます。道路を無理に横断せず、目的地に合う出口を駅員に確認してから徒歩ルートを検索し直してください。`, `지상 연결은 ${surfaceElevators.map(({ entranceNumber }) => entranceNumber).filter(Boolean).join("·") || "1·4"}번 출구에서 확인돼요. 무리하게 길을 건너지 말고 목적지에 맞는 출구를 역무원에게 확인한 뒤 도보 경로를 다시 검색해 주세요.`)}</p>
-                <p className="mt-3 text-lg font-black leading-7 text-slate-950" lang="ko">{staffPhrase}</p>
+                <p className="mt-3 text-lg font-black leading-7 text-[#504e49]" lang="ko">{staffPhrase}</p>
                 <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">1番と4番出口のうち、どちらへ行けばいいですか？</p>
-                <button type="button" onClick={copyStaffPhrase} className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-3 text-sm font-black text-white">{copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "駅員に見せる韓国語をコピー", "역무원에게 보여 줄 한국어 복사")}</button>
+                <button type="button" onClick={copyStaffPhrase} className="mt-3 min-h-11 w-full rounded-xl bg-[#504e49] px-3 text-sm font-black text-white">{copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "駅員に見せる韓国語をコピー", "역무원에게 보여 줄 한국어 복사")}</button>
               </div>
             </div>
           ) : null}
@@ -438,22 +438,22 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
     <svg viewBox="0 0 400 300" className="h-auto w-full" role="img" aria-label={pickLocale(locale, `${floor.toUpperCase()}の案内図`, `${floor.toUpperCase()} 안내도`)}>
       <defs>
         <pattern id={`guide-grid-${floor}`} width="16" height="16" patternUnits="userSpaceOnUse">
-          <path d="M16 0H0V16" fill="none" stroke="#0f172a" strokeOpacity="0.035" />
+          <path d="M16 0H0V16" fill="none" stroke="#504e49" strokeOpacity="0.035" />
         </pattern>
         <filter id={`map-shadow-${floor}`} x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#172033" floodOpacity="0.12" />
+          <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#504e49" floodOpacity="0.12" />
         </filter>
         <marker id={`route-arrow-${floor}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0 0L10 5L0 10Z" fill="#008c4a" />
+          <path d="M0 0L10 5L0 10Z" fill="#455f54" />
         </marker>
       </defs>
-      <rect width="400" height="300" rx="26" fill="#f6f5f1" />
+      <rect width="400" height="300" rx="26" fill="#f4f0e7" />
       <rect width="400" height="300" rx="26" fill={`url(#guide-grid-${floor})`} />
 
       <g transform="translate(20 18)">
-        <rect width="46" height="30" rx="15" fill="#172033" />
+        <rect width="46" height="30" rx="15" fill="#504e49" />
         <text x="23" y="20" textAnchor="middle" fill="#ffffff" fontSize="14" fontWeight="900">{floor.toUpperCase()}</text>
-        <text x="58" y="12" fill="#172033" fontSize="13" fontWeight="900">{pickLocale(locale, "聖水駅 211", "성수역 211")}</text>
+        <text x="58" y="12" fill="#504e49" fontSize="13" fontWeight="900">{pickLocale(locale, "聖水駅 211", "성수역 211")}</text>
         <text x="58" y="29" fill="#64748b" fontSize="10" fontWeight="700">{pickLocale(locale, "移動関係を単純化した案内図", "이동 관계를 단순화한 안내도")}</text>
       </g>
 
@@ -462,33 +462,33 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
           <g filter={`url(#map-shadow-${floor})`}>
             <rect x="20" y="76" width="360" height="160" rx="22" fill="#ffffff" />
           </g>
-          <rect x="20" y="86" width="360" height="34" rx="10" fill="#293445" />
+          <rect x="20" y="86" width="360" height="34" rx="10" fill="#504e49" />
           <line x1="32" y1="98" x2="368" y2="98" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
           <line x1="32" y1="108" x2="368" y2="108" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
-          <rect x="20" y="192" width="360" height="34" rx="10" fill="#293445" />
+          <rect x="20" y="192" width="360" height="34" rx="10" fill="#504e49" />
           <line x1="32" y1="204" x2="368" y2="204" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
           <line x1="32" y1="214" x2="368" y2="214" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2" />
           <rect x="34" y="126" width="332" height="60" rx="18" fill="#e9e6dc" stroke="#d8d3c5" />
-          <rect x="34" y="126" width="8" height="60" rx="4" fill="#00a84d" />
+          <rect x="34" y="126" width="8" height="60" rx="4" fill="#455f54" />
 
           <g>
-            <rect x="34" y="62" width="154" height="24" rx="12" fill="#eef8f2" />
-            <text x="111" y="78" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="900">{pickLocale(locale, "← トゥクソム・龍踏方面", "← 뚝섬·용답 방면")}</text>
-            <rect x="212" y="236" width="154" height="24" rx="12" fill="#eef8f2" />
-            <text x="289" y="252" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="900">{pickLocale(locale, "建大入口方面 →", "건대입구 방면 →")}</text>
+            <rect x="34" y="62" width="154" height="24" rx="12" fill="#edf1ef" />
+            <text x="111" y="78" textAnchor="middle" fill="#455f54" fontSize="10" fontWeight="900">{pickLocale(locale, "← トゥクソム・龍踏方面", "← 뚝섬·용답 방면")}</text>
+            <rect x="212" y="236" width="154" height="24" rx="12" fill="#edf1ef" />
+            <text x="289" y="252" textAnchor="middle" fill="#455f54" fontSize="10" fontWeight="900">{pickLocale(locale, "建大入口方面 →", "건대입구 방면 →")}</text>
           </g>
 
           <path d="M76 146C142 146 188 156 242 156H310" fill="none" stroke="#ffffff" strokeWidth="12" strokeLinecap="round" />
-          <path d="M76 146C142 146 188 156 242 156H310" fill="none" stroke="#008c4a" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
+          <path d="M76 146C142 146 188 156 242 156H310" fill="none" stroke="#455f54" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
 
           <g transform="translate(304 127)">
-            <rect width="54" height="58" rx="14" fill="#172033" />
+            <rect width="54" height="58" rx="14" fill="#504e49" />
             <path d="M18 16H36M27 16V39M20 31L27 39L34 31" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             <text x="27" y="51" textAnchor="middle" fill="#ffffff" fontSize="8" fontWeight="900">2F</text>
           </g>
           <g transform="translate(218 132)">
             <rect width="66" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1" />
-            <text x="33" y="16" textAnchor="middle" fill="#172033" fontSize="9" fontWeight="900">Way out</text>
+            <text x="33" y="16" textAnchor="middle" fill="#504e49" fontSize="9" fontWeight="900">Way out</text>
           </g>
         </>
       ) : null}
@@ -499,31 +499,31 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
             <path d="M28 104Q28 82 50 82H142Q158 82 166 96L180 120H348Q372 120 372 144V202Q372 226 348 226H180L166 250Q158 264 142 264H50Q28 264 28 242Z" fill="#ffffff" />
           </g>
           <path d="M40 116H132Q144 116 150 128L160 146L150 164Q144 176 132 176H40Z" fill="#e8edf0" />
-          <text x="84" y="139" textAnchor="middle" fill="#172033" fontSize="10" fontWeight="900">{pickLocale(locale, "3Fホームから", "3F 승강장에서")}</text>
+          <text x="84" y="139" textAnchor="middle" fill="#504e49" fontSize="10" fontWeight="900">{pickLocale(locale, "3Fホームから", "3F 승강장에서")}</text>
           <text x="84" y="156" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="800">Way out</text>
 
           <g transform="translate(152 119)">
             <text x="24" y="-8" textAnchor="middle" fill="#475569" fontSize="9" fontWeight="900">{pickLocale(locale, "改札", "개찰구")}</text>
             {[0, 1, 2, 3].map((index) => (
               <g key={index} transform={`translate(${index * 13} 0)`}>
-                <rect width="8" height="54" rx="4" fill="#334155" />
-                <circle cx="4" cy="27" r="2" fill="#93c5fd" />
+                <rect width="8" height="54" rx="4" fill="#504e49" />
+                <circle cx="4" cy="27" r="2" fill="#6789ca" />
               </g>
             ))}
           </g>
 
           <path d="M84 146H140C155 146 162 146 176 146H286" fill="none" stroke="#ffffff" strokeWidth="13" strokeLinecap="round" />
-          <path d="M84 146H140C155 146 162 146 176 146H286" fill="none" stroke="#008c4a" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
+          <path d="M84 146H140C155 146 162 146 176 146H286" fill="none" stroke="#455f54" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
 
           <g transform="translate(220 78)">
-            <rect width="126" height="32" rx="16" fill="#eef8f2" />
-            <text x="63" y="21" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="900">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
+            <rect width="126" height="32" rx="16" fill="#edf1ef" />
+            <text x="63" y="21" textAnchor="middle" fill="#455f54" fontSize="10" fontWeight="900">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
           </g>
           <g transform="translate(220 174)">
-            <circle cx="24" cy="24" r="21" fill="#f7d67a" />
-            <text x="24" y="31" textAnchor="middle" fill="#172033" fontSize="20" fontWeight="950">2</text>
-            <circle cx="82" cy="24" r="24" fill="#ffb020" stroke="#008c4a" strokeWidth="4" />
-            <text x="82" y="32" textAnchor="middle" fill="#172033" fontSize="22" fontWeight="950">3</text>
+            <circle cx="24" cy="24" r="21" fill="#e5b560" />
+            <text x="24" y="31" textAnchor="middle" fill="#504e49" fontSize="20" fontWeight="950">2</text>
+            <circle cx="82" cy="24" r="24" fill="#e5b560" stroke="#455f54" strokeWidth="4" />
+            <text x="82" y="32" textAnchor="middle" fill="#504e49" fontSize="22" fontWeight="950">3</text>
             <text x="53" y="58" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="800">Exit 2 · Exit 3</text>
           </g>
           <g transform="translate(48 216)">
@@ -541,24 +541,24 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
           <path d="M28 128H372M154 82V242" stroke="#dce2e6" strokeWidth="20" />
           <path d="M28 128H372M154 82V242" stroke="#ffffff" strokeWidth="14" />
           <path d="M161 184C210 184 226 162 270 162H320" fill="none" stroke="#ffffff" strokeWidth="13" strokeLinecap="round" />
-          <path d="M161 184C210 184 226 162 270 162H320" fill="none" stroke="#008c4a" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
+          <path d="M161 184C210 184 226 162 270 162H320" fill="none" stroke="#455f54" strokeWidth="6" strokeLinecap="round" strokeDasharray="8 7" markerEnd={`url(#route-arrow-${floor})`} />
 
           <g transform="translate(58 100)">
-            <rect width="106" height="112" rx="18" fill="#172033" />
-            <circle cx="38" cy="40" r="23" fill="#00a84d" />
+            <rect width="106" height="112" rx="18" fill="#504e49" />
+            <circle cx="38" cy="40" r="23" fill="#455f54" />
             <text x="38" y="48" textAnchor="middle" fill="#ffffff" fontSize="22" fontWeight="950">211</text>
-            <rect x="70" y="17" width="28" height="46" rx="8" fill="#ffb020" />
-            <text x="84" y="48" textAnchor="middle" fill="#172033" fontSize="24" fontWeight="950">3</text>
+            <rect x="70" y="17" width="28" height="46" rx="8" fill="#e5b560" />
+            <text x="84" y="48" textAnchor="middle" fill="#504e49" fontSize="24" fontWeight="950">3</text>
             <text x="14" y="84" fill="#ffffff" fontSize="13" fontWeight="950">{pickLocale(locale, "聖水駅", "성수역")}</text>
             <text x="14" y="101" fill="#cbd5e1" fontSize="9" fontWeight="800">Seongsu · Exit 3</text>
           </g>
 
           <g transform="translate(278 112)">
-            <rect width="78" height="96" rx="18" fill="#eef8f2" stroke="#b8dfc7" />
-            <circle cx="39" cy="28" r="14" fill="#008c4a" />
+            <rect width="78" height="96" rx="18" fill="#edf1ef" stroke="#a4a199" />
+            <circle cx="39" cy="28" r="14" fill="#455f54" />
             <path d="M32 28H46M39 21V35" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
-            <text x="39" y="57" textAnchor="middle" fill="#087735" fontSize="10" fontWeight="950">NAVER</text>
-            <text x="39" y="73" textAnchor="middle" fill="#087735" fontSize="9" fontWeight="900">{pickLocale(locale, "徒歩へ", "도보로")}</text>
+            <text x="39" y="57" textAnchor="middle" fill="#455f54" fontSize="10" fontWeight="950">NAVER</text>
+            <text x="39" y="73" textAnchor="middle" fill="#455f54" fontSize="9" fontWeight="900">{pickLocale(locale, "徒歩へ", "도보로")}</text>
             <text x="39" y="86" textAnchor="middle" fill="#64748b" fontSize="8" fontWeight="800">{pickLocale(locale, "約4分", "약 4분")}</text>
           </g>
         </>
@@ -566,9 +566,9 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
 
       {markerFloor === floor ? (
         <g filter={`url(#map-shadow-${floor})`}>
-          <circle cx={markerX} cy={markerY} r="13" fill="#ff5a36" stroke="#ffffff" strokeWidth="5" />
+          <circle cx={markerX} cy={markerY} r="13" fill="#941e34" stroke="#ffffff" strokeWidth="5" />
           <circle cx={markerX} cy={markerY} r="3.5" fill="#ffffff" />
-          <rect x={markerX - 30} y={markerY + 17} width="60" height="22" rx="11" fill="#ff5a36" />
+          <rect x={markerX - 30} y={markerY + 17} width="60" height="22" rx="11" fill="#941e34" />
           <text x={markerX} y={markerY + 32} textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="900">{pickLocale(locale, "現在地", "현재 위치")}</text>
         </g>
       ) : null}
@@ -583,8 +583,8 @@ function FloorDetails({ floor, locale }: { floor: FloorId; locale: Locale }) {
     <section className="mt-4" aria-labelledby={`floor-details-${floor}`}>
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-black tracking-[0.12em] text-[#087735]">{floor.toUpperCase()}</p>
-          <h3 id={`floor-details-${floor}`} className="mt-1 text-lg font-black text-slate-950">
+          <p className="text-xs font-black tracking-[0.12em] text-[#455f54]">{floor.toUpperCase()}</p>
+          <h3 id={`floor-details-${floor}`} className="mt-1 text-lg font-black text-[#504e49]">
             {pickLocale(locale, "この階で確認できるもの", "이 층에서 확인할 수 있어요")}
           </h3>
         </div>
@@ -593,9 +593,9 @@ function FloorDetails({ floor, locale }: { floor: FloorId; locale: Locale }) {
       <dl className="mt-3 grid gap-2 sm:grid-cols-2">
         {FLOOR_DETAILS[floor].map((item) => (
           <div key={`${floor}-${item.code}-${item.title.ko}`} className="grid min-h-20 grid-cols-[2.75rem_1fr] items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3">
-            <span className="grid size-11 place-items-center rounded-xl bg-slate-950 text-xs font-black text-white" aria-hidden="true">{item.code}</span>
+            <span className="grid size-11 place-items-center rounded-xl bg-[#504e49] text-xs font-black text-white" aria-hidden="true">{item.code}</span>
             <div>
-              <dt className="text-sm font-black leading-5 text-slate-950">{localize(locale, item.title)}</dt>
+              <dt className="text-sm font-black leading-5 text-[#504e49]">{localize(locale, item.title)}</dt>
               <dd className="mt-1 text-xs font-semibold leading-5 text-slate-500">{localize(locale, item.description)}</dd>
             </div>
           </div>
@@ -608,13 +608,13 @@ function FloorDetails({ floor, locale }: { floor: FloorId; locale: Locale }) {
 function SignCard({ floor, locale }: { floor: FloorId; locale: Locale }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-      <div className="bg-slate-950 p-5 text-white">
+      <div className="bg-[#504e49] p-5 text-white">
         {floor === "3f" ? (
           <><p className="text-2xl font-black">나가는 곳</p><p className="mt-1 text-lg font-bold text-slate-300">Way out · 出口</p></>
         ) : floor === "1f" ? (
-          <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-full bg-[#00a84d] text-2xl font-black">211</span><div><p className="text-2xl font-black">성수</p><p className="text-lg font-bold text-slate-300">Seongsu · 聖水</p></div><span className="ml-auto grid size-14 place-items-center rounded-xl bg-[#ffb020] text-3xl font-black text-slate-950">3</span></div>
+          <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-full bg-[#455f54] text-2xl font-black">211</span><div><p className="text-2xl font-black">성수</p><p className="text-lg font-bold text-slate-300">Seongsu · 聖水</p></div><span className="ml-auto grid size-14 place-items-center rounded-xl bg-[#e5b560] text-3xl font-black text-[#504e49]">3</span></div>
         ) : (
-          <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-xl bg-[#ffb020] text-3xl font-black text-slate-950">3</span><div><p className="text-2xl font-black">3번 출구</p><p className="text-lg font-bold text-slate-300">Exit 3 · 3番出口</p></div></div>
+          <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-xl bg-[#e5b560] text-3xl font-black text-[#504e49]">3</span><div><p className="text-2xl font-black">3번 출구</p><p className="text-lg font-bold text-slate-300">Exit 3 · 3番出口</p></div></div>
         )}
       </div>
       <p className="p-4 text-sm font-bold leading-6 text-slate-600">
@@ -652,8 +652,8 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
 
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby={`field-guide-${quest.id}`}>
-      <p className="text-sm font-black text-[#ff5a36]">{pickLocale(locale, "駅構内サポート · デモ", "역 안 이동 지원 · 데모")}</p>
-      <h2 id={`field-guide-${quest.id}`} className="mt-2 text-2xl font-black tracking-tight text-slate-950">{pickLocale(locale, "今いる場所から3番出口まで案内します", "지금 있는 곳에서 3번 출구까지 안내할게요")}</h2>
+      <p className="text-sm font-black text-[#941e34]">{pickLocale(locale, "駅構内サポート · デモ", "역 안 이동 지원 · 데모")}</p>
+      <h2 id={`field-guide-${quest.id}`} className="mt-2 text-2xl font-black tracking-tight text-[#504e49]">{pickLocale(locale, "今いる場所から3番出口まで案内します", "지금 있는 곳에서 3번 출구까지 안내할게요")}</h2>
       <p className="mt-3 text-base font-semibold leading-7 text-slate-600">
         {pickLocale(locale, "現在地を選ぶと、公式案内図から単純化した階・出口方向と次に探す表示が変わります。駅工事で動線が変わる場合は現地表示を優先してください。", "현재 위치를 고르면 공식 안내도에서 단순화한 층·출구 방향과 다음에 찾을 표지가 바뀌어요. 역 공사로 동선이 달라졌다면 현장 표지를 우선해 주세요.")}
       </p>
@@ -671,7 +671,7 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
         {LOCATIONS.map((item) => {
           const active = item.id === locationId;
           return (
-            <button key={item.id} type="button" aria-pressed={active} onClick={() => { setLocationId(item.id); setFloor(item.floor); setRecoveryId(null); setCopied(false); }} className={`min-h-14 rounded-2xl border px-4 py-3 text-left text-base font-black transition-colors ${active ? "border-slate-950 bg-slate-950 text-white" : "border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-400"}`}>
+            <button key={item.id} type="button" aria-pressed={active} onClick={() => { setLocationId(item.id); setFloor(item.floor); setRecoveryId(null); setCopied(false); }} className={`min-h-14 rounded-2xl border px-4 py-3 text-left text-base font-black transition-colors ${active ? "border-[#504e49] bg-[#504e49] text-white" : "border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-400"}`}>
               {localize(locale, item.label)}
             </button>
           );
@@ -682,20 +682,20 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
         <div className="mt-6">
           <div className="grid grid-cols-3 gap-2" role="group" aria-label={pickLocale(locale, "階を選択", "층 선택")}>
             {FLOORS.map((item) => (
-              <button key={item.id} type="button" aria-pressed={floor === item.id} onClick={() => setFloor(item.id)} className={`min-h-14 rounded-2xl px-2 py-2 text-sm font-black leading-5 ${floor === item.id ? "bg-[#087735] text-white" : "bg-[#eef8f2] text-[#087735]"}`}>
+              <button key={item.id} type="button" aria-pressed={floor === item.id} onClick={() => setFloor(item.id)} className={`min-h-14 rounded-2xl px-2 py-2 text-sm font-black leading-5 ${floor === item.id ? "bg-[#455f54] text-white" : "bg-[#edf1ef] text-[#455f54]"}`}>
                 {localize(locale, item.label)}
               </button>
             ))}
           </div>
 
-          <div className="mt-3 overflow-hidden rounded-3xl border border-[#00a84d]/20 bg-[#f7faf9] p-2 sm:p-4"><FloorMap floor={floor} location={location.id} locale={locale} /></div>
+          <div className="mt-3 overflow-hidden rounded-3xl border border-[#455f54]/20 bg-[#f4f0e7] p-2 sm:p-4"><FloorMap floor={floor} location={location.id} locale={locale} /></div>
           <FloorDetails floor={floor} locale={locale} />
           <div className="mt-3 flex flex-wrap gap-2 text-sm font-black text-slate-600" aria-label={pickLocale(locale, "移動順序", "이동 순서")}>
             {FLOORS.map((item, index) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-2">{index + 1}. {localize(locale, item.label)}</span>)}
           </div>
 
           <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="font-black text-slate-950">{pickLocale(locale, "実際の構造を3Dで確認したいですか？", "실제 구조를 3D로 확인하고 싶나요?")}</p>
+            <p className="font-black text-[#504e49]">{pickLocale(locale, "実際の構造を3Dで確認したいですか？", "실제 구조를 3D로 확인하고 싶나요?")}</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
               {pickLocale(locale, "ソウル市のS-MAPを開き、「성수역」を検索してください。外部サイトに移動し、階ごとの移動は現地の案内表示を優先します。", "서울시 S-MAP을 연 뒤 ‘성수역’을 검색해 주세요. 외부 사이트로 이동하며, 층별 이동은 현장 표지를 우선해요.")}
             </p>
@@ -711,31 +711,31 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
 
           <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
             <div>
-              <p className="text-sm font-black text-[#087735]">{pickLocale(locale, "次に探す表示", "다음에 찾을 표지")}</p>
-              <h3 className="mt-2 text-xl font-black leading-7 text-slate-950" aria-live="polite">{localize(locale, locationGuide!.title)}</h3>
-              <p className="mt-4 rounded-2xl border border-[#ff5a36]/20 bg-[#fff0eb] p-4 text-base font-bold leading-7 text-[#852a19]">{localize(locale, locationGuide!.action)}</p>
+              <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "次に探す表示", "다음에 찾을 표지")}</p>
+              <h3 className="mt-2 text-xl font-black leading-7 text-[#504e49]" aria-live="polite">{localize(locale, locationGuide!.title)}</h3>
+              <p className="mt-4 rounded-2xl border border-[#941e34]/20 bg-[#f7ecee] p-4 text-base font-bold leading-7 text-[#941e34]">{localize(locale, locationGuide!.action)}</p>
             </div>
             <SignCard floor={location.floor} locale={locale} />
           </div>
 
           <div className="mt-6 rounded-2xl border border-slate-200 p-4">
-            <p className="text-base font-black text-slate-950">{pickLocale(locale, "道を間違えたかもしれませんか？", "길을 잘못 든 것 같나요?")}</p>
+            <p className="text-base font-black text-[#504e49]">{pickLocale(locale, "道を間違えたかもしれませんか？", "길을 잘못 든 것 같나요?")}</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-3" role="group" aria-label={pickLocale(locale, "復旧状況", "복구 상황")}>
               {RECOVERIES.map((item) => (
-                <button key={item.id} type="button" aria-pressed={recoveryId === item.id} onClick={() => { setRecoveryId(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 text-sm font-black ${recoveryId === item.id ? "border-[#ff5a36] bg-[#fff0eb] text-[#852a19]" : "border-slate-200 bg-white text-slate-700"}`}>
+                <button key={item.id} type="button" aria-pressed={recoveryId === item.id} onClick={() => { setRecoveryId(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 text-sm font-black ${recoveryId === item.id ? "border-[#941e34] bg-[#f7ecee] text-[#941e34]" : "border-slate-200 bg-white text-slate-700"}`}>
                   {localize(locale, item.label)}
                 </button>
               ))}
             </div>
           </div>
 
-          {recovery ? <div className="mt-4 rounded-2xl bg-[#fff7e8] p-4" role="status"><p className="text-lg font-black text-slate-950">{localize(locale, recovery.title)}</p><p className="mt-2 text-base font-semibold leading-7 text-slate-700">{localize(locale, recovery.action)}</p></div> : null}
+          {recovery ? <div className="mt-4 rounded-2xl bg-[#fbf4e6] p-4" role="status"><p className="text-lg font-black text-[#504e49]">{localize(locale, recovery.title)}</p><p className="mt-2 text-base font-semibold leading-7 text-slate-700">{localize(locale, recovery.action)}</p></div> : null}
 
-          <div className="mt-5 rounded-2xl bg-[#f4f7fb] p-4">
+          <div className="mt-5 rounded-2xl bg-[#eef1f6] p-4">
             <p className="text-sm font-black text-slate-500">{pickLocale(locale, "駅員に見せる韓国語", "역무원에게 보여 줄 한국어")}</p>
-            <p className="mt-3 text-2xl font-black leading-9 text-slate-950" lang="ko">{(recovery ? recovery.phrase : locationGuide!.phrase).ko}</p>
+            <p className="mt-3 text-2xl font-black leading-9 text-[#504e49]" lang="ko">{(recovery ? recovery.phrase : locationGuide!.phrase).ko}</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{(recovery ? recovery.phrase : locationGuide!.phrase).ja}</p>
-            <button type="button" onClick={copyPhrase} className="mt-4 min-h-12 w-full rounded-2xl bg-slate-950 px-4 text-base font-black text-white">
+            <button type="button" onClick={copyPhrase} className="mt-4 min-h-12 w-full rounded-2xl bg-[#504e49] px-4 text-base font-black text-white">
               {copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "韓国語をコピー", "한국어 문장 복사")}
             </button>
           </div>

@@ -82,7 +82,7 @@ export function PwaLifecycle() {
           updateRequested.current = true;
           waitingWorker.postMessage({ type: "SKIP_WAITING" });
         }}
-        className="min-h-11 shrink-0 rounded-xl bg-slate-950 px-4 text-sm font-black text-white hover:bg-[#ff5a36] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+        className="min-h-11 shrink-0 rounded-xl bg-[#504e49] px-4 text-sm font-black text-white hover:bg-[#941e34] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#6789ca]"
       >
         {pickLocale(locale, "更新する", "새 버전 적용하기")}
       </button>

@@ -24,15 +24,14 @@ export default async function Home() {
     <main className="min-h-dvh overflow-hidden">
       <SiteHeader />
 
-      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-20 pt-8 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:pb-28 lg:pt-16">
+      <section className="mx-auto grid w-full max-w-6xl items-start gap-12 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16 lg:pb-28 lg:pt-16">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-900/8 bg-white/75 px-3 py-2 text-xs font-black text-slate-700 shadow-sm backdrop-blur">
-            <span className="size-2 rounded-full bg-[#ff5a36]" aria-hidden="true" />
+          <div className="inline-flex items-center gap-2 rounded-md border-l-4 border-[#941e34] bg-white/70 px-3 py-2 text-xs font-black tracking-[0.08em] text-slate-700 shadow-sm">
             {pickLocale(locale, "ソウルの小さな冒険ガイド", "서울의 작은 모험 가이드")}
           </div>
-          <h1 className="mt-7 max-w-2xl text-[clamp(3rem,8vw,6.5rem)] font-black leading-[0.92] tracking-[-0.075em] text-slate-950">
+          <h1 className="mt-7 max-w-2xl text-[clamp(2.8rem,7vw,5.7rem)] font-black leading-[0.98] tracking-[-0.065em] text-[#504e49]">
             {pickLocale(locale, "ソウルで、", "서울에서,")}
-            <span className="block text-[#ff5a36]">{pickLocale(locale, "一人でも", "혼자서도")}</span>
+            <span className="block text-[#941e34]">{pickLocale(locale, "一人でも", "혼자서도")}</span>
             {pickLocale(locale, "新しい体験を。", "새로운 체험을.")}
           </h1>
           <p className="mt-7 max-w-xl text-lg font-medium leading-8 text-slate-600 sm:text-xl">
@@ -43,42 +42,48 @@ export default async function Home() {
             )}
           </p>
 
-          <div className="mt-9 rounded-[2rem] border border-slate-900/8 bg-white/85 p-5 shadow-[0_24px_80px_rgba(41,37,31,0.09)] backdrop-blur sm:p-7">
+          <div className="seoul-surface seoul-frame mt-9 overflow-hidden rounded-2xl p-5 pt-7 sm:p-7 sm:pt-9">
             <QuestOnboarding />
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold text-slate-600">
             <span className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-full bg-teal-700 text-xs text-white" aria-hidden="true">✓</span>
+              <span className="grid size-7 place-items-center rounded-full bg-[#455f54] text-xs text-white" aria-hidden="true">✓</span>
               {pickLocale(locale, "登録なしで探せる", "가입 없이 찾을 수 있어요")}
             </span>
             <span className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-full bg-teal-700 text-xs text-white" aria-hidden="true">✓</span>
+              <span className="grid size-7 place-items-center rounded-full bg-[#455f54] text-xs text-white" aria-hidden="true">✓</span>
               {pickLocale(locale, "日本語で一歩ずつ案内", "한국어로 한 단계씩 안내")}
             </span>
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-xl lg:max-w-none" aria-label={pickLocale(locale, "ソウルの街を巡る抽象的なイラスト", "서울 거리를 둘러보는 추상 일러스트")}>
-          <div className="absolute -left-12 top-20 size-56 rounded-full bg-[#ffcd57]/55 blur-3xl" aria-hidden="true" />
-          <div className="absolute -right-16 bottom-4 size-72 rounded-full bg-teal-300/40 blur-3xl" aria-hidden="true" />
-          <div className="city-card relative aspect-[4/5] overflow-hidden rounded-[3rem] border-[10px] border-white bg-[#badfd6] shadow-[0_40px_100px_rgba(34,54,50,0.18)] sm:aspect-square lg:aspect-[4/5]">
-            <div className="absolute inset-x-0 top-0 flex justify-between p-6 text-xs font-black tracking-[0.18em] text-slate-800/65">
-              <span>SEOUL QUEST 01</span>
+        <div className="relative mx-auto w-full max-w-xl lg:max-w-none" aria-label={pickLocale(locale, "ソウルの色と街の経路を表現したイラスト", "서울의 색과 도시 경로를 표현한 일러스트")}>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-[#a4a199] bg-[#dfdfdd] shadow-[0_30px_80px_rgba(80,78,73,0.2)] sm:aspect-square lg:aspect-[4/5]">
+            <div className="grid h-3 grid-cols-[1.4fr_0.8fr_1.5fr_1fr]" aria-hidden="true">
+              <span className="bg-[#941e34]" /><span className="bg-[#e5b560]" /><span className="bg-[#455f54]" /><span className="bg-[#6789ca]" />
+            </div>
+            <div className="absolute inset-x-0 top-3 flex justify-between border-b border-[#a4a199] px-6 py-5 text-xs font-black tracking-[0.16em] text-[#504e49]">
+              <span>SEOUL · SEONGSU</span>
               <span>37.5446° N</span>
             </div>
-            <div className="absolute left-[12%] top-[20%] h-[52%] w-[76%] rotate-[-7deg] rounded-[45%_55%_48%_52%] bg-[#f7f3eb] shadow-[0_14px_50px_rgba(33,52,49,0.12)]" />
-            <div className="route-line absolute left-[30%] top-[29%] h-[43%] w-[43%] rounded-[48%] border-[7px] border-dashed border-[#ff5a36]" aria-hidden="true" />
-            <span className="absolute left-[25%] top-[26%] grid size-14 place-items-center rounded-full bg-slate-950 text-xl text-white shadow-xl" aria-hidden="true">1</span>
-            <span className="absolute right-[23%] top-[47%] grid size-14 place-items-center rounded-full bg-[#ffcd57] text-xl font-black text-slate-950 shadow-xl" aria-hidden="true">2</span>
-            <span className="absolute bottom-[23%] left-[35%] grid size-14 place-items-center rounded-full bg-[#ff5a36] text-xl font-black text-white shadow-xl" aria-hidden="true">3</span>
-            <div className="absolute inset-x-7 bottom-7 rounded-[2rem] bg-slate-950 p-6 text-white shadow-2xl">
+
+            <div className="absolute inset-x-[9%] top-[19%] h-[39%] border border-[#a4a199] bg-[#f4f0e7] shadow-[10px_10px_0_#d8ccad]" aria-hidden="true">
+              <div className="absolute inset-x-[9%] top-[18%] h-[12%] bg-[#504e49]" />
+              <div className="absolute inset-x-[9%] bottom-[18%] h-[12%] bg-[#504e49]" />
+              <div className="absolute left-[13%] top-[34%] size-10 rounded-full bg-[#941e34] ring-4 ring-white" />
+              <div className="absolute right-[13%] top-[34%] grid size-10 place-items-center rounded-full bg-[#455f54] text-sm font-black text-white ring-4 ring-white">3</div>
+              <div className="absolute left-[23%] right-[22%] top-[47%] border-t-4 border-dashed border-[#941e34]" />
+              <div className="absolute left-[10%] top-[7%] bg-[#e5b560] px-2 py-1 text-[10px] font-black text-[#504e49]">LINE 2 · 211</div>
+            </div>
+
+            <div className="absolute inset-x-7 bottom-7 rounded-xl bg-[#504e49] p-6 text-white shadow-2xl">
               <div className="flex items-center justify-between">
-                <span className="rounded-full bg-white/12 px-3 py-1 text-xs font-black">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
-                <span className="text-sm font-bold text-[#ffcd57]">{pickLocale(locale, "90分 · 聖水", "90분 · 성수")}</span>
+                <span className="rounded-md border border-white/20 px-3 py-1 text-xs font-black">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
+                <span className="text-sm font-bold text-[#e5b560]">{pickLocale(locale, "90分 · 聖水", "90분 · 성수")}</span>
               </div>
               <p className="mt-4 text-2xl font-black leading-tight tracking-[-0.04em]">{pickLocale(locale, <>今日のソウルに、<br />小さな物語を。</>, <>오늘의 서울에<br />작은 이야기를.</>)}</p>
-              <Link href="/quests" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-white underline decoration-[#ff5a36] decoration-2 underline-offset-4">
+              <Link href="/quests" className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-[#941e34] px-4 text-sm font-black text-white">
                 {pickLocale(locale, "クエストを見る", "퀘스트 둘러보기")}
               </Link>
             </div>
@@ -86,13 +91,13 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="border-y border-slate-900/8 bg-white/55">
+      <section className="border-y border-[var(--border)] bg-white/60">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:grid-cols-3 sm:px-8">
           {features.map(([number, title, body]) => (
-            <article key={number} className="grid grid-cols-[auto_1fr] gap-4">
-              <span className="text-sm font-black text-[#ff5a36]">{number}</span>
+            <article key={number} className="grid grid-cols-[2.75rem_1fr] gap-4 border-t-2 border-[#a4a199] pt-5">
+              <span className="grid size-10 place-items-center rounded-lg bg-[#f7ecee] text-sm font-black text-[#941e34]">{number}</span>
               <div>
-                <h2 className="text-lg font-black text-slate-950">{title}</h2>
+                <h2 className="text-lg font-black text-[#504e49]">{title}</h2>
                 <p className="mt-2 leading-7 text-slate-600">{body}</p>
               </div>
             </article>

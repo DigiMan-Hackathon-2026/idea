@@ -22,7 +22,7 @@ export default async function DemoCompletionPage({ params }: { params: Promise<{
   return (
     <main className="min-h-dvh pb-24">
       <SiteHeader />
-      <Suspense fallback={<div className="mx-auto mt-10 h-96 max-w-4xl animate-pulse rounded-[2rem] bg-white" aria-label={pickLocale(locale, "完了記録を読み込み中", "완료 기록을 불러오는 중")} />}>
+      <Suspense fallback={<div className="mx-auto mt-10 h-96 max-w-4xl animate-pulse rounded-xl bg-white" aria-label={pickLocale(locale, "完了記録を読み込み中", "완료 기록을 불러오는 중")} />}>
         <DemoCompletionContent params={params} />
       </Suspense>
     </main>

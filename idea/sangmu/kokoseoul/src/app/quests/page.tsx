@@ -37,19 +37,19 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <>
-      <section className="border-b border-slate-900/10 pb-6 sm:pb-8">
+      <section className="seoul-surface rounded-xl p-5 sm:p-7">
         <FilterForm filters={filters} />
       </section>
 
       <div className="mt-8 flex items-end justify-between gap-6 sm:mt-10">
         <div>
-          <p className="text-xs font-black tracking-[0.18em] text-[#c93418]">
+          <p className="text-xs font-black tracking-[0.18em] text-[#941e34]">
             {getAreaLabel(filters.area, locale).toUpperCase()}
             {filters.purpose
               ? ` · ${getPurposeLabel(filters.purpose, locale).toUpperCase()}`
               : ""}
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] text-slate-950 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#504e49] sm:text-4xl">
             {pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}
           </h1>
         </div>
@@ -65,15 +65,15 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
           naverMapKeyId={process.env.NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID?.trim() || null}
         />
       ) : (
-        <section className="mt-8 max-w-2xl rounded-[2rem] border border-dashed border-slate-900/20 bg-white/65 px-6 py-16 text-center">
-          <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0eb] text-2xl" aria-hidden="true">↺</span>
-          <h2 className="mt-5 text-2xl font-black tracking-tight text-slate-950">
+        <section className="seoul-surface mt-8 max-w-2xl rounded-xl border-dashed px-6 py-16 text-center">
+          <span className="mx-auto grid size-16 place-items-center rounded-xl bg-[#f7ecee] text-2xl text-[#941e34]" aria-hidden="true">↺</span>
+          <h2 className="mt-5 text-2xl font-black tracking-tight text-[#504e49]">
             {pickLocale(locale, "条件を変えて、もう一度探してみましょう", "조건을 바꿔 다시 찾아보세요")}
           </h2>
           <p className="mx-auto mt-3 max-w-md leading-7 text-slate-600">
             {pickLocale(locale, "今の条件に合うクエストはありません。条件を減らすと見つけやすくなります。", "현재 조건과 맞는 퀘스트가 없어요. 조건을 줄이면 더 쉽게 찾을 수 있어요.")}
           </p>
-          <Link href="/quests" className="mt-6 inline-flex min-h-12 items-center rounded-full bg-slate-950 px-6 text-sm font-black text-white">
+          <Link href="/quests" className="seoul-button-dark mt-6 inline-flex min-h-12 items-center rounded-lg px-6 text-sm font-black">
             {pickLocale(locale, "条件を変更する", "조건 변경하기")}
           </Link>
         </section>
@@ -85,7 +85,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
 async function ResultsFallback() {
   const locale = await getRequestLocale();
   return (
-    <section className="mt-8 max-w-2xl animate-pulse rounded-[2rem] bg-white/70 p-8" aria-label={pickLocale(locale, "クエストを読み込み中", "퀘스트를 불러오는 중")}>
+    <section className="seoul-surface mt-8 max-w-2xl animate-pulse rounded-xl p-8" aria-label={pickLocale(locale, "クエストを読み込み中", "퀘스트를 불러오는 중")}>
       <div className="h-7 w-1/3 rounded-full bg-slate-200" />
       <div className="mt-5 h-64 rounded-3xl bg-slate-200" />
     </section>
