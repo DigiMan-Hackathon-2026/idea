@@ -534,6 +534,16 @@ test("finds the Myeongdong personal color consultation and filters by budget", a
   );
 });
 
+test("finds the Yongsan foundation guide with the global booking information", async ({ page }) => {
+  await page.goto("/quests?area=yongsan&purpose=beauty&time=60&party=solo");
+  await expect(page.getByText("70,000〜72,000ウォン · 店頭でセルフ測定可")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://litt.ly/amorestore",
+  );
+});
+
 test("finds the Seongsu solo meal with the operator's map pin", async ({ page }) => {
   await page.goto("/quests?area=seongsu&purpose=food&time=60&party=solo&budget=under30000");
   await expect(page.getByText("平日のみ営業 · 牛肉クッパ 12,000ウォン")).toBeVisible();

@@ -26,6 +26,7 @@ import seoulLibrary from "@/modules/content/city-hall-seoul-library-first-loan.j
 import soonhee from "@/modules/content/gwangjang-soonhee-bindaetteok.json";
 import cityModel from "@/modules/content/gwanghwamun-seoul-museum-city-model.json";
 import ssamziegil from "@/modules/content/insadong-ssamziegil-craft-gift.json";
+import amoreFoundation from "@/modules/content/yongsan-amore-custom-foundation.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -121,6 +122,14 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     (filters.durationMax === null || filters.durationMax >= moodcollect.durationMinutes) &&
     filters.timeAvailable !== "30" &&
     (!filters.party || filters.party === "solo") &&
+    (!filters.budget || filters.budget === "unlimited");
+  const showAmoreFoundation =
+    (filters.area === "all" || filters.area === "yongsan") &&
+    (!filters.purpose || filters.purpose === "beauty") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= amoreFoundation.durationMinutes) &&
+    filters.timeAvailable !== "30" &&
+    (!filters.party || filters.party === "solo" || filters.party === "two") &&
     (!filters.budget || filters.budget === "unlimited");
   const showKyobo =
     (filters.area === "all" || filters.area === "jongno") &&
@@ -234,6 +243,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
         "要予約 · 1人50分 · 日本語通訳込み20万ウォン",
         "사전 예약 · 1인 50분 · 일본어 통역 포함 20만 원",
       ),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showAmoreFoundation ? [{
+      quest: amoreFoundation,
+      href: "/quests/yongsan-amore-custom-foundation",
+      label: pickLocale(locale, "龍山 · ビューティー", "용산 · 뷰티"),
+      detail: pickLocale(locale, "70,000〜72,000ウォン · 店頭でセルフ測定可", "70,000~72,000원 · 매장 셀프 진단 가능"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showIrotomo ? [{
