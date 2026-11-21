@@ -567,6 +567,43 @@ test("confirms a Line 3 transfer before showing the next stop and saves it offli
   await expect(page.getByRole("status").filter({ hasText: "329 종로3가" })).toBeVisible();
 });
 
+test("finds a Line 9 station in Japanese and recalculates from a skipped stop", async ({ page }) => {
+  await page.goto("/subway");
+  await page.getByRole("textbox", { name: "今いる駅" }).fill("キンポゴンハン");
+  await expect(page.getByRole("button", { name: /512 .*5号線/ })).toBeVisible();
+  await page.getByRole("button", { name: /902 .*9号線/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("915");
+  await page.getByRole("button", { name: /915 .*9号線/ }).click();
+  await expect(page.getByRole("status").filter({ hasText: "903" })).toBeVisible();
+  await expect(page.getByText(/各駅停車の案内です/)).toBeVisible();
+  await page.getByRole("button", { name: "乗車中", exact: true }).click();
+  await page.getByLabel("案内で確認した次の駅").selectOption("other");
+  await page.getByRole("textbox", { name: "実際に停車した駅" }).fill("907");
+  await page.getByRole("button", { name: /907 .*9号線/ }).click();
+  await page.getByRole("button", { name: "この駅から調べ直す" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "908" })).toBeVisible();
+});
+
+test("restores P-prefixed Line 5 branch stations offline", async ({ page, context }) => {
+  await page.goto("/subway");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await page.getByRole("textbox", { name: "今いる駅" }).fill("P550");
+  await page.getByRole("button", { name: /P550 .*5号線/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("P552");
+  await page.getByRole("button", { name: /P552 .*5号線/ }).click();
+
+  try {
+    await context.setOffline(true);
+    await page.reload();
+    const saved = page.getByRole("region", { name: /저장된 이동 정보/ });
+    await expect(saved.getByText(/P550.*올림픽공원/)).toBeVisible();
+    await expect(saved.getByText(/P551.*방이/)).toBeVisible();
+    await expect(saved.getByText(/P552.*오금/)).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
+});
+
 test("restores a subway ride after reload and shows the last confirmed stop offline", async ({ page, context }) => {
   await page.goto("/subway");
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);

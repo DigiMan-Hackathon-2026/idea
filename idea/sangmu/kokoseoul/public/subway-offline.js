@@ -1,7 +1,7 @@
 function isStation(value) {
   return value &&
     typeof value.code === "string" &&
-    /^(?:2\d{2}(?:-[1-4])?|3\d{2})$/.test(value.code) &&
+    /^(?:[1-9]\d{2}(?:-[1-4])?|P[15]\d{2}(?:-1)?)$/.test(value.code) &&
     [value.ko, value.ja, value.en].every((name) => typeof name === "string" && name.length > 0);
 }
 
@@ -44,7 +44,7 @@ function showSavedRide() {
   const phrase = document.getElementById("phrase");
   const phraseJa = document.getElementById("phrase-ja");
   if (transferTo) {
-    const line = transferTo.code[0];
+    const line = transferTo.code.replace(/^P/, "")[0];
     phrase.textContent = line + "호선으로 갈아타려고 해요. 어느 쪽으로 가면 되나요?";
     phraseJa.textContent = line + "号線に乗り換えたいです。どちらへ行けばいいですか？";
   } else if (ride.origin.code === ride.destination.code) {

@@ -22,7 +22,6 @@ const stationReadings = {
   원흥: "ウォヌン",
   삼송: "サムソン",
   ...Object.fromEntries(stationCards.cards
-    .filter(({ lines }) => lines.some(({ line }) => line === "02호선" || line === "03호선"))
     .map(({ stationKey, readingKoKana }) => [stationKey, readingKoKana])),
 };
 
@@ -42,10 +41,8 @@ export default async function SubwayPage() {
     <main className="min-h-dvh pb-20">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-4 pt-8 sm:px-8 sm:pt-12">
-        <p className="inline-flex items-center gap-2 font-black text-[#455f54]">
-          <span aria-hidden="true" className="size-3 rounded-full bg-[#00a84d]" />
-          <span aria-hidden="true" className="size-3 rounded-full bg-[#ef7c1c]" />
-          {pickLocale(locale, "ソウル地下鉄2・3号線", "서울 지하철 2·3호선")}
+        <p className="font-black text-[#455f54]">
+          {pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}
         </p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-[#504e49] sm:text-5xl">
           {pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
@@ -55,7 +52,7 @@ export default async function SubwayPage() {
         </p>
         <SubwayDirectionGuide readings={stationReadings} />
         <p className="mt-4 text-sm leading-6 text-slate-600">
-          {pickLocale(locale, "2・3号線の範囲で、乗り換えが少なく、停車駅の数も少ない経路を表示します。運行変更は駅と車内の案内を確認してください。", "2·3호선 범위에서 환승이 적은 경로를 우선 보여줘요. 환승 횟수가 같으면 정차역이 적은 경로를 골라요. 운행 변경은 역과 열차 안내를 확인해 주세요.")}
+          {pickLocale(locale, "1〜9号線の各駅停車で、乗り換えが少ない経路を優先します。乗り換えの回数が同じなら、停車駅の少ない経路を表示します。", "1~9호선 일반열차 중 환승이 적은 경로를 우선 보여줘요. 환승 횟수가 같으면 정차역이 적은 경로를 골라요.")}
         </p>
         <div className="mt-3 flex flex-wrap gap-x-5 text-sm font-bold">
           <a href="https://www.data.go.kr/data/15120713/fileData.do" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">

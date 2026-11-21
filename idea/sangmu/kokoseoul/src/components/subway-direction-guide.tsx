@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getSubwayNeighbors, getSubwayStation, getSubwayTrip, subwayStations, type SubwayStation } from "@/modules/transit/subway-network";
@@ -25,6 +25,14 @@ function normalize(text: string) {
   return text.normalize("NFKC").toLowerCase().replace(/[\s.()'’·-]/g, "");
 }
 
+const stationAliases: Record<string, string[]> = {
+  "409": ["당고개", "タンゴゲ", "Danggogae"],
+  "432": ["이수", "イス", "Isu"],
+  "512": ["キンポゴンハン"],
+  "728": ["뚝섬유원지", "トゥクソムユウォンジ", "Ttukseom Resort"],
+  "736": ["총신대입구", "チョンシンデイック", "Chongshin Univ."],
+};
+
 function StationPicker({ id, label, code, onSelect, readings }: {
   id: string;
   label: string;
@@ -44,10 +52,13 @@ function StationPicker({ id, label, code, onSelect, readings }: {
     (code ? changeButton.current : field.current)?.focus();
   }, [code]);
   const normalized = normalize(query);
-  const results = subwayStations.filter((item) =>
-    [item.code, item.ko, `${item.ko}역`, item.ja, `${item.ja}駅`, item.en, readings[item.ko] ?? ""]
-      .some((value) => normalize(value).includes(normalized)),
-  ).slice(0, 8);
+  const results = normalized ? subwayStations.flatMap((item) => {
+    const terms = [item.code, item.ko, `${item.ko}역`, item.ja, `${item.ja}駅`, item.en, readings[item.ko] ?? "",
+      ...(stationAliases[item.code] ?? [])].map(normalize);
+    if (terms.includes(normalized)) return [{ item, rank: 0 }];
+    if (terms.some((term) => term.startsWith(normalized))) return [{ item, rank: 1 }];
+    return terms.some((term) => term.includes(normalized)) ? [{ item, rank: 2 }] : [];
+  }).sort((a, b) => a.rank - b.rank).slice(0, 8) : [];
 
   return (
     <div className="min-w-0">
@@ -73,7 +84,7 @@ function StationPicker({ id, label, code, onSelect, readings }: {
           />
           {normalized ? (
             <ul className="mt-2 max-h-52 overflow-y-auto rounded-xl border border-[var(--border)] bg-white">
-              {results.map((item) => (
+              {results.map(({ item }) => (
                 <li key={item.code}>
                   <button type="button" onClick={() => { restoreFocus.current = true; onSelect(item.code); }} className="flex min-h-12 w-full items-center justify-between gap-2 px-3 text-start hover:bg-[var(--surface-muted)]">
                     <span className="font-bold">{stationLabel(item, locale)}</span>
@@ -83,7 +94,7 @@ function StationPicker({ id, label, code, onSelect, readings }: {
                   </button>
                 </li>
               ))}
-              {results.length === 0 ? <li className="p-3 text-sm" role="status">{pickLocale(locale, "2・3号線の駅名か駅番号を確認してください。", "2·3호선의 역 이름이나 역번호를 확인해 주세요.")}</li> : null}
+              {results.length === 0 ? <li className="p-3 text-sm" role="status">{pickLocale(locale, "1〜9号線の駅名か駅番号を確認してください。", "1~9호선의 역 이름이나 역번호를 확인해 주세요.")}</li> : null}
             </ul>
           ) : null}
         </>
@@ -152,17 +163,19 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
   const ride = draft ?? saved ?? emptySubwayRide;
   const { situation, origin, destination } = ride;
   const [observed, setObserved] = useState("");
+  const [otherStation, setOtherStation] = useState("");
   const transfer = getSubwayStation(ride.transfer);
-  const trip = getSubwayTrip(origin, destination);
+  const trip = useMemo(() => getSubwayTrip(origin, destination), [origin, destination]);
   const next = trip?.next;
   const changeNow = trip?.changeNow;
-  const destinationStation = getSubwayStation(destination);
+  const alight = trip?.changes[0]?.from ?? getSubwayStation(destination);
   const observedStation = getSubwayStation(observed);
   const differs = next && observedStation && next.code !== observedStation.code;
 
   function updateRide(next: SubwayRide) {
     setDraft(next);
     setObserved("");
+    setOtherStation("");
     setStorageFailed(!saveSubwayRide(next));
   }
 
@@ -234,7 +247,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
             </>
           ) : null}
 
-          {trip && next && destinationStation ? (
+          {trip && next && alight ? (
             <>
               {transfer ? (
                 <p className="mt-5 rounded-xl bg-[#fbf4e6] p-4 font-bold" role="status">
@@ -245,12 +258,18 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                 <h2 className="font-black text-[#455f54]">{pickLocale(locale, "次の駅で方向を照合", "다음 역으로 방향 확인")}</h2>
                 <p className="mt-2 text-2xl font-black">{stationLabel(next, locale)}</p>
                 <p className="mt-1 font-semibold">{lineLabel(next.line, locale)} · <span lang="ko">{next.ko}</span> · <span lang="en">{next.en}</span></p>
-                <p className="mt-3 text-sm leading-6">{pickLocale(locale, "ホームの表示や車内案内と見比べてください。行先表示が途中駅止まりの場合は、目的の駅まで行くか駅員に確認しましょう。", "승강장 표지나 열차 안내와 대조해요. 행선지가 중간 역까지만 표시되면 목적지까지 가는 열차인지 역무원에게 확인해요.")}</p>
+                <p className="mt-3 text-sm leading-6">{pickLocale(locale, "ホームの表示や車内案内と見比べてください。", "승강장 표지나 열차 안내와 대조해요.")}</p>
+                {next.line === 1 || next.line === 4 || next.line === 9 ? (
+                  <p className="mt-1 text-sm font-bold">{pickLocale(locale, "各駅停車の案内です。電車の種別を確認してください。", "일반열차 기준이에요. 열차 종류를 확인해요.")}</p>
+                ) : null}
+                {next.line === 1 || next.line === 4 || next.line === 5 || next.line === 9 || trip.changes.length > 0 ? (
+                  <p className="mt-2 text-sm font-bold">{pickLocale(locale, `行先表示を見て「${stationLabel(alight, locale)}」まで行くか確かめてください。`, `행선지 표시를 보고 ‘${stationLabel(alight, locale)}’까지 가는지 확인해요.`)}</p>
+                ) : null}
                 {trip.changes.length > 0 ? (
                   <p className="mt-2 text-sm font-black text-[#504e49]">
                     {trip.changes.some(({ from, to }) => from.line !== to.line)
                       ? pickLocale(locale, "乗り換え駅", "갈아탈 역")
-                      : pickLocale(locale, "2号線の乗り換え駅", "2호선 안에서 갈아탈 역")} · {trip.changes.map(({ from, to }) =>
+                      : pickLocale(locale, `${lineLabel(next.line, locale)}の乗り換え駅`, `${lineLabel(next.line, locale)} 안에서 갈아탈 역`)} · {trip.changes.map(({ from, to }) =>
                       from.line === to.line ? stationLabel(from, locale) : `${stationLabel(from, locale)} → ${lineLabel(to.line, locale)} ${to.code}`,
                     ).join(" / ")}
                   </p>
@@ -259,7 +278,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
               {situation === "onboard" ? (
                 <div className="mt-5">
                   <label className="block font-black" htmlFor="subway-observed">{pickLocale(locale, "案内で確認した次の駅", "안내에서 확인한 다음 역")}</label>
-                  <select id="subway-observed" value={observed} onChange={(event) => setObserved(event.target.value)} className="mt-2 min-h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3">
+                  <select id="subway-observed" value={observed} onChange={(event) => { setObserved(event.target.value); setOtherStation(""); }} className="mt-2 min-h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3">
                     <option value="">{pickLocale(locale, "まだ分かりません", "아직 모르겠어요")}</option>
                     {getSubwayNeighbors(origin).map((item) => <option key={item.code} value={item.code}>{stationLabel(item, locale)} · {item.ko}</option>)}
                     <option value="other">{pickLocale(locale, "一覧にない駅が案内された", "목록에 없는 역이 안내됐어요")}</option>
@@ -287,6 +306,16 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                           {pickLocale(locale, "この駅に着いたら、次を確認", "이 역에 도착했어요")}
                         </button>
                       </>
+                    ) : observed === "other" ? (
+                      <>
+                        <p className="mb-3">{pickLocale(locale, "急行や別の路線かもしれません。停車したら、駅の名前と駅番号で調べ直してください。", "급행이나 다른 호선일 수 있어요. 정차하면 역 이름과 역번호를 확인하고 다시 찾아요.")}</p>
+                        <StationPicker id="subway-other-station" label={pickLocale(locale, "実際に停車した駅", "실제로 정차한 역")} code={otherStation} onSelect={setOtherStation} readings={readings} />
+                        {otherStation ? (
+                          <button type="button" onClick={() => updateRide({ ...ride, origin: otherStation, situation: "before", transfer: "" })} className="seoul-button-primary mt-3 min-h-11 rounded-xl px-3 font-bold">
+                            {pickLocale(locale, "この駅から調べ直す", "이 역에서 다시 찾기")}
+                          </button>
+                        ) : null}
+                      </>
                     ) : (
                       <p>{pickLocale(locale, "車内表示か停車駅の駅名・駅番号を確認してください。判断できなければ駅員に聞きましょう。", "열차 화면이나 정차한 역에서 이름·번호를 확인해요. 판단하기 어렵다면 역무원에게 물어봐요.")}</p>
                     )}
@@ -296,7 +325,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
               <details className="mt-5 rounded-xl border border-[var(--border)] p-4">
                 <summary className="cursor-pointer font-black">{pickLocale(locale, `経路を見る · ${trip.rideStops}駅`, `경로 보기 · ${trip.rideStops}정거장`)}</summary>
                 <ol className="mt-3 grid gap-2 pl-2">
-                  {trip.stops.map((item) => <li key={item.code}>
+                  {trip.stops.map((item, index) => <li key={`${index}:${item.code}`}>
                     {stationLabel(item, locale)} · {lineLabel(item.line, locale)}
                     {locale === "ja" ? <> · <span lang="ko">{item.ko}</span></> : null}
                   </li>)}
@@ -305,11 +334,11 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
               <HelpPhrase
                 key={`${situation}:${origin}:${destination}`}
                 ko={situation === "onboard"
-                  ? `${destinationStation.ko}역에 가고 싶어요. 지금 탄 열차가 그쪽으로 가나요?`
-                  : `${destinationStation.ko}역에 가려고 해요. 다음 역이 ${next.ko}역인 열차를 타면 되나요?`}
+                  ? `${alight.ko}역에 가고 싶어요. 지금 탄 열차가 거기까지 가나요?`
+                  : `${alight.ko}역에 가려고 해요. 다음 역이 ${next.ko}역인 열차를 타면 되나요?`}
                 ja={situation === "onboard"
-                  ? `${destinationStation.ja}駅へ行きたいです。この電車で行けますか？`
-                  : `${destinationStation.ja}駅へ行きたいです。次が${next.ja}駅の電車に乗ればいいですか？`}
+                  ? `${alight.ja}駅へ行きたいです。この電車で行けますか？`
+                  : `${alight.ja}駅へ行きたいです。次が${next.ja}駅の電車に乗ればいいですか？`}
               />
             </>
           ) : null}
