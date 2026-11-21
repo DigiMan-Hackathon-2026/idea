@@ -35,11 +35,86 @@ type RecoveryGuide = {
   phrase: LocalizedCopy;
 };
 
+type FloorDetail = {
+  code: string;
+  title: LocalizedCopy;
+  description: LocalizedCopy;
+};
+
 const FLOORS: Array<{ id: FloorId; label: LocalizedCopy }> = [
   { id: "3f", label: { ja: "3F ホーム", ko: "3F 승강장" } },
   { id: "2f", label: { ja: "2F 改札・コンコース", ko: "2F 개찰구·대합실" } },
   { id: "1f", label: { ja: "1F 3番出口", ko: "1F 3번 출구" } },
 ];
+
+const FLOOR_DETAILS: Record<FloorId, FloorDetail[]> = {
+  "3f": [
+    {
+      code: "←",
+      title: { ja: "トゥクソム・龍踏方面", ko: "뚝섬·용답 방면" },
+      description: { ja: "ホームの方向表示で確認", ko: "승강장 방향 표지로 확인" },
+    },
+    {
+      code: "→",
+      title: { ja: "建大入口方面", ko: "건대입구 방면" },
+      description: { ja: "ホームの方向表示で確認", ko: "승강장 방향 표지로 확인" },
+    },
+    {
+      code: "2F",
+      title: { ja: "改札階への接続", ko: "개찰구 층 연결" },
+      description: { ja: "階段・エスカレーター・エレベーター", ko: "계단·에스컬레이터·엘리베이터" },
+    },
+    {
+      code: "SOS",
+      title: { ja: "非常電話", ko: "비상전화" },
+      description: { ja: "公式案内図にホーム内の位置を表示", ko: "공식 안내도에 승강장 내 위치 표시" },
+    },
+  ],
+  "2f": [
+    {
+      code: "i",
+      title: { ja: "案内センター", ko: "고객안내센터" },
+      description: { ja: "出口・設備・乗車方向を駅員に確認", ko: "출구·시설·승차 방향을 역무원에게 확인" },
+    },
+    {
+      code: "WC",
+      title: { ja: "トイレ", ko: "화장실" },
+      description: { ja: "改札・コンコース階", ko: "개찰구·대합실 층" },
+    },
+    {
+      code: "₩",
+      title: { ja: "きっぷ・交通カード", ko: "승차권·교통카드" },
+      description: { ja: "発売・チャージ機を確認", ko: "발매·충전기 위치 확인" },
+    },
+    {
+      code: "B",
+      title: { ja: "授乳室", ko: "수유실" },
+      description: { ja: "公式案内図に表示", ko: "공식 안내도에 표시" },
+    },
+  ],
+  "1f": [
+    {
+      code: "1·4",
+      title: { ja: "トゥクソム・龍踏側", ko: "뚝섬·용답 쪽" },
+      description: { ja: "地上連絡エレベーターの公式情報あり", ko: "지상 연결 엘리베이터 공식 정보 있음" },
+    },
+    {
+      code: "2·3",
+      title: { ja: "建大入口側", ko: "건대입구 쪽" },
+      description: { ja: "今回の目的地は3番出口", ko: "이번 목적지는 3번 출구" },
+    },
+    {
+      code: "3",
+      title: { ja: "3番出口", ko: "3번 출구" },
+      description: { ja: "公式案内図にエスカレーター表示", ko: "공식 안내도에 에스컬레이터 표시" },
+    },
+    {
+      code: "NAV",
+      title: { ja: "地上の徒歩ルート", ko: "지상 도보 경로" },
+      description: { ja: "出口番号を確認してNAVERマップへ", ko: "출구 번호를 확인한 뒤 네이버 지도로" },
+    },
+  ],
+};
 
 const LOCATIONS: LocationGuide[] = [
   {
@@ -503,6 +578,33 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
   );
 }
 
+function FloorDetails({ floor, locale }: { floor: FloorId; locale: Locale }) {
+  return (
+    <section className="mt-4" aria-labelledby={`floor-details-${floor}`}>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-black tracking-[0.12em] text-[#087735]">{floor.toUpperCase()}</p>
+          <h3 id={`floor-details-${floor}`} className="mt-1 text-lg font-black text-slate-950">
+            {pickLocale(locale, "この階で確認できるもの", "이 층에서 확인할 수 있어요")}
+          </h3>
+        </div>
+        <p className="text-right text-xs font-bold text-slate-500">{pickLocale(locale, "公式案内図基準", "공식 안내도 기준")}</p>
+      </div>
+      <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+        {FLOOR_DETAILS[floor].map((item) => (
+          <div key={`${floor}-${item.code}-${item.title.ko}`} className="grid min-h-20 grid-cols-[2.75rem_1fr] items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3">
+            <span className="grid size-11 place-items-center rounded-xl bg-slate-950 text-xs font-black text-white" aria-hidden="true">{item.code}</span>
+            <div>
+              <dt className="text-sm font-black leading-5 text-slate-950">{localize(locale, item.title)}</dt>
+              <dd className="mt-1 text-xs font-semibold leading-5 text-slate-500">{localize(locale, item.description)}</dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
 function SignCard({ floor, locale }: { floor: FloorId; locale: Locale }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -587,6 +689,7 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
           </div>
 
           <div className="mt-3 overflow-hidden rounded-3xl border border-[#00a84d]/20 bg-[#f7faf9] p-2 sm:p-4"><FloorMap floor={floor} location={location.id} locale={locale} /></div>
+          <FloorDetails floor={floor} locale={locale} />
           <div className="mt-3 flex flex-wrap gap-2 text-sm font-black text-slate-600" aria-label={pickLocale(locale, "移動順序", "이동 순서")}>
             {FLOORS.map((item, index) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-2">{index + 1}. {localize(locale, item.label)}</span>)}
           </div>

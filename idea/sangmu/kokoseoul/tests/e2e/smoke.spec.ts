@@ -440,6 +440,8 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await page.getByRole("button", { name: "3Fのホームで降りた" }).click();
   await expect(page.getByRole("img", { name: "3Fの案内図" })).toBeVisible();
   await expect(page.getByText("Way out · 出口")).toBeVisible();
+  await expect(page.getByText("改札階への接続")).toBeVisible();
+  await expect(page.getByText("非常電話")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "S-MAPで聖水駅の3D地図を開く" }),
   ).toHaveAttribute("href", "https://smap.seoul.go.kr/smap/");
@@ -450,6 +452,8 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(page.getByRole("img", { name: "2Fの案内図" })).toBeVisible();
   await expect(page.getByRole("img", { name: "2Fの案内図" })).toContainText("建大入口方面");
   await expect(page.getByRole("img", { name: "2Fの案内図" })).toContainText("Exit 2 · Exit 3");
+  await expect(page.getByText("案内センター")).toBeVisible();
+  await expect(page.getByText("きっぷ・交通カード")).toBeVisible();
   await page.getByRole("button", { name: "違うホームにいる" }).click();
   await expect(
     page.getByText("다른 승강장으로 온 것 같아요. 3번 출구로 가려면 어디로 가야 하나요?"),
