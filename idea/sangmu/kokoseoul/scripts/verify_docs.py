@@ -349,7 +349,7 @@ def check_readme_index() -> list[str]:
     targets = local_link_targets(text)
     linked = set(targets)
     expected = {
-        str(path.relative_to(ROOT)) for path in sorted((ROOT / "docs").glob("*.md"))
+        path.relative_to(ROOT).as_posix() for path in (ROOT / "docs").glob("*.md")
     }
     missing = sorted(expected - linked)
     errors = [f"README.md: missing document index link {path}" for path in missing]
