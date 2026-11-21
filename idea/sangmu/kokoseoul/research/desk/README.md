@@ -5,6 +5,8 @@
 [seoul-japan-places.csv](seoul-japan-places.csv)는 첫 지역·퀘스트 후보를 고를 때 참고하려고 모은 장소 30곳입니다.
 이 목록은 인터뷰 근거가 아닙니다. [후보 선택 가이드](../CANDIDATE_SELECTION_GUIDE.md)의 evidence ID(`E-`, `F-`, `C-`)로 세지 않습니다. 지역이나 퀘스트를 정할 때는 현장·공식 사실 확인과 사용자 사례를 따로 기록해야 합니다.
 
+이 목록으로 만든 [종로·을지로 퀘스트 초안](quest-drafts/README.md)도 같은 이유로 공식 퀘스트 후보가 아닙니다.
+
 ## 분류
 
 - `popular`: 일본인 관광객이 많이 가거나 일본 여행 매체가 반복해서 소개하는 곳 (20곳)
