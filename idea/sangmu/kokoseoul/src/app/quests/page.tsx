@@ -23,6 +23,7 @@ import changdeokgung from "@/modules/content/changdeokgung-japanese-tour.json";
 import kyobo from "@/modules/content/gwanghwamun-kyobo-find-book.json";
 import moodcollect from "@/modules/content/myeongdong-moodcollect-personal-color.json";
 import seoulLibrary from "@/modules/content/city-hall-seoul-library-first-loan.json";
+import soonhee from "@/modules/content/gwangjang-soonhee-bindaetteok.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -74,6 +75,14 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.timeAvailable !== "30" &&
     (!filters.party || filters.party === "solo") &&
     (!filters.budget || filters.budget === "under30000" || filters.budget === "unlimited");
+  const showSoonhee =
+    (filters.area === "all" || filters.area === "jongno") &&
+    (!filters.purpose || filters.purpose === "food") &&
+    filters.tags.every((tag) => tag === "food") &&
+    (filters.durationMax === null || filters.durationMax >= soonhee.durationMinutes) &&
+    filters.timeAvailable !== "30" &&
+    (!filters.party || filters.party === "solo") &&
+    (!filters.budget || filters.budget === "unlimited");
   const showMuseumRoom =
     (filters.area === "all" || filters.area === "yongsan") &&
     (!filters.purpose || filters.purpose === "culture") &&
@@ -145,6 +154,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/seongsu-somugwan-solo-gukbap",
       label: pickLocale(locale, "聖水 · グルメ", "성수 · 식도락"),
       detail: pickLocale(locale, "平日のみ営業 · 牛肉クッパ 12,000ウォン", "평일 영업 · 소고기국밥 12,000원"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showSoonhee ? [{
+      quest: soonhee,
+      href: "/quests/gwangjang-soonhee-bindaetteok",
+      label: pickLocale(locale, "鍾路 · グルメ", "종로 · 식도락"),
+      detail: pickLocale(locale, "広蔵市場 · 持ち帰り可 · 値段は店頭で確認", "광장시장 · 포장 가능 · 가격은 매장 확인"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showMuseumRoom ? [{

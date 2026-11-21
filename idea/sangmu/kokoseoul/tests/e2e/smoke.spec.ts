@@ -541,6 +541,16 @@ test("finds the Seongsu solo meal with the operator's map pin", async ({ page })
   await expect(page.getByRole("link", { name: "NAVERマップを開く（別タブ）" })).toHaveAttribute("href", "https://map.naver.com/p/entry/place/2057338165");
 });
 
+test("finds the Gwangjang Market takeout guide with the Japanese source", async ({ page }) => {
+  await page.goto("/quests?area=jongno&purpose=food&time=60&party=solo");
+  await expect(page.getByText("広蔵市場 · 持ち帰り可 · 値段は店頭で確認")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://japanese.visitkorea.or.kr/svc/contents/contentsView.do?vcontsId=194105",
+  );
+});
+
 test("finds the Changdeokgung tour with the official schedule", async ({ page }) => {
   await page.goto("/quests?area=jongno&purpose=culture&time=120plus");
   await expect(page.getByText("日本語ガイド · 水・金・日 11:00")).toBeVisible();
