@@ -22,6 +22,7 @@ import somugwan from "@/modules/content/seongsu-somugwan-solo-gukbap.json";
 import changdeokgung from "@/modules/content/changdeokgung-japanese-tour.json";
 import kyobo from "@/modules/content/gwanghwamun-kyobo-find-book.json";
 import moodcollect from "@/modules/content/myeongdong-moodcollect-personal-color.json";
+import seoulLibrary from "@/modules/content/city-hall-seoul-library-first-loan.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -118,6 +119,12 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.durationMax === null &&
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
     (!filters.budget || filters.budget === "under30000" || filters.budget === "unlimited");
+  const showSeoulLibrary =
+    (filters.area === "all" || filters.area === "city-hall") &&
+    (!filters.purpose || filters.purpose === "discovery") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= seoulLibrary.durationMinutes) &&
+    filters.timeAvailable !== "30";
   const featured = [
     ...(showHackathon ? [{
       quest: event,
@@ -191,6 +198,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/yeouido-irotomo-first-meetup",
       label: pickLocale(locale, "汝矣島 · 日常の中の新しい体験", "여의도 · 일상 속 새로운 경험"),
       detail: pickLocale(locale, "日曜 15:00〜17:30 · 事前申込制", "일요일 15:00~17:30 · 사전 신청"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showSeoulLibrary ? [{
+      quest: seoulLibrary,
+      href: "/quests/city-hall-seoul-library-first-loan",
+      label: pickLocale(locale, "市庁 · 日常の中の新しい体験", "시청 · 일상 속 새로운 경험"),
+      detail: pickLocale(locale, "ソウル在住の方向け · 貸出無料", "서울 거주자용 · 무료 대출"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
   ];

@@ -173,3 +173,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 광화문 교보문고 책 찾기 퀘스트는 `pnpm db:seed:kyobo`로 로컬에 넣고 `/quests?area=jongno&purpose=shopping`에서 시작합니다.
 
 명동 무드컬렉트 퍼스널컬러 퀘스트는 `pnpm db:seed:moodcollect`로 로컬에 넣고 `/quests?area=myeongdong&purpose=beauty`에서 시작합니다.
+
+서울도서관 첫 대출 퀘스트는 `pnpm db:seed:seoul-library`로 로컬에 넣고 `/quests?area=city-hall&purpose=discovery`에서 시작합니다.

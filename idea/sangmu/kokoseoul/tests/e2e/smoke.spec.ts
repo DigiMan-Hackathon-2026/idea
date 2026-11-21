@@ -562,6 +562,16 @@ test("finds the recurring exchange meetup in Yeouido", async ({ page }) => {
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://irotomo.com/#apply");
 });
 
+test("finds the free Seoul Library loan guide under City Hall", async ({ page }) => {
+  await page.goto("/quests?area=city-hall&purpose=discovery&time=60&budget=free");
+  await expect(page.getByText("ソウル在住の方向け · 貸出無料")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://lib.seoul.go.kr/rwww/html/ko/membership.jsp",
+  );
+});
+
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
   await installServerRunMock(page);
   await page.goto(
