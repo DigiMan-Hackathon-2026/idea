@@ -62,7 +62,7 @@
 | 운영자 인증·인가 | 준비됨 | [운영 인증 계약](ADMIN_AUTHORIZATION_v0.1.md) | D10 결정과 검수 tenant에서 AC13~AC15 실행 |
 | 익명 visitor session | 진행 중 | HMAC token repository, `POST /api/v1/visitor-sessions` 생성과 visitor 인증을 거친 퀘스트 시작 API의 Origin·JSON·cookie·no-store 계약, [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | rate limit·실DB HTTP/browser·삭제 경합 통합 검수 |
 | 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
-| 지도·이동 안내 | 진행 중 | `/quests` 목록·Naver 지도 전환, 서울 `maxBounds`, 역/출구 표기, TMAP 보행자 경로, 현재 위치→역 NAVER 대중교통 및 역→목적지 도보 앱 길찾기, key·인증 실패 복구, [지도·주소 전달 계약](MAP_ADDRESS_HANDOFF_v0.1.md) | 배포 domain 설정과 일본어 iOS·Android 실제 장소·앱 fallback 검수 |
+| 지도·이동 안내 | 진행 중 | `/quests` 목록·Naver 지도 전환, 서울 `maxBounds`, 역/출구 표기, TMAP 보행자 경로, NAVER 앱 길찾기, 개찰구 전·승강장·탑승·오방향 상황별 판단/복구 demo와 한국어 도움 카드, [지도 계약](MAP_ADDRESS_HANDOFF_v0.1.md), [현장 안내 가설](SUBWAY_FIELD_GUIDE_v0.1.md) | 실제 일본인 비교 검증, 역별 동선·사진 검수, 배포 domain과 iOS·Android 앱 fallback 검수 |
 | 제품 코드 F0~F8 | 진행 중 | 가상 demo seed, 익명 session, 실제 UUID run 시작·조회·순서형 단계 완료·완료 카드·피드백·내 기록·전체 삭제의 DB/API/UI/E2E 연결 | 정보 신고 UI의 실제 API 연결과 운영 화면 구현 |
 | AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
 

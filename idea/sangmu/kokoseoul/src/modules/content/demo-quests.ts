@@ -134,6 +134,7 @@ export type DemoQuest = {
   transitGuide: {
     lineCode: string;
     lineColor: `#${string}`;
+    stationCode: string;
     lineJa: string;
     lineKo: string;
     stationJa: string;
@@ -183,6 +184,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     transitGuide: {
       lineCode: "2",
       lineColor: "#00a84d",
+      stationCode: "211",
       lineJa: "2号線",
       lineKo: "2호선",
       stationJa: "聖水駅",

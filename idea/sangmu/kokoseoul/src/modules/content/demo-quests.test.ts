@@ -140,4 +140,12 @@ describe("demo quest discovery", () => {
       ).toBe(true);
     }
   });
+
+  it("keeps the verified station code with the field guide destination", () => {
+    expect(DEMO_QUESTS[0].transitGuide).toMatchObject({
+      lineCode: "2",
+      stationKo: "성수역",
+      stationCode: "211",
+    });
+  });
 });

@@ -402,6 +402,14 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "迷わないための行き方" })).toBeVisible();
   await expect(page.getByText("下車後、3番出口方面へ進む")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "地下鉄で迷ったとき、今どこにいますか？" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "方向を間違えたかもしれない" }).click();
+  await expect(page.getByText("성수역 · Seongsu · 聖水駅 · 211")).toBeVisible();
+  await expect(
+    page.getByText("반대 방향 열차를 탄 것 같아요. 성수역에 가려면 어디로 가야 하나요?"),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "このデモクエストを始める" })
     .click();

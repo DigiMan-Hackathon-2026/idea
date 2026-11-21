@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { DemoReportButton } from "@/components/demo-report-button";
 import { StartDemoButton } from "@/components/start-demo-button";
+import { SubwayFieldGuide } from "@/components/subway-field-guide";
 import { QuestTransitGuide } from "@/components/transit-guide-card";
 import {
   DEMO_QUESTS,
@@ -93,6 +94,9 @@ export default async function QuestDetailPage({
               <p className="mt-5 max-w-2xl rounded-2xl border border-[#ff5a36]/20 bg-[#fff0eb] p-5 leading-7 text-[#852a19]">{pickLocale(locale, quest.bodyJa, quest.bodyKo)}</p>
               <div className="mt-8 max-w-2xl">
                 <QuestTransitGuide quest={quest} />
+              </div>
+              <div className="mt-8 max-w-2xl">
+                <SubwayFieldGuide quest={quest} />
               </div>
             </div>
 
