@@ -163,3 +163,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 올리브영N 성수 쇼핑 퀘스트는 `pnpm db:seed:oliveyoung-shopping`으로 로컬에 넣고 `/quests?area=seongsu&purpose=shopping`에서 시작합니다.
 
 올리브영N 성수 피부 컨설팅 퀘스트는 `pnpm db:seed:oliveyoung-skin`으로 로컬에 넣고 `/quests?area=seongsu&purpose=beauty`에서 시작합니다.
+
+이로토모 교류회 퀘스트는 `pnpm db:seed:irotomo`로 로컬에 넣고 `/quests?area=yeouido&purpose=discovery`에서 시작합니다.

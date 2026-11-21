@@ -2,7 +2,8 @@ import pg from "pg";
 
 export async function seedLocalQuest(quest, {
   supplierId, supplierName, editorId, editorSubject, requestId,
-  areaCode, durationMinutes, tags, soloEvidence, cost = null,
+  areaCode, durationMinutes, tags, soloEvidence, soloStatus = "unknown",
+  cost = null, costMax = cost,
 }) {
   const environment = process.env.APP_ENV;
   if (environment !== "local" && environment !== "test") {
@@ -62,12 +63,15 @@ export async function seedLocalQuest(quest, {
            id, quest_id, version_no, state, title_ja, title_ko, summary_ja,
            summary_ko, body_ja, body_ko, area_code, duration_minutes, tags, solo_status, solo_evidence,
            cost_min, cost_max
-         ) values ($1, $2, 1, 'draft', $3, $4, $5, $6, $7, $8, $9, $10, $11, 'unknown', $12, $13, $13)`,
+         ) values ($1, $2, 1, 'draft', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
         [quest.versionId, quest.id, quest.titleJa, quest.titleKo, quest.summaryJa,
-          quest.summaryKo, quest.bodyJa, quest.bodyKo, areaCode, durationMinutes, tags, soloEvidence, cost],
+          quest.summaryKo, quest.bodyJa, quest.bodyKo, areaCode, durationMinutes, tags, soloStatus, soloEvidence, cost, costMax],
       );
       for (const [index, step] of quest.steps.entries()) {
         const showsVenue = step.showsPlace ?? false;
+        const placeSnapshot = step.guideUrl
+          ? { ...place, guideUrlKo: step.guideUrl, guideUrlJa: step.guideUrl }
+          : place;
         await client.query(
           `insert into quest_steps (
              id, version_id, position, title_ja, title_ko, body_ja, body_ko,
@@ -76,7 +80,7 @@ export async function seedLocalQuest(quest, {
            ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
           [step.id, quest.versionId, index + 1, step.titleJa, step.titleKo, step.bodyJa, step.bodyKo,
             step.completionLabelJa, step.completionLabelKo, step.phraseKo ?? null, step.phraseJa ?? null,
-            showsVenue ? placeId : null, showsVenue ? JSON.stringify(place) : null],
+            showsVenue ? placeId : null, showsVenue ? JSON.stringify(placeSnapshot) : null],
         );
       }
       await client.query(

@@ -521,6 +521,13 @@ test("finds the beauty consultation and respects a short time limit", async ({ p
   await expect(page.getByRole("heading", { name: "条件を変えて、もう一度探してみましょう" })).toBeVisible();
 });
 
+test("finds the recurring exchange meetup in Yeouido", async ({ page }) => {
+  await page.goto("/quests?area=yeouido&purpose=discovery");
+  await expect(page.getByRole("heading", { name: "汝矣島の日韓交流会「いろとも」に初めて参加する" })).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://irotomo.com/#apply");
+});
+
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
   await installServerRunMock(page);
   await page.goto(

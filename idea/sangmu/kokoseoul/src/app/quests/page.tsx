@@ -17,6 +17,7 @@ import myeongdongKyoja from "@/modules/content/myeongdong-kyoja.json";
 import museumRoom from "@/modules/content/museum-room-of-contemplation.json";
 import oliveyoungShopping from "@/modules/content/seongsu-oliveyoung-shopping.json";
 import oliveyoungSkin from "@/modules/content/seongsu-oliveyoung-skin-consulting.json";
+import irotomo from "@/modules/content/yeouido-irotomo-first-meetup.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -78,6 +79,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.durationMax === null &&
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
     (!filters.budget || filters.budget === "unlimited");
+  const showIrotomo =
+    (filters.area === "all" || filters.area === "yeouido") &&
+    (!filters.purpose || filters.purpose === "discovery") &&
+    filters.tags.length === 0 &&
+    filters.durationMax === null &&
+    filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
+    (!filters.budget || filters.budget === "under30000" || filters.budget === "unlimited");
   const featured = [
     ...(showHackathon ? [{
       quest: event,
@@ -112,6 +120,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/seongsu-oliveyoung-skin-consulting",
       label: pickLocale(locale, "聖水 · ビューティー", "성수 · 뷰티"),
       detail: pickLocale(locale, "店頭受付 · 待ち時間は店頭で確認", "현장 접수 · 대기 시간은 매장 확인"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showIrotomo ? [{
+      quest: irotomo,
+      href: "/quests/yeouido-irotomo-first-meetup",
+      label: pickLocale(locale, "汝矣島 · 日常の中の新しい体験", "여의도 · 일상 속 새로운 경험"),
+      detail: pickLocale(locale, "日曜 15:00〜17:30 · 事前申込制", "일요일 15:00~17:30 · 사전 신청"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
   ];
