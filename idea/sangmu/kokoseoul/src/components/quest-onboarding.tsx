@@ -20,6 +20,17 @@ import {
 type AreaChoice = "current" | "choose" | "unknown";
 type LocationStatus = "idle" | "loading" | "failed";
 
+const PURPOSE_DESCRIPTIONS: Record<
+  QuestPurpose,
+  { ja: string; ko: string }
+> = {
+  food: { ja: "食べたいものから探す", ko: "먹고 싶은 것부터 찾기" },
+  culture: { ja: "街の文化や物語に触れる", ko: "도시의 문화와 이야기 만나기" },
+  shopping: { ja: "好みに合うものを見つける", ko: "내 취향에 맞는 것 찾기" },
+  rest: { ja: "急がず休んで歩く", ko: "서두르지 않고 쉬며 걷기" },
+  discovery: { ja: "いつもの街を違う目で見る", ko: "익숙한 도시를 다르게 보기" },
+};
+
 function Choice({
   name,
   value,
@@ -41,6 +52,7 @@ function Choice({
         value={value}
         checked={checked}
         onChange={onChange}
+        style={{ caretColor: "transparent" }}
         className="peer sr-only"
       />
       <span className="flex min-h-13 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-left text-base font-bold leading-6 text-slate-700 shadow-sm transition peer-checked:border-[#941e34] peer-checked:bg-[#f7ecee] peer-checked:text-[#941e34] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
@@ -112,7 +124,7 @@ export function QuestOnboarding() {
     <section aria-labelledby="quest-onboarding-title">
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-black text-[#941e34]">
-          {pickLocale(locale, "おすすめ条件", "추천 조건")}
+          {pickLocale(locale, "今日の選び方", "오늘의 선택")}
         </p>
         <p className="text-sm font-bold text-slate-400" aria-label={pickLocale(locale, `全3問の${step + 1}問目`, `총 3개 중 ${step + 1}번째 질문`)}>
           {step + 1} / 3
@@ -149,7 +161,16 @@ export function QuestOnboarding() {
                 checked={purpose === value}
                 onChange={() => setPurpose(value as QuestPurpose)}
               >
-                {getPurposeLabel(value as QuestPurpose, locale)}
+                <span className="grid gap-0.5">
+                  <span>{getPurposeLabel(value as QuestPurpose, locale)}</span>
+                  <span className="text-sm font-semibold text-slate-500">
+                    {pickLocale(
+                      locale,
+                      PURPOSE_DESCRIPTIONS[value as QuestPurpose].ja,
+                      PURPOSE_DESCRIPTIONS[value as QuestPurpose].ko,
+                    )}
+                  </span>
+                </span>
               </Choice>
             ))}
           </div>

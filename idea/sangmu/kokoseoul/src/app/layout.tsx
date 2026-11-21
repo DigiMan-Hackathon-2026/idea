@@ -19,8 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: pickLocale(
       locale,
-      "ソウルで、ひとりでも迷わず始められるローカル体験。",
-      "서울에서 혼자서도 망설이지 않고 시작하는 로컬 체험.",
+      "グルメ、文化、買い物、散歩、日常の発見から、今日のソウルを選ぶ。",
+      "식도락, 문화, 쇼핑, 산책, 일상의 발견에서 오늘의 서울을 고르세요.",
     ),
     applicationName: brandName,
     robots: {
