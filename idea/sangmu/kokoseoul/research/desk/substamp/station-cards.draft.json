@@ -1,0 +1,622 @@
+{
+  "source": {
+    "originDataset": "station-origins.json",
+    "note": "storyJa는 officialOriginKo에 있는 사실만 근거로 함. 원문에 없는 내용은 supplementJa 또는 hanjaSource=supplement로 분리"
+  },
+  "cards": [
+    {
+      "stationKey": "왕십리",
+      "lines": [
+        {
+          "subwayId": "0208",
+          "line": "02호선"
+        },
+        {
+          "subwayId": "2541",
+          "line": "05호선"
+        }
+      ],
+      "hanja": "往十里",
+      "hanjaSource": "official",
+      "readingKoKana": "ワンシムニ",
+      "readingJaOn": "おうじゅうり",
+      "kanjiNoteJa": "往＝行く、十里＝十里の道のり。「あと十里行け」という意味になります。",
+      "titleJa": "「あと十里行きなさい」と言われた町",
+      "storyJa": "朝鮮王朝の初め、都にふさわしい場所を探していた無学大師（ムハクテサ）が、この辺りで一人の年老いた農夫に出会い、「北西へあと十里行きなさい」と教えられたそうです。農夫の正体は道詵大師（トソンテサ）だったとも言われています。この言い伝えから、往十里と呼ばれるようになりました。",
+      "storyKind": "legend",
+      "supplementJa": [
+        {
+          "text": "韓国の「里」は日本の「里」より短い単位です。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [
+        "답십리"
+      ],
+      "reviewNotesKo": [],
+      "officialOriginKo": "왕십리 동명의 유래는 조선 초 국사였던 무학대사가 도읍지터를 물색하던 중 지금의 왕십리 지역에서 만난 도선대사의 변신인 한 늙은 농부로부터 서북쪽으로 십리를 더 가라는 가르침을 받았기 때문에 왕십리(往十里)라 전해오고 있다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "답십리",
+      "lines": [
+        {
+          "subwayId": "2543",
+          "line": "05호선"
+        }
+      ],
+      "hanja": "踏十里",
+      "hanjaSource": "supplement",
+      "readingKoKana": "タプシムニ",
+      "readingJaOn": "とうじゅうり",
+      "kanjiNoteJa": "踏＝ふむ、十里＝十里の道のり。",
+      "titleJa": "無学大師が「踏んだ」町",
+      "storyJa": "都の場所を決めようとしていた無学大師（ムハクテサ）が、この地を踏んだことから踏十里と呼ばれるようになった、という言い伝えがあります。東大門から歩いて十里の場所にあるから、という説もあります。",
+      "storyKind": "legend",
+      "supplementJa": [],
+      "relatedStations": [
+        "왕십리"
+      ],
+      "reviewNotesKo": [],
+      "officialOriginKo": "무학대사가 도읍지를 정하려고 이 곳을 밟았다 하여 답십리라 했다는 구전이 있는데 일설에 의하면 동대문에서 걸어서 십리에 위치한 곳이라 유래됨",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "압구정",
+      "lines": [
+        {
+          "subwayId": "0326",
+          "line": "03호선"
+        }
+      ],
+      "hanja": "狎鷗亭",
+      "hanjaSource": "supplement",
+      "readingKoKana": "アックジョン",
+      "readingJaOn": "こうおうてい",
+      "kanjiNoteJa": "狎＝なれ親しむ、鷗＝カモメ、亭＝あずまや。「カモメと親しむあずまや」という意味です。",
+      "titleJa": "カモメを友にしたあずまや",
+      "storyJa": "朝鮮王朝の世祖・成宗の時代の権力者、韓明澮（ハン・ミョンフェ）が建てたあずまやの名前です。世の中のことを忘れ、川辺のカモメを友として暮らしたい、という思いが込められています。かつてこの辺りは、帆船が浮かぶ「東湖」や対岸の景色が広がる、絵のような景色だったといいます。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "압구정역은 조선조 세조,성종때 권신 한명회가 세상일을 잊기 위해 강가의 갈매기를 벗삼아 지내겠다는 정자 이름이다. 전일의 이곳은 돛단배 떠있는 \"동호\"와 강북의 원근 풍경 그리고 닥나무가 무성한 저자도 등이 펼쳐져 한 폭의 그림같은 절경이었다고 한다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "명동",
+      "lines": [
+        {
+          "subwayId": "0424",
+          "line": "04호선"
+        }
+      ],
+      "hanja": "明洞",
+      "hanjaSource": "supplement",
+      "readingKoKana": "ミョンドン",
+      "readingJaOn": "めいどう",
+      "kanjiNoteJa": "明＝あかるい、洞＝町。",
+      "titleJa": "「明礼坊」から生まれた名前",
+      "storyJa": "1894年の甲午改革のときに初めて付けられた名前です。朝鮮王朝の初めから、この一帯が「明礼坊（ミョンネバン）」と呼ばれていたことに由来します。流行の発信地として知られるこの街は、かつて喫茶店（タバン）を中心に「芸術の街」とも呼ばれていました。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "「明礼坊」の漢字表記は公式データにはありません。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "명동은 갑오개혁(1894년)때 처음 붙여진 이름으로 이는 조선초부터 이곳을 명례방이라고 한데서 유래된 것이다. 유행의 1번지로 일컫는 이곳은 한때 다방을 중심으로 \"예술의 거리\"로 알려져 있다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "성수",
+      "lines": [
+        {
+          "subwayId": "0211",
+          "line": "02호선"
+        }
+      ],
+      "hanja": "聖水",
+      "hanjaSource": "official",
+      "readingKoKana": "ソンス",
+      "readingJaOn": "せいすい",
+      "kanjiNoteJa": "聖＝きよらか、水＝みず。「聖なる水」という意味です。",
+      "titleJa": "澄んだ水が流れていた「聖なる水」",
+      "storyJa": "言い伝えによると、この辺りにはいつも澄んだ水が流れていて、村の人たちはその水を飲むことができました。また、ソンドクチョンという大きなあずまやがあり、学者たちが流れる水を飲みながら詩を詠んで過ごしたそうです。そこから「聖なる水＝聖水」と呼ばれるようになりました。",
+      "storyKind": "legend",
+      "supplementJa": [],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "전래에 의하면 성수라는 이름은 항상 맑은 물이 흐르고, 마을사람들이 그 물을 마실 수가 있었으며 이곳에 성덕정이라는 큰 정자가 있었는데 이곳 정자에서 선비들이 흐르는 물을 마시며 풍류를 읊으며 노닐었다는 성스러운 물 즉聖水라는 지명으로 불리게 되었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "이태원",
+      "lines": [
+        {
+          "subwayId": "2631",
+          "line": "06호선"
+        }
+      ],
+      "hanja": "梨泰院",
+      "hanjaSource": "official",
+      "readingKoKana": "イテウォン",
+      "readingJaOn": "りたいいん",
+      "kanjiNoteJa": "院＝ここでは旅人が泊まる施設のこと。",
+      "titleJa": "昔の宿の名前が残った町",
+      "storyJa": "朝鮮時代、ここに「梨泰院」という駅院があったことから付いた名前です。駅院そのものはずっと昔になくなりましたが、その名前を持つ町が残り、今の梨泰院洞になりました。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "駅院は、朝鮮時代に公の用事で旅をする人のための宿泊施設です。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "조선시대 때 이태원(梨泰院)이란 역원(驛院)이 있었기 때문에 이름이 붙여졌는데 역원으로서의 이태원은 오래 전에 없어지고 그 명칭을 가진 동네가 용산구 동북쪽에 자리잡아 현재의 이태원동이 되었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "회현",
+      "lines": [
+        {
+          "subwayId": "0425",
+          "line": "04호선"
+        }
+      ],
+      "hanja": "會賢",
+      "hanjaSource": "official",
+      "readingKoKana": "フェヒョン",
+      "readingJaOn": "かいけん",
+      "kanjiNoteJa": "會＝あう（会）、賢＝かしこい。「賢い人が集まる」という意味です。",
+      "titleJa": "賢い人たちが集まった町",
+      "storyJa": "朝鮮王朝末期、高宗の時代に初めて付けられた名前です。以前の「好賢洞（ホヒョンドン）」の発音が変わって生まれたもので、朝鮮王朝の時代にチョン・グァンピルやキム・サンホン兄弟など、賢い人たちが集まって暮らしていたことから「会賢洞」と呼ばれるようになりました。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "회현동은 조선말 고종때 처음 붙여진 이름으로 이는 전일의 호현동(好賢洞)이 반음되어 유래된 것으로 이곳에는 조선왕조때 정광필, 김상헌 형제등의 어진 사람들이 모여 살았기 때문에 회현동(會賢洞)이라 불리어진 것이다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "종로3가",
+      "lines": [
+        {
+          "subwayId": "0153",
+          "line": "01호선"
+        },
+        {
+          "subwayId": "0319",
+          "line": "03호선"
+        },
+        {
+          "subwayId": "2535",
+          "line": "05호선"
+        }
+      ],
+      "hanja": "鍾路三街",
+      "hanjaSource": "supplement",
+      "readingKoKana": "チョンノサムガ",
+      "readingJaOn": "しょうろさんがい",
+      "kanjiNoteJa": "鍾（鐘）＝かね、路＝みち、三街＝三丁目。「鐘のある通りの三丁目」という意味です。",
+      "titleJa": "都の門を開け閉めした鐘の通り",
+      "storyJa": "鐘路という通りの名前から来ています。朝鮮王朝の500年間、夜には「インジョン（人定）」、明け方には「パル」の鐘をついて、都の8つの門を開け閉めする鐘楼がこの通りにありました。朝鮮の初めから市場の店が並ぶにぎやかな通りで、「ウンジョンガ」とも呼ばれたソウルの商業の中心でした。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "現在の正式な漢字表記は「鍾路」で、「鍾」は「鐘」と同じ意味で使われます。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [
+        "종로5가"
+      ],
+      "reviewNotesKo": [],
+      "officialOriginKo": "역이 있는 종로구의 동명과 가로명에서 유래하였다. 종로는 조선왕조 500년 동안 밤에는 인정(人定), 새벽에는 파루를 쳐서 도성 8개문을 여닫게 하는 종루(鐘樓)가 있어 유래된 것이다. 이 거리에는 조선 초부터 시전이 있었던 번화가이어서 일명 운종가로 칭해졌던 서울의 상업 중심가였다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "경복궁",
+      "lines": [
+        {
+          "subwayId": "0317",
+          "line": "03호선"
+        }
+      ],
+      "hanja": "景福宮",
+      "hanjaSource": "supplement",
+      "readingKoKana": "キョンボックン",
+      "readingJaOn": "けいふくきゅう",
+      "kanjiNoteJa": "景＝おおきい・めでたい、福＝さいわい、宮＝宮殿。",
+      "titleJa": "新しい王朝の象徴として建てられた宮殿",
+      "storyJa": "朝鮮王朝を開いた太祖・李成桂（イ・ソンゲ）がソウルを都に定めたあと、新しい王朝の象徴として1395年に建てた宮殿です。初めは比較的小さな規模でしたが、太宗・世宗の時代に増築されました。壬辰倭乱（文禄・慶長の役）で焼失し、約250年後の1869年、高宗の時代に王権を確立するため、今の規模で再建されました。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [
+        "광화문"
+      ],
+      "reviewNotesKo": [
+        "원문 '임진왜란'의 일본어 표기 방침 결정 필요(壬辰倭乱／文禄・慶長の役 병기안)"
+      ],
+      "officialOriginKo": "경복궁은 태조 이성계가 서울에 도읍을 정한후 새왕조를 상징하는 궁전을 1395년 창건했던 초기에는 비교적 소규모였으나 태종, 세종때에 이르러 증축되었으나 임진왜란때 소실되어 250년 후인 1869년 고종때 이르러서야 왕권확립 차원에서 오늘날의 규모로 재건립되었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "광화문",
+      "lines": [
+        {
+          "subwayId": "2534",
+          "line": "05호선"
+        }
+      ],
+      "hanja": "光化門",
+      "hanjaSource": "supplement",
+      "readingKoKana": "クァンファムン",
+      "readingJaOn": "こうかもん",
+      "kanjiNoteJa": "光＝ひかり、化＝かわる・おしえ、門＝もん。",
+      "titleJa": "名前が二度付けられた正門",
+      "storyJa": "景福宮の南の正門です。1395年（太祖4年）9月に建てられ、初めはチョン・ドジョンによって「サジョンムン」と名付けられましたが、1425年（世宗7年）に学者の機関「チッピョンジョン」で「光化門」に改められました。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [
+        "경복궁"
+      ],
+      "reviewNotesKo": [],
+      "officialOriginKo": "광화문은 경복궁의 남정문으로써 당초 1395년(태조4년) 9월에 창건되어 정도전에 의해 사정문으로 명명되었으나 1425년(세종7년) 집현전에서 광화문으로 바꾸었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "안국",
+      "lines": [
+        {
+          "subwayId": "0318",
+          "line": "03호선"
+        }
+      ],
+      "hanja": "安國",
+      "hanjaSource": "official",
+      "readingKoKana": "アングク",
+      "readingJaOn": "あんこく",
+      "kanjiNoteJa": "安＝やすらか、國＝くに（国）。「国が安らか」という意味です。",
+      "titleJa": "「ソウルの中のソウル」と呼ばれた町",
+      "storyJa": "朝鮮の初めから、この一帯を「安国坊（アングクパン）」と定めたことに由来します。かつては北村（プクチョン）、または「ウッテ」と呼ばれた「ソウルの中のソウル」でした。成宗の時代には月山大君（ウォルサンテグン）のあずまや「プンウォルジョン」があり、朝鮮末期に高宗と明成皇后が婚礼を挙げた「アンドン別宮」も近くにありました。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "안국동은 조선초부터 이 일대를 안국방(安國坊)으로 정했기 때문에 유래된 것이다. 이곳은 전일에 북촌(北村), 또는 \"웃대\"로 불리던 \"서울 중의 서울\"이었다. 조선초 성종때 월산대군의 풍월정이 있었으며, 조선말 고종과 명성황후가 혼례식을 올린 안동별궁이 인근에 있었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "동대문역사문화공원",
+      "lines": [
+        {
+          "subwayId": "0205",
+          "line": "02호선"
+        },
+        {
+          "subwayId": "0422",
+          "line": "04호선"
+        },
+        {
+          "subwayId": "2537",
+          "line": "05호선"
+        }
+      ],
+      "hanja": "東大門歴史文化公園",
+      "hanjaSource": "supplement",
+      "readingKoKana": "トンデムンヨクサムナコンウォン",
+      "readingJaOn": "とうだいもんれきしぶんかこうえん",
+      "kanjiNoteJa": "東大門＝東の大きな門、歴史文化公園＝歴史と文化の公園。",
+      "titleJa": "運動場から公園へ変わった駅名",
+      "storyJa": "もとは近くに東大門運動場があったことから付いた駅名でしたが、運動場が取り壊され、2009年12月1日に今の名前に変わりました。東大門運動場は1926年に陸上競技場と野球場、庭球場が完成し、「京城運動場」と呼ばれていました。解放後はソウル運動場、東大門運動場と呼ばれ、のちに取り壊されました。陸上競技場の場所は、もともと朝鮮王朝の約500年間、兵士の選抜や武術の訓練をした「フルリョンウォン（訓練院）」の跡地でした。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [
+        "동대문"
+      ],
+      "reviewNotesKo": [
+        "원문 '해방 후'의 일본어 표기 방침 결정 필요"
+      ],
+      "officialOriginKo": "인근에 동대문운동장이 있어 명명되었다가 동대문운동장이 철거되어 2009년 12월 1일자로 역명이 동대문역사문화공원으로 변경되었다. 동대문운동장은 1926년에 육상경기장과 야구장, 정구장이 완공되어 경성운동장으로 불리었으나, 해방 후에는 서울운동장, 동대문운동장으로 불리우다 철거되었다. 원래 육상경기장은 조선 500여년간 장병의 선발과 무술훈련을 하던 훈련원터였다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "동대문",
+      "lines": [
+        {
+          "subwayId": "0155",
+          "line": "01호선"
+        },
+        {
+          "subwayId": "0421",
+          "line": "04호선"
+        }
+      ],
+      "hanja": "東大門",
+      "hanjaSource": "supplement",
+      "readingKoKana": "トンデムン",
+      "readingJaOn": "とうだいもん",
+      "kanjiNoteJa": "東＝ひがし、大＝おおきい、門＝もん。",
+      "titleJa": "都の東の大きな門",
+      "storyJa": "近くにある東大門から付いた名前です。東大門は「興仁之門（フンインジムン）」の通称で、都の四大門の一つです。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "正式名称「興仁之門」の漢字表記は公式データにはありません。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [
+        "동대문역사문화공원"
+      ],
+      "reviewNotesKo": [
+        "원문의 '보물 제1호'는 문화유산 지정번호 표기 폐지(2021)로 카드에서 뺌. 사실 확인 필요"
+      ],
+      "officialOriginKo": "동대문역은 인근에 위치한 우리나라 보물 제1호인 동대문에서 유래하였다. 동대문은 흥인지문의 속칭으로 도성 4대문의 하나이다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "홍대입구",
+      "lines": [
+        {
+          "subwayId": "0239",
+          "line": "02호선"
+        }
+      ],
+      "hanja": "弘大入口",
+      "hanjaSource": "supplement",
+      "readingKoKana": "ホンデイック",
+      "readingJaOn": "こうだいにゅうこう",
+      "kanjiNoteJa": "弘大＝弘益大学校の略、入口＝いりぐち。",
+      "titleJa": "「東橋」駅になるはずだった駅",
+      "storyJa": "この辺りの町の名前「東橋洞（トンギョドン）」は、「セギョ」という地名が「チャンダリ」と呼ばれたことから生まれました。少し高い場所にあったため「ウッチャンダリ」と呼ばれていました。駅は当初「東橋」駅として開業する予定でしたが、近くに弘益大学校があるため「弘大入口」と名付けられました。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "「チャンダリ」は「小さな橋」という意味の古い呼び名です。",
+          "reviewNeeded": true
+        },
+        {
+          "text": "「東橋洞」の漢字表記は公式データにはありません。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "동교동이란 동명은 세교라는 이름이 \"잔다리\"라고 하는데서 생겼으며 지형이 좀 높은 곳에 위치하여 있었기 때문에 \"윗잔다리\"라고 불렸고 당초 \"동교\"역으로 개통 예정이었으나, 인근에 홍익대학교가 위치하고 있어 \"홍대입구\"로 명명되었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "한강진",
+      "lines": [
+        {
+          "subwayId": "2632",
+          "line": "06호선"
+        }
+      ],
+      "hanja": "漢江鎭",
+      "hanjaSource": "official",
+      "readingKoKana": "ハンガンジン",
+      "readingJaOn": "かんこうちん",
+      "kanjiNoteJa": "漢江＝ソウルを流れる大きな川、鎭＝軍の守りの拠点。",
+      "titleJa": "ソウルの南を守った渡し場",
+      "storyJa": "漢江鎮の渡し場は、地形がオメガ（Ω）の形をしていて舟を着けやすく、江南の沙坪（サピョン）の渡し場とを結ぶ、軍事でも物流でもとても重要な場所でした。忠清・全羅・慶尚の三南地方の産物や、多くの行商人、学者たちが行き交った場所でもあります。南山の峠の向こうには、都の防衛と王室の護衛を担う御営庁の分所「南小営」があったため、渡し場の名前も軍事的な意味を持つ「漢江鎮」になりました。上流のソンパジン、下流のヤンファジンとともに、ソウルの南を守る要所でした。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "한강진(漢江鎭)나루는 지형이 마치 오메가(Ω)모양으로 되어 있어 배를 갖다대기에는 천혜의 지형이었으며 강남의 사평(沙坪)나루(강남구 신사동)를 잇는 군사적으로나 물류면으로 매우 중요한 나루터였다. 특히 삼남지방(충청,호남,영남)의 물산과 많은 보부상과 선비들이 강남의 역삼동과 양재역, 말죽거리에서 몸을 풀고 건너오고 갔던 영고성쇠로 얼룩진 곳이기도 하다. 게다가 목멱산(木覓山, 남산)자락 고개(버티고개) 너머에는 조선조 때 수도방위와 왕실호위를 맡아보던 어영청(御營廳)의 분소인 남소영(南小營)이 있었는지라 나루터 이름도 군사적 의미인 한강진(漢江鎭)나루라고 하였는데 한강상류의 송파진, 하류의 양화진과 더불어 한강의 중간에 위치하여 서울의 남쪽을 지키는 군사상의 요충지였다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "망원",
+      "lines": [
+        {
+          "subwayId": "2622",
+          "line": "06호선"
+        }
+      ],
+      "hanja": "望遠",
+      "hanjaSource": "supplement",
+      "readingKoKana": "マンウォン",
+      "readingJaOn": "ぼうえん",
+      "kanjiNoteJa": "望＝のぞむ、遠＝とおい。「遠くを望む」という意味です。",
+      "titleJa": "山と川を遠くまで望むあずまや",
+      "storyJa": "孝寧大君（ヒョリョンテグン）の別荘「ヒウジョン」を、月山大君（ウォルサンテグン）が成宗15年（1484年）に、「美しい山と川の景色を遠くまで望む」という意味の「望遠亭」に名前を改めました。ここから望遠洞という名前が生まれました。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [
+        "안국"
+      ],
+      "reviewNotesKo": [],
+      "officialOriginKo": "효령대군의 별장인 희우정을 월산대군이 성종 15년(1484년) \"아름다운 산과 강의 경치를 멀리 바라본다\"는 뜻인 망원정으로 이름을 바꾼 데에서 망원동이 유래됨",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "서울역",
+      "lines": [
+        {
+          "subwayId": "0150",
+          "line": "01호선"
+        },
+        {
+          "subwayId": "0426",
+          "line": "04호선"
+        }
+      ],
+      "hanja": "",
+      "hanjaSource": "none",
+      "readingKoKana": "ソウルヨク",
+      "readingJaOn": "",
+      "kanjiNoteJa": "「ソウル」には漢字表記がありません。",
+      "titleJa": "「南大門駅」から始まった中央駅",
+      "storyJa": "ソウルの中央駅であるソウル駅が近くにあることから付いた名前です。1900年に「南大門駅」として始まったソウル駅は、韓国の鉄道を代表する駅で、主要な路線の始発駅であり終着駅です。1923年に「京城駅」と改称されましたが、光復（解放）後に「ソウル駅」と呼ばれるようになりました。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "「ソウル」には漢字表記がありません。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [],
+      "reviewNotesKo": [
+        "원문 '광복 후'의 일본어 표기 방침 결정 필요"
+      ],
+      "officialOriginKo": "우리나라 서울의 중앙역인 서울역이 인근에 위치한데서 유래하였다. 1900년 남대문역으로 출발한 서울역은 우리나라 철도의 대표적인 역으로 주요 철도의 시발점이자 종착역이다.  1923년 경성역으로 개칭되었으나 광복 후에 서울역으로 불려지게 되었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "시청",
+      "lines": [
+        {
+          "subwayId": "0151",
+          "line": "01호선"
+        },
+        {
+          "subwayId": "0201",
+          "line": "02호선"
+        }
+      ],
+      "hanja": "市廳",
+      "hanjaSource": "supplement",
+      "readingKoKana": "シチョン",
+      "readingJaOn": "しちょう",
+      "kanjiNoteJa": "市廳＝市役所（廳は「庁」の旧字）。",
+      "titleJa": "明の使節が通った道",
+      "storyJa": "ソウル市庁が駅の前にあることから付いた名前です。市庁駅がある太平路は、1914年に、中国の使節を迎えた「太平館」の名前から付けられました。明の使節が来ると、この道を通って太平館から景福宮に入りました。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "「太平路」「太平館」の漢字表記は公式データにはありません。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [
+        "경복궁"
+      ],
+      "reviewNotesKo": [],
+      "officialOriginKo": "서울의 시청이 역 앞에 위치한데서 유래하였다. 시청역이 위치한 태평로는 1914년에 중국사신을 맞던 태평관의 이름을 따서 붙인 것이다. 명(明)의 사신이 오면 이 길을 거쳐 태평관에서 경복궁으로 들어갔다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "잠실",
+      "lines": [
+        {
+          "subwayId": "0216",
+          "line": "02호선"
+        },
+        {
+          "subwayId": "2815",
+          "line": "08호선"
+        }
+      ],
+      "hanja": "蠶室",
+      "hanjaSource": "supplement",
+      "readingKoKana": "チャムシル",
+      "readingJaOn": "さんしつ",
+      "kanjiNoteJa": "蠶＝かいこ（蚕）、室＝へや。「蚕を育てる部屋」という意味です。",
+      "titleJa": "国の養蚕所があった場所",
+      "storyJa": "朝鮮の初め、ここに「蚕室」が置かれたことに由来します。蚕室は「チャムシルトフェ」の略で、朝鮮初期の国立の養蚕所でした。",
+      "storyKind": "history",
+      "supplementJa": [],
+      "relatedStations": [],
+      "reviewNotesKo": [],
+      "officialOriginKo": "잠실은 조선초에 이곳에 잠실을 두었기 때문에 유래된 것이다. 잠실은 잠실도회의 준말로 조선초의 국립 양잠소였다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    },
+    {
+      "stationKey": "을지로입구",
+      "lines": [
+        {
+          "subwayId": "0202",
+          "line": "02호선"
+        }
+      ],
+      "hanja": "乙支路入口",
+      "hanjaSource": "supplement",
+      "readingKoKana": "ウルチロイック",
+      "readingJaOn": "おつしろにゅうこう",
+      "kanjiNoteJa": "乙支＝人の姓（乙支文徳）、路＝みち、入口＝いりぐち。",
+      "titleJa": "「黄金町」と呼ばれた時期もある道",
+      "storyJa": "高句麗の名将・乙支文徳（ウルチ・ムンドク）の姓から付けられた通りの名前です。朝鮮王朝の時代には「クリゲ」と呼ばれていたこの道は、1941年から「黄金町」と改められたこともありました。乙支路の入口にあることから、乙支路入口と名付けられました。",
+      "storyKind": "history",
+      "supplementJa": [
+        {
+          "text": "「乙支文徳」の漢字表記は公式データにはありません。",
+          "reviewNeeded": true
+        }
+      ],
+      "relatedStations": [],
+      "reviewNotesKo": [
+        "'황금정' 개칭 연도(원문 1941년)가 다른 자료와 다를 수 있어 확인 필요",
+        "황금정(黃金町)은 일제강점기 일본식 지명. 일본어 안내 시 문구 민감도 검토"
+      ],
+      "officialOriginKo": "을지로입구역은 우리나라의 위인중의 한사람인 고구려의 명장 을지문덕의 성을 따서 붙인 것이다. 조선왕조때는 구리개로 불리우던 이길은 1941년부터 황금정으로 고친적도 있다. 이곳은 을지로의 입구에 위치하였기에 을지로입구로 명명되었다.",
+      "review": {
+        "japanese": "not_reviewed",
+        "facts": "official_text_only"
+      }
+    }
+  ]
+}
