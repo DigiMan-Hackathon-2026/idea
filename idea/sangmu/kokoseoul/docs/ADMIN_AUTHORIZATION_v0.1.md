@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: Auth.js·Google OIDC 구현 전 기준
 
-이 문서는 Google OIDC 인증, Auth.js database session과 DigiMan `admin_principals` 권한을 분리하고, 운영 API마다 활성 principal을 재확인하는 계약이다. 실제 package version·callback·cookie 이름은 D07·D09·D10 결정 후 고정한다.
+이 문서는 Google OIDC 인증, Auth.js database session과 여기서울 `admin_principals` 권한을 분리하고, 운영 API마다 활성 principal을 재확인하는 계약이다. 실제 package version·callback·cookie 이름은 D07·D09·D10 결정 후 고정한다.
 
 ## 보안 경계
 

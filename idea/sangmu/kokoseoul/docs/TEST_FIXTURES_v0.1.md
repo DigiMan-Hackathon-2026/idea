@@ -47,7 +47,7 @@ unit·integration은 injected clock을 사용한다. DB default 시각을 검수
 
 ## 공통 가상 content
 
-- supplier 이름: `DigiMan Test Supplier`
+- supplier 이름: `여기서울 Test Supplier`
 - 장소: `テスト体験場所 A`, `테스트로 1`
 - area: `test-area-a`, `test-area-b`
 - tags: `test-craft`, `test-food`

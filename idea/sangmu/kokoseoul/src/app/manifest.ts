@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "DigiMan — ソウルの小さな冒険ガイド",
-    short_name: "DigiMan",
+    name: "ココソウル — ソウルの小さな冒険ガイド",
+    short_name: "ココソウル",
     description: "ソウルで、ひとりでも迷わず始められるローカル体験。",
     start_url: "/",
     scope: "/",

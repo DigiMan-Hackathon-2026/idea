@@ -18,18 +18,31 @@ export function createPwaIcon(size: number) {
             alignItems: "center",
             background: "#fffaf2",
             borderRadius: "24%",
-            color: "#c93418",
             display: "flex",
-            fontFamily: "Arial, sans-serif",
-            fontSize: Math.round(size * 0.42),
-            fontWeight: 900,
             height: "72%",
             justifyContent: "center",
-            lineHeight: 1,
+          position: "relative",
             width: "72%",
           }}
         >
-          D
+        <div
+          style={{
+            background: "#c93418",
+            borderRadius: 999,
+            height: "18%",
+            position: "absolute",
+            width: "58%",
+          }}
+        />
+        <div
+          style={{
+            background: "#c93418",
+            borderRadius: 999,
+            height: "58%",
+            position: "absolute",
+            width: "18%",
+          }}
+        />
         </div>
       </div>
     ),

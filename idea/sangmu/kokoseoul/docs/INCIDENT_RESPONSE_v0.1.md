@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 운영 체계 확정 전 대응 기준
 
-이 문서는 DigiMan의 장애를 탐지한 순간부터 사용자 피해를 제한하고, 안전한 복구를 확인해 종료·사후 검토하는 절차다. 배포·rollback·backup 명령은 [배포와 복구 운영 런북](OPERATIONS_RUNBOOK_v0.1.md), 관측 신호는 [로그·지표·오류 관측 계약](OBSERVABILITY_CONTRACT_v0.1.md)을 따른다.
+이 문서는 여기서울의 장애를 탐지한 순간부터 사용자 피해를 제한하고, 안전한 복구를 확인해 종료·사후 검토하는 절차다. 배포·rollback·backup 명령은 [배포와 복구 운영 런북](OPERATIONS_RUNBOOK_v0.1.md), 관측 신호는 [로그·지표·오류 관측 계약](OBSERVABILITY_CONTRACT_v0.1.md)을 따른다.
 
 ## 원칙
 

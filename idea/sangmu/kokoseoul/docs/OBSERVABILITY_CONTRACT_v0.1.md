@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: monitoring 도구 확정 전 검토 기준
 
-이 문서는 DigiMan의 request ID, 구조화 로그, 기술 지표, 알림과 보존 범위를 정의한다. 관측 데이터는 사용자 원문을 복제하는 저장소가 아니며, monitoring 장애가 핵심 run transaction을 실패시키지 않게 한다.
+이 문서는 여기서울의 request ID, 구조화 로그, 기술 지표, 알림과 보존 범위를 정의한다. 관측 데이터는 사용자 원문을 복제하는 저장소가 아니며, monitoring 장애가 핵심 run transaction을 실패시키지 않게 한다.
 
 공개 오류 code·HTTP·details와 500/503 경계는 [API 오류·request ID catalog](API_ERROR_CATALOG_v0.1.md)를 따른다.
 

@@ -34,7 +34,7 @@ Node 24.19.0은 Next.js 16.4.6의 최소 Node 20.9 조건과 설치 패키지의
 
 ### F0에서 금지
 
-- DigiMan 제품 문구·퀘스트 화면·도메인 API
+- 여기서울 제품 문구·퀘스트 화면·도메인 API
 - Drizzle schema·migration·seed
 - 실제 데이터베이스·OIDC·Vercel·Neon 계정 연결
 - 실제 secret 또는 개인 callback URL

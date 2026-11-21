@@ -40,7 +40,7 @@ export default function OfflinePage() {
             width: "48px",
           }}
         >
-          D
+          ✦
         </div>
         <h1 style={{ fontSize: "28px", lineHeight: 1.25, margin: "24px 0 0" }}>
           オフラインです

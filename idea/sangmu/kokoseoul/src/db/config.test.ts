@@ -47,7 +47,7 @@ describe("database tooling guard", () => {
         "test",
         "postgresql://runner:local@localhost/postgres",
       ),
-    ).toThrow("outside the DigiMan");
+    ).toThrow("outside the digiman");
   });
 
   it("requires the direct migration URL without logging its value", () => {

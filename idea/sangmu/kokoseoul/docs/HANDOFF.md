@@ -23,7 +23,7 @@
 - 화면 mock과 서버 계약 테스트에 사용할 공개·진행 API JSON은 [B2C API 요청과 응답 예시 v0.1](API_EXAMPLES_B2C_v0.1.md)에 정리했다.
 - 공통 error envelope·request ID·405/500·14개 code는 [API 오류 catalog](API_ERROR_CATALOG_v0.1.md), 목록 정렬·cursor·rotation은 [pagination 계약](PAGINATION_CURSOR_v0.1.md)에 정리했다.
 - B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
-- 사용자 화면은 [DigiMan UX 원칙 v0.1](UX_PRINCIPLES_v0.1.md)의 한 화면 한 핵심 행동, 예측 가능한 버튼 문구, 쉬운 말, 선택권 존중, 오류 예방·복구 기준을 따른다. 토스 공개 자료의 원칙을 참고하지만 토스 브랜드와 외형은 복제하지 않는다.
+- 사용자 화면은 [여기서울 UX 원칙 v0.1](UX_PRINCIPLES_v0.1.md)의 한 화면 한 핵심 행동, 예측 가능한 버튼 문구, 쉬운 말, 선택권 존중, 오류 예방·복구 기준을 따른다. 토스 공개 자료의 원칙을 참고하지만 토스 브랜드와 외형은 복제하지 않는다.
 - demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류에 일본어 복구 행동을 제공한다. 네트워크·서버 장애 주입은 실제 API 연결 뒤 검수한다.
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
 - 기본 경로는 `Referrer-Policy: no-referrer`, Naver 지도 도메인 인증이 필요한 `/quests`만 `origin`을 적용한다. 모든 경로에 MIME sniffing·iframe 차단과 camera·microphone 차단 header를 적용했다. geolocation은 same-origin만 허용하고 시작 화면에서 사용자가 현재 위치를 고른 뒤에만 요청한다. 좌표는 browser 안에서 지원 지역을 고르는 데만 쓰며 URL·저장소·서버 요청·Naver 지도에 넣지 않는다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.

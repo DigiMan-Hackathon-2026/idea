@@ -14,7 +14,7 @@ export default function GlobalError({
 }) {
   const { locale } = useLocale();
   useEffect(() => {
-    console.error("DigiMan page error", error.digest ?? "no-digest");
+    console.error("여기서울 page error", error.digest ?? "no-digest");
   }, [error]);
 
   return (

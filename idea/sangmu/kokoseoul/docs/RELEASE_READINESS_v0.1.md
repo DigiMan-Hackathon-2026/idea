@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 제품 구현 전 release gate
 
-이 문서는 DigiMan의 특정 commit을 internal preview, demo release 또는 실제 콘텐츠 public release 중 어디까지 허용할지 판정하는 단일 체크포인트다. 개별 테스트 방법은 각 계약에 있고, 이 문서는 증거의 완전성·차단 조건·승인 결과를 모은다.
+이 문서는 여기서울의 특정 commit을 internal preview, demo release 또는 실제 콘텐츠 public release 중 어디까지 허용할지 판정하는 단일 체크포인트다. 개별 테스트 방법은 각 계약에 있고, 이 문서는 증거의 완전성·차단 조건·승인 결과를 모은다.
 
 ## release 유형
 

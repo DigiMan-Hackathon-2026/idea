@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 외부 계정·제품 환경 생성 전 기준
 
-이 문서는 DigiMan의 local·test·preview·production 설정 schema, secret 저장·주입·검증·교체·폐기 기준을 정의한다. 실제 값, 계정 ID, project ID와 개인 owner는 저장소에 기록하지 않는다.
+이 문서는 여기서울의 local·test·preview·production 설정 schema, secret 저장·주입·검증·교체·폐기 기준을 정의한다. 실제 값, 계정 ID, project ID와 개인 owner는 저장소에 기록하지 않는다.
 
 ## 원칙
 

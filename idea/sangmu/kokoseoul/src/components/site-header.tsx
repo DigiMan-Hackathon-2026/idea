@@ -13,15 +13,17 @@ export function SiteHeader() {
       <Link
         href="/"
         className="flex items-center gap-2.5 rounded-full text-slate-950"
-        aria-label={pickLocale(locale, "DigiMan ホーム", "DigiMan 홈")}
+        aria-label={pickLocale(locale, "ココソウル ホーム", "여기서울 홈")}
       >
         <span
           aria-hidden="true"
           className="grid size-10 place-items-center rounded-full bg-[#ff5a36] text-lg font-black text-white shadow-[0_6px_18px_rgba(255,90,54,0.25)]"
         >
-          D
+          ✦
         </span>
-        <span className="hidden text-lg font-black tracking-[-0.04em] sm:inline">DIGIMAN</span>
+        <span className="hidden text-lg font-black tracking-[-0.04em] sm:inline">
+          {pickLocale(locale, "ココソウル", "여기서울")}
+        </span>
       </Link>
       <div className="ml-auto flex min-w-0 items-center gap-2">
         <nav className="flex items-center gap-0.5 rounded-full border border-slate-900/10 bg-white/70 p-1 shadow-sm backdrop-blur" aria-label={pickLocale(locale, "メインナビゲーション", "주요 메뉴")}>

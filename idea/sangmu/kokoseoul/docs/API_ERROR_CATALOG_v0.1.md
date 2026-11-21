@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 공통 API 구현 전 기준
 
-이 문서는 DigiMan API의 오류 envelope, HTTP status, code, 공개 가능한 details, request ID, 재시도 의미와 판정 우선순위를 정의한다. 화면의 일본어 문구는 code를 그대로 번역하지 않고 문맥별 다음 행동을 전달한다.
+이 문서는 여기서울 API의 오류 envelope, HTTP status, code, 공개 가능한 details, request ID, 재시도 의미와 판정 우선순위를 정의한다. 화면의 일본어 문구는 code를 그대로 번역하지 않고 문맥별 다음 행동을 전달한다.
 
 ## 공통 envelope
 

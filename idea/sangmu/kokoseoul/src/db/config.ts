@@ -39,7 +39,7 @@ export function assertSafeDatabaseTarget(
 
   const database = decodeURIComponent(url.pathname.slice(1));
   if (!SAFE_DATABASE_NAMES.test(database)) {
-    throw new Error("Database name is outside the DigiMan local/test namespace");
+    throw new Error("Database name is outside the digiman local/test namespace");
   }
 
   const role = decodeURIComponent(url.username);
@@ -64,7 +64,7 @@ export function getSafeRuntimeDatabaseUrl(
   const value = environment.DATABASE_URL;
   const target = assertSafeDatabaseTarget(environment.APP_ENV, value);
   if (!SAFE_RUNTIME_ROLES.test(target.role)) {
-    throw new Error("Database runtime URL must use a DigiMan runtime role");
+    throw new Error("Database runtime URL must use a digiman runtime role");
   }
   return value!;
 }

@@ -8,6 +8,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-## DigiMan UX rules
+## 여기서울 UX rules
 
-Before changing any user-facing screen, interaction, or copy, read and apply `docs/UX_PRINCIPLES_v0.1.md`. Keep the experience bilingual in Korean and Japanese, with equivalent information, actions, and recovery paths in both languages. Do not copy Toss branding or visual assets; use the documented principles within DigiMan's own visual identity.
+Before changing any user-facing screen, interaction, or copy, read and apply `docs/UX_PRINCIPLES_v0.1.md`. Keep the experience bilingual in Korean and Japanese, with equivalent information, actions, and recovery paths in both languages. Do not copy Toss branding or visual assets; use the documented principles within 여기서울's own visual identity.

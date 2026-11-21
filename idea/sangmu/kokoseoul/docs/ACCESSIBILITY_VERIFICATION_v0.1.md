@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: UI 구현 전 검수 기준
 
-이 문서는 DigiMan B2C 모바일 웹의 일본어 탐색·시작·진행·완료·신고 흐름을 키보드, screen reader, 확대, 작은 화면과 지도 실패 상태에서 검수하는 기준이다. 자동 검사는 보조 수단이며 실제 키보드와 일본어 screen reader 관찰을 대체하지 않는다.
+이 문서는 여기서울 B2C 모바일 웹의 일본어 탐색·시작·진행·완료·신고 흐름을 키보드, screen reader, 확대, 작은 화면과 지도 실패 상태에서 검수하는 기준이다. 자동 검사는 보조 수단이며 실제 키보드와 일본어 screen reader 관찰을 대체하지 않는다.
 
 일본어 root와 한국어 주소·phrase의 language 전환, 날짜·비용·숫자 formatting은 [locale·표시 형식 계약](LOCALIZATION_FORMATTING_v0.1.md)을 따른다.
 

@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 구현·검수 환경 준비 전 기준
 
-이 문서는 DigiMan P0의 “20명 동시 이용·5분”을 재현 가능한 workload로 바꾸고, 지연·오류뿐 아니라 DB 정합성·속도 제한·개인정보를 함께 검수하는 기준이다. 숫자는 공개 SLA가 아니라 합의된 preview 환경의 초기 release gate다.
+이 문서는 여기서울 P0의 “20명 동시 이용·5분”을 재현 가능한 workload로 바꾸고, 지연·오류뿐 아니라 DB 정합성·속도 제한·개인정보를 함께 검수하는 기준이다. 숫자는 공개 SLA가 아니라 합의된 preview 환경의 초기 release gate다.
 
 ## 검수 목적
 
@@ -16,7 +16,7 @@
 
 - 20 virtual user 결과로 대규모 traffic 수용량을 주장하지 않는다.
 - 로컬 결과를 production 성능으로 표현하지 않는다.
-- 외부 Google Maps 앱·페이지 로딩 시간을 DigiMan server latency에 포함하지 않는다.
+- 외부 Google Maps 앱·페이지 로딩 시간을 여기서울 server latency에 포함하지 않는다.
 - 평균값 하나로 cold start·tail latency·오류를 숨기지 않는다.
 - 한계까지 부하를 올리는 stress test를 production에서 실행하지 않는다.
 

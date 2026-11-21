@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 실제 장소·기기 검수 전 기준
 
-이 문서는 DigiMan이 탐색 화면에서는 Naver Web Dynamic Map으로 후보 위치를 비교하고, 상세·진행 화면에서는 검수된 장소를 Google Maps 범용 URL로 열며, 어느 연결이 실패해도 목록과 한국어 주소로 복구하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
+이 문서는 여기서울이 탐색 화면에서는 Naver Web Dynamic Map으로 후보 위치를 비교하고, 상세·진행 화면에서는 검수된 장소를 Google Maps 범용 URL로 열며, 어느 연결이 실패해도 목록과 한국어 주소로 복구하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
 
 공식 형식 기준: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started), [Naver Maps JavaScript API v3](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html) · 확인일: 2026-11-21
 
@@ -134,13 +134,13 @@ Maps URL을 iframe·webview에 embed하거나 server가 proxy하지 않는다.
 
 ## 사용자 위치와 지도 기능의 분리
 
-DigiMan은 시작 화면에서 사용자가 `現在地から探す`를 직접 고른 경우에만 geolocation API를 호출한다. 이 값은 지원 지역 선택에만 쓰며 지도 URL이나 길찾기 origin으로 사용하지 않는다.
+여기서울은 시작 화면에서 사용자가 `現在地から探す`를 직접 고른 경우에만 geolocation API를 호출한다. 이 값은 지원 지역 선택에만 쓰며 지도 URL이나 길찾기 origin으로 사용하지 않는다.
 
 - 사용자의 명시적 선택과 최종 버튼 클릭 전에는 permission prompt 없음
-- 좌표와 current location을 DigiMan query·저장소·서버 요청·지도 origin으로 전송하지 않음
+- 좌표와 current location을 여기서울 query·저장소·서버 요청·지도 origin으로 전송하지 않음
 - `Permissions-Policy: geolocation=(self)`로 같은 origin만 허용
 - 위치 거절·지원 없음과 관계없이 주소·지도 search link 사용 가능
-- 사용자가 Google Maps에서 별도로 허용한 위치는 외부 서비스 동작이며 DigiMan이 수집하지 않음
+- 사용자가 Google Maps에서 별도로 허용한 위치는 외부 서비스 동작이며 여기서울이 수집하지 않음
 
 후속 길찾기에 현재 위치를 연결하면 origin 생략 의미, 외부 위치 처리, UI 동의와 privacy 문서를 새로 검토한다. 현재 시작 화면의 지역 판정 허용을 지도·이동 추적으로 확대하지 않는다.
 
@@ -237,7 +237,7 @@ Google 결과는 locale·계정·앱 version에 따라 달라질 수 있어 한 
 - [ ] Google URL은 server allowlist builder만 생성한다.
 - [ ] 지도 없이도 주소 복사·수동 선택·step 진행이 가능하다.
 - [ ] iOS·Android에서 앱 있음·없음 fallback을 검수했다.
-- [ ] 사용자 위치·DigiMan identifier·UTM을 보내지 않는다.
+- [ ] 사용자 위치·여기서울 identifier·UTM을 보내지 않는다.
 - [ ] 지도 오류가 완료 증거나 사용자 실패로 집계되지 않는다.
 - [ ] 장소 변경 report의 pause·새 version 절차가 준비됐다.
 

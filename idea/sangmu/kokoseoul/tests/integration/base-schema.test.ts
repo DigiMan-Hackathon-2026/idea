@@ -44,7 +44,7 @@ describe("PostgreSQL base schema constraints", () => {
     await expect(
       client.query(
         "insert into supplier_orgs (id, name, kind, status) values ($1, $2, $3, $4)",
-        [randomUUID(), "DigiMan", "internal", "unknown"],
+        [randomUUID(), "여기서울", "internal", "unknown"],
       ),
     ).rejects.toMatchObject({ constraint: "supplier_orgs_status_ck" });
   });

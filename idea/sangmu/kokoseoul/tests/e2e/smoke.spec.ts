@@ -15,6 +15,7 @@ test("renders the Japanese landing page without horizontal overflow", async ({
     "camera=(), microphone=(), geolocation=(self)",
   );
   await expect(page.getByRole("heading", { name: /ソウルで/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: "ココソウル ホーム" })).toBeVisible();
   await expect(page.getByText("登録なしで探せる")).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
@@ -39,6 +40,8 @@ test("installs the PWA shell and shows a bilingual offline fallback", async ({
   expect(manifestResponse.ok()).toBe(true);
   const manifest = await manifestResponse.json();
   expect(manifest.display).toBe("standalone");
+  expect(manifest.name).toContain("ココソウル");
+  expect(manifest.short_name).toBe("ココソウル");
   expect(manifest.scope).toBe("/");
   expect(manifest.icons).toEqual(
     expect.arrayContaining([
@@ -98,6 +101,7 @@ test("switches to Korean and keeps the language across navigation", async ({
     page.getByRole("heading", { name: /서울에서/ }),
   ).toBeVisible();
   await expect(page.getByText("가입 없이 찾을 수 있어요")).toBeVisible();
+  await expect(page.getByRole("link", { name: "여기서울 홈" })).toBeVisible();
 
   await page.getByRole("link", { name: "퀘스트", exact: true }).click();
   await expect(

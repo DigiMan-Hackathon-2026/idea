@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: scheduler 선택 전 구현 기준
 
-이 문서는 DigiMan P0의 만료 visitor 정리와 비연결 analytics 보존 정리를 여러 server instance·재시도·복구 환경에서 안전하게 실행하는 기준이다. scheduler provider는 D09 뒤 선택하지만, 작업 의미와 DB 정합성은 provider에 의존하지 않는다.
+이 문서는 여기서울 P0의 만료 visitor 정리와 비연결 analytics 보존 정리를 여러 server instance·재시도·복구 환경에서 안전하게 실행하는 기준이다. scheduler provider는 D09 뒤 선택하지만, 작업 의미와 DB 정합성은 provider에 의존하지 않는다.
 
 ## P0 job inventory
 

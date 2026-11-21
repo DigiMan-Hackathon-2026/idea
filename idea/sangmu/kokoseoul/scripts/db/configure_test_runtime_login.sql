@@ -19,4 +19,4 @@ alter role digiman_runtime_test password :'runtime_password';
 grant digiman_runtime to digiman_runtime_test;
 
 comment on role digiman_runtime_test is
-  'LOGIN role for isolated DigiMan integration databases only';
+  'LOGIN role for isolated 여기서울 integration databases only';

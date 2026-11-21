@@ -2,7 +2,7 @@
 
 조사일: 2026-11-21 · 상태: 계정 생성 전 작업 기준
 
-Vercel, Neon, Auth.js Google OIDC와 Google Maps URL을 DigiMan P0 후보로 평가했다. 현재 결론은 Next.js를 Vercel, PostgreSQL을 Neon에 두는 구성이 구현 속도에는 적합하지만, 무료 Neon만으로는 7일 복구 정책을 충족하지 못한다는 것이다. 계정·유료 요금제·운영 설정은 아직 생성하거나 확정하지 않았다.
+Vercel, Neon, Auth.js Google OIDC와 Google Maps URL을 여기서울 P0 후보로 평가했다. 현재 결론은 Next.js를 Vercel, PostgreSQL을 Neon에 두는 구성이 구현 속도에는 적합하지만, 무료 Neon만으로는 7일 복구 정책을 충족하지 못한다는 것이다. 계정·유료 요금제·운영 설정은 아직 생성하거나 확정하지 않았다.
 
 공식 문서는 변경될 수 있으므로 계정 생성과 공개 배포 직전에 다시 확인한다.
 
@@ -44,7 +44,7 @@ Hobby는 개인 project와 기본 preview·HTTPS·Function 자원을 제공한�
 
 ## Neon
 
-Neon project는 생성할 때 하나의 region에 고정되며 기존 project region을 변경할 수 없다. 현재 공식 AWS region 목록의 아시아 후보는 Singapore `aws-ap-southeast-1`와 Sydney이며 서울·도쿄는 없다. DigiMan의 첫 후보는 Singapore다.
+Neon project는 생성할 때 하나의 region에 고정되며 기존 project region을 변경할 수 없다. 현재 공식 AWS region 목록의 아시아 후보는 Singapore `aws-ap-southeast-1`와 Sydney이며 서울·도쿄는 없다. 여기서울의 첫 후보는 Singapore다.
 
 공식 근거:
 
@@ -93,7 +93,7 @@ Auth.js는 Next.js 통합, Google provider와 database session을 지원한다. 
 - [OAuth provider](https://authjs.dev/getting-started/authentication/oauth)
 - [Session strategy](https://authjs.dev/concepts/session-strategies)
 
-### DigiMan 적용
+### 여기서울 적용
 
 - Google 로그인 성공과 운영 권한을 분리한다.
 - Google issuer와 subject가 `admin_principals`에 있을 때만 운영 API를 허용한다.
