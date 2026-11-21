@@ -1,63 +1,55 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
-import {
-  useClientReady,
-  useDemoRunStorage,
-} from "@/hooks/use-demo-run-storage";
 import { useModalDialog } from "@/hooks/use-modal-dialog";
 import { pickLocale } from "@/lib/locale";
 import {
-  DEMO_RUN_ID,
-  isDemoRunComplete,
-  parseDemoRun,
-} from "@/modules/progress/demo-run";
+  ensureVisitorSession,
+  startQuestRun,
+} from "@/modules/progress/run-api";
 
-export function StartDemoButton() {
+export function StartDemoButton({ questId }: { questId: string }) {
   const { locale } = useLocale();
-  const clientReady = useClientReady();
-  const storedProgress = useDemoRunStorage();
-  const progress = useMemo(
-    () => parseDemoRun(storedProgress),
-    [storedProgress],
-  );
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const [startFailed, setStartFailed] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
 
   useModalDialog(
     isOpen,
-    () => setIsOpen(false),
+    () => {
+      if (!isStarting) setIsOpen(false);
+    },
     dialogRef,
     closeButtonRef,
   );
 
-  if (progress) {
-    const completed = isDemoRunComplete(progress);
-    return (
-      <Link
-        href={
-          completed
-            ? `/runs/${DEMO_RUN_ID}/completion`
-            : `/runs/${DEMO_RUN_ID}`
-        }
-        className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.28)] transition hover:-translate-y-0.5 hover:bg-[#df4223]"
-      >
-        {completed
-          ? pickLocale(locale, "完了した記録を見る", "완료 기록 보기")
-          : pickLocale(locale, "続きから始める", "이어서 시작하기")}
-      </Link>
-    );
+  async function handleStart() {
+    if (isStarting) return;
+    setIsStarting(true);
+    setStartFailed(false);
+    try {
+      await ensureVisitorSession();
+      const run = await startQuestRun(questId);
+      router.push(run.completionPath ?? `/runs/${run.id}`);
+    } catch {
+      setStartFailed(true);
+      setIsStarting(false);
+    }
   }
 
   return (
     <>
       <button
         type="button"
-        disabled={!clientReady}
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setStartFailed(false);
+          setIsOpen(true);
+        }}
         className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#ff5a36] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(255,90,54,0.28)] transition hover:-translate-y-0.5 hover:bg-[#df4223] disabled:cursor-wait disabled:opacity-70"
       >
         {pickLocale(locale, "このデモクエストを始める", "이 데모 퀘스트 시작하기")}
@@ -68,7 +60,7 @@ export function StartDemoButton() {
           className="fixed inset-0 z-50 grid place-items-end bg-slate-950/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5"
           role="presentation"
           onMouseDown={(event) => {
-            if (event.currentTarget === event.target) setIsOpen(false);
+            if (!isStarting && event.currentTarget === event.target) setIsOpen(false);
           }}
         >
           <section
@@ -88,8 +80,9 @@ export function StartDemoButton() {
               <button
                 ref={closeButtonRef}
                 type="button"
+                disabled={isStarting}
                 onClick={() => setIsOpen(false)}
-                className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-xl font-bold text-slate-700 shadow-sm"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-xl font-bold text-slate-700 shadow-sm disabled:opacity-50"
                 aria-label={pickLocale(locale, "閉じる", "닫기")}
               >
                 ×
@@ -98,8 +91,8 @@ export function StartDemoButton() {
             <p className="mt-5 leading-7 text-slate-600">
               {pickLocale(
                 locale,
-                "このデモでは進行をこのブラウザ内だけに保存します。他の端末とは共有されません。ブラウザのデータを削除すると記録を確認できなくなる場合があります。",
-                "이 데모의 진행 기록은 현재 브라우저에만 저장되며 다른 기기와 공유되지 않습니다. 브라우저 데이터를 삭제하면 기록을 확인할 수 없을 수 있습니다.",
+                "このデモでは、匿名の進行記録をこのブラウザ専用のセッションに30日間保存します。他の端末とは共有されません。",
+                "이 데모에서는 익명 진행 기록을 이 브라우저 전용 세션에 30일간 저장합니다. 다른 기기와 공유되지 않습니다.",
               )}
             </p>
             <p className="mt-3 rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#9d2d18]">
@@ -110,16 +103,30 @@ export function StartDemoButton() {
               )}
             </p>
             <div className="mt-7 grid gap-3">
-              <Link
-                href="/runs/seongsu-craft-demo"
-                className="flex min-h-14 items-center justify-center rounded-2xl bg-slate-950 px-6 text-base font-black text-white"
-              >
-                {pickLocale(locale, "記録を作成して始める", "기록을 만들고 시작하기")}
-              </Link>
               <button
                 type="button"
+                onClick={handleStart}
+                disabled={isStarting}
+                className="flex min-h-14 items-center justify-center rounded-2xl bg-slate-950 px-6 text-base font-black text-white"
+              >
+                {isStarting
+                  ? pickLocale(locale, "記録を作成しています…", "기록을 만드는 중…")
+                  : pickLocale(locale, "記録を作成して始める", "기록을 만들고 시작하기")}
+              </button>
+              {startFailed ? (
+                <p className="rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#9d2d18]" role="alert">
+                  {pickLocale(
+                    locale,
+                    "記録を作成できませんでした。通信を確認して、もう一度お試しください。",
+                    "기록을 만들지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.",
+                  )}
+                </p>
+              ) : null}
+              <button
+                type="button"
+                disabled={isStarting}
                 onClick={() => setIsOpen(false)}
-                className="min-h-12 rounded-2xl text-sm font-black text-slate-600"
+                className="min-h-12 rounded-2xl text-sm font-black text-slate-600 disabled:opacity-50"
               >
                 {pickLocale(locale, "戻る", "돌아가기")}
               </button>

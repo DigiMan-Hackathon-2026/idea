@@ -3,17 +3,13 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DemoRunner } from "@/components/demo-runner";
 import { SiteHeader } from "@/components/site-header";
-import { DEMO_RUN_ID } from "@/modules/progress/demo-run";
+import { isUuid } from "@/server/http-validation";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 
-export function generateStaticParams() {
-  return [{ runId: DEMO_RUN_ID }];
-}
-
 async function DemoRunContent({ params }: { params: Promise<{ runId: string }> }) {
   const { runId } = await params;
-  if (runId !== DEMO_RUN_ID) notFound();
+  if (!isUuid(runId)) notFound();
   const locale = await getRequestLocale();
 
   return (
@@ -25,7 +21,7 @@ async function DemoRunContent({ params }: { params: Promise<{ runId: string }> }
           </div>
           <Link href="/quests/11111111-1111-4111-8111-111111111111" className="rounded-full px-4 py-2 text-sm font-black text-slate-600">{pickLocale(locale, "詳細に戻る", "상세 화면으로 돌아가기")}</Link>
         </div>
-        <DemoRunner />
+        <DemoRunner runId={runId} />
     </div>
   );
 }

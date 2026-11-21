@@ -24,7 +24,7 @@ export default async function MyPage() {
       <div className="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-8 sm:pt-10">
         <p className="text-xs font-black tracking-[0.18em] text-[#c93418]">{pickLocale(locale, "このブラウザに保存", "이 브라우저에 저장됨")}</p>
         <h1 className="mt-2 text-4xl font-black tracking-[-0.05em] text-slate-950 sm:text-6xl">{pickLocale(locale, "わたしの記録", "내 기록")}</h1>
-        <p className="mt-3 max-w-xl leading-7 text-slate-600">{pickLocale(locale, "このデモの進行状況は、このブラウザだけに保存されます。", "이 데모의 진행 상황은 현재 브라우저에만 저장됩니다.")}</p>
+        <p className="mt-3 max-w-xl leading-7 text-slate-600">{pickLocale(locale, "このブラウザ専用の匿名セッションで、進行中と完了済みの記録を確認できます。", "이 브라우저 전용 익명 세션으로 진행 중·완료 기록을 확인할 수 있어요.")}</p>
         <MyDemoRecord />
       </div>
     </main>

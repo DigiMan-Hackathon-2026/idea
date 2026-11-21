@@ -12,7 +12,7 @@
 - 기본 브랜치: `main`
 - Windows 작업 위치: `D:\dev\digiman`
 - 맥북 작업본도 `origin/main`과 기능 단위로 동기화한다. 새 기기에서는 원하는 로컬 경로에 복제하고 Windows 경로를 그대로 사용하지 않는다.
-- F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. 우상단 언어 버튼으로 한국어·일본어를 현재 화면에서 전환하며 선택은 1년 locale cookie로 페이지 이동 뒤에도 유지된다. demo 기록과 신고는 브라우저 localStorage에만 저장되며 서버 접수로 표현하지 않는다.
+- F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. 우상단 언어 버튼으로 한국어·일본어를 현재 화면에서 전환하며 선택은 1년 locale cookie로 페이지 이동 뒤에도 유지된다. 진행·완료·피드백·내 기록·삭제는 익명 visitor session과 PostgreSQL API에 연결됐고 정보 신고 화면만 아직 localStorage demo다.
 - 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
 - 현재 통합 검증은 `python3 scripts/verify_all.py`다. 37개 tooling 회귀 테스트, Markdown 64개, JSON block 45개, API endpoint 22개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
@@ -24,14 +24,14 @@
 - 공통 error envelope·request ID·405/500·14개 code는 [API 오류 catalog](API_ERROR_CATALOG_v0.1.md), 목록 정렬·cursor·rotation은 [pagination 계약](PAGINATION_CURSOR_v0.1.md)에 정리했다.
 - B2C 경로별 로딩·오류·주요 행동·일본어 초안은 [B2C 화면 상태와 일본어 문구 계약 v0.1](SCREEN_STATES_v0.1.md)에 정리했다.
 - 사용자 화면은 [여기서울 UX 원칙 v0.1](UX_PRINCIPLES_v0.1.md)의 한 화면 한 핵심 행동, 예측 가능한 버튼 문구, 쉬운 말, 선택권 존중, 오류 예방·복구 기준을 따른다. 토스 공개 자료의 원칙을 참고하지만 토스 브랜드와 외형은 복제하지 않는다.
-- demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류에 일본어 복구 행동을 제공한다. 네트워크·서버 장애 주입은 실제 API 연결 뒤 검수한다.
+- demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류와 진행 API 실패에 일본어·한국어 복구 행동을 제공한다. 응답 유실 뒤에는 run을 다시 조회해 저장 상태를 복구한다.
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
 - 기본 경로는 `Referrer-Policy: no-referrer`, Naver 지도 도메인 인증이 필요한 `/quests`만 `origin`을 적용한다. 모든 경로에 MIME sniffing·iframe 차단과 camera·microphone 차단 header를 적용했다. geolocation은 same-origin만 허용하고 시작 화면에서 사용자가 현재 위치를 고른 뒤에만 요청한다. 좌표는 browser 안에서 지원 지역을 고르는 데만 쓰며 URL·저장소·서버 요청·Naver 지도에 넣지 않는다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.
 - production 응답의 `X-Powered-By`는 비활성화했다. framework·provider version을 공개 header나 오류 body로 추가하지 않는다.
 - Playwright는 Pixel 5와 Desktop Chrome 두 project에서 언어 전환·현재 위치 개인정보 경계·지도 실패 복구·PWA 설치와 오프라인 복구를 포함한 10개 핵심 흐름, 총 20개 E2E를 실행한다. test 45초·expect 10초 한계를 명시했다.
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않는다. Web App Manifest, 192·512px PNG와 Apple icon, same-origin service worker를 제공하며 설치 앱과 일반 웹은 같은 배포를 사용한다. service worker는 개인화 HTML·API·퀘스트 진행 화면을 캐시하지 않고 이중 언어 offline fallback만 보관한다. 앱 코드는 network-first로 받아 배포 뒤 일반 웹과 설치 앱이 함께 갱신되며, worker 자체 변경은 사용자에게 새 버전 적용 행동을 제공한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
-- F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 통합 테스트 46개를 통과했다. 별도 test-only login이 runtime capability에 연결돼 세션 생성→시작→조회→3단계 완료→피드백→신고 HTTP 흐름과 세션·run·step·신고 재전송 멱등성을 실제 DB로 검수한다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. production provider login mapping과 나머지 HTTP adapter 연결은 남아 있다.
+- F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 통합 테스트 46개를 통과했다. migration은 실제 화면과 같은 고정 UUID의 가상 demo 콘텐츠를 seed한다. 별도 test-only login이 runtime capability에 연결돼 세션 생성→시작→조회→3단계 완료→완료 카드→피드백→내 기록→삭제와 신고 HTTP 흐름을 실제 DB로 검수한다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. production provider login mapping은 남아 있다.
 - runtime DB pool은 server-only로 지연 생성되며 local/test `digiman_runtime*` role만 허용한다. transaction은 statement 5초·lock 3초·idle 5초 제한을 사용하고 오류 시 rollback 뒤 원래 오류를 다시 던진다. production provider host와 login mapping은 아직 열지 않았다.
 - 첫 progress repository `startQuestRun`은 quest를 `FOR UPDATE`로 잠그고 현재 published version만 고정한다. 같은 visitor·quest 동시 시작은 `created` 한 번과 같은 run의 `existing`으로 수렴하며, 없는 quest와 paused quest는 각각 `not_found`, `unavailable`을 반환한다.
 - `completeQuestStep`은 quest share lock→run update lock 순서로 pause와 단계 완료를 직렬화한다. 소유자·pinned version·position을 다시 확인하고 마지막 step과 run 완료를 한 transaction에 기록하며, 중복 단계는 최초 `completedAt`을 그대로 반환한다.
@@ -40,11 +40,11 @@
 - visitor session core는 32-byte base64url token, versioned HMAC-SHA-256, current+previous 최대 두 pepper, 고정 30일 만료를 구현했다. raw token은 DB에 저장하지 않고 malformed·unknown·expired는 모두 `invalid`이며 두 연결의 rotation rehash도 version 2 한 행과 기존 expiry로 수렴한다. `POST /api/v1/visitor-sessions`는 exact Origin과 빈 JSON을 검사하고 기존 세션은 200으로 재사용하며 신규 세션은 host-only `HttpOnly`·`SameSite=Lax` cookie와 201을 반환한다. rate limit과 실제 DB를 연결한 browser 검수는 남아 있다.
 - `POST /api/v1/quests/:questId/runs`는 visitor cookie를 검증한 뒤 기존 `startQuestRun` transaction을 호출한다. 신규 201·기존 200, 첫 미완료 step, 완료 경로와 `Location`을 반환하고 malformed ID, session 없음, Origin 불일치, 미공개·중지 quest를 공개 error catalog에 맞춰 분리한다.
 - `PUT /api/v1/runs/:runId/steps/:stepId`는 exact `{completed:true}`와 visitor·Origin을 확인하고 순서형 `completeQuestStep` transaction을 호출한다. 정상·반복은 최초 step 완료 시각과 다음 step을 200으로 반환하며, 마지막 step은 같은 transaction의 run 완료 시각과 completion path로 수렴한다. 타인·없는 step은 404, pause와 순서 위반은 분리된 409다.
-- `PUT /api/v1/runs/:runId/feedback`은 점수 1~5 정수, boolean, 선택 500자 comment와 unknown field를 경계에서 검사한다. 완료·소유 run만 한 행으로 upsert하고, 미완료는 `RUN_NOT_COMPLETED`, 타인·없음은 `NOT_FOUND`로 분리한다.
+- `PUT /api/v1/runs/:runId/feedback`은 점수 1~5 정수, boolean, 선택 방문 경험 enum, 선택 500자 comment와 unknown field를 경계에서 검사한다. 완료·소유 run만 한 행으로 upsert하고, 미완료는 `RUN_NOT_COMPLETED`, 타인·없음은 `NOT_FOUND`로 분리한다.
 - `POST /api/v1/quests/:questId/reports`는 공개 version·category·500자 comment·client request UUID를 검사해 최초 201, 동일 재전송 200을 반환한다. 같은 visitor의 같은 key에 다른 canonical 요청은 `REQUEST_CONFLICT`, 미공개·불일치 version은 `NOT_FOUND`다.
 - mutation route는 공통 JSON object·UTF-8 byte limit·UUID·unknown-key 검증 함수를 사용한다. Content-Type이 다르거나 array·primitive·oversize·비정규 UUID인 요청은 repository와 session 조회 전에 거절한다.
 - `GET /api/v1/runs/:runId`는 visitor 소유 run만 반환하고 고정 version의 제목·demo 표시·단계·문구·장소 snapshot과 완료 시각을 position 순서로 조립한다. quest가 중지되면 기록은 읽을 수 있지만 이어하기는 막고 공개 pause 문구를 반환한다.
-- 구현된 6개 API route의 지원하지 않는 method는 Next 기본 body 대신 공통 `METHOD_NOT_ALLOWED` envelope, 검증된 request ID, `Allow`, `no-store`, `Vary: Cookie`를 포함한 405를 반환한다.
+- 구현된 visitor API route는 지원하지 않는 method에 Next 기본 body 대신 공통 `METHOD_NOT_ALLOWED` envelope, 검증된 request ID, `Allow`, `no-store`, `Vary: Cookie`를 포함한 405를 반환한다.
 - visitor cookie 인증은 4 KiB를 넘는 header, 128자를 넘는 token과 같은 이름의 중복 cookie를 DB 검증 전에 거절한다. session 생성 의도에서는 이를 기존 세션으로 해석하지 않고 제한된 신규 발급 흐름으로 보낸다.
 - API 예외는 연결 거절·reset·timeout, PostgreSQL 연결 class·lock/query timeout과 설정 누락만 재시도 가능한 503으로 분류한다. 예상하지 못한 repository 불변식·코드 오류는 내부 내용을 숨긴 비재시도 500으로 반환해 client의 위험한 자동 mutation 반복을 막는다.
 - CI는 같은 PostgreSQL digest의 `digiman_test_ci` service에 marker와 migration을 적용한 뒤 전체 constraint 통합 테스트를 실행한다. Actions run `44818613781`에서 reports까지 DB 검사와 Pixel 5·Desktop Chrome 12개 브라우저 흐름이 `2m 19s`에 모두 통과했다. `ci-local-only`는 격리된 Actions service의 비운영 값이며 repository·production secret이 아니다.

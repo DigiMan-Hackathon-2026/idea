@@ -1,4 +1,121 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+const demoQuestId = "11111111-1111-4111-8111-111111111111";
+const demoRunId = "66666666-6666-4666-8666-666666666666";
+const demoStepIds = [
+  "33333333-3333-4333-8333-333333333333",
+  "44444444-4444-4444-8444-444444444444",
+  "55555555-5555-4555-8555-555555555555",
+];
+
+async function installServerRunMock(page: Page) {
+  let started = false;
+  let completedSteps = 0;
+
+  function runDetail() {
+    const completed = completedSteps === demoStepIds.length;
+    return {
+      id: demoRunId,
+      questId: demoQuestId,
+      questVersionId: "22222222-2222-4222-8222-222222222222",
+      titleJa: "ひとりで楽しむ聖水クラフト散歩",
+      isDemo: true,
+      status: completed ? "completed" : "in_progress",
+      startedAt: "2026-11-21T09:00:00.000Z",
+      completedAt: completed ? "2026-11-21T10:00:00.000Z" : null,
+      canContinue: !completed,
+      unavailableReasonJa: null,
+      nextStepId: completed ? null : demoStepIds[completedSteps],
+      steps: demoStepIds.map((id, index) => ({
+        id,
+        position: index + 1,
+        bodyJa: `デモ手順 ${index + 1}`,
+        phrase: index < 2 ? { ko: "이걸 하나 주세요.", ja: "これを一つください。" } : null,
+        place: null,
+        completedAt: index < completedSteps ? "2026-11-21T09:30:00.000Z" : null,
+      })),
+    };
+  }
+
+  await page.route("**/api/v1/**", async (route) => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+    if (pathname === "/api/v1/visitor-sessions" && request.method() === "POST") {
+      await route.fulfill({ status: 201, json: { expiresAt: "2026-12-21T09:00:00.000Z" } });
+      return;
+    }
+    if (pathname === `/api/v1/quests/${demoQuestId}/runs` && request.method() === "POST") {
+      started = true;
+      const completed = completedSteps === demoStepIds.length;
+      await route.fulfill({
+        status: 201,
+        json: {
+          id: demoRunId,
+          status: completed ? "completed" : "in_progress",
+          completionPath: completed ? `/runs/${demoRunId}/completion` : null,
+        },
+      });
+      return;
+    }
+    if (pathname.startsWith(`/api/v1/runs/${demoRunId}/steps/`) && request.method() === "PUT") {
+      const stepId = pathname.split("/").at(-1);
+      if (stepId === demoStepIds[completedSteps]) completedSteps += 1;
+      await route.fulfill({
+        status: 200,
+        json: {
+          completionPath:
+            completedSteps === demoStepIds.length
+              ? `/runs/${demoRunId}/completion`
+              : null,
+        },
+      });
+      return;
+    }
+    if (pathname === `/api/v1/runs/${demoRunId}/completion`) {
+      await route.fulfill({ status: completedSteps === 3 ? 200 : 409, json: completedSteps === 3 ? runDetail() : { error: { code: "RUN_NOT_COMPLETED" } } });
+      return;
+    }
+    if (pathname === `/api/v1/runs/${demoRunId}/feedback` && request.method() === "PUT") {
+      await route.fulfill({ status: 200, json: { runId: demoRunId } });
+      return;
+    }
+    if (pathname === `/api/v1/runs/${demoRunId}`) {
+      await route.fulfill({ status: 200, json: runDetail() });
+      return;
+    }
+    if (pathname === "/api/v1/me/runs") {
+      const detail = runDetail();
+      await route.fulfill({
+        status: 200,
+        json: {
+          items: started
+            ? [{
+                id: demoRunId,
+                questId: demoQuestId,
+                titleJa: detail.titleJa,
+                isDemo: true,
+                status: detail.status,
+                startedAt: detail.startedAt,
+                completedAt: detail.completedAt,
+                completedStepCount: completedSteps,
+                totalStepCount: 3,
+                nextStepPosition: completedSteps < 3 ? completedSteps + 1 : null,
+              }]
+            : [],
+          nextCursor: null,
+        },
+      });
+      return;
+    }
+    if (pathname === "/api/v1/me/data" && request.method() === "DELETE") {
+      started = false;
+      completedSteps = 0;
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+    await route.continue();
+  });
+}
 
 test("renders the Japanese landing page without horizontal overflow", async ({
   page,
@@ -280,15 +397,14 @@ test("uses current location without putting coordinates in the URL", async ({
 });
 
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
+  await installServerRunMock(page);
   await page.goto(
     "/quests/11111111-1111-4111-8111-111111111111",
   );
   await page
     .getByRole("button", { name: "このデモクエストを始める" })
     .click();
-  await page
-    .getByRole("link", { name: "記録を作成して始める" })
-    .click();
+  await page.getByRole("button", { name: "記録を作成して始める" }).click();
 
   await page.getByRole("button", { name: "案内を確認しました" }).click();
   await page
@@ -296,7 +412,7 @@ test("completes the ordered demo flow and saves feedback", async ({ page }) => {
     .click();
   await page.getByRole("button", { name: "クエストを完了する" }).click();
 
-  await expect(page).toHaveURL(/\/runs\/seongsu-craft-demo\/completion/);
+  await expect(page).toHaveURL(new RegExp(`/runs/${demoRunId}/completion`));
   await expect(
     page.getByRole("heading", { name: "クエスト完了" }),
   ).toBeVisible();
@@ -316,6 +432,7 @@ test("completes the ordered demo flow and saves feedback", async ({ page }) => {
 });
 
 test("resumes and deletes the browser-only demo record", async ({ page }) => {
+  await installServerRunMock(page);
   await page.goto("/my");
   await expect(
     page.getByRole("heading", { name: "最初のクエストを始めてみましょう" }),
@@ -327,10 +444,9 @@ test("resumes and deletes the browser-only demo record", async ({ page }) => {
   await page
     .getByRole("button", { name: "このデモクエストを始める" })
     .click();
-  await page
-    .getByRole("link", { name: "記録を作成して始める" })
-    .click();
+  await page.getByRole("button", { name: "記録を作成して始める" }).click();
   await page.getByRole("button", { name: "案内を確認しました" }).click();
+  await page.reload();
   await expect(
     page.getByRole("button", { name: "韓国語カードを使いました" }),
   ).toBeVisible();

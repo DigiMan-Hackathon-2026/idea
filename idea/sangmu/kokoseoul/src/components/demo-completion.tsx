@@ -1,61 +1,93 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useLocale } from "@/components/locale-provider";
-import { useDemoRunStorage } from "@/hooks/use-demo-run-storage";
-import {
-  DEMO_FEEDBACK_STORAGE_KEY,
-  DEMO_RUN_ID,
-  isDemoRunComplete,
-  parseDemoRun,
-} from "@/modules/progress/demo-run";
 import { pickLocale } from "@/lib/locale";
+import {
+  fetchQuestRun,
+  saveQuestRunFeedback,
+  type QuestRunDto,
+} from "@/modules/progress/run-api";
 
-export function DemoCompletion() {
+export function DemoCompletion({ runId }: { runId: string }) {
   const { locale } = useLocale();
-  const storedProgress = useDemoRunStorage();
-  const progress = useMemo(
-    () => parseDemoRun(storedProgress),
-    [storedProgress],
-  );
-  const [saved, setSaved] = useState(false);
+  const [run, setRun] = useState<QuestRunDto | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveState, setSaveState] = useState<"idle" | "saved" | "failed">("idle");
 
-  function handleFeedback(event: FormEvent<HTMLFormElement>) {
+  const loadCompletion = useCallback(async () => {
+    try {
+      const nextRun = await fetchQuestRun(runId, true);
+      setRun(nextRun);
+      setLoadFailed(false);
+    } catch {
+      setLoadFailed(true);
+    }
+  }, [runId]);
+
+  useEffect(() => {
+    let active = true;
+    void fetchQuestRun(runId, true)
+      .then((nextRun) => {
+        if (!active) return;
+        setRun(nextRun);
+        setLoadFailed(false);
+      })
+      .catch(() => {
+        if (active) setLoadFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [runId]);
+
+  async function handleFeedback(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isSaving) return;
     const form = new FormData(event.currentTarget);
-    localStorage.setItem(
-      DEMO_FEEDBACK_STORAGE_KEY,
-      JSON.stringify({
-        joyScore: form.get("joyScore"),
-        wasNew: form.get("wasNew"),
-        visitExperience: form.get("visitExperience"),
-        comment: form.get("comment"),
-        savedAt: new Date().toISOString(),
-      }),
-    );
-    setSaved(true);
+    const visitExperience = String(form.get("visitExperience") ?? "");
+    const comment = String(form.get("comment") ?? "").trim();
+    setIsSaving(true);
+    setSaveState("idle");
+    try {
+      await saveQuestRunFeedback(runId, {
+        joyScore: Number(form.get("joyScore")),
+        feltNewExperience: form.get("wasNew") === "yes",
+        visitExperience: visitExperience || null,
+        comment: comment || null,
+      });
+      setSaveState("saved");
+    } catch {
+      setSaveState("failed");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
-  if (storedProgress === null) {
-    return <div className="mx-auto mt-10 h-80 max-w-2xl animate-pulse rounded-[2rem] bg-white" aria-label={pickLocale(locale, "完了記録を読み込み中", "완료 기록을 불러오는 중")} />;
-  }
-
-  if (!progress || !isDemoRunComplete(progress)) {
+  if (loadFailed) {
     return (
-      <section className="mx-auto mt-10 max-w-xl rounded-[2rem] bg-white p-8 text-center shadow-sm">
-        <h1 className="text-2xl font-black text-slate-950">{pickLocale(locale, "まだクエストは完了していません", "아직 퀘스트를 완료하지 않았습니다")}</h1>
-        <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, "三つのステップを順番に確認すると、完了カードが表示されます。", "세 단계를 순서대로 확인하면 완료 카드가 표시됩니다.")}</p>
-        <Link href={`/runs/${DEMO_RUN_ID}`} className="mt-6 inline-flex min-h-12 items-center rounded-full bg-slate-950 px-6 text-sm font-black text-white">{pickLocale(locale, "進行画面に戻る", "진행 화면으로 돌아가기")}</Link>
+      <section className="mx-auto mt-10 max-w-xl rounded-[2rem] bg-white p-8 text-center shadow-sm" role="alert">
+        <h1 className="text-2xl font-black text-slate-950">{pickLocale(locale, "完了記録を確認できませんでした", "완료 기록을 확인하지 못했어요")}</h1>
+        <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, "まだ完了していない場合は、進行画面から続きを確認してください。", "아직 완료하지 않았다면 진행 화면에서 이어서 확인해 주세요.")}</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link href={`/runs/${runId}`} className="inline-flex min-h-12 items-center rounded-full bg-slate-950 px-6 text-sm font-black text-white">{pickLocale(locale, "進行画面に戻る", "진행 화면으로 돌아가기")}</Link>
+          <button type="button" onClick={() => void loadCompletion()} className="min-h-12 rounded-full px-5 text-sm font-black text-slate-600">{pickLocale(locale, "もう一度読み込む", "다시 불러오기")}</button>
+        </div>
       </section>
     );
+  }
+
+  if (!run) {
+    return <div className="mx-auto mt-10 h-80 max-w-2xl animate-pulse rounded-[2rem] bg-white" aria-label={pickLocale(locale, "完了記録を読み込み中", "완료 기록을 불러오는 중")} />;
   }
 
   const completedDate = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(new Date(progress.completedAt!));
+  }).format(new Date(run.completedAt!));
 
   return (
     <div className="mx-auto mt-8 grid max-w-4xl gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
@@ -66,7 +98,7 @@ export function DemoCompletion() {
         </div>
         <div className="mt-14 grid size-28 place-items-center rounded-full bg-[#ffcd57] text-5xl text-slate-950 shadow-[0_15px_50px_rgba(255,205,87,0.25)]" aria-hidden="true">✦</div>
         <h1 className="mt-8 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">{pickLocale(locale, "クエスト完了", "퀘스트 완료")}</h1>
-        <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, "ひとりで楽しむ聖水クラフト散歩", "혼자 즐기는 성수 크래프트 산책")}</p>
+        <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, run.titleJa, "혼자 즐기는 성수 크래프트 산책")}</p>
         <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/55">{pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")}</p>
       </section>
 
@@ -94,20 +126,14 @@ export function DemoCompletion() {
 
         <label className="mt-6 grid gap-2 text-sm font-black text-slate-800">
           {pickLocale(locale, "ソウル訪問経験（任意）", "서울 방문 경험(선택)")}
-          <select
-            name="visitExperience"
-            defaultValue=""
-            className="min-h-12 rounded-2xl border border-slate-900/10 bg-[#f8f6f1] px-3 text-base font-semibold"
-          >
+          <select name="visitExperience" defaultValue="" className="min-h-12 rounded-2xl border border-slate-900/10 bg-[#f8f6f1] px-3 text-base font-semibold">
             <option value="">{pickLocale(locale, "選ばない", "선택 안 함")}</option>
             <option value="first">{pickLocale(locale, "初めて", "처음")}</option>
             <option value="repeat_2_4">{pickLocale(locale, "2〜4回目", "2~4번째")}</option>
             <option value="repeat_5_plus">{pickLocale(locale, "5回以上", "5번째 이상")}</option>
             <option value="resident">{pickLocale(locale, "ソウル在住", "서울 거주")}</option>
           </select>
-          <span className="text-xs font-semibold leading-5 text-slate-500">
-            {pickLocale(locale, "今後のおすすめを改善するために使います。", "앞으로 추천을 개선하는 데 사용해요.")}
-          </span>
+          <span className="text-xs font-semibold leading-5 text-slate-500">{pickLocale(locale, "今後のおすすめを改善するために使います。", "앞으로 추천을 개선하는 데 사용해요.")}</span>
         </label>
 
         <label className="mt-6 grid gap-2 text-sm font-black text-slate-800">
@@ -116,8 +142,16 @@ export function DemoCompletion() {
         </label>
         <p className="mt-2 text-xs font-semibold text-slate-500">{pickLocale(locale, "個人情報は入力しないでください。", "개인정보는 입력하지 마세요.")}</p>
 
-        <button type="submit" className="mt-5 min-h-12 w-full rounded-2xl bg-[#ff5a36] px-5 text-sm font-black text-white">{pickLocale(locale, "フィードバックを保存する", "피드백 저장하기")}</button>
-        <p className="mt-3 min-h-5 text-center text-sm font-bold text-teal-700" aria-live="polite">{saved ? pickLocale(locale, "フィードバックを保存しました", "피드백을 저장했습니다") : ""}</p>
+        <button type="submit" disabled={isSaving} className="mt-5 min-h-12 w-full rounded-2xl bg-[#ff5a36] px-5 text-sm font-black text-white disabled:cursor-wait disabled:opacity-65">
+          {isSaving ? pickLocale(locale, "保存しています…", "저장하는 중…") : pickLocale(locale, "フィードバックを保存する", "피드백 저장하기")}
+        </button>
+        <p className={`mt-3 min-h-5 text-center text-sm font-bold ${saveState === "failed" ? "text-[#9d2d18]" : "text-teal-700"}`} aria-live="polite">
+          {saveState === "saved"
+            ? pickLocale(locale, "フィードバックを保存しました", "피드백을 저장했습니다")
+            : saveState === "failed"
+              ? pickLocale(locale, "保存できませんでした。もう一度お試しください。", "저장하지 못했어요. 다시 시도해 주세요.")
+              : ""}
+        </p>
         <Link href="/quests" className="mt-2 flex min-h-11 items-center justify-center text-sm font-black text-slate-600">{pickLocale(locale, "別のクエストを探す", "다른 퀘스트 찾기")}</Link>
       </form>
     </div>

@@ -2,21 +2,17 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DemoCompletion } from "@/components/demo-completion";
 import { SiteHeader } from "@/components/site-header";
-import { DEMO_RUN_ID } from "@/modules/progress/demo-run";
+import { isUuid } from "@/server/http-validation";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 
-export function generateStaticParams() {
-  return [{ runId: DEMO_RUN_ID }];
-}
-
 async function DemoCompletionContent({ params }: { params: Promise<{ runId: string }> }) {
   const { runId } = await params;
-  if (runId !== DEMO_RUN_ID) notFound();
+  if (!isUuid(runId)) notFound();
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8">
-      <DemoCompletion />
+      <DemoCompletion runId={runId} />
     </div>
   );
 }
