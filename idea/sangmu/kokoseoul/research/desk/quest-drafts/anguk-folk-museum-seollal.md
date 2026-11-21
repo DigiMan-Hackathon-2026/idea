@@ -7,7 +7,7 @@
 ## 방문 조건
 
 - 장소: 국립민속박물관 본관 · 서울 종로구 삼청로 37
-- 공개 안내에서 확인: 상설전시관 2 ‘한국인의 일 년’에서 설과 세시풍속을 다룬다.
+- 공개 안내에서 확인: 상설전시관 2 ‘한국인의 일 년’에서 설과 세시풍속을 다룬다. 정월 전시는 설에 떡국을 먹고 세배와 덕담을 나누는 풍습을 소개하고, 온라인 전시(VR)가 있다. 상설전시관 1은 2026-09-30~12-21(예정) 휴관이다. 관람료는 무료다(문화체육관광부 전시 안내, 경복궁 관람료 별도).
 - 미확인: 당일 전시 운영, 일본어 자료 제공 범위.
 
 ## 한·일 안내 초안
@@ -47,6 +47,8 @@
 
 ## 출처
 
+- [국립민속박물관 상설전시 안내](https://www.nfm.go.kr/home/subIndex/11.do)
+- [문화체육관광부 국립민속박물관 전시 안내(요금 무료)](https://www.mcst.go.kr/site/s_culture/culture/cultureView.jsp?pSeq=74041)
 - [국립민속박물관 상설전시 2 소개와 온라인 해설](https://www.youtube.com/watch?v=NZpr_dbJSTg)
 - [국립민속박물관 설 풍습 안내](https://www.nfm.go.kr/kids/elecontents/view.do?topic=4)
 - [서울관광재단 국립민속박물관 위치·관람 안내](https://korean.visitseoul.net/palace/%EA%B5%AD%EB%A6%BD%EB%AF%BC%EC%86%8D%EB%B0%95%EB%AC%BC%EA%B4%80/KOP001644)

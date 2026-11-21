@@ -33,7 +33,7 @@
 - [올리브영N 성수에서 혼자 피부 진단 받기](seongsu-oliveyoung-skin-consulting.md)
 - [올리브영 뷰티 맨션 성수에서 립 수정화장 배워보기](seongsu-beauty-mansion-quick-touch-up.md)
 - [코코리컬러 홍대점에서 미니 퍼스널컬러 상담 받기](hongdae-cocory-mini-personal-color.md)
-- [이철헤어커커 명동점에서 헤드스파 메뉴 고르기](myeongdong-leekaja-head-spa.md)
+- [이가자 명동에서 헤드스파 메뉴 고르기](myeongdong-leekaja-head-spa.md)
 - [아모레용산에서 내 색에 맞는 파운데이션 골라보기](yongsan-amore-custom-foundation.md)
 
 ## 휴식·산책 · 5개
