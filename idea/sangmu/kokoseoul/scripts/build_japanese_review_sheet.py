@@ -105,6 +105,68 @@ def ui_rows() -> list[dict[str, str]]:
     return rows
 
 
+FIELD_JA = re.compile(r'\b(\w*?)Ja\s*:\s*(["`])((?:\\.|(?!\2).)*)\2', re.S)
+MAP_JA = re.compile(r'(\w+)\s*:\s*(["`])((?:\\.|(?!\2).)*)\2', re.S)
+
+
+def module_rows() -> list[dict[str, str]]:
+    """Japanese strings stored as `fooJa: "..."` fields in TypeScript modules."""
+    rows = []
+    for path in sorted((ROOT / "src").rglob("*.ts")):
+        if ".test." in path.name or path.name.endswith(".d.ts"):
+            continue
+        text = path.read_text(encoding="utf-8")
+        for match in FIELD_JA.finditer(text):
+            value = match.group(3)
+            if not KANA.search(value) and not re.search(r"[一-鿿]", value):
+                continue
+            stem = match.group(1)
+            nearby = text[match.end(): match.end() + 600]
+            ko = re.search(rf'\b{re.escape(stem)}Ko\s*:\s*(["`])((?:\\.|(?!\1).)*)\1', nearby, re.S)
+            line = text.count("\n", 0, match.start()) + 1
+            rows.append(row(2, "앱 데모·선택지", path, f"line {line}", f"{stem or 'text'}Ja 필드", ko.group(2) if ko else "", value))
+    return rows
+
+
+LABEL_OBJECT = re.compile(r"export const (\w+_LABELS)(_KO)?\b[^=]*=\s*\{(.*?)\n\}(?:\s*as\s+const)?;", re.S)
+LABEL_ENTRY = re.compile(r'^\s*"?([\w-]+)"?\s*:\s*"((?:\\.|[^"])*)"', re.M)
+LABEL_PAIR = re.compile(r'"?([\w-]+)"?\s*:\s*\{\s*ja\s*:\s*"((?:\\.|[^"])*)"\s*,\s*ko\s*:\s*"((?:\\.|[^"])*)"\s*,?\s*\}', re.S)
+
+
+def label_rows() -> list[dict[str, str]]:
+    """Option labels kept as paired `FOO_LABELS` (Japanese) and `FOO_LABELS_KO` objects."""
+    rows = []
+    for path in sorted((ROOT / "src").rglob("*.ts")):
+        if ".test." in path.name:
+            continue
+        text = path.read_text(encoding="utf-8")
+        objects: dict[str, dict[str, tuple[str, int]]] = {}
+        for match in LABEL_OBJECT.finditer(text):
+            name = match.group(1) + (match.group(2) or "")
+            body_start = match.start(3)
+            objects[name] = {
+                entry.group(1): (entry.group(2), text.count("\n", 0, body_start + entry.start(1)) + 1)
+                for entry in LABEL_ENTRY.finditer(match.group(3))
+            }
+        for match in LABEL_OBJECT.finditer(text):
+            if match.group(2):
+                continue
+            body_start = match.start(3)
+            for pair in LABEL_PAIR.finditer(match.group(3)):
+                line = text.count("\n", 0, body_start + pair.start(1)) + 1
+                rows.append(row(2, "앱 데모·선택지", path, f"line {line} ({match.group(1)}.{pair.group(1)})", "선택지 라벨", pair.group(3), pair.group(2)))
+        for name, entries in objects.items():
+            if name.endswith("_KO"):
+                continue
+            entries = {key: value for key, value in entries.items() if key not in ("ja", "ko")}
+            korean = objects.get(name + "_KO", {})
+            for key, (value, line) in entries.items():
+                if not KANA.search(value) and not re.search(r"[一-鿿]", value):
+                    continue
+                rows.append(row(2, "앱 데모·선택지", path, f"line {line} ({name}.{key})", "선택지 라벨", korean.get(key, ("", 0))[0], value))
+    return rows
+
+
 def draft_rows() -> list[dict[str, str]]:
     rows = []
     for path in sorted(DRAFTS.glob("*.md")):
@@ -160,7 +222,7 @@ def row(priority: int, group: str, path: Path, locator: str, context: str, ko: s
 
 
 def main() -> int:
-    rows = app_content_rows() + ui_rows() + draft_rows() + station_rows()
+    rows = app_content_rows() + ui_rows() + label_rows() + module_rows() + draft_rows() + station_rows()
     rows.sort(key=lambda item: int(item["priority"]))
     for number, item in enumerate(rows, start=1):
         item["id"] = f"J{number:04d}"
