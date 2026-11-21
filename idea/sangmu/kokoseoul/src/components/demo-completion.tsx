@@ -101,7 +101,7 @@ export function DemoCompletion({ runId }: { runId: string }) {
         <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, run.titleJa, run.titleKo)}</p>
         <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/55">{run.isDemo
           ? pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")
-          : pickLocale(locale, "案内を完了した記録です。出席は主催者の受付で確認してください。", "참여 안내를 완료한 기록이에요. 출석은 주최 측 접수처에서 확인해 주세요.")}</p>
+          : pickLocale(locale, "ご自身で確認した手順の記録です。", "직접 확인한 단계를 기록했어요.")}</p>
       </section>
 
       <form onSubmit={handleFeedback} className="rounded-xl bg-white p-6 shadow-sm">

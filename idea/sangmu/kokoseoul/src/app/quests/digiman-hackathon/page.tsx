@@ -49,7 +49,7 @@ async function HackathonGuide() {
           </ol>
           <div className="mt-6">
             {quest?.canStart ? (
-              <StartDemoButton questId={event.id} isDemo={false} />
+              <StartDemoButton questId={event.id} kind="event" />
             ) : (
               <p role="status" className="font-bold text-slate-600">
                 {pickLocale(locale, "現在、進行記録を作成できません。集合場所は主催者の参加案内をご確認ください。", "지금은 진행 기록을 만들 수 없어요. 집합 장소는 주최 측 참가 안내를 확인해 주세요.")}

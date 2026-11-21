@@ -13,6 +13,7 @@ import {
 } from "@/modules/content/demo-quests";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
+import myeongdongKyoja from "@/modules/content/myeongdong-kyoja.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -48,7 +49,31 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
     (!filters.budget || filters.budget === "unlimited") &&
     !hasDigimanHackathonEnded(event.id);
-  const resultCount = quests.length + Number(showHackathon);
+  const showMyeongdongKyoja =
+    (filters.area === "all" || filters.area === "myeongdong") &&
+    (!filters.purpose || filters.purpose === "food") &&
+    filters.tags.every((tag) => tag === "food") &&
+    (filters.durationMax === null || filters.durationMax >= 60) &&
+    filters.timeAvailable !== "30" &&
+    (!filters.party || filters.party === "solo") &&
+    (!filters.budget || filters.budget === "unlimited");
+  const featured = [
+    ...(showHackathon ? [{
+      quest: event,
+      href: DIGIMAN_HACKATHON_PATH,
+      label: pickLocale(locale, "本選参加者向け · 応募受付終了", "본선 참가자용 · 모집 마감"),
+      detail: pickLocale(locale, event.scheduleJa, event.scheduleKo),
+      action: pickLocale(locale, "参加ガイドを見る", "참여 안내 보기"),
+    }] : []),
+    ...(showMyeongdongKyoja ? [{
+      quest: myeongdongKyoja,
+      href: "/quests/myeongdong-kyoja",
+      label: pickLocale(locale, "明洞 · グルメ", "명동 · 식도락"),
+      detail: myeongdongKyoja.place.addressKo,
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+  ];
+  const resultCount = quests.length + featured.length;
 
   return (
     <>
@@ -73,26 +98,24 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
         </p>
       </div>
 
-      {showHackathon ? (
-        <article className="seoul-surface mt-6 max-w-2xl rounded-xl p-5 sm:p-7">
-          <p className="text-sm font-black text-[#941e34]">
-            {pickLocale(locale, "本選参加者向け · 応募受付終了", "본선 참가자용 · 모집 마감")}
-          </p>
-          <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, event.titleJa, event.titleKo)}</h2>
-          <p className="mt-2 font-bold text-slate-600">{pickLocale(locale, event.scheduleJa, event.scheduleKo)}</p>
-          <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, event.summaryJa, event.summaryKo)}</p>
-          <Link href={DIGIMAN_HACKATHON_PATH} className="seoul-button-primary mt-4 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-black">
-            {pickLocale(locale, "参加ガイドを見る", "참여 안내 보기")}
+      {featured.map(({ quest, href, label, detail, action }) => (
+        <article key={quest.id} className="seoul-surface mt-6 max-w-2xl rounded-xl p-5 sm:p-7">
+          <p className="text-sm font-black text-[#941e34]">{label}</p>
+          <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, quest.titleJa, quest.titleKo)}</h2>
+          <p className="mt-2 font-bold text-slate-600">{detail}</p>
+          <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
+          <Link href={href} className="seoul-button-primary mt-4 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-black">
+            {action}
           </Link>
         </article>
-      ) : null}
+      ))}
       {quests.length > 0 ? (
         <QuestResultsView
           quests={quests}
           filters={filters}
           naverMapKeyId={process.env.NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID?.trim() || null}
         />
-      ) : showHackathon ? null : (
+      ) : featured.length > 0 ? null : (
         <section className="seoul-surface mt-8 max-w-2xl rounded-xl border-dashed px-6 py-16 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-xl bg-[#f7ecee] text-2xl text-[#941e34]" aria-hidden="true">↺</span>
           <h2 className="mt-5 text-2xl font-black tracking-tight text-[#504e49]">

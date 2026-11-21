@@ -101,6 +101,11 @@ export function DemoRunner({ runId }: { runId: string }) {
 
   const phrase = currentStep.phrase;
   const place = currentStep.place;
+  const placeMapUrl = place && !run.isDemo
+    ? place.naverMapPlaceId && /^\d+$/.test(place.naverMapPlaceId)
+      ? `https://map.naver.com/p/entry/place/${place.naverMapPlaceId}`
+      : `https://map.naver.com/p/search/${encodeURIComponent(place.addressKo)}`
+    : null;
 
   async function handleComplete() {
     if (isSaving || !run?.canContinue) return;
@@ -158,10 +163,10 @@ export function DemoRunner({ runId }: { runId: string }) {
               <p className="text-xs font-black text-slate-400">{pickLocale(locale, "場所", "장소")}</p>
               <h3 className="mt-1 text-lg font-black text-[#504e49]">{pickLocale(locale, place.nameJa, place.nameKo)}</h3>
               <p className="mt-3 select-all rounded-xl bg-white p-3 font-bold text-slate-700" lang="ko">{place.addressKo}</p>
-              {place.naverMapPlaceId && /^\d+$/.test(place.naverMapPlaceId) ? (
+              {placeMapUrl ? (
                 <a
                   className="mt-3 mr-2 inline-flex min-h-11 items-center rounded-full border border-slate-900/10 bg-white px-4 text-sm font-black text-slate-700"
-                  href={`https://map.naver.com/p/entry/place/${place.naverMapPlaceId}`}
+                  href={placeMapUrl}
                   target="_blank"
                   rel="noreferrer"
                 >

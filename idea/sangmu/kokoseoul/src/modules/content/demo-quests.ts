@@ -4,12 +4,14 @@ export const AREA_LABELS = {
   all: "ソウル全体",
   seongsu: "聖水",
   sinchon: "新村",
+  myeongdong: "明洞",
 } as const;
 
 export const AREA_LABELS_KO: Record<keyof typeof AREA_LABELS, string> = {
   all: "서울 전체",
   seongsu: "성수",
   sinchon: "신촌",
+  myeongdong: "명동",
 };
 
 export const TAG_LABELS = {

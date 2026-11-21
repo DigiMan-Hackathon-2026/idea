@@ -11,7 +11,14 @@ import {
   startQuestRun,
 } from "@/modules/progress/run-api";
 
-export function StartDemoButton({ questId, isDemo = true }: { questId: string; isDemo?: boolean }) {
+export function StartDemoButton({
+  questId,
+  kind = "demo",
+}: {
+  questId: string;
+  kind?: "demo" | "event" | "visit";
+}) {
+  const isDemo = kind === "demo";
   const { locale } = useLocale();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +62,9 @@ export function StartDemoButton({ questId, isDemo = true }: { questId: string; i
       >
         {isDemo
           ? pickLocale(locale, "このデモクエストを始める", "이 데모 퀘스트 시작하기")
-          : pickLocale(locale, "参加ガイドを始める", "참여 안내 시작하기")}
+          : kind === "event"
+            ? pickLocale(locale, "参加ガイドを始める", "참여 안내 시작하기")
+            : pickLocale(locale, "訪問ガイドを始める", "방문 안내 시작하기")}
       </button>
 
       {isOpen ? (
@@ -102,7 +111,7 @@ export function StartDemoButton({ questId, isDemo = true }: { questId: string; i
                 "익명 진행 기록을 이 브라우저 전용 세션에 30일간 저장해요. 다른 기기와 공유되지 않아요.",
               )}
             </p>
-            <p className="mt-3 rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]">
+            {kind !== "visit" ? <p className="mt-3 rounded-2xl bg-[#f7ecee] p-4 text-sm font-bold leading-6 text-[#941e34]">
               {isDemo ? pickLocale(
                 locale,
                 "実際の店舗・場所への訪問を案内するものではありません。",
@@ -112,7 +121,7 @@ export function StartDemoButton({ questId, isDemo = true }: { questId: string; i
                 "主催者から本選の参加案内が届いた方向けです。イベントへの申込や受付は、主催者の案内に従ってください。",
                 "주최 측에서 본선 참가 안내를 받은 분을 위한 안내예요. 행사 신청과 접수는 주최 측 안내를 따라 주세요.",
               )}
-            </p>
+            </p> : null}
             <div className="mt-7 grid gap-3">
               <button
                 type="button"
