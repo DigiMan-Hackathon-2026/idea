@@ -36,9 +36,13 @@
 - [이철헤어커커 명동점에서 헤드스파 메뉴 고르기](myeongdong-leekaja-head-spa.md)
 - [아모레용산에서 내 색에 맞는 파운데이션 골라보기](yongsan-amore-custom-foundation.md)
 
-## 성수 휴식·산책
+## 휴식·산책 · 5개
 
-[서울숲에서 혼자 천천히 걷기](seongsu-seoul-forest-walk.md)는 서울숲 공식 사이트와 서울시 자료에서 주소, 가는 길, 시설 시간, 사슴 먹이 판매 중단을 확인한 초안입니다. 공식 사이트의 운영 단체가 2021년에 활동을 마쳐 시간 정보는 현장에서 다시 확인할 항목입니다.
+- [서울숲에서 혼자 천천히 걷기](seongsu-seoul-forest-walk.md)
+- [낙산 성곽길을 따라 천천히 걷기](naksan-city-wall-walk.md)
+- [남산 성곽길 바깥쪽과 안쪽 걸어보기](namsan-city-wall-walk.md)
+- [여의도한강공원에서 밤섬 바라보기](yeouido-hangang-bamseom-view.md)
+- [윤동주 시인의 언덕에서 쉬어가기](inwang-yun-dongju-hill-rest.md)
 
 ## 일상 속 새로운 경험 · 6개
 
