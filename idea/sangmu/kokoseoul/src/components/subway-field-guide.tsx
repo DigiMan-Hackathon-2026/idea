@@ -514,6 +514,21 @@ export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest;
             {FLOORS.map((item, index) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-2">{index + 1}. {localize(locale, item.label)}</span>)}
           </div>
 
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="font-black text-slate-950">{pickLocale(locale, "実際の構造を3Dで確認したいですか？", "실제 구조를 3D로 확인하고 싶나요?")}</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+              {pickLocale(locale, "ソウル市のS-MAPを開き、「성수역」を検索してください。外部サイトに移動し、階ごとの移動は現地の案内表示を優先します。", "서울시 S-MAP을 연 뒤 ‘성수역’을 검색해 주세요. 외부 사이트로 이동하며, 층별 이동은 현장 표지를 우선해요.")}
+            </p>
+            <a
+              href="https://smap.seoul.go.kr/smap/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 text-center text-sm font-black text-slate-800 hover:border-slate-500"
+            >
+              {pickLocale(locale, "S-MAPで聖水駅の3D地図を開く", "S-MAP에서 성수역 3D 지도 열기")}
+            </a>
+          </div>
+
           <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
             <div>
               <p className="text-sm font-black text-[#087735]">{pickLocale(locale, "次に探す表示", "다음에 찾을 표지")}</p>

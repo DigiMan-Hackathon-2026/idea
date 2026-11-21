@@ -440,6 +440,12 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await page.getByRole("button", { name: "3Fのホームで降りた" }).click();
   await expect(page.getByRole("img", { name: "3Fの概念図" })).toBeVisible();
   await expect(page.getByText("Way out · 出口")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "S-MAPで聖水駅の3D地図を開く" }),
+  ).toHaveAttribute("href", "https://smap.seoul.go.kr/smap/");
+  await expect(
+    page.getByRole("link", { name: "S-MAPで聖水駅の3D地図を開く" }),
+  ).toHaveAttribute("target", "_blank");
   await page.getByRole("button", { name: "2F 改札・コンコース" }).click();
   await expect(page.getByRole("img", { name: "2Fの概念図" })).toBeVisible();
   await expect(page.getByRole("img", { name: "2Fの概念図" })).toContainText("建大入口方面");
