@@ -153,7 +153,9 @@ export function NaverQuestMap({
   return (
     <section className="mt-6 grid max-w-5xl gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
       <div className="relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-slate-900/10 bg-[#dcece7] shadow-sm">
-        <div ref={containerRef} className="absolute inset-0" />
+        <div className="absolute inset-0">
+          <div ref={containerRef} className="h-full w-full" data-testid="naver-map" />
+        </div>
         <p className="absolute left-4 top-4 z-[1] rounded-full bg-white/95 px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
           {pickLocale(locale, "ソウル市内のみ", "서울 안에서만")}
         </p>

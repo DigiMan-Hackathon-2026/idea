@@ -145,6 +145,11 @@ test("switches between the quest list and Seoul-scoped map", async ({
   if (result === "map") {
     await expect(page.getByText("ソウル市内のみ")).toBeVisible();
     await expect(page.getByRole("link", { name: "詳細を見る" })).toBeVisible();
+    const mapCanvas = page.getByTestId("naver-map");
+    await expect
+      .poll(async () => (await mapCanvas.boundingBox())?.height ?? 0)
+      .toBeGreaterThanOrEqual(400);
+    await expect(mapCanvas.locator("img").first()).toBeVisible();
   } else {
     await expect(
       page.getByText("現在地の共有は必要ありません。", { exact: false }),
