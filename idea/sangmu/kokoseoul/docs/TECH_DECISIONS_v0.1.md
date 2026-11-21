@@ -16,7 +16,7 @@
 | 배포 후보 | Vercel | Next.js 서버 렌더링과 서버 함수를 별도 서버 운영 없이 배포 |
 | 운영자 인증 | Auth.js + Google OIDC + DB 세션 | 임시 비밀번호 없이 OIDC subject 허용 목록과 서버 폐기 가능한 세션 사용 |
 | 방문자 인증 | 자체 익명 opaque 세션 쿠키 | 가입 없는 30일 브라우저 기록과 토큰 해시 저장 계약 유지 |
-| 지도 | 탐색은 Naver Web Dynamic Map, 외부 이동은 Google Maps URL + 한국어 주소 | 서울 탐색은 일본어 지도와 앱 안의 맥락을 유지하고, 실제 이동은 키 없이 외부 앱·브라우저로 연결 |
+| 지도·도보 경로 | 탐색은 Naver Web Dynamic Map, 도보 경로는 server-side TMAP API, 모바일 보조 이동은 Naver Maps URL scheme | 서울 탐색 맥락을 유지하면서 실제 보행선을 앱 안에 표시하고 provider 장애 때 외부 앱으로 복구 |
 | 테스트 | Vitest + 실제 PostgreSQL 통합 테스트 + Playwright | 도메인 트랜잭션과 모바일 브라우저 흐름을 서로 다른 층에서 검증 |
 | 패키지 관리 | pnpm + lockfile | 팀 환경에서 의존성 결과 고정; 실제 착수 시 Corepack으로 버전 고정 |
 
@@ -34,6 +34,7 @@ src/modules/content  퀘스트·버전·공개 상태
 src/modules/session  방문자 세션·운영자 권한
 src/modules/progress run·단계 완료·완료 카드
 src/modules/feedback 피드백·신고
+src/modules/routing  외부 경로 API 호출·응답 검증·단기 cache
 src/db               스키마·마이그레이션·DB 연결
 ```
 
@@ -90,7 +91,7 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 
 ## 지도 연결
 
-탐색 결과에는 Naver Maps JavaScript API v3를 선택적으로 지연 로드하고, 상세·진행 화면의 외부 이동은 Google Maps 범용 URL과 한국어 주소 복사를 유지한다. 두 기능은 서로의 성공에 의존하지 않는다.
+탐색 결과에는 Naver Maps JavaScript API v3를 선택적으로 지연 로드하고, 역 출구부터 퀘스트 지점까지의 실제 보행 경로는 동일 출처 API가 TMAP 보행자 경로 API를 server-side로 호출해 표시한다. 모바일 Naver Maps URL scheme은 provider 실패 때의 보조 수단이며 핵심 흐름은 외부 앱 설치에 의존하지 않는다.
 
 - Naver Client ID가 설정된 환경은 탐색 지도로 시작하고, key가 없는 환경은 목록으로 시작한다. 목록을 선택하면 지도 SDK를 화면에서 제거한다.
 - UI locale에 따라 `language=ja` 또는 `language=ko`를 전달한다.
@@ -100,6 +101,11 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 - map marker는 검수된 장소 좌표만 사용하며 시작 화면에서 얻은 사용자 현재 위치를 SDK에 넘기지 않는다.
 - 서비스 지역은 서울로 한정하고 Naver `maxBounds`와 콘텐츠 좌표 검증으로 서울 밖 후보·지도 중심 이동을 막는다.
 - 지도 SDK 응답과 tile은 service worker에 저장하지 않는다.
+- `POST /api/v1/routes/walking`은 임의 좌표 대신 검수된 `questId`만 받고 exact Origin을 검사한다.
+- `TMAP_APP_KEY`는 server-only로 유지하고 client bundle·응답·log에 포함하지 않는다.
+- TMAP 선 좌표는 서울 경계와 유한 숫자를 검증한 뒤 Naver 지도 위에 표시한다. 거리·시간은 provider 응답을 사용하고 추정값을 만들지 않는다.
+- 경로 응답은 browser·service worker에 저장하지 않으며 서버 메모리에서 호출량 보호 목적으로 5분만 cache한다.
+- API 실패 시 경로선과 거리·시간을 숨기고, 모바일에서만 공식 Naver Maps 보행 길찾기 URL scheme을 제공한다.
 
 - 검색 링크: `https://www.google.com/maps/search/?api=1&query=...`
 - 길찾기 링크: `https://www.google.com/maps/dir/?api=1&destination=...`
@@ -107,7 +113,7 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 - 같은 화면에 한국어 주소 복사 버튼을 둔다.
 - `api=1` 누락, 인코딩 오류, 다른 장소 선택을 자동 검수 대상으로 둔다.
 - 일본어 iOS Safari와 Android Chrome에서 링크·주소 복사를 실제 확인한다.
-- 서울 내 경로 품질이 부족하면 Naver Map 외부 링크를 보조 선택지로 추가하되, 진행의 필수 조건으로 만들지 않는다.
+- Naver Maps 외부 이동은 진행의 필수 조건으로 만들지 않는다.
 
 Google Maps URL은 앱 설치 여부와 관계없이 공통 형식으로 앱 또는 브라우저를 열 수 있고 API 키가 필요 없다. 참고: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started)
 

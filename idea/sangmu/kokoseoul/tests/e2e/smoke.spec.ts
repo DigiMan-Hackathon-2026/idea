@@ -122,6 +122,25 @@ test("switches between the quest list and Seoul-scoped map", async (
   { page },
   testInfo,
 ) => {
+  await page.route("**/api/v1/routes/walking", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      status: 200,
+      body: JSON.stringify({
+        source: "TMAP",
+        fetchedAt: "2026-11-21T09:00:00.000Z",
+        route: {
+          distanceMeters: 313,
+          durationSeconds: 240,
+          path: [
+            { latitude: 37.54418, longitude: 127.05632 },
+            { latitude: 37.5435, longitude: 127.055 },
+            { latitude: 37.54292, longitude: 127.05445 },
+          ],
+        },
+      }),
+    });
+  });
   const response = await page.goto("/quests");
 
   expect(response?.headers()["referrer-policy"]).toBe("origin");
@@ -149,6 +168,9 @@ test("switches between the quest list and Seoul-scoped map", async (
     await expect(page.getByRole("link", { name: "詳細を見る" })).toBeVisible();
     await expect(page.getByTestId("transit-guide")).toContainText(
       "2号線 · 聖水駅 3番出口",
+    );
+    await expect(page.getByTestId("transit-guide")).toContainText(
+      "徒歩約4分 · 313m",
     );
     if (testInfo.project.name === "mobile-chromium") {
       await expect(

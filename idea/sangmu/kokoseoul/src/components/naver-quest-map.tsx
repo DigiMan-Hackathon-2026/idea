@@ -19,10 +19,12 @@ import {
 
 type NaverMapInstance = { fitBounds(bounds: unknown, padding?: number): void };
 type NaverMarkerInstance = { setMap(map: null): void };
+type NaverPolylineInstance = { setMap(map: NaverMapInstance | null): void };
 
 type NaverMapsApi = {
   Map: new (element: HTMLElement, options: Record<string, unknown>) => NaverMapInstance;
   Marker: new (options: Record<string, unknown>) => NaverMarkerInstance;
+  Polyline: new (options: Record<string, unknown>) => NaverPolylineInstance;
   LatLng: new (latitude: number, longitude: number) => unknown;
   LatLngBounds: new (
     southWest?: unknown,
@@ -42,6 +44,14 @@ declare global {
 }
 
 type LoadState = "idle" | "loading" | "ready" | "error";
+type WalkingRoute = {
+  distanceMeters: number;
+  durationSeconds: number;
+  path: Array<{ latitude: number; longitude: number }>;
+};
+type RouteState =
+  | { status: "idle" | "loading" | "error" }
+  | { status: "ready"; route: WalkingRoute };
 
 function NaverWalkRouteAction({ quest }: { quest: DemoQuest }) {
   const { locale } = useLocale();
@@ -134,8 +144,11 @@ export function NaverQuestMap({
 }) {
   const { locale } = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<NaverMapInstance | null>(null);
+  const routeLineRef = useRef<NaverPolylineInstance | null>(null);
   const [loadState, setLoadState] = useState<LoadState>(keyId ? "idle" : "error");
   const [selectedQuest, setSelectedQuest] = useState(quests[0] ?? null);
+  const [routeState, setRouteState] = useState<RouteState>({ status: "idle" });
 
   useEffect(() => {
     if (!keyId || !containerRef.current || quests.length === 0) return;
@@ -181,6 +194,7 @@ export function NaverQuestMap({
         zoomControl: true,
         zoomControlOptions: { position: 3 },
       });
+      mapRef.current = map;
       const bounds = new maps.LatLngBounds();
 
       markers = quests.flatMap((quest, index) => {
@@ -230,11 +244,76 @@ export function NaverQuestMap({
 
     return () => {
       cancelled = true;
+      routeLineRef.current?.setMap(null);
+      routeLineRef.current = null;
+      mapRef.current = null;
       markers.forEach((marker) => marker.setMap(null));
       script.remove();
       if (window.navermap_authFailure === fail) delete window.navermap_authFailure;
     };
   }, [keyId, locale, quests]);
+
+  useEffect(() => {
+    if (
+      loadState !== "ready" ||
+      !selectedQuest ||
+      !mapRef.current ||
+      !window.naver?.maps
+    ) {
+      return;
+    }
+
+    const controller = new AbortController();
+    let active = true;
+    routeLineRef.current?.setMap(null);
+    routeLineRef.current = null;
+    setRouteState({ status: "loading" });
+
+    void fetch("/api/v1/routes/walking", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ questId: selectedQuest.id }),
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("route unavailable");
+        return (await response.json()) as { route?: WalkingRoute };
+      })
+      .then(({ route }) => {
+        if (!active || !route || route.path.length < 2 || !mapRef.current) {
+          throw new Error("route unavailable");
+        }
+        const { maps } = window.naver!;
+        const path = route.path.map(
+          (point) => new maps.LatLng(point.latitude, point.longitude),
+        );
+        routeLineRef.current = new maps.Polyline({
+          map: mapRef.current,
+          path,
+          strokeColor: "#ff5a36",
+          strokeOpacity: 0.92,
+          strokeWeight: 6,
+          strokeLineCap: "round",
+          strokeLineJoin: "round",
+        });
+        const bounds = new maps.LatLngBounds();
+        path.forEach((point) => bounds.extend(point));
+        mapRef.current.fitBounds(bounds, 64);
+        setRouteState({ status: "ready", route });
+      })
+      .catch((error: unknown) => {
+        if (active && !(error instanceof DOMException && error.name === "AbortError")) {
+          setRouteState({ status: "error" });
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+      routeLineRef.current?.setMap(null);
+      routeLineRef.current = null;
+    };
+  }, [loadState, selectedQuest]);
 
   if (!keyId || loadState === "error") {
     return (
@@ -292,12 +371,22 @@ export function NaverQuestMap({
                   {pickLocale(locale, selectedQuest.transitGuide.lineJa, selectedQuest.transitGuide.lineKo)} · {pickLocale(locale, selectedQuest.transitGuide.stationJa, selectedQuest.transitGuide.stationKo)} {pickLocale(locale, selectedQuest.transitGuide.exitJa, selectedQuest.transitGuide.exitKo)}
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-600">
-                  {pickLocale(locale, "正確な徒歩ルートはNAVERマップで確認できます。", "정확한 도보 경로는 네이버 지도에서 확인할 수 있어요.")}
+                  {routeState.status === "ready"
+                    ? pickLocale(
+                        locale,
+                        `徒歩約${Math.max(1, Math.ceil(routeState.route.durationSeconds / 60))}分 · ${routeState.route.distanceMeters}m`,
+                        `도보 약 ${Math.max(1, Math.ceil(routeState.route.durationSeconds / 60))}분 · ${routeState.route.distanceMeters}m`,
+                      )
+                    : routeState.status === "loading" || routeState.status === "idle"
+                      ? pickLocale(locale, "実際の徒歩ルートを確認しています…", "실제 도보 경로를 확인하고 있어요…")
+                      : pickLocale(locale, "アプリ内のルートを読み込めませんでした。", "앱 안에서 경로를 불러오지 못했어요.")}
                 </p>
               </div>
             </div>
             <p className="mt-3 text-xs font-bold leading-5 text-slate-500">
-              {pickLocale(locale, "実際のルート検索はNAVERマップが提供します。", "실제 길찾기는 네이버 지도에서 제공합니다.")}
+              {routeState.status === "ready"
+                ? pickLocale(locale, "TMAPの徒歩ルート基準 · ルートは端末に保存しません。", "TMAP 도보 경로 기준 · 경로를 기기에 저장하지 않아요.")
+                : pickLocale(locale, "スマートフォンではNAVERマップでも確認できます。", "스마트폰에서는 네이버 지도에서도 확인할 수 있어요.")}
             </p>
             <NaverWalkRouteAction quest={selectedQuest} />
           </div>
