@@ -1,121 +1,152 @@
-import { getLineTwoNeighbors, getLineTwoTrip, lineTwoStations, type LineTwoStation } from "./line-two";
+import { lineTwoServices } from "./line-two";
+import { subwayStations, type SubwayStation } from "./subway-stations";
 
-export type SubwayStation = LineTwoStation & { line: 2 | 3 };
-type Change = { from: SubwayStation; to: SubwayStation };
-type Leg = { stops: SubwayStation[]; changes: Change[] };
-
-function lineThreeStation(code: string, ko: string, ja: string, en: string): SubwayStation {
-  return { code, ko, ja, en, line: 3 };
-}
-
-// External station numbers and order follow the Seoul Metropolitan Government route map.
-const lineThree = [
-  lineThreeStation("309", "대화", "大化", "Daehwa"),
-  lineThreeStation("310", "주엽", "注葉", "Juyeop"),
-  lineThreeStation("311", "정발산", "鼎鉢山", "Jeongbalsan"),
-  lineThreeStation("312", "마두", "馬頭", "Madu"),
-  lineThreeStation("313", "백석", "白石", "Baekseok"),
-  lineThreeStation("314", "대곡", "大谷", "Daegok"),
-  lineThreeStation("315", "화정", "花井", "Hwajeong"),
-  lineThreeStation("316", "원당", "元堂", "Wondang"),
-  lineThreeStation("317", "원흥", "元興", "Wonheung"),
-  lineThreeStation("318", "삼송", "三松", "Samsong"),
-  lineThreeStation("319", "지축", "紙杻", "Jichuk"),
-  lineThreeStation("320", "구파발", "旧把撥", "Gupabal"),
-  lineThreeStation("321", "연신내", "ヨンシンネ", "Yeonsinnae"),
-  lineThreeStation("322", "불광", "仏光", "Bulgwang"),
-  lineThreeStation("323", "녹번", "碌磻", "Nokbeon"),
-  lineThreeStation("324", "홍제", "弘済", "Hongje"),
-  lineThreeStation("325", "무악재", "毋岳チェ", "Muakjae"),
-  lineThreeStation("326", "독립문", "独立門", "Dongnimmun"),
-  lineThreeStation("327", "경복궁", "景福宮", "Gyeongbokgung"),
-  lineThreeStation("328", "안국", "安国", "Anguk"),
-  lineThreeStation("329", "종로3가", "鐘路3街", "Jongno 3(sam)-ga"),
-  lineThreeStation("330", "을지로3가", "乙支路3街", "Euljiro 3(sam)-ga"),
-  lineThreeStation("331", "충무로", "忠武路", "Chungmuro"),
-  lineThreeStation("332", "동대입구", "東大入口", "Dongguk Univ."),
-  lineThreeStation("333", "약수", "薬水", "Yaksu"),
-  lineThreeStation("334", "금호", "金湖", "Geumho"),
-  lineThreeStation("335", "옥수", "玉水", "Oksu"),
-  lineThreeStation("336", "압구정", "狎鴎亭", "Apgujeong"),
-  lineThreeStation("337", "신사", "新沙", "Sinsa"),
-  lineThreeStation("338", "잠원", "蚕院", "Jamwon"),
-  lineThreeStation("339", "고속터미널", "高速ターミナル", "Express Bus Terminal"),
-  lineThreeStation("340", "교대", "教大", "Seoul Nat'l Univ. of Education"),
-  lineThreeStation("341", "남부터미널", "南部ターミナル", "Nambu Bus Terminal"),
-  lineThreeStation("342", "양재", "良才", "Yangjae"),
-  lineThreeStation("343", "매봉", "メボン", "Maebong"),
-  lineThreeStation("344", "도곡", "道谷", "Dogok"),
-  lineThreeStation("345", "대치", "大峙", "Daechi"),
-  lineThreeStation("346", "학여울", "ハンニョウル", "Hangnyeoul"),
-  lineThreeStation("347", "대청", "大庁", "Daecheong"),
-  lineThreeStation("348", "일원", "逸院", "Irwon"),
-  lineThreeStation("349", "수서", "水西", "Suseo"),
-  lineThreeStation("350", "가락시장", "可楽市場", "Garak Market"),
-  lineThreeStation("351", "경찰병원", "警察病院", "National Police Hospital"),
-  lineThreeStation("352", "오금", "梧琴", "Ogeum"),
-];
-
-function onLineTwo(station: LineTwoStation): SubwayStation {
-  return { ...station, line: 2 };
-}
-
-export const subwayStations = [...lineTwoStations.map(onLineTwo), ...lineThree];
+export { subwayStations, type SubwayStation };
 
 const stationsByCode = new Map(subwayStations.map((station) => [station.code, station]));
-const lineThreeIndex = new Map(lineThree.map(({ code }, index) => [code, index]));
-const connections = [
-  { 2: "203", 3: "330" }, // Euljiro 3-ga
-  { 2: "223", 3: "340" }, // Seoul Nat'l Univ. of Education
-] as const;
 
 export function getSubwayStation(code: string) {
   return stationsByCode.get(code);
 }
 
-export function getSubwayNeighbors(code: string) {
-  const index = lineThreeIndex.get(code);
-  if (index === undefined) return getLineTwoNeighbors(code).map(onLineTwo);
-  return [lineThree[index - 1], lineThree[index + 1]].filter(Boolean);
+function range(start: number, end: number, prefix = "") {
+  return Array.from({ length: end - start + 1 }, (_, index) => prefix + (start + index))
+    .filter((code) => stationsByCode.has(code));
 }
 
-function getLeg(line: SubwayStation["line"], origin: string, destination: string): Leg {
-  if (line === 2) {
-    const trip = getLineTwoTrip(origin, destination)!;
-    return {
-      stops: trip.stops.map(onLineTwo),
-      changes: trip.changes.map(onLineTwo).map((station) => ({ from: station, to: station })),
-    };
+// General stopping patterns. The adjacent station shown belongs to a local train.
+// Shared track appears in each service that can continue without changing trains.
+const lineOneNorth = ["100-3", "100-2", "100-1", ...range(100, 141)];
+const lineOneSouth = [...range(119, 141), ...range(142, 177, "P")];
+const lineFiveWest = range(510, 548);
+
+const services = [
+  ...lineTwoServices,
+  range(309, 352),
+  [...lineOneNorth, ...range(142, 161)],
+  lineOneSouth,
+  [...lineOneSouth.slice(0, lineOneSouth.indexOf("P157") + 1), "P157-1"],
+  [...range(139, 141), ...range(142, 144, "P"), "P144-1"],
+  range(405, 456),
+  [...lineFiveWest, ...range(549, 558)],
+  [...lineFiveWest, ...range(549, 555, "P")],
+  ["610", ...range(616, 648)],
+  range(709, 761),
+  range(804, 827),
+  range(901, 938),
+];
+
+// Confirmed transfer stations on the Seoul Metro map. Chongshin Univ. and Isu
+// share a transfer despite the different Korean names used on the platforms.
+const transferStations = [
+  ["113", "710"], ["116", "412"], ["120", "644"], ["126", "211-4"],
+  ["127", "636"], ["128", "421"], ["130", "329", "534"], ["132", "201"],
+  ["133", "426"], ["136", "917"], ["138", "525"], ["140", "234"],
+  ["145", "750"], ["P142", "746"], ["P149", "443"],
+  ["203", "330"], ["204", "535"], ["205", "422", "536"], ["206", "635"],
+  ["208", "540"], ["212", "727"], ["216", "814"], ["218", "930"],
+  ["223", "340"], ["226", "433"], ["233", "744"], ["234-4", "518"],
+  ["236", "523"], ["237", "913"], ["238", "622"], ["243", "531"],
+  ["321", "614"], ["322", "612"], ["331", "423"], ["333", "633"],
+  ["339", "734", "923"], ["350", "817"], ["352", "P552"],
+  ["411", "713"], ["428", "628"], ["431", "920"], ["432", "736"],
+  ["512", "902"], ["526", "915"], ["529", "626"], ["537", "634"],
+  ["544", "725"], ["547", "811"], ["P550", "936"], ["645", "717"], ["815", "933"],
+];
+
+type Change = { from: SubwayStation; to: SubwayStation };
+type Edge = { to: string; service: number | null };
+const edgesByCode = new Map(subwayStations.map(({ code }) => [code, [] as Edge[]]));
+
+function connect(from: string, to: string, service: number | null) {
+  edgesByCode.get(from)!.push({ to, service });
+}
+
+services.forEach((stops, service) => {
+  for (let index = 1; index < stops.length; index++) {
+    connect(stops[index - 1], stops[index], service);
+    connect(stops[index], stops[index - 1], service);
   }
+});
 
-  const start = lineThreeIndex.get(origin)!;
-  const end = lineThreeIndex.get(destination)!;
-  const stops = lineThree.slice(Math.min(start, end), Math.max(start, end) + 1);
-  return { stops: start <= end ? stops : stops.reverse(), changes: [] };
+// Line 6 runs clockwise through Eungam's loop, with no reverse service.
+const eungamLoop = [...range(610, 615), "610"];
+const lineSixService = services.findIndex((stops) => stops[0] === "610");
+for (let index = 1; index < eungamLoop.length; index++) {
+  connect(eungamLoop[index - 1], eungamLoop[index], lineSixService);
 }
 
-function itinerary(first: Leg, transfer?: Change, second?: Leg) {
-  const changeNow = first.stops.length === 1 ? transfer : undefined;
+for (const group of transferStations) {
+  for (const from of group) {
+    for (const to of group) {
+      if (from !== to) connect(from, to, null);
+    }
+  }
+}
+
+export function getSubwayNeighbors(code: string) {
+  const neighbors = new Set(edgesByCode.get(code)?.flatMap(({ to, service }) => service === null ? [] : [to]));
+  return Array.from(neighbors, (neighbor) => stationsByCode.get(neighbor)!);
+}
+
+type Visit = {
+  code: string;
+  service: number | null;
+  transfers: number;
+  rideStops: number;
+  previous?: Visit;
+  change?: Change;
+};
+
+function compare(a: Visit, b: Visit) {
+  return a.transfers - b.transfers || a.rideStops - b.rideStops;
+}
+
+function itinerary(arrival: Visit) {
+  const visits = [arrival];
+  for (let visit = arrival.previous; visit; visit = visit.previous) visits.push(visit);
+  visits.reverse();
+  const firstStep = visits[1];
+  const changeNow = firstStep?.service === null ? firstStep.change : undefined;
   return {
-    stops: [...first.stops, ...(second?.stops ?? [])],
-    rideStops: first.stops.length - 1 + (second ? second.stops.length - 1 : 0),
-    changes: [...first.changes, ...(transfer ? [transfer] : []), ...(second?.changes ?? [])],
-    next: first.stops[1],
+    stops: visits.map(({ code }) => stationsByCode.get(code)!),
+    rideStops: arrival.rideStops,
+    changes: visits.flatMap(({ change }) => change ? [change] : []),
+    next: firstStep && !changeNow ? stationsByCode.get(firstStep.code) : undefined,
     changeNow,
   };
 }
 
-// Keep same-line trips on that line. Mixed trips prefer fewer transfers
-// (including Line 2 branches), then fewer train stops.
+// A station can belong to several services. Remember the incoming service so a
+// change between branches counts as a transfer even when the station code stays the same.
 export function getSubwayTrip(origin: string, destination: string) {
-  const start = getSubwayStation(origin);
-  const end = getSubwayStation(destination);
-  if (!start || !end) return null;
-  if (start.line === end.line) return itinerary(getLeg(start.line, origin, destination));
+  if (!stationsByCode.has(origin) || !stationsByCode.has(destination)) return null;
+  const queue: Visit[] = [{ code: origin, service: null, transfers: 0, rideStops: 0 }];
+  const visited = new Set<string>();
 
-  return connections.map((connection) => {
-    const from = getSubwayStation(connection[start.line])!;
-    const to = getSubwayStation(connection[end.line])!;
-    return itinerary(getLeg(start.line, origin, from.code), { from, to }, getLeg(end.line, to.code, destination));
-  }).sort((a, b) => a.changes.length - b.changes.length || a.rideStops - b.rideStops)[0];
+  while (queue.length > 0) {
+    queue.sort((a, b) => compare(b, a));
+    const visit = queue.pop()!;
+    const key = `${visit.code}:${visit.service}`;
+    if (visited.has(key)) continue;
+    visited.add(key);
+    if (visit.code === destination) return itinerary(visit);
+
+    for (const { to, service } of edgesByCode.get(visit.code)!) {
+      if (visited.has(`${to}:${service}`)) continue;
+      const interline = service === null;
+      const change = interline || (visit.service !== null && service !== visit.service)
+        ? { from: stationsByCode.get(visit.code)!, to: stationsByCode.get(interline ? to : visit.code)! }
+        : undefined;
+      queue.push({
+        code: to,
+        service,
+        previous: visit,
+        change,
+        transfers: visit.transfers + Number(Boolean(change)),
+        rideStops: visit.rideStops + Number(!interline),
+      });
+    }
+  }
+  return null;
 }

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getLineTwoNeighbors, getLineTwoTrip, lineTwoStations } from "./line-two";
+import { getSubwayNeighbors, getSubwayTrip, subwayStations } from "./subway-network";
 
 function tripCodes(origin: string, destination: string) {
-  return getLineTwoTrip(origin, destination)?.stops.map(({ code }) => code);
+  return getSubwayTrip(origin, destination)?.stops.map(({ code }) => code);
 }
 
 describe("Line 2 station directions", () => {
@@ -13,20 +13,21 @@ describe("Line 2 station directions", () => {
   });
 
   it("identifies both branch changes without confusing their shared stations", () => {
-    expect(getLineTwoNeighbors("211").map(({ code }) => code)).toEqual(["210", "212", "211-1"]);
-    expect(getLineTwoNeighbors("234").map(({ code }) => code)).toEqual(["233", "235", "234-1"]);
+    expect(getSubwayNeighbors("211").map(({ code }) => code)).toEqual(["210", "212", "211-1"]);
+    expect(getSubwayNeighbors("234").map(({ code }) => code)).toEqual(["233", "235", "234-1"]);
     expect(tripCodes("211", "211-4")).toEqual(["211", "211-1", "211-2", "211-3", "211-4"]);
-    expect(getLineTwoTrip("211-4", "234-4")?.changes.map(({ code }) => code)).toEqual(["211", "234"]);
-    expect(getLineTwoTrip("211-4", "211-1")?.changes).toEqual([]);
+    expect(getSubwayTrip("211-4", "212")?.changes.map(({ from }) => from.code)).toEqual(["211"]);
+    expect(getSubwayTrip("234-1", "235")?.changes.map(({ from }) => from.code)).toEqual(["234"]);
+    expect(getSubwayTrip("211-4", "211-1")?.changes).toEqual([]);
   });
 
   it("handles unsupported station numbers and a journey that is already complete", () => {
-    expect(getLineTwoTrip("211", "999")).toBeNull();
+    expect(getSubwayTrip("211", "999")).toBeNull();
     expect(tripCodes("211", "211")).toEqual(["211"]);
   });
 
   it("connects all 51 distinct station numbers", () => {
-    const codes = lineTwoStations.map(({ code }) => code);
+    const codes = subwayStations.filter(({ line }) => line === 2).map(({ code }) => code);
     expect(new Set(codes).size).toBe(51);
     for (const code of codes) {
       expect(tripCodes(code, "201")?.at(-1)).toBe("201");

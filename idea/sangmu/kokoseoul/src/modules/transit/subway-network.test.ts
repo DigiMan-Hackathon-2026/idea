@@ -31,10 +31,47 @@ describe("subway route guidance", () => {
   });
 
   it("keeps Line 2 branch transfers and does not mix transfer platforms with train neighbors", () => {
-    const trip = getSubwayTrip("211-1", "327");
-    expect(trip?.changes.map(({ from, to }) => [from.code, to.code])).toEqual([["211", "211"], ["203", "330"]]);
+    const trip = getSubwayTrip("211-1", "208");
+    expect(trip?.changes.map(({ from, to }) => [from.code, to.code])).toEqual([["211", "211"]]);
     expect(getSubwayNeighbors("203").map(({ code }) => code)).toEqual(["202", "204"]);
     expect(getSubwayTrip("330", "202")?.changeNow?.to.code).toBe("203");
     expect(getSubwayTrip("999", "327")).toBeNull();
+  });
+
+  it("connects every numbered station in both directions", () => {
+    const counts = [102, 51, 44, 51, 56, 39, 53, 24, 38];
+    expect(new Set(subwayStations.map(({ code }) => code)).size).toBe(458);
+    for (const [index, count] of counts.entries()) {
+      const stations = subwayStations.filter(({ line }) => line === index + 1);
+      expect(stations).toHaveLength(count);
+      for (const { code, ko, ja, en } of stations) {
+        expect([ko, ja, en].every(Boolean), code).toBe(true);
+        expect(getSubwayTrip(code, "201")?.stops.at(-1)?.code, code).toBe("201");
+        expect(getSubwayTrip("201", code)?.stops.at(-1)?.code, code).toBe(code);
+      }
+    }
+  });
+
+  it("uses verified branches and never runs Eungam's loop in reverse", () => {
+    expect(getSubwayTrip("100-3", "101")?.stops.map(({ code }) => code))
+      .toEqual(["100-3", "100-2", "100-1", "100", "101"]);
+    expect(getSubwayTrip("P144-1", "139")?.stops.map(({ code }) => code))
+      .toEqual(["P144-1", "P144", "P143", "P142", "141", "140", "139"]);
+    expect(getSubwayTrip("P157-1", "P158")?.changes[0]?.from.code).toBe("P157");
+    expect(getSubwayTrip("558", "P555")?.changes[0]?.from.code).toBe("548");
+    expect(getSubwayTrip("616", "611")?.stops.map(({ code }) => code)).toEqual(["616", "610", "611"]);
+    expect(getSubwayTrip("611", "610")?.stops.map(({ code }) => code)).toEqual(["611", "612", "613", "614", "615", "610"]);
+    expect(getSubwayNeighbors("610").map(({ code }) => code)).toEqual(["616", "611"]);
+  });
+
+  it("handles transfers with different names, airport platforms, and outer terminals", () => {
+    expect(getSubwayTrip("432", "737")?.changeNow?.to.code).toBe("736");
+    expect(getSubwayTrip("512", "903")?.changeNow?.to.code).toBe("902");
+    expect(getSubwayTrip("902", "915")?.next?.code).toBe("903");
+    expect(getSubwayTrip("762", "764")).toBeNull();
+    expect(getSubwayNeighbors("761").map(({ code }) => code)).toEqual(["760"]);
+    expect(getSubwayNeighbors("804").map(({ code }) => code)).toEqual(["805"]);
+    expect(getSubwayNeighbors("405").map(({ code }) => code)).toEqual(["406"]);
+    expect(getSubwayNeighbors("938").map(({ code }) => code)).toEqual(["937"]);
   });
 });

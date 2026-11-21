@@ -1,4 +1,4 @@
-export type LineTwoStation = {
+type LineTwoStation = {
   code: string;
   ko: string;
   ja: string;
@@ -71,65 +71,8 @@ const sindorimBranch = [
 ];
 
 export const lineTwoStations = [...loop, ...seongsuBranch, ...sindorimBranch];
-const stationsByCode = new Map(lineTwoStations.map((item) => [item.code, item]));
-const segments = [
-  { id: "loop", codes: [...loop.map(({ code }) => code), loop[0].code] },
-  { id: "seongsu", codes: ["211", ...seongsuBranch.map(({ code }) => code)] },
-  { id: "sindorim", codes: ["234", ...sindorimBranch.map(({ code }) => code)] },
-] as const;
-
-type SegmentId = (typeof segments)[number]["id"];
-type Edge = { next: string; segment: SegmentId };
-const edges = new Map(lineTwoStations.map(({ code }) => [code, [] as Edge[]]));
-
-for (const { id, codes } of segments) {
-  for (let index = 1; index < codes.length; index++) {
-    const from = codes[index - 1];
-    const to = codes[index];
-    edges.get(from)!.push({ next: to, segment: id });
-    edges.get(to)!.push({ next: from, segment: id });
-  }
-}
-
-export function getLineTwoStation(code: string) {
-  return stationsByCode.get(code);
-}
-
-export function getLineTwoNeighbors(code: string) {
-  return (edges.get(code) ?? []).map(({ next }) => stationsByCode.get(next)!);
-}
-
-// Adjacent stops have equal weight. This returns the fewest stops on Line 2.
-// The branch junctions split consecutive edges into separate boarding segments.
-export function getLineTwoTrip(origin: string, destination: string) {
-  if (!stationsByCode.has(origin) || !stationsByCode.has(destination)) return null;
-  const queue = [origin];
-  const previous = new Map<string, { from: string; segment: SegmentId }>();
-  for (let index = 0; index < queue.length && !previous.has(destination) && origin !== destination; index++) {
-    const from = queue[index];
-    for (const { next, segment } of edges.get(from) ?? []) {
-      if (next === origin || previous.has(next)) continue;
-      previous.set(next, { from, segment });
-      queue.push(next);
-    }
-  }
-  if (origin !== destination && !previous.has(destination)) return null;
-
-  const codes = [destination];
-  const journeySegments: SegmentId[] = [];
-  for (let at = destination; at !== origin;) {
-    const edge = previous.get(at)!;
-    journeySegments.push(edge.segment);
-    at = edge.from;
-    codes.push(at);
-  }
-  codes.reverse();
-  journeySegments.reverse();
-  const stops = codes.map((code) => stationsByCode.get(code)!);
-  return {
-    stops,
-    changes: journeySegments.flatMap((segment, index) =>
-      index > 0 && segment !== journeySegments[index - 1] ? [stops[index]] : [],
-    ),
-  };
-}
+export const lineTwoServices = [
+  [...loop.map(({ code }) => code), loop[0].code],
+  ["211", ...seongsuBranch.map(({ code }) => code)],
+  ["234", ...sindorimBranch.map(({ code }) => code)],
+];
