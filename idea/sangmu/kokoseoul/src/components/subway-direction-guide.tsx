@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getLineTwoNeighbors, getLineTwoStation, getLineTwoTrip, lineTwoStations, type LineTwoStation } from "@/modules/transit/line-two";
+import { emptySubwayRide, readSavedRide, restoreSubwayRide, saveSubwayRide, subscribeToSavedRide, type SubwayRide } from "@/modules/transit/saved-subway-ride";
 
 type Situation = "before" | "onboard" | "exit";
 const situations: Record<Situation, { ja: string; ko: string }> = {
@@ -139,11 +140,13 @@ function ExitHelp() {
 
 export function SubwayDirectionGuide({ readings }: { readings: Record<string, string> }) {
   const { locale } = useLocale();
-  const [situation, setSituation] = useState<Situation>("before");
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
+  const saved = restoreSubwayRide(useSyncExternalStore(subscribeToSavedRide, readSavedRide, () => null));
+  const [draft, setDraft] = useState<SubwayRide | null>(null);
+  const [storageFailed, setStorageFailed] = useState(false);
+  const ride = draft ?? saved ?? emptySubwayRide;
+  const { situation, origin, destination } = ride;
   const [observed, setObserved] = useState("");
-  const [transfer, setTransfer] = useState<LineTwoStation | null>(null);
+  const transfer = getLineTwoStation(ride.transfer);
   const trip = getLineTwoTrip(origin, destination);
   const next = trip?.stops[1];
   const originStation = getLineTwoStation(origin);
@@ -151,26 +154,40 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
   const observedStation = getLineTwoStation(observed);
   const differs = next && observedStation && next.code !== observedStation.code;
 
-  function changeOrigin(code: string) {
-    setOrigin(code);
+  function updateRide(next: SubwayRide) {
+    setDraft(next);
     setObserved("");
-    setTransfer(null);
+    setStorageFailed(!saveSubwayRide(next));
   }
 
   return (
     <section className="seoul-surface rounded-2xl p-4 sm:p-6" aria-label={pickLocale(locale, "地下鉄の現地サポート", "지하철 현장 안내")}>
       <div className="grid grid-cols-3 gap-2" role="group" aria-label={pickLocale(locale, "今の状況", "지금 상황")}>
         {(Object.keys(situations) as Situation[]).map((item) => (
-          <button key={item} type="button" className={choiceClass} aria-pressed={item === situation} onClick={() => { setSituation(item); setObserved(""); setTransfer(null); }}>
+          <button key={item} type="button" className={choiceClass} aria-pressed={item === situation} onClick={() => updateRide({ ...ride, situation: item, transfer: "" })}>
             {pickLocale(locale, situations[item].ja, situations[item].ko)}
           </button>
         ))}
       </div>
+      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 text-sm text-slate-600">
+        <p role="status">
+          {storageFailed
+            ? pickLocale(locale, "このブラウザーでは保存できませんでした。", "이 브라우저에는 이동 정보를 저장하지 못했어요.")
+            : saved
+              ? pickLocale(locale, "この端末に保存した案内です。今いる駅を確かめてください。", "이 기기에 저장된 안내예요. 지금 있는 역을 확인해 주세요.")
+              : pickLocale(locale, "駅を二つ選ぶと、この端末に案内を保存します。", "역 두 곳을 고르면 안내를 이 기기에 저장해요.")}
+        </p>
+        {saved || origin || destination ? (
+          <button type="button" onClick={() => updateRide(emptySubwayRide)} className="min-h-11 font-bold text-[#941e34] underline">
+            {pickLocale(locale, "移動情報を消す", "이동 정보 지우기")}
+          </button>
+        ) : null}
+      </div>
       {situation === "exit" ? <ExitHelp /> : (
         <>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={changeOrigin} readings={readings} />
-            <StationPicker id="subway-destination" label={pickLocale(locale, "降りたい駅", "내릴 역")} code={destination} readings={readings} onSelect={(code) => { setDestination(code); setObserved(""); setTransfer(null); }} />
+            <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={(code) => updateRide({ ...ride, origin: code, transfer: "" })} readings={readings} />
+            <StationPicker id="subway-destination" label={pickLocale(locale, "降りたい駅", "내릴 역")} code={destination} readings={readings} onSelect={(code) => updateRide({ ...ride, destination: code, transfer: "" })} />
           </div>
 
           {trip && !next ? (
@@ -219,7 +236,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                     {differs ? (
                       <>
                         <p>{pickLocale(locale, `選んだ方向と異なります。次の停車駅が「${stationLabel(observedStation, locale)}」と確認できたら、そこで降りて方向を確かめましょう。`, `고른 방향과 달라요. 다음 정차역이 ‘${stationLabel(observedStation, locale)}’가 맞으면 그 역에서 내려 방향을 확인해요.`)}</p>
-                        <button type="button" onClick={() => { changeOrigin(observedStation.code); setSituation("before"); }} className="seoul-button-primary mt-3 min-h-11 rounded-xl px-3 font-bold">
+                        <button type="button" onClick={() => updateRide({ ...ride, origin: observedStation.code, situation: "before", transfer: "" })} className="seoul-button-primary mt-3 min-h-11 rounded-xl px-3 font-bold">
                           {pickLocale(locale, "降りた駅から調べ直す", "내린 역에서 다시 찾기")}
                         </button>
                       </>
@@ -227,11 +244,13 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                       <>
                         <p>{pickLocale(locale, "次の駅は選んだ方向と一致しています。行先表示も確かめましょう。", "다음 역이 고른 방향과 일치해요. 열차 행선지도 확인해요.")}</p>
                         <button type="button" onClick={() => {
-                          changeOrigin(observedStation.code);
-                          if (trip.changes.some((item) => item.code === observedStation.code)) {
-                            setTransfer(observedStation);
-                            setSituation("before");
-                          }
+                          const changeTrains = trip.changes.some((item) => item.code === observedStation.code);
+                          updateRide({
+                            ...ride,
+                            origin: observedStation.code,
+                            transfer: changeTrains ? observedStation.code : "",
+                            situation: changeTrains ? "before" : "onboard",
+                          });
                         }} className="mt-2 min-h-11 font-bold underline">
                           {pickLocale(locale, "この駅に着いたら、次を確認", "이 역에 도착했어요")}
                         </button>
