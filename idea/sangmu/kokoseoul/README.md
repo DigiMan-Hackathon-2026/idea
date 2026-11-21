@@ -183,3 +183,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 인사동 쌈지길 공예 선물 퀘스트는 `pnpm db:seed:ssamziegil`로 로컬에 넣고 `/quests?area=jongno&purpose=shopping`에서 시작합니다.
 
 아모레용산 맞춤 파운데이션 퀘스트는 `pnpm db:seed:amore-foundation`으로 로컬에 넣고 `/quests?area=yongsan&purpose=beauty`에서 시작합니다.
+
+서울책보고 첫 북토크 퀘스트는 `pnpm db:seed:bookbogo`로 로컬에 넣고 `/quests?area=jamsil&purpose=discovery`에서 시작합니다.

@@ -612,6 +612,16 @@ test("finds the free Seoul Library loan guide under City Hall", async ({ page })
   );
 });
 
+test("finds the Jamsil book talk and opens the operator's current program list", async ({ page }) => {
+  await page.goto("/quests?area=jamsil&purpose=discovery&time=120plus");
+  await expect(page.getByText("日程・料金は回ごとに確認")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://www.seoulbookbogo.kr/front/index.php?allGrp=N&allLec=&bstart=&g_page=program&lgCode=1&m_page=program01&siteCode=TOL&tn=1",
+  );
+});
+
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
   await installServerRunMock(page);
   await page.goto(

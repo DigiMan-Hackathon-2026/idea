@@ -34,6 +34,7 @@
     "db:seed:city-model": "node --env-file-if-exists=.env.local scripts/db/seed-gwanghwamun-seoul-museum-city-model.mjs",
     "db:seed:ssamziegil": "node --env-file-if-exists=.env.local scripts/db/seed-insadong-ssamziegil-craft-gift.mjs",
     "db:seed:amore-foundation": "node --env-file-if-exists=.env.local scripts/db/seed-yongsan-amore-custom-foundation.mjs",
+    "db:seed:bookbogo": "node --env-file-if-exists=.env.local scripts/db/seed-jamsil-seoul-bookbogo-first-book-talk.mjs",
     "audit:dependencies": "pnpm audit --audit-level moderate",
     "verify:docs": "python3 scripts/verify_all.py",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:docs"

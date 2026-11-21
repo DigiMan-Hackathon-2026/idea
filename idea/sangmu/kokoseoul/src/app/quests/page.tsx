@@ -27,6 +27,7 @@ import soonhee from "@/modules/content/gwangjang-soonhee-bindaetteok.json";
 import cityModel from "@/modules/content/gwanghwamun-seoul-museum-city-model.json";
 import ssamziegil from "@/modules/content/insadong-ssamziegil-craft-gift.json";
 import amoreFoundation from "@/modules/content/yongsan-amore-custom-foundation.json";
+import bookbogo from "@/modules/content/jamsil-seoul-bookbogo-first-book-talk.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -156,6 +157,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.tags.length === 0 &&
     (filters.durationMax === null || filters.durationMax >= seoulLibrary.durationMinutes) &&
     filters.timeAvailable !== "30";
+  const showBookbogo =
+    (filters.area === "all" || filters.area === "jamsil") &&
+    (!filters.purpose || filters.purpose === "discovery") &&
+    filters.tags.length === 0 &&
+    filters.durationMax === null &&
+    filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
+    (!filters.budget || filters.budget === "unlimited");
   const featured = [
     ...(showHackathon ? [{
       quest: event,
@@ -264,6 +272,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/city-hall-seoul-library-first-loan",
       label: pickLocale(locale, "市庁 · 日常の中の新しい体験", "시청 · 일상 속 새로운 경험"),
       detail: pickLocale(locale, "ソウル在住の方向け · 貸出無料", "서울 거주자용 · 무료 대출"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showBookbogo ? [{
+      quest: bookbogo,
+      href: "/quests/jamsil-seoul-bookbogo-first-book-talk",
+      label: pickLocale(locale, "蚕室 · 日常の中の新しい体験", "잠실 · 일상 속 새로운 경험"),
+      detail: pickLocale(locale, "日程・料金は回ごとに確認", "일정·비용은 회차별 확인"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
   ];
