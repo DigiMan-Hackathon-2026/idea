@@ -40,8 +40,9 @@
 
 [서울숲에서 혼자 천천히 걷기](seongsu-seoul-forest-walk.md)는 서울숲 공식 사이트와 서울시 자료에서 주소, 가는 길, 시설 시간, 사슴 먹이 판매 중단을 확인한 초안입니다. 공식 사이트의 운영 단체가 2021년에 활동을 마쳐 시간 정보는 현장에서 다시 확인할 항목입니다.
 
-## 일상 속 새로운 경험 · 5개
+## 일상 속 새로운 경험 · 6개
 
+- [신촌에서 디지망 해커톤에 참여하기](sinchon-digiman-hackathon.md) (11월 29일 본선 · 선발 참가자용)
 - [여의도 이로토모 한일 교류회에 혼자 가보기](yeouido-irotomo-first-meetup.md)
 - [이촌글로벌빌리지센터 손뜨개 교실에 처음 참여하기](ichon-global-village-knitting.md)
 - [이촌에서 생활 한국어 멘토링 다음 회차 찾아보기](ichon-korean-speaking-mentoring.md)
