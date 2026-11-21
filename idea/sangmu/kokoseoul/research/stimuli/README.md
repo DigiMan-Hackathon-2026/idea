@@ -5,6 +5,7 @@
 ## 현재 자극물
 
 - [가상 안내 예시 v0.1](TEXT_GUIDANCE_DEMO_v0.1.md)
+- [올리브영에서 저장한 화장품 찾기](OLIVE_YOUNG_SHOPPING_CARD_v0.1.md) · [비교 테스트 진행안](../desk/OLIVE_YOUNG_SHOPPING_TEST_v0.1.md)
 
 상태는 일본어 모어 화자 검수 전이다. 검수 전 세션에서 사용했다면 해당 한계를 인터뷰 기록과 합성에 표시한다.
 
