@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { drawStamp, stampPixels, type StampMotif } from "./stamp-art";
+import { collectStationStamp } from "./stamp-collection";
 import styles from "./station-album.module.css";
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
   lineLabel: string;
   stationName: string;
   locale: Locale;
-  collected: boolean;
+  collected: boolean | null;
   children: ReactNode;
 };
 
@@ -20,11 +21,21 @@ export function StampImage({ color, motif, lineId, lineLabel, stationName, local
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const painted = useRef(false);
   const saving = useRef(false);
-  const [status, setStatus] = useState<"idle" | "saving" | "requested" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "collected" | "claim-error" | "saving" | "requested" | "export-error">("idle");
   const attachCanvas = useCallback((element: HTMLCanvasElement | null) => {
     canvas.current = element;
     painted.current = element !== null && drawStamp(element, { color, motif, lineLabel, stationName });
   }, [color, motif, lineLabel, stationName]);
+
+  function collect() {
+    if (collected !== false) return;
+    try {
+      collectStationStamp(stationName);
+      setStatus("collected");
+    } catch {
+      setStatus("claim-error");
+    }
+  }
 
   async function save() {
     if (!collected || saving.current || !canvas.current) return;
@@ -50,7 +61,7 @@ export function StampImage({ color, motif, lineId, lineLabel, stationName, local
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
     } catch {
-      setStatus("error");
+      setStatus("export-error");
     } finally {
       saving.current = false;
     }
@@ -65,14 +76,18 @@ export function StampImage({ color, motif, lineId, lineLabel, stationName, local
         </canvas>
         <figcaption>{children}</figcaption>
       </figure>
-      {collected && (
+      {collected !== null && (
         <div className={styles.stampActions}>
-          <button type="button" className={`${styles.saveStamp} seoul-button-primary`} onClick={save} disabled={status === "saving"}>
-            {status === "saving" ? pickLocale(locale, "画像を準備中…", "이미지 준비 중…") : pickLocale(locale, "スタンプをPNGで保存", "스탬프 PNG로 저장")}
+          <button type="button" className={`${styles.saveStamp} seoul-button-primary`} onClick={collected ? save : collect} disabled={status === "saving"}>
+            {!collected ? pickLocale(locale, "訪問を記録してスタンプをもらう", "방문을 기록하고 스탬프 받기")
+              : status === "saving" ? pickLocale(locale, "画像を準備中…", "이미지 준비 중…")
+              : pickLocale(locale, "スタンプをPNGで保存", "스탬프 PNG로 저장")}
           </button>
           <p role="status" className={styles.note}>
+            {status === "collected" && collected && pickLocale(locale, "スタンプ帳に追加しました。", "스탬프를 도감에 추가했어요.")}
+            {status === "claim-error" && !collected && pickLocale(locale, "スタンプを保存できませんでした。ブラウザーの保存設定を確認して、もう一度お試しください。", "스탬프를 저장하지 못했어요. 브라우저의 저장 설정을 확인하고 다시 시도해 주세요.")}
             {status === "requested" && pickLocale(locale, "ブラウザーのダウンロードをご確認ください。", "브라우저의 다운로드를 확인해 주세요.")}
-            {status === "error" && pickLocale(locale, "画像を作成できませんでした。もう一度お試しください。", "이미지를 만들지 못했어요. 다시 시도해 주세요.")}
+            {status === "export-error" && pickLocale(locale, "画像を作成できませんでした。もう一度お試しください。", "이미지를 만들지 못했어요. 다시 시도해 주세요.")}
           </p>
         </div>
       )}

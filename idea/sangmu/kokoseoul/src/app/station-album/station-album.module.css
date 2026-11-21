@@ -23,6 +23,7 @@
 .collectionSummary p { margin: 0; }
 .collectionSummary span, .lines small { font-variant-numeric: tabular-nums; }
 .collectionSummary span { margin-inline-start: .4rem; }
+.retryCollection { min-height: 2.75rem; padding-inline: .35rem; text-decoration: underline; font-weight: 750; }
 
 .lines {
   display: flex;
