@@ -2,43 +2,57 @@
 
 작성일: 2026-11-22 · 상태: 인터뷰 전 데스크 초안
 
-인터뷰 근거와 현장 확인 없이 [퀘스트 후보 템플릿](../../quest-candidates/TEMPLATE.md)의 형식만 빌려 쓴 초안입니다. 공식 후보가 아니므로 `research/quest-candidates/`에 두지 않습니다. [후보 선택 가이드](../../CANDIDATE_SELECTION_GUIDE.md)의 문제 → 지역 → 퀘스트 gate를 통과하지 않았고, 첫 지역 결정(D05)이나 첫 퀘스트 결정(D06)의 근거로 쓰지 않습니다.
+실제 장소와 공개 자료를 바탕으로 어떤 행동을 안내할지 정리한 초안입니다. 공개 전에 현장 확인과 한·일 문구 검수를 진행합니다. 공식 퀘스트 후보 선정은 [후보 선택 가이드](../../CANDIDATE_SELECTION_GUIDE.md)의 문제 → 지역 → 퀘스트 순서를 따릅니다.
 
-## 왜 종로·을지로인가
+## 식도락 · 5개
 
-[장소 목록](../seoul-japan-places.csv)에서 일본 여행 매체가 반복 소개한 장소(P03 광장시장, P06 창덕궁, P07 종묘)가 한 지역에 모여 있습니다. 시장 주문, 고궁 매표·해설, 골목 가게 웨이팅처럼 혼자일 때 막히는 행동의 종류도 다양합니다. 그래서 퀘스트 6개까지 늘려 볼 수 있습니다.
+- [광장시장 순희네빈대떡에서 혼자 한 끼](gwangjang-solo-meal.md)
+- [소무관 성수본점에서 혼자 국밥 주문하기](seongsu-somugwan-solo-gukbap.md)
+- [명동교자 본점에서 칼국수 한 그릇 주문하기](myeongdong-kyoja-solo-kalguksu.md)
+- [토속촌에서 삼계탕 한 그릇 주문하기](seochon-tosokchon-samgyetang.md)
+- [통인시장 손맛김밥에서 한 줄 포장하기](tongin-market-sonmat-gimbap.md)
 
-## 초안
+## 문화 체험 · 5개
 
-| 초안 | 핵심 행동 | 혼자일 때 막히는 지점 | 장소 근거 |
-| --- | --- | --- | --- |
-| [광장시장에서 혼자 한 끼](gwangjang-solo-meal.md) | 노점에 앉아 1인분 주문·결제 | 혼자 앉아도 되는지, 한국어 주문, 결제 방식 | P03 |
-| [창덕궁 전각 일본어 해설 듣기](changdeokgung-japanese-tour.md) | 전각 매표, 일본어 해설 합류, 인정전 품계석 관찰 | 공사 중 출입구, 집합 장소, 후원 표와 구분 | P06 · 궁능유적본부 |
-| [익선동 한옥 카페에서 웨이팅 등록하기](ikseon-cafe-waitlist.md) | 대기 등록 후 차례에 입장·주문 | 한국어 대기 기기, 한국 전화번호 요구 가능성 | P20(출처 없음) |
+- [창덕궁 전각 일본어 해설 듣기](changdeokgung-japanese-tour.md)
+- [뤼미에르 퍼퓸 성수점에서 향수 만들기](seongsu-lumiere-perfume-class.md)
+- [국립중앙박물관 사유의 방에서 반가사유상 비교하기](yongsan-museum-room-of-quiet-contemplation.md)
+- [국립민속박물관에서 한국의 설 풍습 찾아보기](anguk-folk-museum-seollal.md)
+- [서울역사박물관 도시모형에서 다녀온 동네 찾아보기](gwanghwamun-seoul-museum-city-model.md)
 
-## 성수 식도락
+## 쇼핑 · 5개
 
-[소무관 성수본점에서 혼자 국밥 주문하기](seongsu-somugwan-solo-gukbap.md)는 업체 안내에서 주소, 메뉴, 가격과 1인분 제공을 확인한 초안입니다. 입장·주문·결제 동선은 현장에서 확인할 항목입니다.
+- [올리브영N 성수에서 저장한 화장품 찾아 사기](seongsu-oliveyoung-saved-product.md)
+- [광화문 교보문고에서 찾던 책 한 권 확인하기](gwanghwamun-kyobo-find-book.md)
+- [동대문종합시장에서 리본이나 부자재 소량 고르기](dongdaemun-market-small-trim.md)
+- [서울풍물시장에서 오래된 물건 하나 골라보기](sinseol-seoul-folk-flea-market.md)
+- [인사동 쌈지길에서 작은 공예 선물 고르기](insadong-ssamziegil-craft-gift.md)
 
-## 성수 문화 체험
+## 뷰티 · 5개
 
-[뤼미에르 퍼퓸 성수점에서 혼자 향수 만들기](seongsu-lumiere-perfume-class.md)는 예약 페이지에서 주소, 가격, 시간대, 환불 조건을 확인한 초안입니다. 1인 예약 가능 여부, 진행 언어, 완성품 당일 수령은 업체 문의와 현장에서 확인할 항목입니다.
-
-## 성수 쇼핑
-
-[올리브영N 성수에서 저장한 화장품 찾아 사기](seongsu-oliveyoung-saved-product.md)는 [올리브영 상품 찾기 비교 테스트](../OLIVE_YOUNG_SHOPPING_TEST_v0.1.md) 결과에 따라 쓸 초안입니다. 매장 위치, 재고 조회 경로, 즉시환급 법령 기준을 공식 자료로 확인했고 주소·영업시간·성수점 환급 절차는 현장에서 확인할 항목입니다.
-
-## 성수 뷰티
-
-[올리브영N 성수에서 혼자 피부 진단 받기](seongsu-oliveyoung-skin-consulting.md)는 운영사 발표와 여러 보도에서 3층 당일 현장 예약, 하루 30~40명 규모, 외국인 이용 비중을 확인한 초안입니다. 가격, 소요 시간, 일본어 지원은 현장에서 확인할 항목입니다.
+- [올리브영N 성수에서 혼자 피부 진단 받기](seongsu-oliveyoung-skin-consulting.md)
+- [올리브영 뷰티 맨션 성수에서 립 수정화장 배워보기](seongsu-beauty-mansion-quick-touch-up.md)
+- [코코리컬러 홍대점에서 미니 퍼스널컬러 상담 받기](hongdae-cocory-mini-personal-color.md)
+- [이철헤어커커 명동점에서 헤드스파 메뉴 고르기](myeongdong-leekaja-head-spa.md)
+- [아모레용산에서 내 색에 맞는 파운데이션 골라보기](yongsan-amore-custom-foundation.md)
 
 ## 성수 휴식·산책
 
 [서울숲에서 혼자 천천히 걷기](seongsu-seoul-forest-walk.md)는 서울숲 공식 사이트와 서울시 자료에서 주소, 가는 길, 시설 시간, 사슴 먹이 판매 중단을 확인한 초안입니다. 공식 사이트의 운영 단체가 2021년에 활동을 마쳐 시간 정보는 현장에서 다시 확인할 항목입니다.
 
-## 일상 속 새로운 경험
+## 일상 속 새로운 경험 · 5개
 
-[여의도 이로토모 한일 교류회에 혼자 가보기](yeouido-irotomo-first-meetup.md)는 서울 거주 일본인을 위한 첫 참여 안내 초안입니다. 공식 신청과 입금, 네이버 지도, 자리 찾기, 첫 대화까지 한국어와 일본어로 안내합니다. 히나마쓰리 같은 계절 행사도 주최 측 공지가 나왔을 때 날짜와 신청 조건을 확인해 소개합니다.
+- [여의도 이로토모 한일 교류회에 혼자 가보기](yeouido-irotomo-first-meetup.md)
+- [이촌글로벌빌리지센터 손뜨개 교실에 처음 참여하기](ichon-global-village-knitting.md)
+- [이촌에서 생활 한국어 멘토링 다음 회차 찾아보기](ichon-korean-speaking-mentoring.md)
+- [서울책보고에서 북토크 처음 들어보기](jamsil-seoul-bookbogo-first-book-talk.md)
+- [서울도서관에서 회원증 만들고 첫 책 빌리기](city-hall-seoul-library-first-loan.md)
+
+서울에 사는 일본인이 새 모임에 참여하거나 생활 속 활동을 시작하는 데 초점을 둡니다. 히나마쓰리 같은 계절 행사는 주최 측의 새 공고에서 날짜와 신청 조건을 확인하면 초안을 추가합니다.
+
+## 장소 조사 중
+
+[익선동 한옥 카페에서 웨이팅 등록하기](ikseon-cafe-waitlist.md)는 점포와 출처를 정한 뒤 식도락 목록에 추가합니다.
 
 ## 공통 규칙
 
