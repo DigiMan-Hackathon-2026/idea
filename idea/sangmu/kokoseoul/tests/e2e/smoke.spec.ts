@@ -515,6 +515,7 @@ test("checks the next Line 2 station and recovers from a different direction", a
   await expect(page.getByRole("status").filter({ hasText: "211 聖水" })).toBeVisible();
   await page.getByRole("button", { name: "한국어로 전환" }).click();
   await page.getByRole("button", { name: "개찰구·출구", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "교통카드를 찍기 전에 호선과 방면을 확인해요" })).toBeVisible();
   await page.getByRole("button", { name: "다른 개찰구로 나왔어요" }).click();
   await expect(page.getByRole("heading", { name: "교통카드를 다시 찍기 전에 연결 통로를 물어봐요" })).toBeVisible();
   await expect(page.getByText("다른 개찰구로 나왔어요. 교통카드를 다시 찍지 않고 목표 출구로 갈 수 있나요?")).toBeVisible();

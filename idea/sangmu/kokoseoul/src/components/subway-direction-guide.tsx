@@ -111,6 +111,7 @@ function HelpPhrase({ ko, ja }: { ko: string; ja: string }) {
 }
 
 const exitSituations = [
+  { id: "enter", ko: "개찰구에 들어가기 전", ja: "改札に入る前", titleKo: "교통카드를 찍기 전에 호선과 방면을 확인해요", titleJa: "カードをタッチする前に路線と方面を確認", bodyKo: "개찰구 앞에서 2호선 표지와 타려는 방향을 확인해요. 방향을 모르겠으면 ‘타기 전’에서 다음 역을 찾아보고 역무원에게 물어봐요.", bodyJa: "改札の手前で2号線の表示と乗る方向を確認します。迷ったら「乗る前」で次の駅を調べて、駅員に聞きましょう。", phraseKo: "2호선을 타려고 해요. 지도에 나온 방향으로 가려면 어느 개찰구로 들어가면 되나요?", phraseJa: "2号線に乗りたいです。地図の方向へ行くには、どの改札から入ればいいですか？" },
   { id: "gate", ko: "개찰구를 나가기 전", ja: "改札を出る前", titleKo: "개찰구를 통과하기 전에 출구 번호를 확인해요", titleJa: "改札を出る前に出口番号を確認", bodyKo: "목적지의 출구 번호와 개찰구 위 표지를 대조해요. 모르겠으면 교통카드를 찍기 전에 역무원에게 물어봐요.", bodyJa: "目的地の出口番号と改札上の案内を見比べます。迷ったら、交通カードをタッチする前に駅員に聞きましょう。", phraseKo: "이 목적지로 가려면 몇 번 출구가 가까운가요? 어느 개찰구로 나가면 될까요?", phraseJa: "この目的地へ行くには何番出口が近いですか？ どの改札から出ればいいですか？" },
   { id: "wrong-gate", ko: "다른 개찰구로 나왔어요", ja: "別の改札から出た", titleKo: "교통카드를 다시 찍기 전에 연결 통로를 물어봐요", titleJa: "カードを再度タッチする前に連絡通路を確認", bodyKo: "원하는 출구 번호를 보여주고 개찰구 밖으로 이동할 수 있는지 확인해요.", bodyJa: "目的の出口番号を見せ、改札の外から行けるか尋ねます。", phraseKo: "다른 개찰구로 나왔어요. 교통카드를 다시 찍지 않고 목표 출구로 갈 수 있나요?", phraseJa: "別の改札から出ました。交通カードを再度タッチせずに目的の出口へ行けますか？" },
   { id: "wrong-exit", ko: "다른 출구로 나왔어요", ja: "別の出口から出た", titleKo: "지금 나온 출구 번호로 다시 찾아요", titleJa: "今いる出口番号から探し直す", bodyKo: "출구 기둥에서 역 이름과 번호를 확인해요. 지도를 열어 ‘역 이름 + 출구 번호’를 출발지로 쓰고, 길을 건널 때는 횡단보도를 이용해요.", bodyJa: "出口の柱で駅名と番号を確認します。地図で「駅名＋出口番号」を出発地に設定し、道路は横断歩道で渡りましょう。", phraseKo: "여기가 몇 번 출구인가요? 이 목적지까지 가는 안전한 길을 알려 주세요.", phraseJa: "ここは何番出口ですか？ この目的地まで安全に行ける道を教えてください。" },
@@ -120,11 +121,11 @@ const choiceClass = "min-h-12 rounded-xl border border-[var(--border)] bg-white 
 
 function ExitHelp() {
   const { locale } = useLocale();
-  const [selection, setSelection] = useState<(typeof exitSituations)[number]["id"]>("gate");
+  const [selection, setSelection] = useState<(typeof exitSituations)[number]["id"]>("enter");
   const selected = exitSituations.find(({ id }) => id === selection)!;
   return (
     <div className="mt-5">
-      <div className="grid gap-2 sm:grid-cols-3" role="group" aria-label={pickLocale(locale, "改札・出口での状況", "개찰구·출구 상황")}>
+      <div className="grid grid-cols-2 gap-2" role="group" aria-label={pickLocale(locale, "改札・出口での状況", "개찰구·출구 상황")}>
         {exitSituations.map((item) => <button key={item.id} type="button" className={choiceClass} aria-pressed={item.id === selection} onClick={() => setSelection(item.id)}>{pickLocale(locale, item.ja, item.ko)}</button>)}
       </div>
       <div className="mt-5 rounded-xl bg-[#edf1ef] p-4" role="status">
