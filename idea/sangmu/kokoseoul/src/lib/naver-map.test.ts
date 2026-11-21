@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildNaverMapScriptUrl,
+  buildNaverPublicTransitRouteIntentUrl,
+  buildNaverPublicTransitRouteUrl,
   buildNaverWalkRouteIntentUrl,
   buildNaverWalkRouteUrl,
   detectNaverMapMobilePlatform,
@@ -67,6 +69,36 @@ describe("buildNaverWalkRouteUrl", () => {
     });
 
     expect(url).toMatch(/^intent:\/\/route\/walk\?/);
+    expect(url).toContain("scheme=nmap");
+    expect(url).toContain("package=com.nhn.android.nmap");
+  });
+});
+
+describe("buildNaverPublicTransitRouteUrl", () => {
+  const params = {
+    destination: {
+      latitude: 37.54418,
+      longitude: 127.05632,
+      name: "성수역 3번 출구",
+    },
+    appName: "https://example.com/quests",
+  };
+
+  it("lets NAVER Maps use its own current location without receiving user coordinates", () => {
+    const url = new URL(buildNaverPublicTransitRouteUrl(params));
+
+    expect(url.protocol).toBe("nmap:");
+    expect(url.host).toBe("route");
+    expect(url.pathname).toBe("/public");
+    expect(url.searchParams.get("dname")).toBe("성수역 3번 출구");
+    expect(url.searchParams.get("slat")).toBeNull();
+    expect(url.searchParams.get("slng")).toBeNull();
+  });
+
+  it("builds the official Android public-transit intent form", () => {
+    const url = buildNaverPublicTransitRouteIntentUrl(params);
+
+    expect(url).toMatch(/^intent:\/\/route\/public\?/);
     expect(url).toContain("scheme=nmap");
     expect(url).toContain("package=com.nhn.android.nmap");
   });

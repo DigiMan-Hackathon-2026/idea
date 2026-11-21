@@ -36,6 +36,40 @@ export type NaverWalkRouteParams = {
   appName: string;
 };
 
+export type NaverCurrentLocationRouteParams = {
+  destination: { latitude: number; longitude: number; name: string };
+  appName: string;
+};
+
+function buildNaverCurrentLocationRouteUrl(
+  path: "/route/public" | "/route/walk",
+  { destination, appName }: NaverCurrentLocationRouteParams,
+): string {
+  const url = new URL(`nmap://${path.slice(1)}`);
+  url.searchParams.set("dlat", String(destination.latitude));
+  url.searchParams.set("dlng", String(destination.longitude));
+  url.searchParams.set("dname", destination.name);
+  url.searchParams.set("appname", appName);
+  return url.toString();
+}
+
+export function buildNaverPublicTransitRouteUrl(
+  params: NaverCurrentLocationRouteParams,
+): string {
+  return buildNaverCurrentLocationRouteUrl("/route/public", params);
+}
+
+function buildNaverRouteIntentUrl(routeUrl: string): string {
+  const route = new URL(routeUrl);
+  return `intent://${route.host}${route.pathname}?${route.searchParams.toString()}#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end`;
+}
+
+export function buildNaverPublicTransitRouteIntentUrl(
+  params: NaverCurrentLocationRouteParams,
+): string {
+  return buildNaverRouteIntentUrl(buildNaverPublicTransitRouteUrl(params));
+}
+
 export function buildNaverWalkRouteUrl({
   start,
   destination,
@@ -55,8 +89,7 @@ export function buildNaverWalkRouteUrl({
 export function buildNaverWalkRouteIntentUrl(
   params: NaverWalkRouteParams,
 ): string {
-  const route = new URL(buildNaverWalkRouteUrl(params));
-  return `intent://route/walk?${route.searchParams.toString()}#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end`;
+  return buildNaverRouteIntentUrl(buildNaverWalkRouteUrl(params));
 }
 
 export type NaverMapMobilePlatform = "android" | "ios" | "unsupported";

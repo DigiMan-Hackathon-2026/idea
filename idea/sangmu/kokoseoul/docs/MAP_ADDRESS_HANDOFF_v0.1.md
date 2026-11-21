@@ -2,9 +2,9 @@
 
 작성일: 2026-11-21 · 상태: 실제 장소·기기 검수 전 기준
 
-이 문서는 여기서울이 탐색 화면에서는 Naver Web Dynamic Map으로 후보 위치를 비교하고, 상세·진행 화면에서는 검수된 장소를 Google Maps 범용 URL로 열며, 어느 연결이 실패해도 목록과 한국어 주소로 복구하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
+이 문서는 여기서울이 탐색 화면에서는 Naver Web Dynamic Map으로 후보 위치를 비교하고, 상세 화면에서는 NAVER 지도 앱의 대중교통·도보 길찾기와 검수된 장소 정보를 연결하며, 어느 연결이 실패해도 목록과 한국어 주소로 복구하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
 
-공식 형식 기준: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started), [Naver Maps JavaScript API v3](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html) · 확인일: 2026-11-21
+공식 형식 기준: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started), [Naver Maps JavaScript API v3](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [NAVER 지도 앱 URL Scheme](https://guide.ncloud-docs.com/docs/maps-url-scheme) · 확인일: 2026-11-21
 
 ## 탐색 지도
 
@@ -17,15 +17,28 @@
 - 지도 인증을 위한 referrer는 `/quests`의 origin까지만 허용하며 path와 query는 보내지 않는다.
 - 외부 지도 이동과 한국어 주소 fallback은 탐색 지도 상태와 독립적이다.
 
-## P0 선택
+## P0 장소 열기
 
 - action은 `search`만 사용한다.
 - base는 `https://www.google.com/maps/search/`다.
 - `api=1`과 non-empty `query`를 필수로 한다.
 - 검증된 Google Place ID가 있을 때만 `query_place_id`를 함께 사용한다.
 - 주소·장소명·좌표는 content snapshot에서 server가 선택한다.
-- 출발지·현재 위치·길찾기·navigation·Street View는 P0에서 생성하지 않는다.
+- Google 장소 검색 URL에는 출발지·현재 위치·navigation·Street View parameter를 넣지 않는다.
 - Google Maps app 설치와 위치 권한을 요구하지 않는다.
+
+장소 검색은 주소 확인용 보조 경로로 유지한다. 이동 안내는 아래 NAVER 지도 앱 길찾기 계약을 별도로 따른다.
+
+## NAVER 대중교통·도보 길찾기
+
+- 대중교통은 공식 `/route/public`, 역에서 장소까지 도보는 `/route/walk` URL Scheme만 사용한다.
+- `appname`에는 현재 페이지 전체 URL 대신 서비스 origin만 넣어 quest·run·query를 외부로 보내지 않는다.
+- 대중교통 URL은 출발 좌표·출발지명을 생략한다. 공식 계약에 따라 NAVER 지도 앱이 사용자가 앱에 허용한 현재 위치를 사용한다.
+- 여기서울은 이 행동을 위해 현재 위치를 새로 요청하거나 읽거나 서버로 보내지 않는다.
+- 목적지는 검수된 역·출구 좌표와 이름이며, 도보 출발점은 같은 역·출구 snapshot이다.
+- Android mobile web은 공식 Intent URL, iOS mobile web은 `nmap://`와 App Store fallback을 사용한다.
+- 앱 미설치·외부 이동 실패·위치 미허용은 quest 실패가 아니다. 역·출구·주소·앱 내부 도보 안내는 그대로 유지한다.
+- 실시간 출발역·환승·운행 정보는 NAVER 지도 결과이며 여기서울이 보장하거나 캐시하지 않는다.
 
 Google 공식 문서상 Maps URL은 공통 URL로 앱·browser를 열 수 있고 API key가 필요 없지만, `api=1`이 없으면 action parameter가 무시될 수 있다. URL은 표준 encoding을 적용하고 2,048자 제한보다 충분히 작게 유지한다.
 

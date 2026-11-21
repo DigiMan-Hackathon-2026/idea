@@ -34,6 +34,26 @@ const demoStepCopy = [
   },
 ];
 
+const walkingRouteResponse = {
+  source: "TMAP",
+  fetchedAt: "2026-11-21T09:00:00.000Z",
+  route: {
+    distanceMeters: 313,
+    durationSeconds: 240,
+    path: [
+      { latitude: 37.54418, longitude: 127.05632 },
+      { latitude: 37.5435, longitude: 127.055 },
+      { latitude: 37.54292, longitude: 127.05445 },
+    ],
+  },
+};
+
+async function installWalkingRouteMock(page: Page) {
+  await page.route("**/api/v1/routes/walking", async (route) => {
+    await route.fulfill({ status: 200, json: walkingRouteResponse });
+  });
+}
+
 async function installServerRunMock(page: Page) {
   let started = false;
   let completedSteps = 0;
@@ -67,6 +87,10 @@ async function installServerRunMock(page: Page) {
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
+    if (pathname === "/api/v1/routes/walking") {
+      await route.fulfill({ status: 200, json: walkingRouteResponse });
+      return;
+    }
     if (pathname === "/api/v1/visitor-sessions" && request.method() === "POST") {
       await route.fulfill({ status: 201, json: { expiresAt: "2026-12-21T09:00:00.000Z" } });
       return;
@@ -269,25 +293,7 @@ test("switches between the quest list and Seoul-scoped map", async (
   { page },
   testInfo,
 ) => {
-  await page.route("**/api/v1/routes/walking", async (route) => {
-    await route.fulfill({
-      contentType: "application/json",
-      status: 200,
-      body: JSON.stringify({
-        source: "TMAP",
-        fetchedAt: "2026-11-21T09:00:00.000Z",
-        route: {
-          distanceMeters: 313,
-          durationSeconds: 240,
-          path: [
-            { latitude: 37.54418, longitude: 127.05632 },
-            { latitude: 37.5435, longitude: 127.055 },
-            { latitude: 37.54292, longitude: 127.05445 },
-          ],
-        },
-      }),
-    });
-  });
+  await installWalkingRouteMock(page);
   const response = await page.goto("/quests");
 
   expect(response?.headers()["referrer-policy"]).toBe("origin");
@@ -314,19 +320,23 @@ test("switches between the quest list and Seoul-scoped map", async (
   if (result === "map") {
     await expect(page.getByRole("link", { name: "詳細を見る" })).toBeVisible();
     await expect(page.getByTestId("transit-guide")).toContainText(
-      "2号線 · 聖水駅 3番出口",
+      "2号線 · 聖水駅",
     );
+    await expect(page.getByTestId("transit-guide")).toContainText("下車後、3番出口方面へ進む");
     await expect(page.getByTestId("transit-guide")).toContainText(
       "徒歩約4分 · 313m",
     );
     if (testInfo.project.name === "mobile-chromium") {
       await expect(
-        page.getByRole("button", { name: "NAVERマップで徒歩ルートを見る" }),
+        page.getByRole("button", { name: "現在地から駅まで公共交通で行く" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "駅から目的地まで徒歩で行く" }),
       ).toBeVisible();
     } else {
       await expect(
         page.getByText(
-          "スマートフォンで開くと、NAVERマップアプリに移動できます。",
+          "スマートフォンでは、現在地からの公共交通と駅からの徒歩ルートをNAVERマップで確認できます。",
         ),
       ).toBeVisible();
     }
@@ -344,6 +354,7 @@ test("switches between the quest list and Seoul-scoped map", async (
 });
 
 test("filters the demo and opens its start notice", async ({ page }) => {
+  await installWalkingRouteMock(page);
   await page.goto("/");
 
   await page.getByText("観光・文化体験", { exact: true }).click();
@@ -385,9 +396,12 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(page.getByText("デモ体験").first()).toBeVisible();
 
   await page.getByRole("link", { name: "クエストの詳細を見る" }).click();
+  await expect(page).toHaveURL(new RegExp(`/quests/${demoQuestId}$`));
   await expect(
     page.getByRole("heading", { name: "ひとりで楽しむ聖水クラフト散歩" }),
   ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "迷わないための行き方" })).toBeVisible();
+  await expect(page.getByText("下車後、3番出口方面へ進む")).toBeVisible();
   await page
     .getByRole("button", { name: "このデモクエストを始める" })
     .click();
@@ -508,6 +522,7 @@ test("resumes and deletes the browser-only demo record", async ({ page }) => {
 });
 
 test("saves a clearly local-only demo information report", async ({ page }) => {
+  await installWalkingRouteMock(page);
   await page.goto(
     "/quests/11111111-1111-4111-8111-111111111111",
   );

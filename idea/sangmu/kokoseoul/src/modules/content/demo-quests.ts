@@ -132,12 +132,18 @@ export type DemoQuest = {
   cost: { min: number; max: number; currency: "KRW" };
   mapPoint: { latitude: number; longitude: number };
   transitGuide: {
+    lineCode: string;
+    lineColor: `#${string}`;
     lineJa: string;
     lineKo: string;
     stationJa: string;
     stationKo: string;
     exitJa: string;
     exitKo: string;
+    directionJa: string;
+    directionKo: string;
+    arrivalTipJa: string;
+    arrivalTipKo: string;
     stationPoint: { latitude: number; longitude: number };
   };
   solo: {
@@ -175,12 +181,18 @@ export const DEMO_QUESTS: DemoQuest[] = [
     cost: { min: 12000, max: 18000, currency: "KRW" },
     mapPoint: { latitude: 37.54292, longitude: 127.05445 },
     transitGuide: {
+      lineCode: "2",
+      lineColor: "#00a84d",
       lineJa: "2号線",
       lineKo: "2호선",
       stationJa: "聖水駅",
       stationKo: "성수역",
       exitJa: "3番出口",
       exitKo: "3번 출구",
+      directionJa: "下車後、3番出口方面へ進む",
+      directionKo: "하차 후 3번 출구 방향으로 이동",
+      arrivalTipJa: "3番出口を出たら、実際の徒歩ルートに沿って約4分です。",
+      arrivalTipKo: "3번 출구로 나온 뒤 실제 도보 경로를 따라 약 4분 이동해요.",
       stationPoint: { latitude: 37.54418, longitude: 127.05632 },
     },
     solo: {

@@ -28,7 +28,7 @@
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
 - 기본 경로는 `Referrer-Policy: no-referrer`, Naver 지도 도메인 인증이 필요한 `/quests`만 `origin`을 적용한다. 모든 경로에 MIME sniffing·iframe 차단과 camera·microphone 차단 header를 적용했다. geolocation은 same-origin만 허용하고 시작 화면에서 사용자가 현재 위치를 고른 뒤에만 요청한다. 좌표는 browser 안에서 지원 지역을 고르는 데만 쓰며 URL·저장소·서버 요청·Naver 지도에 넣지 않는다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.
 - production 응답의 `X-Powered-By`는 비활성화했다. framework·provider version을 공개 header나 오류 body로 추가하지 않는다.
-- Playwright는 Pixel 5와 Desktop Chrome 두 project에서 언어 전환·현재 위치 개인정보 경계·지도 실패 복구·PWA 설치와 오프라인 복구를 포함한 10개 핵심 흐름, 총 20개 E2E를 실행한다. test 45초·expect 10초 한계를 명시했다.
+- Playwright는 Pixel 5와 Desktop Chrome 두 project에서 언어 전환·현재 위치 개인정보 경계·지도 실패 복구·지하철/도보 안내·PWA 설치와 오프라인 복구를 포함한 10개 핵심 흐름, 총 20개 E2E를 실행한다. test 45초·expect 10초 한계를 명시했다.
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않는다. Web App Manifest, 192·512px PNG와 Apple icon, same-origin service worker를 제공하며 설치 앱과 일반 웹은 같은 배포를 사용한다. service worker는 개인화 HTML·API·퀘스트 진행 화면을 캐시하지 않고 이중 언어 offline fallback만 보관한다. 앱 코드는 network-first로 받아 배포 뒤 일반 웹과 설치 앱이 함께 갱신되며, worker 자체 변경은 사용자에게 새 버전 적용 행동을 제공한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
 - F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 통합 테스트 47개를 통과했다. 가상 demo 콘텐츠는 schema migration에서 분리되어 local·test allowlist와 DB marker를 확인하는 명시적 seed 명령으로만 생성된다. 퀘스트와 단계의 일본어·한국어 콘텐츠는 DB가 관리하며 두 언어가 완전하지 않으면 공개를 거절한다. 별도 test-only login이 runtime capability에 연결돼 세션 생성→시작→조회→3단계 완료→완료 카드→피드백→내 기록→삭제와 신고 HTTP 흐름을 실제 DB로 검수한다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. production provider login mapping은 남아 있다.
@@ -58,7 +58,7 @@
 - 행사 전 제품 코드·scaffold·DB·배포 허용 여부는 [사전 개발 범위 확인서](EVENT_RULES_CHECKLIST.md)에 위험으로 남기되 구현을 차단하지 않는다. 제출·공개 전에는 공식 답변을 확인한다.
 - 실제 퀘스트의 장소·가격·혼자 이용·일본어·asset 권리는 [콘텐츠 사실과 권리 검수 v0.1](CONTENT_VERIFICATION_v0.1.md)에 따라 기록한다.
 - 첫 타깃·지역·quest는 [evidence coding 가이드](../research/EVIDENCE_CODING_GUIDE.md)와 [후보 선택 가이드](../research/CANDIDATE_SELECTION_GUIDE.md)에 따라 실제 사건·반대 근거·현장 사실 ID로 고른다.
-- 운영자 인증은 Auth.js와 Google OIDC의 DB 세션, 지도는 Google Maps 범용 URL과 한국어 주소 복사를 우선 검증한다. 외부 서비스 프로비저닝과 실제 콘텐츠 기반 세로 흐름은 아직 없다.
+- 운영자 인증은 Auth.js와 Google OIDC의 DB 세션을 후보로 둔다. 사용자 지도는 Naver Dynamic Map, 역 출구부터 목적지까지의 선은 TMAP 보행자 경로, 현재 위치에서 역까지의 대중교통과 역부터 목적지까지의 앱 길찾기는 NAVER 지도 URL Scheme을 사용한다. 서비스는 대중교통 길찾기용 현재 위치를 받거나 전송하지 않고 NAVER 지도 앱이 자체 권한으로 처리한다. 배포 domain 등록과 실제 iOS·Android 앱 fallback 검수는 남아 있다.
 - 비밀값이나 로그인 세션은 저장소로 이전하지 않는다. 맥북의 GitHub 인증과 도구 가용성은 그 기기에서 확인한다.
 
 ## 사용자가 확정한 방향

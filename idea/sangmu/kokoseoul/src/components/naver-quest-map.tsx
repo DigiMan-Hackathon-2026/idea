@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
+import { TransitGuideCard, type TransitRouteStatus } from "@/components/transit-guide-card";
 import { pickLocale } from "@/lib/locale";
 import {
   buildNaverMapScriptUrl,
-  buildNaverWalkRouteIntentUrl,
-  buildNaverWalkRouteUrl,
-  detectNaverMapMobilePlatform,
   SEOUL_MAP_BOUNDS,
 } from "@/lib/naver-map";
 import {
@@ -52,86 +50,6 @@ type WalkingRoute = {
 type RouteState =
   | { status: "idle" | "loading" | "error" }
   | { status: "ready"; route: WalkingRoute };
-
-function NaverWalkRouteAction({ quest }: { quest: DemoQuest }) {
-  const { locale } = useLocale();
-  const [platform, setPlatform] = useState<
-    ReturnType<typeof detectNaverMapMobilePlatform> | "checking"
-  >("checking");
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setPlatform(
-        detectNaverMapMobilePlatform(
-          window.navigator.userAgent,
-          window.navigator.maxTouchPoints,
-        ),
-      );
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
-  if (platform === "checking") return null;
-
-  if (platform === "unsupported") {
-    return (
-      <p className="mt-4 text-xs font-bold leading-5 text-slate-500">
-        {pickLocale(
-          locale,
-          "スマートフォンで開くと、NAVERマップアプリに移動できます。",
-          "스마트폰에서 열면 네이버 지도 앱으로 이동할 수 있어요.",
-        )}
-      </p>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        const params = {
-          start: {
-            ...quest.transitGuide.stationPoint,
-            name: pickLocale(
-              locale,
-              `${quest.transitGuide.stationJa} ${quest.transitGuide.exitJa}`,
-              `${quest.transitGuide.stationKo} ${quest.transitGuide.exitKo}`,
-            ),
-          },
-          destination: {
-            ...quest.mapPoint,
-            name: pickLocale(locale, quest.titleJa, quest.titleKo),
-          },
-          appName: window.location.href,
-        };
-
-        if (platform === "android") {
-          window.location.href = buildNaverWalkRouteIntentUrl(params);
-          return;
-        }
-
-        const clickedAt = Date.now();
-        window.location.href = buildNaverWalkRouteUrl(params);
-        window.setTimeout(() => {
-          if (
-            document.visibilityState === "visible" &&
-            Date.now() - clickedAt < 2_000
-          ) {
-            window.location.href =
-              "https://itunes.apple.com/app/id311867728?mt=8";
-          }
-        }, 1_500);
-      }}
-      className="mt-4 min-h-11 w-full rounded-full border border-[#00a84d]/25 bg-white px-4 text-sm font-black text-[#087735]"
-    >
-      {pickLocale(
-        locale,
-        "NAVERマップで徒歩ルートを見る",
-        "네이버 지도에서 도보 길찾기",
-      )}
-    </button>
-  );
-}
 
 export function NaverQuestMap({
   quests,
@@ -228,7 +146,7 @@ export function NaverQuestMap({
             `${quest.transitGuide.stationKo} ${quest.transitGuide.exitKo}`,
           ),
           icon: {
-            content: `<div style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#152238;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:#00a84d;color:white;font-size:14px">2</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
+            content: `<div style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#152238;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:${quest.transitGuide.lineColor};color:white;font-size:14px">${quest.transitGuide.lineCode}</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
             anchor: new maps.Point(19, 19),
           },
         });
@@ -361,34 +279,8 @@ export function NaverQuestMap({
           <p className="mt-4 leading-7 text-slate-600">
             {pickLocale(locale, selectedQuest.summaryJa, selectedQuest.summaryKo)}
           </p>
-          <div className="mt-5 rounded-2xl bg-[#eef8f2] p-4" data-testid="transit-guide">
-            <div className="flex items-start gap-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#00a84d] text-sm font-black text-white" aria-hidden="true">
-                2
-              </span>
-              <div>
-                <p className="text-sm font-black text-slate-950">
-                  {pickLocale(locale, selectedQuest.transitGuide.lineJa, selectedQuest.transitGuide.lineKo)} · {pickLocale(locale, selectedQuest.transitGuide.stationJa, selectedQuest.transitGuide.stationKo)} {pickLocale(locale, selectedQuest.transitGuide.exitJa, selectedQuest.transitGuide.exitKo)}
-                </p>
-                <p className="mt-1 text-sm font-bold text-slate-600">
-                  {routeState.status === "ready"
-                    ? pickLocale(
-                        locale,
-                        `徒歩約${Math.max(1, Math.ceil(routeState.route.durationSeconds / 60))}分 · ${routeState.route.distanceMeters}m`,
-                        `도보 약 ${Math.max(1, Math.ceil(routeState.route.durationSeconds / 60))}분 · ${routeState.route.distanceMeters}m`,
-                      )
-                    : routeState.status === "loading" || routeState.status === "idle"
-                      ? pickLocale(locale, "実際の徒歩ルートを確認しています…", "실제 도보 경로를 확인하고 있어요…")
-                      : pickLocale(locale, "アプリ内のルートを読み込めませんでした。", "앱 안에서 경로를 불러오지 못했어요.")}
-                </p>
-              </div>
-            </div>
-            <p className="mt-3 text-xs font-bold leading-5 text-slate-500">
-              {routeState.status === "ready"
-                ? pickLocale(locale, "TMAPの徒歩ルート基準 · ルートは端末に保存しません。", "TMAP 도보 경로 기준 · 경로를 기기에 저장하지 않아요.")
-                : pickLocale(locale, "スマートフォンではNAVERマップでも確認できます。", "스마트폰에서는 네이버 지도에서도 확인할 수 있어요.")}
-            </p>
-            <NaverWalkRouteAction quest={selectedQuest} />
+          <div className="mt-5">
+            <TransitGuideCard quest={selectedQuest} routeState={routeState as TransitRouteStatus} />
           </div>
           <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-full bg-[#ff5a36] px-5 text-sm font-black text-white">
             {pickLocale(locale, "詳細を見る", "자세히 보기")}
