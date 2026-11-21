@@ -19,6 +19,7 @@ import oliveyoungShopping from "@/modules/content/seongsu-oliveyoung-shopping.js
 import oliveyoungSkin from "@/modules/content/seongsu-oliveyoung-skin-consulting.json";
 import irotomo from "@/modules/content/yeouido-irotomo-first-meetup.json";
 import somugwan from "@/modules/content/seongsu-somugwan-solo-gukbap.json";
+import changdeokgung from "@/modules/content/changdeokgung-japanese-tour.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -75,6 +76,12 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     (!filters.purpose || filters.purpose === "culture") &&
     filters.tags.length === 0 &&
     (filters.durationMax === null || filters.durationMax >= museumRoom.durationMinutes);
+  const showChangdeokgung =
+    (filters.area === "all" || filters.area === "jongno") &&
+    (!filters.purpose || filters.purpose === "culture") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= changdeokgung.durationMinutes) &&
+    filters.timeAvailable !== "30" && filters.timeAvailable !== "60";
   const showOliveyoungShopping =
     (filters.area === "all" || filters.area === "seongsu") &&
     (!filters.purpose || filters.purpose === "shopping") &&
@@ -122,6 +129,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/museum-room-of-contemplation",
       label: pickLocale(locale, "龍山 · 文化体験", "용산 · 문화 체험"),
       detail: pickLocale(locale, "国立中央博物館2階 · 無料", "국립중앙박물관 2층 · 무료"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showChangdeokgung ? [{
+      quest: changdeokgung,
+      href: "/quests/changdeokgung-japanese-tour",
+      label: pickLocale(locale, "鍾路 · 文化体験", "종로 · 문화 체험"),
+      detail: pickLocale(locale, "日本語ガイド · 水・金・日 11:00", "일본어 해설 · 수·금·일 11:00"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showOliveyoungShopping ? [{

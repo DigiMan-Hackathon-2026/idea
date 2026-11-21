@@ -528,6 +528,13 @@ test("finds the Seongsu solo meal with the operator's map pin", async ({ page })
   await expect(page.getByRole("link", { name: "NAVERマップを開く（別タブ）" })).toHaveAttribute("href", "https://map.naver.com/p/entry/place/2057338165");
 });
 
+test("finds the Changdeokgung tour with the official schedule", async ({ page }) => {
+  await page.goto("/quests?area=jongno&purpose=culture&time=120plus");
+  await expect(page.getByText("日本語ガイド · 水・金・日 11:00")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://royal.khs.go.kr/ROYAL/contents/R706020000.do?schGroupCode=cdg");
+});
+
 test("finds the recurring exchange meetup in Yeouido", async ({ page }) => {
   await page.goto("/quests?area=yeouido&purpose=discovery");
   await expect(page.getByRole("heading", { name: "汝矣島の日韓交流会「いろとも」に初めて参加する" })).toBeVisible();

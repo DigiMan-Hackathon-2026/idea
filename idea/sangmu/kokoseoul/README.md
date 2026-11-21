@@ -167,3 +167,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 이로토모 교류회 퀘스트는 `pnpm db:seed:irotomo`로 로컬에 넣고 `/quests?area=yeouido&purpose=discovery`에서 시작합니다.
 
 소무관 성수본점 국밥 퀘스트는 `pnpm db:seed:somugwan`으로 로컬에 넣고 `/quests?area=seongsu&purpose=food`에서 시작합니다.
+
+창덕궁 일본어 해설 퀘스트는 `pnpm db:seed:changdeokgung`으로 로컬에 넣고 `/quests?area=jongno&purpose=culture`에서 시작합니다.
