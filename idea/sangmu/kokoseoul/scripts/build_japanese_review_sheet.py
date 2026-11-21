@@ -38,6 +38,7 @@ DRAFTS_IN_APP = {
     "seongsu-oliveyoung-skin-consulting.md",
     "seongsu-somugwan-solo-gukbap.md",
     "yeouido-irotomo-first-meetup.md",
+    "insadong-ssamziegil-craft-gift.md",
 }
 
 CONTEXT = {
