@@ -40,7 +40,7 @@ Content-Security-Policy: <environment-specific-policy>
 Referrer-Policy: no-referrer
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
-Permissions-Policy: camera=(), microphone=(), geolocation=()
+Permissions-Policy: camera=(), microphone=(), geolocation=(self)
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 X-Request-Id: <validated-server-id>
 ```
@@ -129,15 +129,15 @@ COOP·CORP·COEP를 이름만 보고 일괄 적용하지 않는다. auth callbac
 
 ## Permissions Policy
 
-P0는 camera, microphone, geolocation을 사용하지 않으므로 비활성화한다.
+P0는 camera와 microphone을 사용하지 않으므로 비활성화한다. geolocation은 시작 화면에서 사용자가 현재 위치를 직접 선택했을 때만 같은 origin에 허용한다.
 
 ```text
-Permissions-Policy: camera=(), microphone=(), geolocation=()
+Permissions-Policy: camera=(), microphone=(), geolocation=(self)
 ```
 
 fullscreen, clipboard-write 등 추가 directive는 browser 지원과 기능을 확인한 뒤 정한다. 주소 복사는 user gesture의 Clipboard API를 우선하고 policy를 넓히지 않아도 되는 fallback을 제공한다.
 
-위치 기반 기능을 후속 추가하면 UI 권한 요청, 거절 fallback, privacy 문서와 header를 함께 바꾼다.
+좌표는 browser 안에서 가까운 지원 지역을 판정한 직후 버리고 URL·저장소·서버 요청에 넣지 않는다. 거절·timeout·미지원이면 지역 직접 선택과 미정 fallback을 제공한다.
 
 ## Referrer Policy
 
@@ -258,7 +258,7 @@ remote CSP report endpoint는 P0에 필수 아님이다. 도입하면 report bod
 - [ ] 개인·admin·error 응답이 no-store이며 Cookie를 올바르게 Vary한다.
 - [ ] visitor·admin cookie가 분리되고 삭제 scope가 일치한다.
 - [ ] mutation exact Origin과 same-origin CORS 정책을 검수했다.
-- [ ] camera·microphone·geolocation이 비활성이고 주소 fallback이 동작한다.
+- [ ] camera·microphone이 비활성이고 geolocation은 명시적 선택 뒤 same-origin에서만 동작하며 지역 선택 fallback이 있다.
 - [ ] referrer에 개인 path·query가 나가지 않는다.
 - [ ] header snapshot을 Chromium·WebKit·provider edge에서 확인했다.
 

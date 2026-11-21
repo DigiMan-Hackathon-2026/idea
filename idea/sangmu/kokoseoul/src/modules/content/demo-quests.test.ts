@@ -5,6 +5,7 @@ import {
   formatWonRange,
   getMatchReasons,
   parseQuestFilters,
+  resolveDemoAreaFromCoordinates,
 } from "./demo-quests";
 
 describe("demo quest discovery", () => {
@@ -15,13 +16,33 @@ describe("demo quest discovery", () => {
         tags: "craft,unknown,craft",
         durationMax: "120",
       }),
-    ).toEqual({ area: "seongsu", tags: ["craft"], durationMax: 120 });
+    ).toEqual({
+      area: "seongsu",
+      tags: ["craft"],
+      durationMax: 120,
+      purpose: null,
+      timeAvailable: null,
+      party: null,
+      koreanComfort: null,
+      budget: null,
+      walking: null,
+    });
   });
 
   it("falls back to unrestricted filters", () => {
     expect(
       parseQuestFilters({ area: "unknown", durationMax: "999" }),
-    ).toEqual({ area: "all", tags: [], durationMax: null });
+    ).toEqual({
+      area: "all",
+      tags: [],
+      durationMax: null,
+      purpose: null,
+      timeAvailable: null,
+      party: null,
+      koreanComfort: null,
+      budget: null,
+      walking: null,
+    });
   });
 
   it("filters the demo without inventing results", () => {
@@ -69,5 +90,31 @@ describe("demo quest discovery", () => {
       "선택한 관심사와 맞아요",
       "90분 안에 체험할 수 있어요",
     ]);
+  });
+
+  it("parses and applies progressive recommendation conditions", () => {
+    const filters = parseQuestFilters({
+      purpose: "culture",
+      time: "120plus",
+      area: "seongsu",
+      party: "solo",
+      koreanComfort: "low",
+      budget: "under30000",
+      walking: "moderate",
+    });
+
+    expect(filterDemoQuests(DEMO_QUESTS, filters)).toHaveLength(1);
+    expect(
+      filterDemoQuests(DEMO_QUESTS, { ...filters, budget: "under10000" }),
+    ).toEqual([]);
+    expect(
+      filterDemoQuests(DEMO_QUESTS, { ...filters, party: "family" }),
+    ).toEqual([]);
+  });
+
+  it("uses location only to choose the nearest supported demo area", () => {
+    expect(resolveDemoAreaFromCoordinates(37.5446, 127.0557)).toBe("seongsu");
+    expect(resolveDemoAreaFromCoordinates(37.5665, 126.978)).toBe("all");
+    expect(resolveDemoAreaFromCoordinates(Number.NaN, 127)).toBe("all");
   });
 });

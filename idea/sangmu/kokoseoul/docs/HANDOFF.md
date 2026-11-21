@@ -26,9 +26,9 @@
 - 사용자 화면은 [DigiMan UX 원칙 v0.1](UX_PRINCIPLES_v0.1.md)의 한 화면 한 핵심 행동, 예측 가능한 버튼 문구, 쉬운 말, 선택권 존중, 오류 예방·복구 기준을 따른다. 토스 공개 자료의 원칙을 참고하지만 토스 브랜드와 외형은 복제하지 않는다.
 - demo 웹은 필터 결과 없음, 없는 quest·run 직접 접근, 예상치 못한 화면 오류에 일본어 복구 행동을 제공한다. 네트워크·서버 장애 주입은 실제 API 연결 뒤 검수한다.
 - 웹 공통 skip link와 reduced-motion을 적용했고 시작·신고·삭제 modal의 초기 초점·focus trap·Escape 종료를 Playwright로 검수한다. screen reader·실제 기기 검수는 아직 남아 있다.
-- 모든 경로에 `Referrer-Policy: no-referrer`, MIME sniffing·iframe 차단과 camera·microphone·geolocation 비활성 header를 적용하고 Chromium 응답에서 검수한다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.
+- 모든 경로에 `Referrer-Policy: no-referrer`, MIME sniffing·iframe 차단과 camera·microphone 차단 header를 적용했다. geolocation은 same-origin만 허용하고 시작 화면에서 사용자가 현재 위치를 고른 뒤에만 요청한다. 좌표는 browser 안에서 지원 지역을 고르는 데만 쓰며 URL·저장소·서버 요청에 넣지 않는다. 사용자 HTML은 쿠키 기반 개인화 전환 전부터 cache `no-store`를 강제한다. Next 개발 서버는 설정의 `private, no-store`를 `no-store`로 직렬화하므로 provider의 최종 header는 배포 검수에 남긴다. CSP nonce와 production HSTS도 배포 환경 확인 뒤 남아 있다.
 - production 응답의 `X-Powered-By`는 비활성화했다. framework·provider version을 공개 header나 오류 body로 추가하지 않는다.
-- Playwright는 Pixel 5와 Desktop Chrome 두 project에서 언어 전환을 포함한 7개 핵심 흐름, 총 14개 E2E를 실행한다. 개발 서버 초기 compile이 겹치는 병렬 실행을 고려해 test 45초·expect 10초 한계를 명시했다.
+- Playwright는 Pixel 5와 Desktop Chrome 두 project에서 언어 전환·현재 위치 개인정보 경계를 포함한 8개 핵심 흐름, 총 16개 E2E를 실행한다. test 45초·expect 10초 한계를 명시했다.
 - 현재 demo metadata는 검색 노출을 막는 `noindex, nofollow`다. 실제 콘텐츠 검수와 공개 결정 없이 이를 제거하지 않으며 manifest·SVG app icon은 demo 식별용으로만 사용한다.
 - `pnpm audit:dependencies`는 moderate 이상 알려진 취약점을 검사한다. Drizzle Kit의 취약한 transitive esbuild 범위는 pnpm override로 0.25.12에 고정했으며 2026-11-21 현재 알려진 취약점은 0건이다. 네트워크가 필요한 검사라 로컬 `pnpm verify`와 분리하고 GitHub Actions에서는 실행한다.
 - F1은 PostgreSQL 17.12 digest, Drizzle ORM 0.45.4·Kit 0.31.11·pg 8.23.1을 고정했다. 전체 domain 14 tables와 password 없는 capability role은 빈 DB·재적용, `SET ROLE` 권한 거부와 실제 통합 테스트 46개를 통과했다. 별도 test-only login이 runtime capability에 연결돼 세션 생성→시작→조회→3단계 완료→피드백→신고 HTTP 흐름과 세션·run·step·신고 재전송 멱등성을 실제 DB로 검수한다. visitor·session은 같은 DB transaction instant의 고정 30일 만료를 가진다. 두 연결의 동시 시작·step·마지막 step·신고는 한 행·한 완료로 수렴하고, start/pause는 quest row lock 순서로 직렬화되며 audit 실패는 domain 변경도 rollback한다. production provider login mapping과 나머지 HTTP adapter 연결은 남아 있다.
@@ -93,9 +93,9 @@
 
 핵심 흐름은 다음과 같다.
 
-`조건 선택 → 퀘스트 탐색 → 상세 안내 → 시작 → 단계 수행 → 완료 카드 → 기록·피드백`
+`목적→시간→지역 선택 → 퀘스트 탐색 → 상세 안내 → 시작 → 단계 수행 → 완료 카드 → 기록·피드백`
 
-- 지역·관심사·최대 소요 시간에 맞춰 설명 가능한 규칙으로 추천한다.
+- 시작 화면은 목적·시간·지역만 한 질문씩 받고, 탐색 화면에서 동행·한국어 대화 부담·예산·걷기 정도를 선택 조건으로 보완한다. 서울 방문 경험은 가치를 경험한 완료 시점에만 선택적으로 묻는다.
 - 일본어 행동 안내와 필요할 때 직원에게 보여주는 한국어 요청 카드를 제공한다.
 - 가입 없이 탐색하고, 시작·신고 시 익명 브라우저 세션을 생성한다.
 - 개인 기록은 해당 브라우저에서 유지한다. 30일 보존은 현재 설계 초안이다. 계정 연결·기기 간 기록 동기화는 후속 기능이다.

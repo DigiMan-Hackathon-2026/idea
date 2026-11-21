@@ -2,7 +2,7 @@
 
 작성일: 2026-11-21 · 상태: 실제 장소·기기 검수 전 기준
 
-이 문서는 DigiMan이 위치 권한·지도 SDK·API key 없이 검수된 장소를 Google Maps 범용 URL로 열고, 실패해도 한국어 주소를 복사·확인할 수 있게 하는 계약이다. 지도는 보조 수단이며 quest 진행·완료의 권한 또는 증거가 아니다.
+이 문서는 DigiMan이 지도 SDK·API key 없이 검수된 장소를 Google Maps 범용 URL로 열고, 실패해도 한국어 주소를 복사·확인할 수 있게 하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
 
 공식 형식 기준: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started) · 확인일: 2026-11-21
 
@@ -122,17 +122,17 @@ published version의 place snapshot은 기존 run을 위해 불변이다. 장소
 
 Maps URL을 iframe·webview에 embed하거나 server가 proxy하지 않는다.
 
-## 위치 권한 없음
+## 사용자 위치와 지도 기능의 분리
 
-DigiMan은 P0에서 geolocation API를 호출하지 않는다.
+DigiMan은 시작 화면에서 사용자가 `現在地から探す`를 직접 고른 경우에만 geolocation API를 호출한다. 이 값은 지원 지역 선택에만 쓰며 지도 URL이나 길찾기 origin으로 사용하지 않는다.
 
-- 첫 화면·지도 클릭 전에 위치 permission prompt 없음
-- current location을 query·origin으로 전송하지 않음
-- `Permissions-Policy: geolocation=()` 유지
+- 사용자의 명시적 선택과 최종 버튼 클릭 전에는 permission prompt 없음
+- 좌표와 current location을 DigiMan query·저장소·서버 요청·지도 origin으로 전송하지 않음
+- `Permissions-Policy: geolocation=(self)`로 같은 origin만 허용
 - 위치 거절·지원 없음과 관계없이 주소·지도 search link 사용 가능
 - 사용자가 Google Maps에서 별도로 허용한 위치는 외부 서비스 동작이며 DigiMan이 수집하지 않음
 
-후속 길찾기를 추가하면 origin 생략 의미, 외부 위치 처리, UI 동의와 privacy 문서를 새로 검토한다.
+후속 길찾기에 현재 위치를 연결하면 origin 생략 의미, 외부 위치 처리, UI 동의와 privacy 문서를 새로 검토한다. 현재 시작 화면의 지역 판정 허용을 지도·이동 추적으로 확대하지 않는다.
 
 ## 주소 복사
 
@@ -178,7 +178,7 @@ screen reader에는 성공을 한 번만 알리고 반복 toast를 낭독하지 
 | iPhone Safari, app 없음 | web fallback, 주소 유지 |
 | Android Chrome, app 있음 | 정확한 search action, back 복귀 |
 | Android Chrome, app 없음·기본 미지정 | chooser/web fallback |
-| 위치 권한 거절 | DigiMan 기능 변화 없음 |
+| 위치 권한 거절 | 지역 직접 선택·미정 fallback, 지도 주소 기능 유지 |
 | 일본어 OS·browser | button·외부 이동·오류 문구 자연스러움 |
 | 360px viewport | 주소 wrap·copy·map 행동 가림 없음 |
 | screen reader | ko language 전환·외부 link·copy result |
@@ -195,7 +195,8 @@ Google 결과는 locale·계정·앱 version에 따라 달라질 수 있어 한 
 - [ ] `javascript:`·custom scheme·short link 입력 거절
 - [ ] visitor·run·request ID canary가 URL에 없음
 - [ ] no-referrer·noopener·noreferrer와 CSP snapshot
-- [ ] geolocation API 호출과 permission prompt 없음
+- [ ] geolocation은 현재 위치 직접 선택 뒤에만 호출되고 거절 fallback이 동작함
+- [ ] 사용자 좌표가 URL·storage·서버 요청·지도 URL에 없음
 - [ ] map 실패 뒤 주소·step state 유지
 - [ ] published place snapshot 수정 경로 없음
 

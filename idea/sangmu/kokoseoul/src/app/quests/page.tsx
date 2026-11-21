@@ -8,6 +8,7 @@ import {
   DEMO_QUESTS,
   filterDemoQuests,
   getAreaLabel,
+  getPurposeLabel,
   parseQuestFilters,
 } from "@/modules/content/demo-quests";
 import { pickLocale } from "@/lib/locale";
@@ -37,13 +38,16 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
   return (
     <>
       <section className="rounded-[2rem] border border-slate-900/8 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-7">
-        <FilterForm filters={filters} compact />
+        <FilterForm filters={filters} />
       </section>
 
       <div className="mt-10 flex items-end justify-between gap-6">
         <div>
           <p className="text-xs font-black tracking-[0.18em] text-[#c93418]">
             {getAreaLabel(filters.area, locale).toUpperCase()}
+            {filters.purpose
+              ? ` · ${getPurposeLabel(filters.purpose, locale).toUpperCase()}`
+              : ""}
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl">
             {pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}

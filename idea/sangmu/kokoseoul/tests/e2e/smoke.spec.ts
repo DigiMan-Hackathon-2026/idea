@@ -12,7 +12,7 @@ test("renders the Japanese landing page without horizontal overflow", async ({
   expect(response?.headers()["x-frame-options"]).toBe("DENY");
   expect(response?.headers()["x-powered-by"]).toBeUndefined();
   expect(response?.headers()["permissions-policy"]).toBe(
-    "camera=(), microphone=(), geolocation=()",
+    "camera=(), microphone=(), geolocation=(self)",
   );
   await expect(page.getByRole("heading", { name: /ソウルで/ })).toBeVisible();
   await expect(page.getByText("登録なしで探せる")).toBeVisible();
@@ -59,16 +59,33 @@ test("switches to Korean and keeps the language across navigation", async ({
 test("filters the demo and opens its start notice", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByLabel("エリア").selectOption("seongsu");
-  await page.getByLabel("ものづくり").check({ force: true });
+  await page.getByText("観光・文化体験", { exact: true }).click();
   await page
-    .getByRole("button", { name: "条件に合うクエストを探す" })
+    .getByRole("button", { name: "使える時間を選ぶ" })
     .click();
+  await page.getByText("2時間以上", { exact: true }).click();
+  await page.getByRole("button", { name: "エリアを選ぶ" }).click();
+  await page.getByText("エリアを指定する", { exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "エリア", exact: true })
+    .selectOption("seongsu");
+  await page.getByRole("button", { name: "おすすめクエストを見る" }).click();
 
-  await expect(page).toHaveURL(/\/quests\?area=seongsu&tags=craft/);
+  await expect(page).toHaveURL(
+    /\/quests\?purpose=culture&time=120plus&area=seongsu/,
+  );
   await expect(
     page.getByRole("heading", { name: "あなたに合うクエスト" }),
   ).toBeVisible();
+  await expect(page.getByText("デモ体験").first()).toBeVisible();
+
+  await page.getByText("条件をもっと合わせる").click();
+  await page.getByLabel("同行人数").selectOption("solo");
+  await page.getByLabel("韓国語での会話").selectOption("low");
+  await page.getByLabel("予算").selectOption("under30000");
+  await page.getByLabel("歩きたい量").selectOption("moderate");
+  await page.getByRole("button", { name: "この条件で探し直す" }).click();
+  await expect(page).toHaveURL(/party=solo/);
   await expect(page.getByText("デモ体験").first()).toBeVisible();
 
   await page.getByRole("link", { name: "クエストの詳細を見る" }).click();
@@ -89,6 +106,28 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(page.getByRole("button", { name: "閉じる" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toBeHidden();
+});
+
+test("uses current location without putting coordinates in the URL", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["geolocation"], {
+    origin: "http://127.0.0.1:3000",
+  });
+  await context.setGeolocation({ latitude: 37.5446, longitude: 127.0557 });
+  await page.goto("/");
+
+  await page.getByText("日常の中の新しい体験", { exact: true }).click();
+  await page.getByRole("button", { name: "使える時間を選ぶ" }).click();
+  await page.getByText("まだ決めていない", { exact: true }).click();
+  await page.getByRole("button", { name: "エリアを選ぶ" }).click();
+  await page.getByText("現在地から探す", { exact: true }).click();
+  await page.getByRole("button", { name: "おすすめクエストを見る" }).click();
+
+  await expect(page).toHaveURL(/area=seongsu&areaSource=current/);
+  expect(page.url()).not.toContain("37.5446");
+  expect(page.url()).not.toContain("127.0557");
 });
 
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
@@ -113,7 +152,10 @@ test("completes the ordered demo flow and saves feedback", async ({ page }) => {
     page.getByRole("heading", { name: "クエスト完了" }),
   ).toBeVisible();
 
-  await page.getByLabel("5").check({ force: true });
+  await page
+    .getByRole("radio", { name: "5", exact: true })
+    .locator("..")
+    .click();
   await page.getByLabel("はい").check();
   await page.getByLabel("よかった点や分かりにくかった点（任意）").fill(
     "日本語カードが分かりやすい",
@@ -192,13 +234,14 @@ test("saves a clearly local-only demo information report", async ({ page }) => {
 });
 
 test("shows recoverable empty and missing quest states", async ({ page }) => {
-  await page.goto("/quests?durationMax=60");
+  await page.goto("/quests?time=30");
   await expect(
     page.getByRole("heading", {
       name: "条件を変えて、もう一度探してみましょう",
     }),
   ).toBeVisible();
-  await expect(page.getByLabel("最大時間")).toHaveValue("60");
+  await page.getByText("条件をもっと合わせる").click();
+  await expect(page.getByLabel("使える時間")).toHaveValue("30");
 
   await page.goto("/quests/not-a-real-quest");
   await expect(

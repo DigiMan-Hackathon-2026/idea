@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FilterForm } from "@/components/filter-form";
+import { QuestOnboarding } from "@/components/quest-onboarding";
 import { SiteHeader } from "@/components/site-header";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
@@ -44,7 +44,7 @@ export default async function Home() {
           </p>
 
           <div className="mt-9 rounded-[2rem] border border-slate-900/8 bg-white/85 p-5 shadow-[0_24px_80px_rgba(41,37,31,0.09)] backdrop-blur sm:p-7">
-            <FilterForm />
+            <QuestOnboarding />
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold text-slate-600">

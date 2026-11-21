@@ -29,6 +29,7 @@ export function DemoCompletion() {
       JSON.stringify({
         joyScore: form.get("joyScore"),
         wasNew: form.get("wasNew"),
+        visitExperience: form.get("visitExperience"),
         comment: form.get("comment"),
         savedAt: new Date().toISOString(),
       }),
@@ -90,6 +91,24 @@ export function DemoCompletion() {
             <label className="flex items-center gap-2"><input type="radio" name="wasNew" value="no" required /> {pickLocale(locale, "いいえ", "아니요")}</label>
           </div>
         </fieldset>
+
+        <label className="mt-6 grid gap-2 text-sm font-black text-slate-800">
+          {pickLocale(locale, "ソウル訪問経験（任意）", "서울 방문 경험(선택)")}
+          <select
+            name="visitExperience"
+            defaultValue=""
+            className="min-h-12 rounded-2xl border border-slate-900/10 bg-[#f8f6f1] px-3 text-base font-semibold"
+          >
+            <option value="">{pickLocale(locale, "選ばない", "선택 안 함")}</option>
+            <option value="first">{pickLocale(locale, "初めて", "처음")}</option>
+            <option value="repeat_2_4">{pickLocale(locale, "2〜4回目", "2~4번째")}</option>
+            <option value="repeat_5_plus">{pickLocale(locale, "5回以上", "5번째 이상")}</option>
+            <option value="resident">{pickLocale(locale, "ソウル在住", "서울 거주")}</option>
+          </select>
+          <span className="text-xs font-semibold leading-5 text-slate-500">
+            {pickLocale(locale, "今後のおすすめを改善するために使います。", "앞으로 추천을 개선하는 데 사용해요.")}
+          </span>
+        </label>
 
         <label className="mt-6 grid gap-2 text-sm font-black text-slate-800">
           {pickLocale(locale, "よかった点や分かりにくかった点（任意）", "좋았던 점이나 이해하기 어려웠던 점(선택)")}
