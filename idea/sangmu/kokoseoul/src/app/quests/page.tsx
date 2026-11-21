@@ -37,11 +37,11 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <>
-      <section className="rounded-[2rem] border border-slate-900/8 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-7">
+      <section className="border-b border-slate-900/10 pb-6 sm:pb-8">
         <FilterForm filters={filters} />
       </section>
 
-      <div className="mt-10 flex items-end justify-between gap-6">
+      <div className="mt-8 flex items-end justify-between gap-6 sm:mt-10">
         <div>
           <p className="text-xs font-black tracking-[0.18em] text-[#c93418]">
             {getAreaLabel(filters.area, locale).toUpperCase()}
@@ -49,7 +49,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
               ? ` · ${getPurposeLabel(filters.purpose, locale).toUpperCase()}`
               : ""}
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl">
+          <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] text-slate-950 sm:text-4xl">
             {pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}
           </h1>
         </div>

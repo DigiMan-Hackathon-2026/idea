@@ -358,6 +358,10 @@ test("switches between the quest list and Seoul-scoped map", async (
       .poll(async () => (await mapCanvas.boundingBox())?.height ?? 0)
       .toBeGreaterThanOrEqual(400);
     await expect(mapCanvas.locator("img").first()).toBeVisible();
+    await page.getByRole("button", { name: "リスト" }).click();
+    await expect(mapCanvas).toHaveCount(0);
+    await page.getByRole("button", { name: "地図" }).click();
+    await expect(page.getByTestId("naver-map")).toBeVisible();
   } else {
     await expect(
       page.getByText("現在地の共有は必要ありません。", { exact: false }),

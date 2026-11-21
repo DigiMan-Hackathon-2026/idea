@@ -66,12 +66,12 @@ function NaverTransitRouteActions({ quest }: { quest: DemoQuest }) {
   const platform = useNaverMapPlatform();
 
   if (platform === "checking") {
-    return <div className="mt-5 h-24 animate-pulse rounded-2xl bg-white/70" aria-hidden="true" />;
+    return <div className="mt-5 h-24 animate-pulse rounded-xl bg-slate-100" aria-hidden="true" />;
   }
 
   if (platform === "unsupported") {
     return (
-      <p className="mt-5 rounded-2xl bg-white/75 p-4 text-sm font-bold leading-6 text-slate-600">
+      <p className="mt-5 border-t border-slate-900/10 pt-4 text-sm font-bold leading-6 text-slate-600">
         {pickLocale(
           locale,
           "スマートフォンでは、現在地からの公共交通と駅からの徒歩ルートをNAVERマップで確認できます。",
@@ -117,7 +117,7 @@ function NaverTransitRouteActions({ quest }: { quest: DemoQuest }) {
             platform,
           )
         }
-        className="min-h-12 rounded-2xl bg-slate-950 px-4 text-sm font-black text-white"
+        className="min-h-12 rounded-xl bg-slate-950 px-4 text-sm font-black text-white hover:bg-slate-800"
       >
         {pickLocale(
           locale,
@@ -134,7 +134,7 @@ function NaverTransitRouteActions({ quest }: { quest: DemoQuest }) {
             platform,
           )
         }
-        className="min-h-12 rounded-2xl border border-[#00a84d]/25 bg-white px-4 text-sm font-black text-[#087735]"
+        className="min-h-12 rounded-xl border border-slate-900/15 bg-white px-4 text-sm font-black text-slate-800 hover:bg-slate-50"
       >
         {pickLocale(
           locale,
@@ -173,7 +173,7 @@ export function TransitGuideCard({
         : pickLocale(locale, "徒歩ルートはNAVERマップで確認できます", "도보 경로는 네이버 지도에서 확인할 수 있어요");
 
   return (
-    <section className="rounded-3xl bg-[#eef8f2] p-5" data-testid="transit-guide" aria-labelledby={`transit-${quest.id}`}>
+    <section className="rounded-xl border border-slate-900/10 bg-slate-50 p-4" data-testid="transit-guide" aria-labelledby={`transit-${quest.id}`}>
       <p className="text-xs font-black tracking-[0.14em] text-[#087735]">
         {pickLocale(locale, "地下鉄＋徒歩", "지하철+도보")}
       </p>
@@ -181,15 +181,15 @@ export function TransitGuideCard({
         {pickLocale(locale, "迷わないための行き方", "헤매지 않는 이동 안내")}
       </h3>
 
-      <ol className="relative mt-5 grid gap-1 before:absolute before:bottom-7 before:left-[1.15rem] before:top-7 before:w-0.5 before:bg-[#00a84d]/25">
-        <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 rounded-2xl p-2">
+      <ol className="relative mt-5 grid gap-2 before:absolute before:bottom-7 before:left-[1.15rem] before:top-7 before:w-px before:bg-slate-300">
+        <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 p-2">
           <span className="z-10 grid size-9 place-items-center rounded-full border-2 border-[#00a84d] bg-white text-sm font-black text-[#087735]" aria-hidden="true">1</span>
           <div>
             <p className="text-sm font-black text-slate-950">{pickLocale(locale, "現在地から出発", "현재 위치에서 출발")}</p>
             <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "乗車駅・乗換・所要時間はNAVERマップで確認", "승차역·환승·소요 시간은 네이버 지도에서 확인")}</p>
           </div>
         </li>
-        <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 rounded-2xl bg-white/80 p-2">
+        <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 border-y border-slate-900/8 bg-white p-2 py-3">
           <span className="z-10 grid size-9 place-items-center rounded-full text-sm font-black text-white" style={{ backgroundColor: quest.transitGuide.lineColor }} aria-hidden="true">{quest.transitGuide.lineCode}</span>
           <div>
             <p className="text-sm font-black text-slate-950">
@@ -198,7 +198,7 @@ export function TransitGuideCard({
             <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, quest.transitGuide.directionJa, quest.transitGuide.directionKo)}</p>
           </div>
         </li>
-        <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 rounded-2xl p-2">
+        <li className="relative grid grid-cols-[2.4rem_1fr] gap-3 p-2">
           <span className="z-10 grid size-9 place-items-center rounded-full bg-[#ff5a36] text-sm font-black text-white" aria-hidden="true">3</span>
           <div>
             <p className="text-sm font-black text-slate-950">

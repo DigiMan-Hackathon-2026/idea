@@ -17,6 +17,7 @@ import {
 } from "@/modules/content/demo-quests";
 
 type NaverMapInstance = {
+  destroy(): void;
   fitBounds(bounds: unknown, padding?: number): void;
   panTo(position: unknown): void;
 };
@@ -198,6 +199,7 @@ export function NaverQuestMap({
     if (!keyId || !containerRef.current || quests.length === 0) return;
 
     let cancelled = false;
+    let map: NaverMapInstance | null = null;
     let markers: NaverMarkerInstance[] = [];
     const existingScript = document.querySelector<HTMLScriptElement>(
       "script[data-digiman-naver-map]",
@@ -230,7 +232,7 @@ export function NaverQuestMap({
         new maps.LatLng(SEOUL_MAP_BOUNDS.south, SEOUL_MAP_BOUNDS.west),
         new maps.LatLng(SEOUL_MAP_BOUNDS.north, SEOUL_MAP_BOUNDS.east),
       );
-      const map = new maps.Map(containerRef.current, {
+      map = new maps.Map(containerRef.current, {
         center: new maps.LatLng(firstPoint.latitude, firstPoint.longitude),
         zoom: 15,
         minZoom: 11,
@@ -297,8 +299,9 @@ export function NaverQuestMap({
       userLocationMarkerRef.current = null;
       userLocationCircleRef.current?.setMap(null);
       userLocationCircleRef.current = null;
-      mapRef.current = null;
       markers.forEach((marker) => marker.setMap(null));
+      map?.destroy();
+      mapRef.current = null;
       script.remove();
       if (window.navermap_authFailure === fail) delete window.navermap_authFailure;
     };
@@ -385,13 +388,13 @@ export function NaverQuestMap({
 
   return (
     <section className="mt-6 grid max-w-5xl gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
-      <div className="relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-slate-900/10 bg-[#dcece7] shadow-sm">
+      <div className="relative min-h-[28rem] overflow-hidden rounded-2xl border border-slate-900/15 bg-slate-100">
         <div className="absolute inset-0">
           <div ref={containerRef} className="h-full w-full" data-testid="naver-map" />
         </div>
         {loadState !== "ready" ? (
           <div className="absolute inset-0 grid place-items-center bg-[#eef5f2]" role="status">
-            <p className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm">
+            <p className="rounded-xl border border-slate-900/10 bg-white px-4 py-3 text-sm font-black text-slate-700">
               {pickLocale(locale, "地図を読み込んでいます…", "지도를 불러오고 있어요…")}
             </p>
           </div>
@@ -402,9 +405,9 @@ export function NaverQuestMap({
               type="button"
               onClick={showCurrentLocation}
               disabled={userLocationState === "locating"}
-              className="flex min-h-12 max-w-full items-center gap-2 rounded-full border border-slate-900/10 bg-white px-4 text-sm font-black text-slate-900 shadow-lg transition hover:bg-slate-50 disabled:cursor-wait disabled:text-slate-500"
+              className="flex min-h-11 max-w-full items-center gap-2 rounded-xl border border-slate-900/15 bg-white px-3.5 text-sm font-black text-slate-900 shadow-sm transition hover:bg-slate-50 disabled:cursor-wait disabled:text-slate-500"
             >
-              <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#e8f2ff] text-[#0967d2]" aria-hidden="true">
+              <span className="grid size-6 shrink-0 place-items-center text-[#0967d2]" aria-hidden="true">
                 {userLocationState === "locating" ? "…" : "⌖"}
               </span>
               <span className="truncate">
@@ -416,7 +419,7 @@ export function NaverQuestMap({
               </span>
             </button>
             <p
-              className={`mt-2 rounded-2xl bg-white/95 px-3 py-2 text-xs font-bold leading-5 text-slate-700 shadow-md ${userLocationState === "idle" || userLocationState === "locating" ? "sr-only" : ""}`}
+              className={`mt-2 rounded-xl border border-slate-900/10 bg-white/95 px-3 py-2 text-xs font-bold leading-5 text-slate-600 ${userLocationState === "idle" || userLocationState === "locating" ? "sr-only" : ""}`}
               data-testid="user-location-status"
               role="status"
             >
@@ -433,7 +436,7 @@ export function NaverQuestMap({
       </div>
 
       {selectedQuest ? (
-        <article className="self-start rounded-[2rem] border border-slate-900/8 bg-white p-6 shadow-sm">
+        <article className="self-start rounded-2xl border border-slate-900/10 bg-white p-5">
           <p className="text-xs font-black tracking-[0.12em] text-[#c93418]">
             {getAreaLabel(selectedQuest.areaCode, locale).toUpperCase()}
           </p>
@@ -449,7 +452,7 @@ export function NaverQuestMap({
           <div className="mt-5">
             <TransitGuideCard quest={selectedQuest} routeState={routeState as TransitRouteStatus} />
           </div>
-          <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-full bg-[#ff5a36] px-5 text-sm font-black text-white">
+          <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-slate-800">
             {pickLocale(locale, "詳細を見る", "자세히 보기")}
           </Link>
         </article>
