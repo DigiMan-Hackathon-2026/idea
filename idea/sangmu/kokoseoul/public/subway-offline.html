@@ -32,6 +32,7 @@
       <p>今どの駅にいるか教えていただけますか？</p>
     </div>
     <section id="saved" class="card" hidden aria-label="保存した移動 · 저장된 이동 정보">
+      <p id="express" class="notice" hidden>9号線の急行 · <span lang="ko">9호선 급행</span></p>
       <dl>
         <dt>最後に選んだ駅 · <span lang="ko">마지막으로 고른 역</span></dt>
         <dd id="origin"></dd>
@@ -39,12 +40,18 @@
         <dd id="destination"></dd>
         <dt id="next-label">次に照合する駅 · <span lang="ko">다음에 대조할 역</span></dt>
         <dd id="next"></dd>
+        <dt id="local-change-label" hidden>各駅停車に乗り換える駅 · <span lang="ko">일반열차로 갈아탈 역</span></dt>
+        <dd id="local-change" hidden></dd>
         <dt id="transfer-to-label" hidden>乗り換え先の駅番号 · <span lang="ko">갈아탈 호선의 역번호</span></dt>
         <dd id="transfer-to" hidden></dd>
       </dl>
       <p id="transfer" class="notice" hidden>
         保存した案内では、最後に選んだ駅で乗り換えます。<br>
         <span lang="ko">저장한 안내에서는 마지막으로 고른 역에서 갈아타요.</span>
+      </p>
+      <p id="change-to-local" class="notice" hidden>
+        ここで各駅停車に乗り換えます。<br>
+        <span lang="ko">이 역에서 일반열차로 갈아타요.</span>
       </p>
       <p>保存した案内です。今いる駅と運行状況は現地で確かめてください。</p>
       <p lang="ko">저장해 둔 안내예요. 지금 있는 역과 운행 상황은 현장에서 다시 확인해 주세요.</p>

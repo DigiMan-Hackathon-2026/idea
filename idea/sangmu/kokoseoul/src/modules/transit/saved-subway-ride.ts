@@ -1,4 +1,4 @@
-import { getSubwayStation, getSubwayTrip } from "./subway-network";
+import { getSubwayStation, getSubwayTransfer, getSubwayTrip, isLineNineExpressStop, type SubwayTrain } from "./subway-network";
 
 // The static offline screen reads the same versioned browser entry.
 const storageKey = "yeogiseoul.subway-ride.v1";
@@ -9,6 +9,7 @@ export type SubwayRide = {
   destination: string;
   situation: "before" | "onboard" | "exit";
   transfer: string;
+  train: SubwayTrain;
 };
 
 export const emptySubwayRide: SubwayRide = {
@@ -16,6 +17,7 @@ export const emptySubwayRide: SubwayRide = {
   destination: "",
   situation: "before",
   transfer: "",
+  train: "local",
 };
 
 export function subscribeToSavedRide(listener: () => void) {
@@ -47,7 +49,13 @@ export function restoreSubwayRide(raw: string | null): SubwayRide | null {
     const situation = value?.situation;
     if (!getSubwayStation(origin) || !getSubwayStation(destination)) return null;
     if (situation !== "before" && situation !== "onboard" && situation !== "exit") return null;
-    return { origin, destination, situation, transfer: value.transfer === origin ? origin : "" };
+    return {
+      origin,
+      destination,
+      situation,
+      transfer: value.transfer === origin || getSubwayTransfer(origin, value.transfer) ? value.transfer : "",
+      train: value.train === "express" && isLineNineExpressStop(origin) ? "express" : "local",
+    };
   } catch {
     return null;
   }
@@ -58,14 +66,17 @@ export function saveSubwayRide(ride: SubwayRide) {
     const origin = getSubwayStation(ride.origin);
     const destination = getSubwayStation(ride.destination);
     if (origin && destination) {
-      const trip = getSubwayTrip(origin.code, destination.code);
+      const trip = getSubwayTrip(origin.code, destination.code, ride.train);
+      const change = getSubwayTransfer(origin.code, ride.transfer) ?? trip?.changeNow;
       window.localStorage.setItem(storageKey, JSON.stringify({
         origin,
         destination,
         situation: ride.situation,
         transfer: ride.transfer,
-        next: trip?.next ?? null,
-        transferTo: trip?.changeNow?.to ?? null,
+        train: ride.train,
+        next: change ? null : trip?.next ?? null,
+        transferTo: change?.to ?? null,
+        localChange: trip?.localChange ?? null,
       }));
     } else {
       window.localStorage.removeItem(storageKey);

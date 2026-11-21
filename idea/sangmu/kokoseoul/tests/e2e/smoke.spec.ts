@@ -584,6 +584,41 @@ test("finds a Line 9 station in Japanese and recalculates from a skipped stop", 
   await expect(page.getByRole("status").filter({ hasText: "908" })).toBeVisible();
 });
 
+test("keeps the Line 9 express to local transfer online and offline", async ({ page, context }) => {
+  await page.goto("/subway");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await page.getByRole("textbox", { name: "今いる駅" }).fill("902");
+  await page.getByRole("button", { name: /902 .*9号線/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("903");
+  await page.getByRole("button", { name: /903 .*9号線/ }).click();
+  await page.getByRole("button", { name: "急行", exact: true }).click();
+  const guidance = page.getByRole("status").filter({ has: page.getByRole("heading", { name: "次の駅で方向を照合" }) });
+  await expect(guidance.getByText(/905 .*で降りて、各駅停車に乗り換え/)).toBeVisible();
+
+  try {
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByText("9号線の急行 · 9호선 급행")).toBeVisible();
+    await expect(page.locator("#local-change")).toContainText("905");
+    await expect(page.locator("#next")).toContainText("905");
+  } finally {
+    await context.setOffline(false);
+  }
+
+  await page.getByRole("link", { name: /지하철 안내 다시 불러오기/ }).click();
+  await expect(page.getByRole("button", { name: "急行", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "乗車中", exact: true }).click();
+  const observed = page.getByLabel("案内で確認した次の駅");
+  await expect(observed.getByRole("option", { name: /903/ })).toHaveCount(0);
+  await observed.selectOption("905");
+  await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();
+  await expect(page.getByRole("button", { name: "各駅停車", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(/905 .*で各駅停車に乗り換えます/)).toBeVisible();
+  await expect(guidance.getByText(/^904 /)).toBeVisible();
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await expect(page.getByText(/905 마곡나루에서 일반열차로 갈아타요/)).toBeVisible();
+});
+
 test("restores P-prefixed Line 5 branch stations offline", async ({ page, context }) => {
   await page.goto("/subway");
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);

@@ -52,7 +52,7 @@ export default async function SubwayPage() {
         </p>
         <SubwayDirectionGuide readings={stationReadings} />
         <p className="mt-4 text-sm leading-6 text-slate-600">
-          {pickLocale(locale, "1〜9号線の各駅停車で、乗り換えが少ない経路を優先します。乗り換えの回数が同じなら、停車駅の少ない経路を表示します。", "1~9호선 일반열차 중 환승이 적은 경로를 우선 보여줘요. 환승 횟수가 같으면 정차역이 적은 경로를 골라요.")}
+          {pickLocale(locale, "乗り換えの少ない経路を優先し、回数が同じなら停車駅の少ない経路を表示します。電車の運行状況は駅や車内の案内で確かめてください。", "환승이 적은 경로를 우선하고, 환승 횟수가 같으면 정차역이 적은 경로를 보여줘요. 운행 상황은 역이나 열차에서 확인해 주세요.")}
         </p>
         <div className="mt-3 flex flex-wrap gap-x-5 text-sm font-bold">
           <a href="https://www.data.go.kr/data/15120713/fileData.do" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">
