@@ -536,6 +536,37 @@ test("keeps the transfer instruction when arriving from the Seongsu branch", asy
   await expect(page.getByRole("status").filter({ hasText: "210 トゥクソム" })).toBeVisible();
 });
 
+test("confirms a Line 3 transfer before showing the next stop and saves it offline", async ({ page, context }) => {
+  await page.goto("/subway");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await page.getByRole("textbox", { name: "今いる駅" }).fill("202");
+  await page.getByRole("button", { name: /202 乙支路入口/ }).click();
+  await page.getByRole("textbox", { name: "降りたい駅" }).fill("アングク");
+  await page.getByRole("button", { name: /328 安国.*3号線/ }).click();
+  await expect(page.getByText(/乗り換え駅 · 203 乙支路3街 → 3号線 330/)).toBeVisible();
+  await page.getByRole("button", { name: "乗車中", exact: true }).click();
+  await page.getByLabel("案内で確認した次の駅").selectOption("203");
+  await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();
+  await expect(page.getByRole("heading", { name: "3号線に乗り換え" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "次の駅で方向を照合" })).toHaveCount(0);
+
+  try {
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByText("330 乙支路3街 · 을지로3가 · Euljiro 3(sam)-ga")).toBeVisible();
+    await expect(page.getByText(/3호선으로 갈아타려고 해요/)).toBeVisible();
+    await expect(page.getByText(/다음에 대조할 역/)).toBeHidden();
+  } finally {
+    await context.setOffline(false);
+  }
+  await page.getByRole("link", { name: /지하철 안내 다시 불러오기/ }).click();
+  await expect(page.getByRole("heading", { name: "3号線に乗り換え" })).toBeVisible();
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await expect(page.getByRole("heading", { name: "3호선으로 갈아타요" })).toBeVisible();
+  await page.getByRole("button", { name: "갈아탈 승강장에 도착했어요" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "329 종로3가" })).toBeVisible();
+});
+
 test("restores a subway ride after reload and shows the last confirmed stop offline", async ({ page, context }) => {
   await page.goto("/subway");
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);

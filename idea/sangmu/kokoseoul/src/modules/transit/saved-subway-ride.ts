@@ -1,4 +1,4 @@
-import { getLineTwoStation, getLineTwoTrip } from "./line-two";
+import { getSubwayStation, getSubwayTrip } from "./subway-network";
 
 // The static offline screen reads the same versioned browser entry.
 const storageKey = "yeogiseoul.subway-ride.v1";
@@ -45,7 +45,7 @@ export function restoreSubwayRide(raw: string | null): SubwayRide | null {
     const origin = value?.origin?.code;
     const destination = value?.destination?.code;
     const situation = value?.situation;
-    if (!getLineTwoStation(origin) || !getLineTwoStation(destination)) return null;
+    if (!getSubwayStation(origin) || !getSubwayStation(destination)) return null;
     if (situation !== "before" && situation !== "onboard" && situation !== "exit") return null;
     return { origin, destination, situation, transfer: value.transfer === origin ? origin : "" };
   } catch {
@@ -55,16 +55,17 @@ export function restoreSubwayRide(raw: string | null): SubwayRide | null {
 
 export function saveSubwayRide(ride: SubwayRide) {
   try {
-    const origin = getLineTwoStation(ride.origin);
-    const destination = getLineTwoStation(ride.destination);
+    const origin = getSubwayStation(ride.origin);
+    const destination = getSubwayStation(ride.destination);
     if (origin && destination) {
-      const trip = getLineTwoTrip(origin.code, destination.code);
+      const trip = getSubwayTrip(origin.code, destination.code);
       window.localStorage.setItem(storageKey, JSON.stringify({
         origin,
         destination,
         situation: ride.situation,
         transfer: ride.transfer,
-        next: trip?.stops[1] ?? null,
+        next: trip?.next ?? null,
+        transferTo: trip?.changeNow?.to ?? null,
       }));
     } else {
       window.localStorage.removeItem(storageKey);
