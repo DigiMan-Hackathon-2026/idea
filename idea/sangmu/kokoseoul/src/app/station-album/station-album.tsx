@@ -42,7 +42,7 @@ function StationStamp({ line, card, locale, collected }: { line: AlbumLine; card
   return (
     <StampImage key={`${line.id}:${card.stationKey}:${locale}`} color={line.color} motif={line.motif}
       lineId={line.id} lineLabel={lineLabel(locale, line.id)} stationName={card.stationKey}
-      locale={locale} collected={collected}>
+      locale={locale} collected={collected} stationPoints={card.stationPoints}>
       {pickLocale(locale, line.ja, line.ko)}
       <CollectionStatus collected={collected} locale={locale} />
     </StampImage>
@@ -58,7 +58,7 @@ export function StationAlbum({
   collectedOnly: boolean;
 }) {
   const t = (ja: string, ko: string) => pickLocale(locale, ja, ko);
-  const { line, cards, lineIndex, totalStations } = album;
+  const { line, cards, lineIndex, totalStations, coordinateSource } = album;
   const { availability, keys } = useStampCollection();
   const isCollected = (key: string) => keys.has(key);
   const collectedCount = (stationKeys: string[]) => stationKeys.filter(isCollected).length;
@@ -78,7 +78,7 @@ export function StationAlbum({
             <strong>{t("全体の収集状況", "전체 수집 현황")}</strong>{" "}
             {ready && <span>{t(`${totalCollected} / ${totalStations}駅`, `${totalCollected} / ${totalStations}개 역`)}</span>}
           </p>
-          <p className={styles.note}>{t("訪れた駅を自分で記録します。スタンプはこのブラウザーに保存され、乗換駅は全体で1駅と数えます。", "방문한 역을 직접 기록해요. 스탬프는 이 브라우저에 저장되며, 환승역은 전체에서 한 번만 세어요.")}</p>
+          <p className={styles.note}>{t("駅の近くで現在地を確認すると、スタンプがもらえます。現在地はブラウザー内で確認し、スタンプだけを保存します。乗換駅は全体で1駅と数えます。", "역 근처에서 현재 위치를 확인하면 스탬프를 받을 수 있어요. 위치는 브라우저 안에서 확인하고 스탬프만 저장해요. 환승역은 전체에서 한 번만 세어요.")}</p>
           {availability === "loading" && <p role="status" className={styles.note}>{t("スタンプを読み込み中です。", "스탬프를 불러오는 중이에요.")}</p>}
           {availability === "unavailable" && (
             <div role="alert">
@@ -188,6 +188,7 @@ export function StationAlbum({
           </article>
         )}
       </div>
+      <a className={styles.source} href={coordinateSource}>{t("駅の位置データ：ソウル特別市", "역 위치 데이터: 서울특별시")}</a>
     </div>
   );
 }

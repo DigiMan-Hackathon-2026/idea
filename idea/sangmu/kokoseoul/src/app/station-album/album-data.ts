@@ -1,5 +1,7 @@
 import "server-only";
 import stationCards from "../../../research/desk/substamp/station-cards.draft.json";
+import stationLocations from "./station-points.json";
+import type { StationPoint } from "./stamp-proximity";
 
 const lines = [
   { id: 1, color: "#0052a4", motif: "dancheong", ko: "단청 연꽃", ja: "丹青の蓮" },
@@ -19,7 +21,10 @@ type StationName = Pick<Card, "stationKey" | "readingKoKana">;
 export type AlbumCard = Pick<Card, "stationKey" | "readingKoKana" | "hanja" | "titleJa" | "storyJa" | "storyKind" | "officialOriginKo" | "kanjiNoteJa"> & {
   related: (StationName & { lineId: number })[];
   sourceUrls: string[];
+  stationPoints: StationPoint[];
 };
+
+const pointsByKey: Readonly<Record<string, number[][] | undefined>> = stationLocations.stations;
 
 function numberedLine(name: string) {
   const match = /^0?([1-9])호선(?:\(연장\))?$/.exec(name);
@@ -50,6 +55,7 @@ export function getStationAlbum(requestedLine: unknown) {
     line,
     lineIndex,
     totalStations: cardsByKey.size,
+    coordinateSource: stationLocations.source.dataset,
     cards: cards.map((card): AlbumCard => ({
       stationKey: card.stationKey,
       readingKoKana: card.readingKoKana,
@@ -60,6 +66,11 @@ export function getStationAlbum(requestedLine: unknown) {
       officialOriginKo: card.officialOriginKo,
       kanjiNoteJa: card.kanjiNoteJa,
       sourceUrls: card.source?.urls ?? [],
+      stationPoints: (pointsByKey[card.stationKey] ?? []).flatMap(([latitude, longitude]): StationPoint[] =>
+        Number.isFinite(latitude) && Math.abs(latitude) <= 90 &&
+        Number.isFinite(longitude) && Math.abs(longitude) <= 180
+          ? [[latitude, longitude]] : [],
+      ),
       related: card.relatedStations.flatMap((key) => {
         const other = cardsByKey.get(key);
         if (!other) return [];
