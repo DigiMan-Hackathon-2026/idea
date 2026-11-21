@@ -290,10 +290,14 @@ test("switches to Korean and keeps the language across navigation", async ({
 });
 
 test("switches between the quest list and Seoul-scoped map", async (
-  { page },
+  { page, context },
   testInfo,
 ) => {
   await installWalkingRouteMock(page);
+  await context.grantPermissions(["geolocation"], {
+    origin: "http://localhost:3000",
+  });
+  await context.setGeolocation({ latitude: 37.5446, longitude: 127.0557 });
   const response = await page.goto("/quests");
 
   expect(response?.headers()["referrer-policy"]).toBe("origin");
@@ -327,6 +331,16 @@ test("switches between the quest list and Seoul-scoped map", async (
       "徒歩約4分 · 313m",
     );
     if (testInfo.project.name === "mobile-chromium") {
+      await page.getByRole("button", { name: "地図で現在地を表示" }).click();
+      await expect(page.getByTestId("current-location-marker")).toBeVisible();
+      await expect(page.getByTestId("user-location-status")).toContainText(
+        "位置情報はこの地図にだけ表示され、保存されません。",
+      );
+      await expect(
+        page.getByRole("button", { name: "現在地に戻る" }),
+      ).toBeVisible();
+      expect(page.url()).not.toContain("37.5446");
+      expect(page.url()).not.toContain("127.0557");
       await expect(
         page.getByRole("button", { name: "現在地から駅まで公共交通で行く" }),
       ).toBeVisible();
