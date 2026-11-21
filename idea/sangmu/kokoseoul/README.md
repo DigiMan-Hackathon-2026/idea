@@ -187,3 +187,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 서울책보고 첫 북토크 퀘스트는 `pnpm db:seed:bookbogo`로 로컬에 넣고 `/quests?area=jamsil&purpose=discovery`에서 시작합니다.
 
 통인시장 손맛김밥 퀘스트는 `pnpm db:seed:sonmat`으로 로컬에 넣고 `/quests?area=jongno&purpose=food`에서 시작합니다.
+
+이후 추가된 카테고리별 방문 가이드는 `pnpm db:seed:visit-guides`로 로컬에 넣습니다. `pnpm db:seed:visit-guides food`처럼 카테고리 하나만 넣을 수도 있습니다.

@@ -29,6 +29,7 @@ import ssamziegil from "@/modules/content/insadong-ssamziegil-craft-gift.json";
 import amoreFoundation from "@/modules/content/yongsan-amore-custom-foundation.json";
 import bookbogo from "@/modules/content/jamsil-seoul-bookbogo-first-book-talk.json";
 import sonmat from "@/modules/content/tongin-market-sonmat-gimbap.json";
+import { filterVisitGuides } from "@/modules/content/visit-guides";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -171,7 +172,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.durationMax === null &&
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60" &&
     (!filters.budget || filters.budget === "unlimited");
-  const featured = [
+  const featured: {
+    quest: { id: string; titleJa: string; titleKo: string; summaryJa: string; summaryKo: string };
+    href: string;
+    label: string;
+    detail: string;
+    action: string;
+  }[] = [
     ...(showHackathon ? [{
       quest: event,
       href: DIGIMAN_HACKATHON_PATH,
@@ -296,6 +303,15 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
   ];
+  for (const guide of filterVisitGuides(filters)) {
+    featured.push({
+      quest: guide,
+      href: `/quests/${guide.slug}`,
+      label: `${getAreaLabel(guide.areaCode, locale)} · ${getPurposeLabel(guide.purpose, locale)}`,
+      detail: pickLocale(locale, guide.detailJa, guide.detailKo),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    });
+  }
   const resultCount = quests.length + featured.length;
 
   return (

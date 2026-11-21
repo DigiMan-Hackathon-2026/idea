@@ -6,6 +6,7 @@ import { ReportButton } from "@/components/report-button";
 import { StartDemoButton } from "@/components/start-demo-button";
 import { SubwayFieldGuide } from "@/components/subway-field-guide";
 import { QuestTransitGuide } from "@/components/transit-guide-card";
+import { VisitGuidePage } from "@/components/visit-guide-page";
 import {
   DEMO_QUESTS,
   findDemoQuest,
@@ -16,6 +17,7 @@ import {
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import { getSeongsuStationSnapshot } from "@/modules/transit/seoul-metro.server";
+import { findVisitGuide } from "@/modules/content/visit-guides";
 
 export function generateStaticParams() {
   return DEMO_QUESTS.map((quest) => ({ questId: quest.id }));
@@ -27,7 +29,7 @@ export async function generateMetadata({
   params: Promise<{ questId: string }>;
 }): Promise<Metadata> {
   const { questId } = await params;
-  const quest = findDemoQuest(questId);
+  const quest = findVisitGuide(questId) ?? findDemoQuest(questId);
   const locale = await getRequestLocale();
   return {
     title: quest
@@ -47,6 +49,18 @@ export default async function QuestDetailPage({
   const { questId } = await params;
   const quest = findDemoQuest(questId);
   const locale = await getRequestLocale();
+  const guide = findVisitGuide(questId);
+
+  if (guide) {
+    return (
+      <VisitGuidePage
+        guide={guide}
+        locale={locale}
+        listHref={`/quests?area=${guide.areaCode}&purpose=${guide.purpose}`}
+        sourceUrl={pickLocale(locale, guide.place.guideUrlJa, guide.place.guideUrlKo)}
+      />
+    );
+  }
 
   if (!quest) notFound();
 
