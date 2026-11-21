@@ -145,7 +145,9 @@ PostgreSQL 17.12 이미지를 digest로 고정했습니다. `.env.local` 또는 
 ```bash
 docker compose up -d --wait postgres
 pnpm db:migrate
+pnpm db:seed:demo
 pnpm test:integration
 ```
 
 DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` 이름만 허용합니다. 통합 테스트 DB에는 `digiman:test` database comment marker가 있어야 합니다.
+데모 콘텐츠는 migration에 포함하지 않으며 위 명령으로 local·test DB에만 명시적으로 넣습니다. preview·production 환경이나 허용 목록 밖의 DB에서는 seed가 시작 전에 실패합니다.

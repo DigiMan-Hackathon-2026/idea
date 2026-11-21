@@ -60,10 +60,10 @@ async function createPublishedFixture(): Promise<PublishedFixture> {
   );
   await client.query(
     `insert into quest_versions
-      (id, quest_id, version_no, state, title_ja, summary_ja, body_ja,
+      (id, quest_id, version_no, state, title_ja, title_ko, summary_ja, summary_ko, body_ja, body_ko,
        area_code, tags, duration_minutes, cost_min, cost_max, solo_status,
        solo_evidence)
-     values ($1, $2, 1, 'draft', $3, $4, $5, 'seongsu', $6, 60, 1000,
+     values ($1, $2, 1, 'draft', $3, '진행 테스트 체험', $4, '진행 테스트 개요', $5, '진행 테스트 본문', 'seongsu', $6, 60, 1000,
        2000, 'confirmed', $7)`,
     [
       versionId,
@@ -77,9 +77,10 @@ async function createPublishedFixture(): Promise<PublishedFixture> {
   );
   for (const [index, stepId] of stepIds.entries()) {
     await client.query(
-      `insert into quest_steps (id, version_id, position, body_ja)
-       values ($1, $2, $3, $4)`,
-      [stepId, versionId, index + 1, `進行テスト手順 ${index + 1}`],
+      `insert into quest_steps
+        (id, version_id, position, title_ja, title_ko, body_ja, body_ko, completion_label_ja, completion_label_ko)
+       values ($1, $2, $3, $4, $5, $6, $7, '完了する', '완료하기')`,
+      [stepId, versionId, index + 1, `進行テスト手順 ${index + 1}`, `진행 테스트 단계 ${index + 1}`, `進行テスト案内 ${index + 1}`, `진행 테스트 안내 ${index + 1}`],
     );
   }
   await client.query(

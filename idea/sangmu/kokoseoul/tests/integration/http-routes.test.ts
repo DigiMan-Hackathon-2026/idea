@@ -85,17 +85,19 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
     );
     await setupClient.query(
       `insert into quest_versions
-        (id, quest_id, version_no, state, title_ja, summary_ja, body_ja,
+        (id, quest_id, version_no, state, title_ja, title_ko, summary_ja, summary_ko, body_ja, body_ko,
          area_code, tags, duration_minutes, solo_status, solo_evidence)
-       values ($1, $2, 1, 'draft', 'HTTPテスト体験', '概要', '本文',
+       values ($1, $2, 1, 'draft', 'HTTPテスト体験', 'HTTP 테스트 체험', '概要', '개요', '本文', '본문',
          'seongsu', array['craft'], 60, 'confirmed', '가상 통합 테스트 근거')`,
       [versionId, questId],
     );
     for (const [index, stepId] of stepIds.entries()) {
       await setupClient.query(
-        `insert into quest_steps (id, version_id, position, body_ja)
-         values ($1, $2, $3, $4)`,
-        [stepId, versionId, index + 1, `HTTPテスト手順 ${index + 1}`],
+        `insert into quest_steps
+          (id, version_id, position, title_ja, title_ko, body_ja, body_ko,
+           completion_label_ja, completion_label_ko)
+         values ($1, $2, $3, $4, $5, $6, $7, '完了する', '완료하기')`,
+        [stepId, versionId, index + 1, `HTTPテスト手順 ${index + 1}`, `HTTP 테스트 단계 ${index + 1}`, `HTTPテスト案内 ${index + 1}`, `HTTP 테스트 안내 ${index + 1}`],
       );
     }
     await setupClient.query(

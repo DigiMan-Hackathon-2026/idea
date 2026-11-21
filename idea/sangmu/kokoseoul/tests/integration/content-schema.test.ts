@@ -58,10 +58,10 @@ async function createContentFixture(
   );
   await client.query(
     `insert into quest_versions
-      (id, quest_id, version_no, state, title_ja, summary_ja, body_ja,
+      (id, quest_id, version_no, state, title_ja, title_ko, summary_ja, summary_ko, body_ja, body_ko,
        area_code, tags, duration_minutes, cost_min, cost_max, solo_status,
        solo_evidence)
-     values ($1, $2, $3, 'draft', $4, $5, $6, 'seongsu', $7, 60, 1000,
+     values ($1, $2, $3, 'draft', $4, '테스트 체험', $5, '테스트용 개요입니다.', $6, '테스트용 본문입니다.', 'seongsu', $7, 60, 1000,
        2000, 'confirmed', $8)`,
     [
       versionId,
@@ -81,9 +81,11 @@ async function createContentFixture(
 async function addSteps(versionId: string, count = 3) {
   for (let position = 1; position <= count; position += 1) {
     await client.query(
-      `insert into quest_steps (id, version_id, position, body_ja)
-       values ($1, $2, $3, $4)`,
-      [randomUUID(), versionId, position, `テスト手順 ${position}`],
+      `insert into quest_steps
+        (id, version_id, position, title_ja, title_ko, body_ja, body_ko,
+         completion_label_ja, completion_label_ko)
+       values ($1, $2, $3, $4, $5, $6, $7, '完了する', '완료하기')`,
+      [randomUUID(), versionId, position, `テスト手順 ${position}`, `테스트 단계 ${position}`, `テスト案内 ${position}`, `테스트 안내 ${position}`],
     );
   }
 }
@@ -189,6 +191,20 @@ describe("PostgreSQL quest content constraints", () => {
     await expectConstraint(
       () => publishVersion(fixture.versionId, fixture.adminId),
       "quest_versions_steps_complete_ck",
+    );
+  });
+
+  it("requires Korean and Japanese step content before publication", async () => {
+    const fixture = await createContentFixture();
+    await addSteps(fixture.versionId);
+    await client.query(
+      "update quest_steps set title_ko = null where version_id = $1 and position = 2",
+      [fixture.versionId],
+    );
+
+    await expectConstraint(
+      () => publishVersion(fixture.versionId, fixture.adminId),
+      "quest_versions_steps_locale_complete_ck",
     );
   });
 

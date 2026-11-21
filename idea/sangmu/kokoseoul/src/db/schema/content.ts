@@ -110,8 +110,11 @@ export const questVersions = pgTable(
     versionNo: integer("version_no").notNull(),
     state: varchar("state", { length: 16 }).notNull(),
     titleJa: varchar("title_ja", { length: 200 }),
+    titleKo: varchar("title_ko", { length: 200 }),
     summaryJa: varchar("summary_ja", { length: 500 }),
+    summaryKo: varchar("summary_ko", { length: 500 }),
     bodyJa: text("body_ja"),
+    bodyKo: text("body_ko"),
     areaCode: varchar("area_code", { length: 64 }),
     tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
     durationMinutes: integer("duration_minutes"),
@@ -143,15 +146,18 @@ export const questVersions = pgTable(
     check("quest_versions_version_no_ck", sql`${table.versionNo} >= 1`),
     check(
       "quest_versions_title_ck",
-      sql`${table.titleJa} is null or char_length(btrim(${table.titleJa})) between 1 and 200`,
+      sql`(${table.titleJa} is null or char_length(btrim(${table.titleJa})) between 1 and 200)
+        and (${table.titleKo} is null or char_length(btrim(${table.titleKo})) between 1 and 200)`,
     ),
     check(
       "quest_versions_summary_ck",
-      sql`${table.summaryJa} is null or char_length(btrim(${table.summaryJa})) between 1 and 500`,
+      sql`(${table.summaryJa} is null or char_length(btrim(${table.summaryJa})) between 1 and 500)
+        and (${table.summaryKo} is null or char_length(btrim(${table.summaryKo})) between 1 and 500)`,
     ),
     check(
       "quest_versions_body_ck",
-      sql`${table.bodyJa} is null or char_length(btrim(${table.bodyJa})) between 1 and 10000`,
+      sql`(${table.bodyJa} is null or char_length(btrim(${table.bodyJa})) between 1 and 10000)
+        and (${table.bodyKo} is null or char_length(btrim(${table.bodyKo})) between 1 and 10000)`,
     ),
     check(
       "quest_versions_area_code_ck",
@@ -201,8 +207,11 @@ export const questVersions = pgTable(
       "quest_versions_published_fields_ck",
       sql`${table.state} = 'draft' or (
         ${table.titleJa} is not null
+        and ${table.titleKo} is not null
         and ${table.summaryJa} is not null
+        and ${table.summaryKo} is not null
         and ${table.bodyJa} is not null
+        and ${table.bodyKo} is not null
         and ${table.areaCode} is not null
         and ${table.durationMinutes} is not null
         and ${table.soloStatus} is not null
@@ -224,7 +233,12 @@ export const questSteps = pgTable(
       .notNull()
       .references(() => questVersions.id, { onDelete: "restrict" }),
     position: integer("position").notNull(),
+    titleJa: varchar("title_ja", { length: 200 }),
+    titleKo: varchar("title_ko", { length: 200 }),
     bodyJa: text("body_ja").notNull(),
+    bodyKo: text("body_ko"),
+    completionLabelJa: varchar("completion_label_ja", { length: 200 }),
+    completionLabelKo: varchar("completion_label_ko", { length: 200 }),
     phraseKo: varchar("phrase_ko", { length: 500 }),
     phraseJa: varchar("phrase_ja", { length: 500 }),
     placeId: uuid("place_id").references(() => places.id, {
@@ -244,8 +258,13 @@ export const questSteps = pgTable(
       sql`${table.position} between 1 and 5`,
     ),
     check(
-      "quest_steps_body_ck",
-      sql`char_length(btrim(${table.bodyJa})) between 1 and 3000`,
+      "quest_steps_locale_content_ck",
+      sql`(${table.titleJa} is null or char_length(btrim(${table.titleJa})) between 1 and 200)
+        and (${table.titleKo} is null or char_length(btrim(${table.titleKo})) between 1 and 200)
+        and char_length(btrim(${table.bodyJa})) between 1 and 3000
+        and (${table.bodyKo} is null or char_length(btrim(${table.bodyKo})) between 1 and 3000)
+        and (${table.completionLabelJa} is null or char_length(btrim(${table.completionLabelJa})) between 1 and 200)
+        and (${table.completionLabelKo} is null or char_length(btrim(${table.completionLabelKo})) between 1 and 200)`,
     ),
     check(
       "quest_steps_phrase_pair_ck",
