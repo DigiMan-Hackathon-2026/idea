@@ -2,6 +2,7 @@ import { lineTwoServices } from "./line-two";
 import { subwayStations, type SubwayStation } from "./subway-stations";
 
 export { subwayStations, type SubwayStation };
+export type SubwayTrain = "local" | "express";
 
 const stationsByCode = new Map(subwayStations.map((station) => [station.code, station]));
 
@@ -14,11 +15,19 @@ function range(start: number, end: number, prefix = "") {
     .filter((code) => stationsByCode.has(code));
 }
 
-// General stopping patterns. The adjacent station shown belongs to a local train.
 // Shared track appears in each service that can continue without changing trains.
 const lineOneNorth = ["100-3", "100-2", "100-1", ...range(100, 141)];
 const lineOneSouth = [...range(119, 141), ...range(142, 177, "P")];
 const lineFiveWest = range(510, 548);
+// Seoul Metro Line 9 marks these stops in the operator's station guide.
+const lineNineExpress = [
+  "902", "905", "907", "910", "913", "915", "917", "920",
+  "923", "925", "927", "929", "930", "933", "936", "938",
+];
+
+export function isLineNineExpressStop(code: string) {
+  return lineNineExpress.includes(code);
+}
 
 const services = [
   ...lineTwoServices,
@@ -34,7 +43,9 @@ const services = [
   range(709, 761),
   range(804, 827),
   range(901, 938),
+  lineNineExpress,
 ];
+const expressService = services.length - 1;
 
 // Confirmed transfer stations on the Seoul Metro map. Chongshin Univ. and Isu
 // share a transfer despite the different Korean names used on the platforms.
@@ -84,9 +95,18 @@ for (const group of transferStations) {
   }
 }
 
-export function getSubwayNeighbors(code: string) {
-  const neighbors = new Set(edgesByCode.get(code)?.flatMap(({ to, service }) => service === null ? [] : [to]));
+export function getSubwayNeighbors(code: string, train: SubwayTrain = "local") {
+  const express = train === "express" && isLineNineExpressStop(code);
+  const neighbors = new Set(edgesByCode.get(code)
+    ?.filter(({ service }) => service !== null && (service === expressService) === express)
+    .map(({ to }) => to));
   return Array.from(neighbors, (neighbor) => stationsByCode.get(neighbor)!);
+}
+
+export function getSubwayTransfer(origin: string, target: string): Change | undefined {
+  if (edgesByCode.get(origin)?.some(({ to, service }) => service === null && to === target)) {
+    return { from: stationsByCode.get(origin)!, to: stationsByCode.get(target)! };
+  }
 }
 
 type Visit = {
@@ -108,20 +128,30 @@ function itinerary(arrival: Visit) {
   visits.reverse();
   const firstStep = visits[1];
   const changeNow = firstStep?.service === null ? firstStep.change : undefined;
+  const changes = visits.flatMap(({ change }) => change ? [change] : []);
+  const firstChange = changes[0];
   return {
     stops: visits.map(({ code }) => stationsByCode.get(code)!),
     rideStops: arrival.rideStops,
-    changes: visits.flatMap(({ change }) => change ? [change] : []),
+    changes,
     next: firstStep && !changeNow ? stationsByCode.get(firstStep.code) : undefined,
     changeNow,
+    localChange: firstStep?.service === expressService && firstChange && firstChange.from.code === firstChange.to.code
+      ? firstChange.from : undefined,
   };
 }
 
-// A station can belong to several services. Remember the incoming service so a
-// change between branches counts as a transfer even when the station code stays the same.
-export function getSubwayTrip(origin: string, destination: string) {
+// Express mode describes the current train. After leaving it, the route uses
+// the same local network as the default mode.
+export function getSubwayTrip(origin: string, destination: string, train: SubwayTrain = "local") {
   if (!stationsByCode.has(origin) || !stationsByCode.has(destination)) return null;
-  const queue: Visit[] = [{ code: origin, service: null, transfers: 0, rideStops: 0 }];
+  const initial: Visit = {
+    code: origin,
+    service: train === "express" && isLineNineExpressStop(origin) ? expressService : null,
+    transfers: 0,
+    rideStops: 0,
+  };
+  const queue = [initial];
   const visited = new Set<string>();
 
   while (queue.length > 0) {
@@ -133,6 +163,8 @@ export function getSubwayTrip(origin: string, destination: string) {
     if (visit.code === destination) return itinerary(visit);
 
     for (const { to, service } of edgesByCode.get(visit.code)!) {
+      if (service === expressService && visit.service !== expressService) continue;
+      if (visit === initial && initial.service === expressService && service !== expressService) continue;
       if (visited.has(`${to}:${service}`)) continue;
       const interline = service === null;
       const change = interline || (visit.service !== null && service !== visit.service)

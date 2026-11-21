@@ -74,4 +74,29 @@ describe("subway route guidance", () => {
     expect(getSubwayNeighbors("405").map(({ code }) => code)).toEqual(["406"]);
     expect(getSubwayNeighbors("938").map(({ code }) => code)).toEqual(["937"]);
   });
+
+  it("uses only the selected Line 9 stopping pattern in either direction", () => {
+    const trip = getSubwayTrip("902", "938", "express");
+    expect(trip?.stops.map(({ code }) => code)).toEqual([
+      "902", "905", "907", "910", "913", "915", "917", "920",
+      "923", "925", "927", "929", "930", "933", "936", "938",
+    ]);
+    expect(trip?.rideStops).toBe(15);
+    expect(getSubwayTrip("938", "902", "express")?.next?.code).toBe("936");
+    expect(getSubwayNeighbors("905", "express").map(({ code }) => code)).toEqual(["902", "907"]);
+    expect(getSubwayTrip("902", "938")?.next?.code).toBe("903");
+    expect(getSubwayTrip("903", "938", "express")?.next?.code).toBe("904");
+  });
+
+  it("alights at a real express stop before continuing to a local-only station", () => {
+    const trip = getSubwayTrip("902", "903", "express");
+    expect(trip?.stops.map(({ code }) => code)).toEqual(["902", "905", "904", "903"]);
+    expect(trip?.localChange?.code).toBe("905");
+    expect(getSubwayTrip("905", "903")?.next?.code).toBe("904");
+    expect(getSubwayTrip("902", "906", "express")?.localChange?.code).toBe("905");
+
+    const otherLine = getSubwayTrip("902", "527", "express");
+    expect(otherLine?.changes[0]?.to.code).toBe("526");
+    expect(otherLine?.localChange).toBeUndefined();
+  });
 });
