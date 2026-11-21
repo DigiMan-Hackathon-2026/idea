@@ -499,7 +499,7 @@ test("uses current location without putting coordinates in the URL", async ({
   expect(page.url()).not.toContain("127.0557");
 });
 
-test("shows an honest preparation state for beauty content", async ({ page }) => {
+test("finds the beauty consultation and respects a short time limit", async ({ page }) => {
   await page.goto("/");
 
   await page.getByRole("radio", { name: /^ビューティー/ }).locator("..").click();
@@ -511,12 +511,14 @@ test("shows an honest preparation state for beauty content", async ({ page }) =>
 
   await expect(page).toHaveURL(/purpose=beauty/);
   await expect(
-    page.getByRole("heading", { name: "ビューティー体験を準備しています" }),
+    page.getByRole("heading", { name: "オリーブヤングN聖水で肌のコンサルティングを受ける" }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "別の目的を選ぶ" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "訪問ガイドを見る" })).toHaveAttribute(
     "href",
-    "/",
+    "/quests/seongsu-oliveyoung-skin-consulting",
   );
+  await page.goto("/quests?purpose=beauty&time=30");
+  await expect(page.getByRole("heading", { name: "条件を変えて、もう一度探してみましょう" })).toBeVisible();
 });
 
 test("completes the ordered demo flow and saves feedback", async ({ page }) => {
