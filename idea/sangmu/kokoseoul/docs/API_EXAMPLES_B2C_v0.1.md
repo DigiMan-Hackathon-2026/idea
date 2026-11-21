@@ -173,6 +173,44 @@ Accept: application/json
 
 위 조각은 달라지는 필드만 나타낸다. 실제 응답에는 상세의 나머지 필드도 포함한다.
 
+## 앱 내 도보 경로
+
+클라이언트는 임의 좌표나 TMAP key를 보내지 않고 검수된 퀘스트 ID만 보낸다.
+
+```http
+POST /api/v1/routes/walking HTTP/1.1
+Host: example.test
+Content-Type: application/json
+Origin: https://example.test
+
+{"questId":"11111111-1111-4111-8111-111111111111"}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+X-Request-Id: 01KAMEWALKINGROUTE00000000
+```
+
+```json
+{
+  "route": {
+    "distanceMeters": 313,
+    "durationSeconds": 240,
+    "path": [
+      { "latitude": 37.54418, "longitude": 127.05632 },
+      { "latitude": 37.5435, "longitude": 127.055 },
+      { "latitude": 37.54292, "longitude": 127.05445 }
+    ]
+  },
+  "source": "TMAP",
+  "fetchedAt": "2026-11-21T09:00:00.000Z"
+}
+```
+
+서버는 provider 응답 좌표를 서울 경계 안으로 검증하고 5분만 메모리 cache한다. browser와 service worker는 경로를 저장하지 않는다. key 누락·timeout·provider 오류·비정상 좌표는 내부 상세 없이 503 `SERVICE_UNAVAILABLE`로 반환한다.
+
 ## 익명 방문자 세션
 
 세션은 시작 또는 신고 버튼을 누르고 기록 안내에 동의한 뒤 호출한다.

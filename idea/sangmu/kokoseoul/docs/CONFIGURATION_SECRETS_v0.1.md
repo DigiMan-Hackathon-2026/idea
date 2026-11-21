@@ -54,6 +54,7 @@ OAuth client ID처럼 본질적으로 browser에 보일 수 있는 값도 다른
 | `SESSION_TOKEN_PEPPERS` | key material | F3 이후 | visitor token hash lookup | versioned key ring, current·bounded previous만 |
 | `SESSION_TOKEN_ACTIVE_VERSION` | server config | F3 이후 | 신규 visitor token hash | key ring에 존재하는 bounded identifier |
 | `NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID` | public config | 탐색 지도 사용 환경 | Naver Web Dynamic Map loader | browser 노출 전제, 환경별 Client ID, Web 서비스 URL allowlist |
+| `TMAP_APP_KEY` | credential | 앱 내 도보 경로 사용 환경 | server-side TMAP 보행자 경로 client | `NEXT_PUBLIC_*` 금지, 응답·log 노출 금지, 환경별 분리 |
 | `CURSOR_SIGNING_KEYS` | key material | 목록 API 이후 | cursor 발급·검증 | versioned key ring, current·bounded previous만 |
 | `CURSOR_SIGNING_ACTIVE_VERSION` | server config | 목록 API 이후 | cursor 발급 | key ring에 존재하는 bounded identifier |
 | `AUTH_SECRET` | key material | F7 이후 | Auth.js server session | 환경별 분리, version 호환 검수 |
@@ -63,6 +64,8 @@ OAuth client ID처럼 본질적으로 browser에 보일 수 있는 값도 다른
 rate limiter IP HMAC, monitoring DSN, backup credential을 추가하면 session·Auth·cursor secret을 재사용하지 않고 inventory에 별도 purpose·rotation·consumer를 먼저 정의한다.
 
 `NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID`는 Naver SDK 요청에 포함되어 browser에서 보이는 Client ID이며 secret이 아니다. 실제 값은 저장소에 넣지 않고 환경별로 분리하며 Naver Cloud의 Web 서비스 URL에 승인한 domain만 등록한다. Client Secret은 browser 변수나 이 기능에 사용하지 않는다.
+
+`TMAP_APP_KEY`는 동일 출처 Route Handler만 읽는 credential이다. browser 요청에는 `questId`만 포함하고 key·provider 요청 본문은 반환하지 않는다. provider 오류도 public `SERVICE_UNAVAILABLE`로 정규화해 key나 upstream 상세를 노출하지 않는다.
 
 ## `.env.example`
 

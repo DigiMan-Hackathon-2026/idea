@@ -37,6 +37,7 @@ JSON·query·Unicode·UUID·body 크기와 idempotency canonical 비교는 [입�
 | --- | --- | --- | --- | --- | --- |
 | `GET /quests` | 공개, visitor 선택 | 200 목록 | cursor는 필터와 결합, 완료 quest 제외는 서버 판단 | 400 필터·cursor, 429, 503 | AC01, AC02, AC19 |
 | `GET /quests/:questId` | 공개, visitor 선택 | 200 상세 | 현재 공개본과 ownRun을 한 응답에서 판단 | 404 미공개·없음, 429, 503 | AC01, AC06~AC08, AC14, AC19 |
+| `POST /routes/walking` | 인증 없음, same-origin | 200 TMAP 경로 | 검수된 demo `questId`만 허용, 서버 5분 cache, browser 저장 없음 | 400, 403 Origin, 404, 503 | AC01, AC02 |
 | `POST /visitor-sessions` | 인증 없음 | 201 신규, 200 기존 | 기존 cookie는 같은 session, 만료 연장 없음 | 400, 403 Origin, 429, 503 | AC01, AC16 |
 | `POST /quests/:questId/runs` | visitor | 201 신규, 200 기존 | DB `(visitor_id, quest_id)` unique, 두 탭 모두 같은 run | 401, 403 Origin, 404, 409 `QUEST_UNAVAILABLE`, 503 | AC03, AC07, AC08 |
 | `GET /runs/:runId` | 소유 visitor | 200 고정 버전 run | version snapshot을 사용, 상태 추측 없음 | 401, 404, 503 | AC06~AC08, AC10 |

@@ -80,7 +80,7 @@ class DocumentationContractsTest(unittest.TestCase):
 
     def test_api_examples_and_index_have_the_same_endpoints(self) -> None:
         self.assertEqual(verifier.example_endpoints(), verifier.indexed_endpoints())
-        self.assertEqual(len(verifier.example_endpoints()), 21)
+        self.assertEqual(len(verifier.example_endpoints()), 22)
 
     def test_error_catalog_matches_expected_contract(self) -> None:
         self.assertEqual(verifier.check_error_code_coverage(), [])
