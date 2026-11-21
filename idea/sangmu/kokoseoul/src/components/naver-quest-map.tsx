@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
-import { buildNaverMapScriptUrl } from "@/lib/naver-map";
+import {
+  buildNaverMapScriptUrl,
+  SEOUL_MAP_BOUNDS,
+} from "@/lib/naver-map";
 import {
   formatWonRange,
   getAreaLabel,
@@ -18,7 +21,10 @@ type NaverMapsApi = {
   Map: new (element: HTMLElement, options: Record<string, unknown>) => NaverMapInstance;
   Marker: new (options: Record<string, unknown>) => NaverMarkerInstance;
   LatLng: new (latitude: number, longitude: number) => unknown;
-  LatLngBounds: new () => { extend(point: unknown): void };
+  LatLngBounds: new (
+    southWest?: unknown,
+    northEast?: unknown,
+  ) => { extend(point: unknown): void };
   Point: new (x: number, y: number) => unknown;
   Event: {
     addListener(target: unknown, event: string, listener: () => void): void;
@@ -80,10 +86,15 @@ export function NaverQuestMap({
 
       const { maps } = window.naver;
       const firstPoint = quests[0].mapPoint;
+      const seoulBounds = new maps.LatLngBounds(
+        new maps.LatLng(SEOUL_MAP_BOUNDS.south, SEOUL_MAP_BOUNDS.west),
+        new maps.LatLng(SEOUL_MAP_BOUNDS.north, SEOUL_MAP_BOUNDS.east),
+      );
       const map = new maps.Map(containerRef.current, {
         center: new maps.LatLng(firstPoint.latitude, firstPoint.longitude),
         zoom: 15,
         minZoom: 11,
+        maxBounds: seoulBounds,
         zoomControl: true,
         zoomControlOptions: { position: 3 },
       });
@@ -143,6 +154,9 @@ export function NaverQuestMap({
     <section className="mt-6 grid max-w-5xl gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
       <div className="relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-slate-900/10 bg-[#dcece7] shadow-sm">
         <div ref={containerRef} className="absolute inset-0" />
+        <p className="absolute left-4 top-4 z-[1] rounded-full bg-white/95 px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
+          {pickLocale(locale, "ソウル市内のみ", "서울 안에서만")}
+        </p>
         {loadState !== "ready" ? (
           <div className="absolute inset-0 grid place-items-center bg-[#eef5f2]" role="status">
             <p className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm">

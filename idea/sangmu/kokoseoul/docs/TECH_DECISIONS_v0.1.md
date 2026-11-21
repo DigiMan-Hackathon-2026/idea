@@ -98,6 +98,7 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 - 지도 인증을 위해 `/quests` 응답만 `Referrer-Policy: origin`을 사용한다. path·query·사용자 좌표는 전송하지 않는다.
 - key 누락, 인증 실패, SDK·tile network 실패 시 목록 복귀 행동을 제공한다.
 - map marker는 검수된 장소 좌표만 사용하며 시작 화면에서 얻은 사용자 현재 위치를 SDK에 넘기지 않는다.
+- 서비스 지역은 서울로 한정하고 Naver `maxBounds`와 콘텐츠 좌표 검증으로 서울 밖 후보·지도 중심 이동을 막는다.
 - 지도 SDK 응답과 tile은 service worker에 저장하지 않는다.
 
 - 검색 링크: `https://www.google.com/maps/search/?api=1&query=...`

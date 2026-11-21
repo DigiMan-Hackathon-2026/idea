@@ -7,6 +7,7 @@ import {
   parseQuestFilters,
   resolveDemoAreaFromCoordinates,
 } from "./demo-quests";
+import { isPointWithinSeoulMapBounds } from "../../lib/naver-map";
 
 describe("demo quest discovery", () => {
   it("parses supported filters and ignores unknown values", () => {
@@ -116,5 +117,16 @@ describe("demo quest discovery", () => {
     expect(resolveDemoAreaFromCoordinates(37.5446, 127.0557)).toBe("seongsu");
     expect(resolveDemoAreaFromCoordinates(37.5665, 126.978)).toBe("all");
     expect(resolveDemoAreaFromCoordinates(Number.NaN, 127)).toBe("all");
+  });
+
+  it("keeps every published demo quest inside the Seoul service area", () => {
+    expect(
+      DEMO_QUESTS.every((quest) =>
+        isPointWithinSeoulMapBounds(
+          quest.mapPoint.latitude,
+          quest.mapPoint.longitude,
+        ),
+      ),
+    ).toBe(true);
   });
 });

@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildNaverMapScriptUrl } from "./naver-map";
+import {
+  buildNaverMapScriptUrl,
+  isPointWithinSeoulMapBounds,
+} from "./naver-map";
 
 describe("buildNaverMapScriptUrl", () => {
   it("uses the current UI locale and safely encodes the public key", () => {
@@ -14,5 +17,11 @@ describe("buildNaverMapScriptUrl", () => {
   it("supports the Korean map locale", () => {
     const url = new URL(buildNaverMapScriptUrl("key", "ko"));
     expect(url.searchParams.get("language")).toBe("ko");
+  });
+
+  it("accepts Seoul content coordinates and rejects other regions", () => {
+    expect(isPointWithinSeoulMapBounds(37.5446, 127.0557)).toBe(true);
+    expect(isPointWithinSeoulMapBounds(35.1796, 129.0756)).toBe(false);
+    expect(isPointWithinSeoulMapBounds(Number.NaN, 127)).toBe(false);
   });
 });

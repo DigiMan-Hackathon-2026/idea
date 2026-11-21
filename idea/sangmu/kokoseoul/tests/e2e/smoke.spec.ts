@@ -118,7 +118,7 @@ test("switches to Korean and keeps the language across navigation", async ({
   ).toBeVisible();
 });
 
-test("switches between quest list and the recoverable map state", async ({
+test("switches between the quest list and Seoul-scoped map", async ({
   page,
 }) => {
   const response = await page.goto("/quests");
@@ -129,12 +129,30 @@ test("switches between quest list and the recoverable map state", async ({
     "true",
   );
   await page.getByRole("button", { name: "地図" }).click();
-  await expect(
-    page.getByRole("heading", { name: "地図を読み込めませんでした" }),
-  ).toBeVisible();
-  await expect(page.getByText("現在地の共有は必要ありません。", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "リストに戻る" }).click();
-  await expect(page.getByText("デモ体験").first()).toBeVisible();
+  async function currentMapState() {
+    if (await page.getByText("ソウル市内のみ").isVisible()) return "map";
+    if (
+      await page
+        .getByRole("heading", { name: "地図を読み込めませんでした" })
+        .isVisible()
+    ) {
+      return "fallback";
+    }
+    return "loading";
+  }
+  await expect.poll(currentMapState).not.toBe("loading");
+  const result = await currentMapState();
+
+  if (result === "map") {
+    await expect(page.getByText("ソウル市内のみ")).toBeVisible();
+    await expect(page.getByRole("link", { name: "詳細を見る" })).toBeVisible();
+  } else {
+    await expect(
+      page.getByText("現在地の共有は必要ありません。", { exact: false }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "リストに戻る" }).click();
+    await expect(page.getByText("デモ体験").first()).toBeVisible();
+  }
 });
 
 test("filters the demo and opens its start notice", async ({ page }) => {

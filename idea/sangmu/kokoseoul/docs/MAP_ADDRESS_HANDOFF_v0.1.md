@@ -11,6 +11,7 @@
 - `/quests`는 목록을 기본으로 렌더링하고 사용자가 지도 탭을 선택했을 때만 Naver SDK를 불러온다.
 - map locale은 현재 UI와 같은 일본어 또는 한국어로 제한한다.
 - marker에는 검수된 place 좌표만 사용하고 사용자 GPS 좌표는 사용하지 않는다.
+- 공개 후보 좌표는 서울 서비스 경계 안이어야 하며 지도 중심도 `maxBounds`로 서울 안에 제한한다.
 - key 누락·인증 실패·network 실패에는 빈 지도나 가짜 pin을 표시하지 않고 목록 복귀를 제공한다.
 - SDK script·tile·응답은 service worker와 application storage에 저장하지 않는다.
 - 지도 인증을 위한 referrer는 `/quests`의 origin까지만 허용하며 path와 query는 보내지 않는다.
