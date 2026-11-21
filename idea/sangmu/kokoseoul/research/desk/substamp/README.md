@@ -63,7 +63,7 @@
 
 | `hanjaCheck.status` | 뜻 | 수 |
 | --- | --- | ---: |
-| `wikipedia_station` | 한국어 위키백과 역 문서의 역명 한자와 일치 | 172 |
+| `wikipedia_station` | 한국어 위키백과 역 문서의 역명 한자와 일치 | 171 |
 | `wikipedia_dong` | 위키백과 동 문서의 동 이름 한자와 일치 | 30 |
 | `wikipedia_place` | 위키백과 지명 문서와 일치 | 1 |
 | `official_text` | 공식 원문에 한자가 있음 | 13 |
