@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   buildNaverMapScriptUrl,
+  buildNaverWalkRouteIntentUrl,
   buildNaverWalkRouteUrl,
+  detectNaverMapMobilePlatform,
   isPointWithinSeoulMapBounds,
 } from "./naver-map";
 
@@ -51,5 +53,37 @@ describe("buildNaverWalkRouteUrl", () => {
     expect(url.searchParams.get("sname")).toBe("성수역 3번 출구");
     expect(url.searchParams.get("dname")).toBe("성수 데모 퀘스트");
     expect(url.searchParams.get("appname")).toBe("http://localhost:3000");
+  });
+
+  it("builds the official Android intent form with a store fallback", () => {
+    const url = buildNaverWalkRouteIntentUrl({
+      start: { latitude: 37.54418, longitude: 127.05632, name: "성수역" },
+      destination: {
+        latitude: 37.54292,
+        longitude: 127.05445,
+        name: "성수 데모",
+      },
+      appName: "https://example.com",
+    });
+
+    expect(url).toMatch(/^intent:\/\/route\/walk\?/);
+    expect(url).toContain("scheme=nmap");
+    expect(url).toContain("package=com.nhn.android.nmap");
+  });
+});
+
+describe("detectNaverMapMobilePlatform", () => {
+  it("supports Android, iPhone, and touch-capable iPads", () => {
+    expect(detectNaverMapMobilePlatform("Mozilla/5.0 Android")).toBe("android");
+    expect(detectNaverMapMobilePlatform("Mozilla/5.0 iPhone")).toBe("ios");
+    expect(detectNaverMapMobilePlatform("Mozilla/5.0 Macintosh", 5)).toBe(
+      "ios",
+    );
+  });
+
+  it("does not offer an invalid app URL on desktop", () => {
+    expect(detectNaverMapMobilePlatform("Mozilla/5.0 Macintosh", 0)).toBe(
+      "unsupported",
+    );
   });
 });

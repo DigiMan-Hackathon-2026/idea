@@ -6,7 +6,9 @@ import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import {
   buildNaverMapScriptUrl,
+  buildNaverWalkRouteIntentUrl,
   buildNaverWalkRouteUrl,
+  detectNaverMapMobilePlatform,
   SEOUL_MAP_BOUNDS,
 } from "@/lib/naver-map";
 import {
@@ -40,6 +42,86 @@ declare global {
 }
 
 type LoadState = "idle" | "loading" | "ready" | "error";
+
+function NaverWalkRouteAction({ quest }: { quest: DemoQuest }) {
+  const { locale } = useLocale();
+  const [platform, setPlatform] = useState<
+    ReturnType<typeof detectNaverMapMobilePlatform> | "checking"
+  >("checking");
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setPlatform(
+        detectNaverMapMobilePlatform(
+          window.navigator.userAgent,
+          window.navigator.maxTouchPoints,
+        ),
+      );
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  if (platform === "checking") return null;
+
+  if (platform === "unsupported") {
+    return (
+      <p className="mt-4 text-xs font-bold leading-5 text-slate-500">
+        {pickLocale(
+          locale,
+          "スマートフォンで開くと、NAVERマップアプリに移動できます。",
+          "스마트폰에서 열면 네이버 지도 앱으로 이동할 수 있어요.",
+        )}
+      </p>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const params = {
+          start: {
+            ...quest.transitGuide.stationPoint,
+            name: pickLocale(
+              locale,
+              `${quest.transitGuide.stationJa} ${quest.transitGuide.exitJa}`,
+              `${quest.transitGuide.stationKo} ${quest.transitGuide.exitKo}`,
+            ),
+          },
+          destination: {
+            ...quest.mapPoint,
+            name: pickLocale(locale, quest.titleJa, quest.titleKo),
+          },
+          appName: window.location.href,
+        };
+
+        if (platform === "android") {
+          window.location.href = buildNaverWalkRouteIntentUrl(params);
+          return;
+        }
+
+        const clickedAt = Date.now();
+        window.location.href = buildNaverWalkRouteUrl(params);
+        window.setTimeout(() => {
+          if (
+            document.visibilityState === "visible" &&
+            Date.now() - clickedAt < 2_000
+          ) {
+            window.location.href =
+              "https://itunes.apple.com/app/id311867728?mt=8";
+          }
+        }, 1_500);
+      }}
+      className="mt-4 min-h-11 w-full rounded-full border border-[#00a84d]/25 bg-white px-4 text-sm font-black text-[#087735]"
+    >
+      {pickLocale(
+        locale,
+        "NAVERマップで徒歩ルートを見る",
+        "네이버 지도에서 도보 길찾기",
+      )}
+    </button>
+  );
+}
 
 export function NaverQuestMap({
   quests,
@@ -215,36 +297,9 @@ export function NaverQuestMap({
               </div>
             </div>
             <p className="mt-3 text-xs font-bold leading-5 text-slate-500">
-              {pickLocale(locale, "NAVERマップアプリが開きます。", "네이버 지도 앱이 열립니다.")}
+              {pickLocale(locale, "実際のルート検索はNAVERマップが提供します。", "실제 길찾기는 네이버 지도에서 제공합니다.")}
             </p>
-            <button
-              type="button"
-              onClick={() => {
-                const stationName = pickLocale(
-                  locale,
-                  `${selectedQuest.transitGuide.stationJa} ${selectedQuest.transitGuide.exitJa}`,
-                  `${selectedQuest.transitGuide.stationKo} ${selectedQuest.transitGuide.exitKo}`,
-                );
-                window.location.href = buildNaverWalkRouteUrl({
-                  start: {
-                    ...selectedQuest.transitGuide.stationPoint,
-                    name: stationName,
-                  },
-                  destination: {
-                    ...selectedQuest.mapPoint,
-                    name: pickLocale(
-                      locale,
-                      selectedQuest.titleJa,
-                      selectedQuest.titleKo,
-                    ),
-                  },
-                  appName: window.location.origin,
-                });
-              }}
-              className="mt-4 min-h-11 w-full rounded-full border border-[#00a84d]/25 bg-white px-4 text-sm font-black text-[#087735]"
-            >
-              {pickLocale(locale, "NAVERマップで徒歩ルートを見る", "네이버 지도에서 도보 길찾기")}
-            </button>
+            <NaverWalkRouteAction quest={selectedQuest} />
           </div>
           <Link href={`/quests/${selectedQuest.id}`} className="mt-6 flex min-h-12 items-center justify-center rounded-full bg-[#ff5a36] px-5 text-sm font-black text-white">
             {pickLocale(locale, "詳細を見る", "자세히 보기")}

@@ -30,15 +30,17 @@ export function buildNaverMapScriptUrl(keyId: string, locale: Locale): string {
   return url.toString();
 }
 
+export type NaverWalkRouteParams = {
+  start: { latitude: number; longitude: number; name: string };
+  destination: { latitude: number; longitude: number; name: string };
+  appName: string;
+};
+
 export function buildNaverWalkRouteUrl({
   start,
   destination,
   appName,
-}: {
-  start: { latitude: number; longitude: number; name: string };
-  destination: { latitude: number; longitude: number; name: string };
-  appName: string;
-}): string {
+}: NaverWalkRouteParams): string {
   const url = new URL("nmap://route/walk");
   url.searchParams.set("slat", String(start.latitude));
   url.searchParams.set("slng", String(start.longitude));
@@ -48,4 +50,23 @@ export function buildNaverWalkRouteUrl({
   url.searchParams.set("dname", destination.name);
   url.searchParams.set("appname", appName);
   return url.toString();
+}
+
+export function buildNaverWalkRouteIntentUrl(
+  params: NaverWalkRouteParams,
+): string {
+  const route = new URL(buildNaverWalkRouteUrl(params));
+  return `intent://route/walk?${route.searchParams.toString()}#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end`;
+}
+
+export type NaverMapMobilePlatform = "android" | "ios" | "unsupported";
+
+export function detectNaverMapMobilePlatform(
+  userAgent: string,
+  maxTouchPoints = 0,
+): NaverMapMobilePlatform {
+  if (/Android/i.test(userAgent)) return "android";
+  if (/iPad|iPhone|iPod/i.test(userAgent)) return "ios";
+  if (/Macintosh/i.test(userAgent) && maxTouchPoints > 1) return "ios";
+  return "unsupported";
 }

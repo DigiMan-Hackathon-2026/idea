@@ -118,9 +118,10 @@ test("switches to Korean and keeps the language across navigation", async ({
   ).toBeVisible();
 });
 
-test("switches between the quest list and Seoul-scoped map", async ({
-  page,
-}) => {
+test("switches between the quest list and Seoul-scoped map", async (
+  { page },
+  testInfo,
+) => {
   const response = await page.goto("/quests");
 
   expect(response?.headers()["referrer-policy"]).toBe("origin");
@@ -149,9 +150,17 @@ test("switches between the quest list and Seoul-scoped map", async ({
     await expect(page.getByTestId("transit-guide")).toContainText(
       "2号線 · 聖水駅 3番出口",
     );
-    await expect(
-      page.getByRole("button", { name: "NAVERマップで徒歩ルートを見る" }),
-    ).toBeVisible();
+    if (testInfo.project.name === "mobile-chromium") {
+      await expect(
+        page.getByRole("button", { name: "NAVERマップで徒歩ルートを見る" }),
+      ).toBeVisible();
+    } else {
+      await expect(
+        page.getByText(
+          "スマートフォンで開くと、NAVERマップアプリに移動できます。",
+        ),
+      ).toBeVisible();
+    }
     await expect
       .poll(async () => (await mapCanvas.boundingBox())?.height ?? 0)
       .toBeGreaterThanOrEqual(400);
