@@ -1,0 +1,126 @@
+[
+  {
+    "id": "d13eb739-ecf7-418b-8395-c2b828752043",
+    "versionId": "64cb18dc-15bb-432c-9013-59d4101e334b",
+    "slug": "dongdaemun-market-small-trim",
+    "areaCode": "jongno",
+    "purpose": "shopping",
+    "titleKo": "동대문종합시장에서 리본이나 부자재 소량 고르기",
+    "titleJa": "東大門総合市場でリボンやパーツを少量選ぶ",
+    "summaryKo": "5층에서 쓸 부자재를 고르고 최소 구매 수량을 확인해요.",
+    "summaryJa": "5階で使いたいパーツを探し、最低購入数を確認します。",
+    "bodyKo": "시장 안내에서 5층 부자재 상가를 확인해요. 일요일 휴무 안내가 있어요. 소량 판매 여부와 가격은 점포마다 물어봐요.",
+    "bodyJa": "市場の案内で5階のパーツ売り場を確認します。日曜は休みと案内されています。少量販売と値段はお店ごとに聞きましょう。",
+    "detailKo": "5층 부자재 · 소량 판매는 매장 확인",
+    "detailJa": "5階のパーツ売り場 · 少量販売は店頭で確認",
+    "durationMinutes": 45,
+    "place": {
+      "id": "f262388c-e89a-4174-bf5f-a8957e65b0f7",
+      "nameKo": "동대문종합시장",
+      "nameJa": "東大門総合市場",
+      "addressKo": "서울 종로구 종로 266",
+      "guideUrlKo": "https://dft.co.kr/bbs/board.php?bo_table=store&wr_id=13",
+      "guideUrlJa": "https://dft.co.kr/bbs/board.php?bo_table=store&wr_id=13",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "2488bb00-a840-48b4-9c96-9bd54f75f8c3",
+        "titleKo": "5층 부자재 매장 찾기",
+        "titleJa": "5階のパーツ売り場を探す",
+        "bodyKo": "종로 266에서 동대문종합시장 간판을 확인해요. 층별 안내에서 5층을 찾아요.",
+        "bodyJa": "「종로 266」の東大門総合市場を探し、フロア案内で5階を確認します。",
+        "completionLabelKo": "부자재 매장을 찾았어요",
+        "completionLabelJa": "パーツ売り場を見つけました",
+        "showsPlace": true
+      },
+      {
+        "id": "da506207-d49a-4fdf-922e-5bbf1d0f0895",
+        "titleKo": "쓸 곳과 크기 정하기",
+        "titleJa": "使い道と大きさを決める",
+        "bodyKo": "가방이나 옷처럼 붙일 곳을 떠올려요. 어울리는 색과 크기의 물건을 하나 골라요.",
+        "bodyJa": "かばんや服など、付けたい場所を思い浮かべ、合いそうな色と大きさの品を選びます。",
+        "completionLabelKo": "비교할 물건을 골랐어요",
+        "completionLabelJa": "気になる品を選びました"
+      },
+      {
+        "id": "1bb37bf9-e49d-447b-97ce-a0fd3dd38d10",
+        "titleKo": "최소 수량과 가격 묻기",
+        "titleJa": "最低購入数と値段を聞く",
+        "bodyKo": "낱개 또는 짧은 길이로 살 수 있는지 물어요. 묶음 단위만 가능하다면 필요한 양만 살 수 있는 다른 매장을 찾아요.",
+        "bodyJa": "ばら売りや短い長さで買えるか聞きます。まとめ売りだけなら、必要な量で買える別のお店を探しましょう。",
+        "completionLabelKo": "살 수 있는 수량과 가격을 확인했어요",
+        "completionLabelJa": "購入できる量と値段を確認しました",
+        "phraseKo": "조금만 사고 싶어요. 최소 몇 개부터 살 수 있고 얼마인가요?",
+        "phraseJa": "少しだけ欲しいです。何個から買えて、値段はいくらですか？"
+      }
+    ],
+    "seed": {
+      "supplierId": "15852898-52fb-45ed-9354-96d441d160c1",
+      "editorId": "8698000e-3c51-43cd-ad18-fe04ea935e03",
+      "requestId": "43318082-f8ab-401a-b299-6113a63e0dfd"
+    }
+  },
+  {
+    "id": "68305736-8999-46aa-90f0-9c10cfc2f6b4",
+    "versionId": "e0c1d1e5-c3b2-484b-9ffc-043ba4eb041d",
+    "slug": "sinseol-seoul-folk-flea-market",
+    "areaCode": "sinseol",
+    "purpose": "shopping",
+    "titleKo": "서울풍물시장에서 오래된 물건 하나 골라보기",
+    "titleJa": "ソウル風物市場で昔の品を一つ選ぶ",
+    "summaryKo": "눈에 들어온 물건의 쓰임새와 상태를 확인해요.",
+    "summaryJa": "気になった品の使い道と状態を確かめます。",
+    "bodyKo": "신설동 서울풍물시장에 가요. 물건의 가격과 상태는 가게마다 달라요. 마음에 드는 물건을 살펴보는 것만으로 마칠 수 있어요.",
+    "bodyJa": "新設洞のソウル風物市場へ。品物の値段や状態はお店によって異なります。気に入った品を見て回るだけでも完了できます。",
+    "detailKo": "신설동 · 가격과 상태는 매장 확인",
+    "detailJa": "新設洞 · 値段と状態は店頭で確認",
+    "durationMinutes": 45,
+    "place": {
+      "id": "c9ac72be-c636-4106-8dbd-d60ffa184763",
+      "nameKo": "서울풍물시장",
+      "nameJa": "ソウル風物市場",
+      "addressKo": "서울 동대문구 천호대로4길 21",
+      "guideUrlKo": "https://news.seoul.go.kr/economy/pungmul-time",
+      "guideUrlJa": "https://english.visitkorea.or.kr/svc/whereToGo/locIntrdn/rgnContentsView.do?vcontsId=75569",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "02d938a2-7de5-41af-9a59-b1fc50a06d2a",
+        "titleKo": "서울풍물시장 입구 찾기",
+        "titleJa": "ソウル風物市場の入口を探す",
+        "bodyKo": "신설동역 6번 출구에서 천호대로4길 21로 가요. 공식 안내에서 방문일 영업 여부를 확인해요.",
+        "bodyJa": "新設洞駅6番出口から「천호대로4길 21」へ。来店日の営業は公式案内で確認します。",
+        "completionLabelKo": "시장에 도착했어요",
+        "completionLabelJa": "市場に着きました",
+        "showsPlace": true
+      },
+      {
+        "id": "d1f4b958-f269-4226-98a6-ef6fde336859",
+        "titleKo": "오래된 물건 하나 고르기",
+        "titleJa": "昔の品を一つ選ぶ",
+        "bodyKo": "생활용품이나 오래된 소품 중에서 궁금한 물건 하나를 골라요. 만져봐도 되는지 먼저 물어봐요.",
+        "bodyJa": "生活用品や昔の小物から気になる品を一つ選びます。触ってよいか、先に聞きましょう。",
+        "completionLabelKo": "살펴볼 물건을 골랐어요",
+        "completionLabelJa": "見てみたい品を選びました"
+      },
+      {
+        "id": "1d5bbf88-813f-4864-bc95-ced1d6201d25",
+        "titleKo": "쓰임새와 상태 확인하기",
+        "titleJa": "使い道と状態を確かめる",
+        "bodyKo": "어디에 쓰던 물건인지 묻고 흠집이나 작동 여부를 확인해요. 구매하려면 가격과 교환 조건도 물어봐요.",
+        "bodyJa": "何に使われていたか聞き、傷や動作を確かめます。買う場合は値段と交換条件も聞きましょう。",
+        "completionLabelKo": "물건의 쓰임새와 상태를 확인했어요",
+        "completionLabelJa": "品物の使い道と状態を確認しました",
+        "phraseKo": "이건 어디에 쓰던 물건인가요? 상태를 살펴봐도 되나요?",
+        "phraseJa": "これは何に使われていたものですか？ 状態を見てもいいですか？"
+      }
+    ],
+    "seed": {
+      "supplierId": "3c43b694-3b87-4b24-8f96-7e5babcab575",
+      "editorId": "049ba6ab-581d-47f7-9bd2-36378a8a3070",
+      "requestId": "338b73f8-1f93-42cf-a7fb-45f0f6f39dda"
+    }
+  }
+]

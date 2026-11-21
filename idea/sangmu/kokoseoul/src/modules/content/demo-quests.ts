@@ -10,6 +10,7 @@ export const AREA_LABELS = {
   jongno: "鍾路",
   "city-hall": "市庁",
   jamsil: "蚕室",
+  sinseol: "新設洞",
 } as const;
 
 export const AREA_LABELS_KO: Record<keyof typeof AREA_LABELS, string> = {
@@ -22,6 +23,7 @@ export const AREA_LABELS_KO: Record<keyof typeof AREA_LABELS, string> = {
   jongno: "종로",
   "city-hall": "시청",
   jamsil: "잠실",
+  sinseol: "신설동",
 };
 
 export const TAG_LABELS = {
