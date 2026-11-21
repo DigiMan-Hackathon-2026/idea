@@ -5,6 +5,7 @@ export const AREA_LABELS = {
   seongsu: "聖水",
   sinchon: "新村",
   myeongdong: "明洞",
+  yongsan: "龍山",
 } as const;
 
 export const AREA_LABELS_KO: Record<keyof typeof AREA_LABELS, string> = {
@@ -12,6 +13,7 @@ export const AREA_LABELS_KO: Record<keyof typeof AREA_LABELS, string> = {
   seongsu: "성수",
   sinchon: "신촌",
   myeongdong: "명동",
+  yongsan: "용산",
 };
 
 export const TAG_LABELS = {

@@ -21,6 +21,7 @@
     "db:seed:demo": "node --env-file-if-exists=.env.local scripts/db/seed-demo.mjs",
     "db:seed:hackathon": "node --env-file-if-exists=.env.local scripts/db/seed-digiman-hackathon.mjs",
     "db:seed:myeongdong-kyoja": "node --env-file-if-exists=.env.local scripts/db/seed-myeongdong-kyoja.mjs",
+    "db:seed:museum-room": "node --env-file-if-exists=.env.local scripts/db/seed-museum-room-of-contemplation.mjs",
     "audit:dependencies": "pnpm audit --audit-level moderate",
     "verify:docs": "python3 scripts/verify_all.py",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:docs"

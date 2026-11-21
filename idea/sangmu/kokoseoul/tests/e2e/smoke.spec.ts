@@ -678,7 +678,7 @@ test("sends an information report once and retries with the same request ID", as
 });
 
 test("shows recoverable empty and missing quest states", async ({ page }) => {
-  await page.goto("/quests?time=30");
+  await page.goto("/quests?area=seongsu&time=30");
   await expect(
     page.getByRole("heading", {
       name: "条件を変えて、もう一度探してみましょう",

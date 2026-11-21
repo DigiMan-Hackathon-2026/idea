@@ -14,6 +14,7 @@ import {
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import myeongdongKyoja from "@/modules/content/myeongdong-kyoja.json";
+import museumRoom from "@/modules/content/museum-room-of-contemplation.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -57,6 +58,11 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.timeAvailable !== "30" &&
     (!filters.party || filters.party === "solo") &&
     (!filters.budget || filters.budget === "unlimited");
+  const showMuseumRoom =
+    (filters.area === "all" || filters.area === "yongsan") &&
+    (!filters.purpose || filters.purpose === "culture") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= museumRoom.durationMinutes);
   const featured = [
     ...(showHackathon ? [{
       quest: event,
@@ -70,6 +76,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/myeongdong-kyoja",
       label: pickLocale(locale, "明洞 · グルメ", "명동 · 식도락"),
       detail: myeongdongKyoja.place.addressKo,
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showMuseumRoom ? [{
+      quest: museumRoom,
+      href: "/quests/museum-room-of-contemplation",
+      label: pickLocale(locale, "龍山 · 文化体験", "용산 · 문화 체험"),
+      detail: pickLocale(locale, "国立中央博物館2階 · 無料", "국립중앙박물관 2층 · 무료"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
   ];

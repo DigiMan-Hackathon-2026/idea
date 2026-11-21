@@ -2,7 +2,7 @@ import pg from "pg";
 
 export async function seedLocalQuest(quest, {
   supplierId, supplierName, editorId, editorSubject, requestId,
-  areaCode, durationMinutes, tags, soloEvidence,
+  areaCode, durationMinutes, tags, soloEvidence, cost = null,
 }) {
   const environment = process.env.APP_ENV;
   if (environment !== "local" && environment !== "test") {
@@ -60,10 +60,11 @@ export async function seedLocalQuest(quest, {
       await client.query(
         `insert into quest_versions (
            id, quest_id, version_no, state, title_ja, title_ko, summary_ja,
-           summary_ko, body_ja, body_ko, area_code, duration_minutes, tags, solo_status, solo_evidence
-         ) values ($1, $2, 1, 'draft', $3, $4, $5, $6, $7, $8, $9, $10, $11, 'unknown', $12)`,
+           summary_ko, body_ja, body_ko, area_code, duration_minutes, tags, solo_status, solo_evidence,
+           cost_min, cost_max
+         ) values ($1, $2, 1, 'draft', $3, $4, $5, $6, $7, $8, $9, $10, $11, 'unknown', $12, $13, $13)`,
         [quest.versionId, quest.id, quest.titleJa, quest.titleKo, quest.summaryJa,
-          quest.summaryKo, quest.bodyJa, quest.bodyKo, areaCode, durationMinutes, tags, soloEvidence],
+          quest.summaryKo, quest.bodyJa, quest.bodyKo, areaCode, durationMinutes, tags, soloEvidence, cost],
       );
       for (const [index, step] of quest.steps.entries()) {
         const showsVenue = step.showsPlace ?? false;

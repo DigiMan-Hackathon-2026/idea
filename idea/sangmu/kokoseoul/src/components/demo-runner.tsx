@@ -101,6 +101,7 @@ export function DemoRunner({ runId }: { runId: string }) {
 
   const phrase = currentStep.phrase;
   const place = currentStep.place;
+  const guideUrl = place ? pickLocale(locale, place.guideUrlJa, place.guideUrlKo) : undefined;
   const placeMapUrl = place && !run.isDemo
     ? place.naverMapPlaceId && /^\d+$/.test(place.naverMapPlaceId)
       ? `https://map.naver.com/p/entry/place/${place.naverMapPlaceId}`
@@ -171,6 +172,11 @@ export function DemoRunner({ runId }: { runId: string }) {
                   rel="noreferrer"
                 >
                   {pickLocale(locale, "NAVERマップを開く（別タブ）", "네이버 지도 열기 (새 탭)")}
+                </a>
+              ) : null}
+              {guideUrl?.startsWith("https://") ? (
+                <a className="mt-3 mr-2 inline-flex min-h-11 items-center rounded-full border border-slate-900/10 bg-white px-4 text-sm font-black text-slate-700" href={guideUrl} target="_blank" rel="noreferrer">
+                  {pickLocale(locale, "公式ガイドを見る（別タブ）", "공식 안내 보기 (새 탭)")}
                 </a>
               ) : null}
               <button type="button" onClick={() => handleCopy(place.addressKo)} className="mt-3 min-h-11 rounded-full border border-slate-900/10 bg-white px-4 text-sm font-black text-slate-700">
