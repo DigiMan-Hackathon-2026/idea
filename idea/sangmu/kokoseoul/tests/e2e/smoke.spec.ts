@@ -102,6 +102,8 @@ test("switches to Korean and keeps the language across navigation", async ({
   ).toBeVisible();
   await expect(page.getByText("가입 없이 찾을 수 있어요")).toBeVisible();
   await expect(page.getByRole("link", { name: "여기서울 홈" })).toBeVisible();
+  const koreanManifest = await page.request.get("/manifest.webmanifest");
+  expect((await koreanManifest.json()).short_name).toBe("여기서울");
 
   await page.getByRole("link", { name: "퀘스트", exact: true }).click();
   await expect(

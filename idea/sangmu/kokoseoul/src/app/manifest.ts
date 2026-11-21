@@ -1,16 +1,28 @@
 import type { MetadataRoute } from "next";
+import { pickLocale } from "@/lib/locale";
+import { getRequestLocale } from "@/lib/locale.server";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const locale = await getRequestLocale();
+  const brandName = pickLocale(locale, "ココソウル", "여기서울");
   return {
-    name: "ココソウル — ソウルの小さな冒険ガイド",
-    short_name: "ココソウル",
-    description: "ソウルで、ひとりでも迷わず始められるローカル体験。",
+    name: pickLocale(
+      locale,
+      `${brandName} — ソウルの小さな冒険ガイド`,
+      `${brandName} — 서울의 작은 모험 가이드`,
+    ),
+    short_name: brandName,
+    description: pickLocale(
+      locale,
+      "ソウルで、ひとりでも迷わず始められるローカル体験。",
+      "서울에서 혼자서도 망설이지 않고 시작하는 로컬 체험.",
+    ),
     start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#f7f3eb",
     theme_color: "#f7f3eb",
-    lang: "ja",
+    lang: locale,
     icons: [
       {
         src: "/pwa-icon-192",

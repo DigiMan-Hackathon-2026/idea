@@ -1,8 +1,7 @@
-const SHELL_CACHE = "digiman-shell-v1";
+const SHELL_CACHE = "yeogiseoul-shell-v2";
 const OFFLINE_URL = "/offline";
 const SHELL_URLS = [
   OFFLINE_URL,
-  "/manifest.webmanifest",
   "/icon.svg",
   "/pwa-icon-192",
   "/pwa-icon-512",
@@ -19,7 +18,12 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith("digiman-shell-") && key !== SHELL_CACHE)
+            .filter(
+              (key) =>
+                (key.startsWith("digiman-shell-") ||
+                  key.startsWith("yeogiseoul-shell-")) &&
+                key !== SHELL_CACHE,
+            )
             .map((key) => caches.delete(key)),
         ),
       )
