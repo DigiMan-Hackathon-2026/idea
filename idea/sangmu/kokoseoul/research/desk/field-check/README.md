@@ -1,10 +1,10 @@
-# 퀘스트 초안 현장 확인 키트
+# 퀘스트 현장 확인 키트
 
-작성일: 2026-11-22 · 상태: 현장 확인 준비
+작성일: 2026-11-22 · 갱신: 2026-11-22(앱 데이터 기준) · 상태: 현장 확인 준비
 
-[퀘스트 데스크 초안](../quest-drafts/README.md) 31개의 미확인 항목을 사람이 직접 확인하기 위한 동선과 확인표다. 지역과 운영 요일이 맞는 초안을 하루 동선으로 묶었고, 현장에 가지 않아도 되는 항목은 문의·온라인 확인으로 따로 뺐다. 확인 결과는 [콘텐츠 검수 계약](../../../docs/CONTENT_VERIFICATION_v0.1.md)의 A등급 근거(현장 확인·담당자 답변)가 된다.
+앱에 들어간 퀘스트 17개(`src/modules/content/*.json`)와 방문 가이드 14개(`src/modules/content/visit-guides/*.json`), 아직 앱에 없는 [초안](../quest-drafts/README.md) 1개(코코리컬러)의 미확인 항목을 사람이 직접 확인하기 위한 동선과 확인표다. 지역과 운영 요일이 맞는 곳을 하루 동선으로 묶었고, 현장에 가지 않아도 되는 항목은 문의·온라인 확인으로 따로 뺐다. 확인 결과는 [콘텐츠 검수 계약](../../../docs/CONTENT_VERIFICATION_v0.1.md)의 A등급 근거(현장 확인·담당자 답변)가 된다.
 
-[앱 퀘스트 데이터 점검](app-quest-audit.md)에 앱에 들어간 퀘스트 9개를 초안 출처와 대조한 결과가 있다. 현장 확인 결과는 앱 데이터에도 반영해야 한다.
+[앱 데이터 점검](app-quest-audit.md) 1~3차에서 공식 안내로 확인한 사실은 확인표에서 뺐고, 근거를 찾지 못한 앱 문구(F120~F127)를 넣었다. 확인표의 `app` 열이 결과를 반영할 앱 데이터 파일이다.
 
 ## 먼저 할 일
 
@@ -37,10 +37,10 @@
 
 | 시간 | 초안 | 확인할 것 |
 | --- | --- | --- |
-| 10:30 | [창덕궁 일본어 해설](../quest-drafts/changdeokgung-japanese-tour.md) | 금호문 입장, 매표 위치, 해설 집합 장소 |
+| 10:30 | [창덕궁 일본어 해설](../quest-drafts/changdeokgung-japanese-tour.md) | 금호문 입장, 매표 위치, 해설 집합 장소, 해설 실제 소요 시간 |
 | 12:30 | [인사동 쌈지길 공예 선물](../quest-drafts/insadong-ssamziegil-craft-gift.md) | 공예 소품 점포, 포장·교환 |
 | 13:30 | [국립민속박물관 설 풍습](../quest-drafts/anguk-folk-museum-seollal.md) | 전시관 2 접근, 설명판 언어 |
-| 15:00 | [토속촌 삼계탕](../quest-drafts/seochon-tosokchon-samgyetang.md) 또는 [통인시장 김밥](../quest-drafts/tongin-market-sonmat-gimbap.md) | 1인 착석·대기 / 엽전·카드 결제, 포장 |
+| 15:00 | [토속촌 삼계탕](../quest-drafts/seochon-tosokchon-samgyetang.md) 또는 [통인시장 김밥](../quest-drafts/tongin-market-sonmat-gimbap.md) | 1인 착석·대기, 일본어 메뉴판 실제 표기 / 엽전·카드 결제, 포장 |
 | 16:00 | [윤동주 시인의 언덕](../quest-drafts/inwang-yun-dongju-hill-rest.md) | 버스 번호(7012/7212), 정류장, 화장실 |
 
 ### C. 광화문·동대문·낙산 · 평일
@@ -48,12 +48,12 @@
 | 시간 | 초안 | 확인할 것 |
 | --- | --- | --- |
 | 10:00 | [교보문고 광화문 책 찾기](../quest-drafts/gwanghwamun-kyobo-find-book.md) | 검색 기기 표기, 재고와 진열 차이 |
-| 11:00 | [서울역사박물관 도시모형](../quest-drafts/gwanghwamun-seoul-museum-city-model.md) | 3층 입장 동선, 영상 시간표 |
-| 12:00 | [서울도서관 첫 대출](../quest-drafts/city-hall-seoul-library-first-loan.md) | 2층 발급 창구, 외국인 서류·본인인증 |
-| 13:00 | [광장시장 순희네빈대떡](../quest-drafts/gwangjang-solo-meal.md) | 1인 착석, 1인분, 결제 방식 |
-| 14:30 | [동대문종합시장 부자재](../quest-drafts/dongdaemun-market-small-trim.md) | 층별 안내, 소량 판매, 결제 |
+| 11:00 | [서울역사박물관 도시모형](../quest-drafts/gwanghwamun-seoul-museum-city-model.md) | 3층 입장 동선, 영상 시간표, 무료 자유 관람 여부 |
+| 12:00 | [서울도서관 첫 대출](../quest-drafts/city-hall-seoul-library-first-loan.md) | 2층 발급 창구, 외국인 서류·본인인증, 세계자료실 층·운영시간 |
+| 13:00 | [광장시장 순희네빈대떡](../quest-drafts/gwangjang-solo-meal.md) | 1인 착석, 1인분, 결제 방식, 포장 |
+| 14:30 | [동대문종합시장 부자재](../quest-drafts/dongdaemun-market-small-trim.md) | 소량 판매, 가격 표기, 결제. 일요일 휴무 |
 | 15:30 | [낙산 성곽길](../quest-drafts/naksan-city-wall-walk.md) | 흥인지문에서 거꾸로 올라가도 된다. 화장실·쉼터, 조명 |
-| 별도 | [서울풍물시장](../quest-drafts/sinseol-seoul-folk-flea-market.md) | 동대문에서 가까운 신설동. 중고 소품 구역, 교환 |
+| 별도 | [서울풍물시장](../quest-drafts/sinseol-seoul-folk-flea-market.md) | 동대문에서 가까운 신설동. 중고 소품 구역, 교환. 화요일 휴장 |
 
 ### D. 용산·이촌·여의도 · 일요일
 
@@ -64,7 +64,7 @@
 | 10:00 | [국립중앙박물관 사유의 방](../quest-drafts/yongsan-museum-room-of-quiet-contemplation.md) | 2층 안내판, 일본어 자료 |
 | 11:30 | [아모레용산 파운데이션](../quest-drafts/yongsan-amore-custom-foundation.md) | 요금, 예약, 일본어 상담, 수령 |
 | 12:30 | [이촌글로벌빌리지센터](../quest-drafts/ichon-global-village-knitting.md) | 위치(한강쇼핑센터 3층), 새 공지 |
-| 13:30 | [여의도한강공원 밤섬](../quest-drafts/yeouido-hangang-bamseom-view.md) | 체험관 시간·요금, 여의나루역에서 실제 시간 |
+| 13:30 | [여의도한강공원 밤섬](../quest-drafts/yeouido-hangang-bamseom-view.md) | 강변에서 밤섬이 잘 보이는 지점, 여의나루역에서 실제 시간. 철새조망대는 12~2월, 생태체험관은 4~10월 운영 |
 | 15:00 | [이로토모 교류회](../quest-drafts/yeouido-irotomo-first-meetup.md) | 사전 신청·입금 필요. 좌석 확인, 스태프 일본어 도움 |
 
 ### E. 명동·남산·홍대 · 평일
@@ -72,7 +72,8 @@
 | 시간 | 초안 | 확인할 것 |
 | --- | --- | --- |
 | 11:00 | [명동교자 칼국수](../quest-drafts/myeongdong-kyoja-solo-kalguksu.md) | 대기 등록, 주문·결제 순서, 지도에서 본점 식별 |
-| 12:30 | [이가자 명동 헤드스파](../quest-drafts/myeongdong-leekaja-head-spa.md) | 포함 항목·추가 요금, 현장 언어. 예약 필요 |
+| 12:30 | [이가자 명동 헤드스파](../quest-drafts/myeongdong-leekaja-head-spa.md) | 현장 메뉴·가격이 공식 사이트와 같은지, 포함 항목·추가 요금, 현장 일본어 응대. 예약 필요 |
+| 13:30 | 무드컬렉트 명동 퍼스널컬러(초안 없음) | 1인 50분·통역 포함 20만 원, 퇴계로 125 3층·명동역 8번 출구. 예약 필요 |
 | 14:30 | [남산 성곽길](../quest-drafts/namsan-city-wall-walk.md) | 장충체육관~국립극장 실제 시간, 시간 제한 구간 출입구 |
 | 17:00 | [코코리컬러 홍대 퍼스널컬러](../quest-drafts/hongdae-cocory-mini-personal-color.md) | 예약 언어, 해외 결제·취소, 결과 안내 형식. 예약 필요 |
 
@@ -84,22 +85,27 @@
 | --- | --- |
 | [이촌 손뜨개 교실](../quest-drafts/ichon-global-village-knitting.md) | 잔여석, 초보자 참여, 두 날짜 참석 여부. 마감 11-23 17:00 |
 | [이촌 생활 한국어 멘토링](../quest-drafts/ichon-korean-speaking-mentoring.md) | 다음 모집 공지 |
-| [서울책보고 북토크](../quest-drafts/jamsil-seoul-bookbogo-first-book-talk.md) | 접수 중인 회차, 언어·비용·취소 |
+| [서울책보고 북토크](../quest-drafts/jamsil-seoul-bookbogo-first-book-talk.md) | 접수 중인 회차, 언어·비용·취소. 방문하면 잠실나루역 1번 출구 동선 |
 | [디지망 해커톤](../quest-drafts/sinchon-digiman-hackathon.md) | 11-29 본선 당일 참가 안내와 현장을 대조 |
+
+## 확인표에서 뺀 항목
+
+- F073 동대문종합시장 부자재 층별 안내: [동대문관광특구 상가 안내](https://dft.co.kr/bbs/board.php?bo_table=store&wr_id=13)의 층별 품목으로 확인했다(3차 점검).
 
 ## 기록 방법
 
 - 항목마다 [확인표](field-check-items.csv)에 확인한 값, 확인 방법(현장 관찰·직원 답변·안내판·공식 문의), 확인일, 확인자 코드를 적는다.
 - 직원 답변은 공개 가능한 요약만 남긴다. 담당자 이름·개인 연락처와 대화 원문은 Git에 올리지 않는다.
 - 안내판·메뉴판 사진은 팀이 직접 찍은 것만 쓰고, 사람 얼굴이 나오지 않게 찍는다. 사진 파일은 저장소에 올리지 않고 사용 권리를 확보한 것만 초안의 asset으로 등록한다.
-- 확인한 값이 초안과 다르면 초안을 고치고, 확인할 수 없으면 `미확인`으로 둔다. 혼자 이용이 확인되지 않으면 `confirmed`로 바꾸지 않는다.
+- 확인한 값이 초안과 다르면 초안을 고치고, 확인할 수 없으면 `미확인`으로 둔다. 앱 데이터(`app` 열)와 다르면 앱 담당에게 해당 파일과 항목 id를 알린다. 혼자 이용이 확인되지 않으면 `confirmed`로 바꾸지 않는다.
 - 한·일 요청 문구는 실제 상황에서 통했는지, 더 자연스러운 표현이 있었는지 함께 적는다.
 
 ## 확인표 열
 
 | 열 | 적을 것 |
 | --- | --- |
-| `id`, `route`, `draft`, `place`, `check_item` | 미리 채워 둔 항목. `route`는 위 동선(A~E, 문의, 공통) |
+| `id`, `route`, `draft`, `place`, `check_item` | 미리 채워 둔 항목. `route`는 위 동선(A~E, 문의, 공통). `draft`가 `-`이면 초안이 없다 |
+| `app` | 결과를 반영할 앱 데이터 파일(`src/modules/content/` 기준). 앱에 없으면 `(앱 없음)` |
 | `value` | 확인한 값. 확인하지 못했으면 `미확인`과 이유 |
 | `method` | 현장 관찰, 직원 답변, 안내판, 공식 문의 중 하나 |
 | `checked_at`, `checker_code` | 확인일(YYYY-MM-DD)과 확인자 코드. 이름은 쓰지 않는다 |
@@ -129,4 +135,5 @@
 | 이가자 명동 | 헤드스파 포함 항목(건조·스타일링), 추가 요금, 일본어 상담 |
 | 아모레용산 | 커스텀 매치 메뉴별 요금, 예약 방법, 일본어 상담, 당일 수령 |
 | 서울숲공원 | 현재 운영 기관, 곤충식물원·방문자센터 시간과 휴관일, 사슴 먹이 주기 규칙, 입장료 |
-| 여의도한강공원 안내센터 | 밤섬생태체험관 관람 시간·휴관일·요금, 일본어 안내 |
+| 여의도한강공원 안내센터 | 밤섬생태체험관·철새조망대 관람 시간과 요금, 일본어 안내 |
+| 무드컬렉트 | 1인 예약과 소요 시간, 일본어 통역 포함 가격, 매장 층·가까운 출구 |
