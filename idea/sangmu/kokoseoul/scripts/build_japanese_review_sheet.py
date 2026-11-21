@@ -23,8 +23,11 @@ OUT = ROOT / "research" / "desk" / "japanese-review" / "japanese-review-sheet.cs
 CONTENT = ROOT / "src" / "modules" / "content"
 DRAFTS = ROOT / "research" / "desk" / "quest-drafts"
 CARDS = ROOT / "research" / "desk" / "substamp" / "station-cards.draft.json"
+VISIT_GUIDES = CONTENT / "visit-guides"
 
 # Drafts whose quest already ships in the app; review the app text instead.
+# Drafts named like an app quest file or visit-guide slug are skipped automatically,
+# so list only drafts whose app file has a different name.
 DRAFTS_IN_APP = {
     "changdeokgung-japanese-tour.md",
     "city-hall-seoul-library-first-loan.md",
@@ -46,6 +49,7 @@ CONTEXT = {
     "summaryJa": "퀘스트 요약(목록·상세)",
     "bodyJa": "퀘스트 상세 본문",
     "scheduleJa": "일정 표시",
+    "detailJa": "목록 카드 보조 문구",
     "place.nameJa": "장소 이름",
     "titleJa@step": "단계 제목",
     "bodyJa@step": "단계 안내",
@@ -60,27 +64,49 @@ FIELDS = [
 
 KANA = re.compile(r"[぀-ゟ゠-ヿ]")
 HANGUL = re.compile(r"[가-힣]")
+# A Korean sentence followed by its Japanese translation on the same line.
+MIXED_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[^\s가-힣]*[぀-ゟ゠-ヿ一-鿿])")
 
 
 def rel(path: Path) -> str:
     return str(path.relative_to(ROOT))
 
 
+def app_quests() -> list[tuple[Path, str, dict]]:
+    """App quest JSON files plus visit guides (lists of quests), with locator prefixes."""
+    quests = []
+    for path in sorted(CONTENT.glob("*.json")):
+        quests.append((path, "", json.loads(path.read_text(encoding="utf-8"))))
+    for path in sorted(VISIT_GUIDES.glob("*.json")) if VISIT_GUIDES.is_dir() else []:
+        for index, data in enumerate(json.loads(path.read_text(encoding="utf-8"))):
+            quests.append((path, f"[{index}:{data.get('slug', index)}].", data))
+    return quests
+
+
+def drafts_in_app() -> set[str]:
+    names = set(DRAFTS_IN_APP)
+    for path, prefix, data in app_quests():
+        if not prefix:
+            names.add(f"{path.stem}.md")
+        if data.get("slug"):
+            names.add(f"{data['slug']}.md")
+    return names
+
+
 def app_content_rows() -> list[dict[str, str]]:
     rows = []
-    for path in sorted(CONTENT.glob("*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        for key in ("titleJa", "summaryJa", "bodyJa", "scheduleJa"):
+    for path, prefix, data in app_quests():
+        for key in ("titleJa", "summaryJa", "bodyJa", "detailJa", "scheduleJa"):
             if isinstance(data.get(key), str):
-                rows.append(row(1, "앱 퀘스트", path, key, CONTEXT[key], data.get(key[:-2] + "Ko", ""), data[key]))
+                rows.append(row(1, "앱 퀘스트", path, prefix + key, CONTEXT[key], data.get(key[:-2] + "Ko", ""), data[key]))
         place = data.get("place") or {}
         if isinstance(place.get("nameJa"), str):
-            rows.append(row(1, "앱 퀘스트", path, "place.nameJa", CONTEXT["place.nameJa"], place.get("nameKo", ""), place["nameJa"]))
+            rows.append(row(1, "앱 퀘스트", path, prefix + "place.nameJa", CONTEXT["place.nameJa"], place.get("nameKo", ""), place["nameJa"]))
         for index, step in enumerate(data.get("steps") or []):
             for key in ("titleJa", "bodyJa", "completionLabelJa", "phraseJa"):
                 if isinstance(step.get(key), str):
                     rows.append(row(
-                        1, "앱 퀘스트", path, f"steps[{index}].{key}", CONTEXT[key + "@step"],
+                        1, "앱 퀘스트", path, f"{prefix}steps[{index}].{key}", CONTEXT[key + "@step"],
                         step.get(key[:-2] + "Ko", ""), step[key],
                     ))
     return rows
@@ -170,8 +196,9 @@ def label_rows() -> list[dict[str, str]]:
 
 def draft_rows() -> list[dict[str, str]]:
     rows = []
+    in_app = drafts_in_app()
     for path in sorted(DRAFTS.glob("*.md")):
-        if path.name in DRAFTS_IN_APP or path.name == "README.md":
+        if path.name in in_app or path.name == "README.md":
             continue
         lines = path.read_text(encoding="utf-8").splitlines()
         previous_ko = ""
@@ -190,9 +217,13 @@ def draft_rows() -> list[dict[str, str]]:
                 previous_ko = stripped[2:]
                 continue
             if len(KANA.findall(stripped)) >= 3 and not stripped.startswith(("|", "[")):
-                rows.append(row(3, "퀘스트 초안", path, f"line {number}", "단계 안내", previous_ko, stripped))
+                mixed = MIXED_SPLIT.search(stripped) if HANGUL.search(stripped[:20]) else None
+                if mixed:
+                    rows.append(row(3, "퀘스트 초안", path, f"line {number}", "단계 안내", stripped[:mixed.start()], stripped[mixed.end():]))
+                else:
+                    rows.append(row(3, "퀘스트 초안", path, f"line {number}", "단계 안내", previous_ko, stripped))
                 continue
-            if HANGUL.search(stripped) and not stripped.startswith(("|", "#", "-")):
+            if HANGUL.search(stripped) and not stripped.startswith(("|", "#", "-", "[")):
                 previous_ko = stripped
     return rows
 
