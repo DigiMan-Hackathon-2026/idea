@@ -19,6 +19,10 @@
 7. 선택한 문제·지역과 연결된 퀘스트만 `quest-candidates/TEMPLATE.md`로 구체화하고 [콘텐츠 검수 계약](../docs/CONTENT_VERIFICATION_v0.1.md)에 따라 출처·일본어·asset 권리를 기록한다.
 8. 타깃·지역·퀘스트 결정이 바뀌면 D04~D06과 B2C 스펙의 변경 기록도 갱신한다.
 
+## 데스크 리서치
+
+[역 스탬프·역명 유래 카드 샘플](desk/substamp/README.md)은 공공데이터와 웹 검색으로 만든 참고 자료다. 인터뷰·현장 근거가 아니므로 evidence ID로 세지 않는다.
+
 ## 저장 가능 여부
 
 | 자료 | Git 저장 |
