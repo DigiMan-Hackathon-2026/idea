@@ -301,7 +301,7 @@ test("switches between the quest list and Seoul-scoped map", async (
   const response = await page.goto("/quests");
 
   expect(response?.headers()["referrer-policy"]).toBe("origin");
-  const mapButton = page.getByRole("button", { name: "地図" });
+  const mapButton = page.getByRole("button", { name: "地図", exact: true });
   if ((await mapButton.getAttribute("aria-pressed")) !== "true") {
     await mapButton.click();
   }
@@ -423,11 +423,16 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "今いる場所から3番出口まで案内します" }),
   ).toBeVisible();
+  await expect(
+    page.getByText("リアルタイムのエレベーター・快速降車情報は接続準備中です。"),
+  ).toBeVisible();
   await page.getByRole("button", { name: "3Fのホームで降りた" }).click();
   await expect(page.getByRole("img", { name: "3Fの概念図" })).toBeVisible();
   await expect(page.getByText("Way out · 出口")).toBeVisible();
   await page.getByRole("button", { name: "2F 改札・コンコース" }).click();
   await expect(page.getByRole("img", { name: "2Fの概念図" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "2Fの概念図" })).toContainText("建大入口方面");
+  await expect(page.getByRole("img", { name: "2Fの概念図" })).toContainText("2・3番出口");
   await page.getByRole("button", { name: "違うホームにいる" }).click();
   await expect(
     page.getByText("다른 승강장으로 온 것 같아요. 3번 출구로 가려면 어디로 가야 하나요?"),

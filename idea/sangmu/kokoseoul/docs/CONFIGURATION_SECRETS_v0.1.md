@@ -55,6 +55,7 @@ OAuth client ID처럼 본질적으로 browser에 보일 수 있는 값도 다른
 | `SESSION_TOKEN_ACTIVE_VERSION` | server config | F3 이후 | 신규 visitor token hash | key ring에 존재하는 bounded identifier |
 | `NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID` | public config | 탐색 지도 사용 환경 | Naver Web Dynamic Map loader | browser 노출 전제, 환경별 Client ID, Web 서비스 URL allowlist |
 | `TMAP_APP_KEY` | credential | 앱 내 도보 경로 사용 환경 | server-side TMAP 보행자 경로 client | `NEXT_PUBLIC_*` 금지, 응답·log 노출 금지, 환경별 분리 |
+| `SEOUL_METRO_PUBLIC_DATA_SERVICE_KEY` | credential | 역내 이동 지원 환경 | server-side 서울교통공사 승강기·빠른 하차 client | 공공데이터포털 디코딩 키, browser·log 노출 금지, 누락·장애 시 현장 확인 안내 |
 | `CURSOR_SIGNING_KEYS` | key material | 목록 API 이후 | cursor 발급·검증 | versioned key ring, current·bounded previous만 |
 | `CURSOR_SIGNING_ACTIVE_VERSION` | server config | 목록 API 이후 | cursor 발급 | key ring에 존재하는 bounded identifier |
 | `AUTH_SECRET` | key material | F7 이후 | Auth.js server session | 환경별 분리, version 호환 검수 |

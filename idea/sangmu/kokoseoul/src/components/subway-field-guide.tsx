@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale, type Locale } from "@/lib/locale";
 import type { DemoQuest } from "@/modules/content/demo-quests";
+import type { SeoulMetroStationSnapshot } from "@/modules/transit/seoul-metro";
 
 type FloorId = "3f" | "2f" | "1f";
 type LocationId = "platform" | "inside_gate" | "outside_gate" | "exit_3";
@@ -54,8 +55,8 @@ const LOCATIONS: LocationGuide[] = [
     label: { ja: "2F・改札の内側", ko: "2F 개찰구 안쪽이에요" },
     title: { ja: "「3番出口」の表示がある改札を確認します", ko: "‘3번 출구’ 표시가 있는 개찰구를 확인해요" },
     action: {
-      ja: "3番出口の表示が見つかるまで改札を出ないでください。分からない場合は駅員にこの画面を見せます。",
-      ko: "3번 출구 표시를 찾기 전에는 개찰구를 나가지 마세요. 모르겠다면 역무원에게 이 화면을 보여 주세요.",
+      ja: "改札を出る前に「2・3番出口／建大入口方面」の表示を探してください。見つからない場合は駅員にこの画面を見せます。",
+      ko: "개찰구를 나가기 전에 ‘2·3번 출구·건대입구 방면’ 표시를 찾아요. 보이지 않으면 역무원에게 이 화면을 보여 주세요.",
     },
     phrase: {
       ja: "3番出口へ行くには、どの改札を通ればいいですか？",
@@ -66,10 +67,10 @@ const LOCATIONS: LocationGuide[] = [
     id: "outside_gate",
     floor: "2f",
     label: { ja: "2F・改札を出た", ko: "2F 개찰구 밖으로 나왔어요" },
-    title: { ja: "黄色い出口番号から「3」を探します", ko: "출구 번호에서 ‘3’을 찾아요" },
+    title: { ja: "「2・3番出口」方面へ進み、「3」を選びます", ko: "‘2·3번 출구’ 방면으로 간 뒤 ‘3’을 골라요" },
     action: {
-      ja: "3番以外の階段へ進まず、案内板の番号が3であることを確認してから1Fへ下ります。",
-      ko: "3번이 아닌 계단으로 가지 말고, 표지판 번호가 3인지 확인한 뒤 1F로 내려가세요.",
+      ja: "公式案内図では2・3番出口が建大入口側です。最後の分岐で番号が3であることを確認して1Fへ下ります。",
+      ko: "공식 안내도에서 2·3번 출구는 건대입구 쪽이에요. 마지막 갈림길에서 번호가 3인지 확인하고 1F로 내려가세요.",
     },
     phrase: { ja: "3番出口はどちらですか？", ko: "3번 출구는 어느 쪽인가요?" },
   },
@@ -129,6 +130,79 @@ function localize(locale: Locale, copy: LocalizedCopy) {
   return pickLocale(locale, copy.ja, copy.ko);
 }
 
+const PROVIDER_LABELS: Record<string, LocalizedCopy> = {
+  외선: { ja: "外回り", ko: "외선" },
+  내선: { ja: "内回り", ko: "내선" },
+  상행: { ja: "上り", ko: "상행" },
+  하행: { ja: "下り", ko: "하행" },
+  건대입구: { ja: "建大入口方面", ko: "건대입구 방면" },
+  뚝섬: { ja: "トゥクソム方面", ko: "뚝섬 방면" },
+  용답: { ja: "龍踏方面", ko: "용답 방면" },
+  계단: { ja: "階段", ko: "계단" },
+  엘리베이터: { ja: "エレベーター", ko: "엘리베이터" },
+  에스컬레이터: { ja: "エスカレーター", ko: "에스컬레이터" },
+};
+
+function providerLabel(locale: Locale, value: string | null) {
+  if (!value) return pickLocale(locale, "方向未表示", "방향 정보 없음");
+  const match = Object.entries(PROVIDER_LABELS).find(([source]) => value.includes(source));
+  return match
+    ? localize(locale, match[1])
+    : pickLocale(locale, "公式情報を確認", "공식 정보 확인");
+}
+
+function StationDataPanel({ snapshot, locale }: { snapshot: SeoulMetroStationSnapshot; locale: Locale }) {
+  const hasAttentionStatus = snapshot.elevators.some(({ operatingStatus }) =>
+    operatingStatus ? /점검|고장|중지|불가/.test(operatingStatus) : false,
+  );
+  const checkedAt = snapshot.checkedAt
+    ? new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Asia/Seoul",
+      }).format(new Date(snapshot.checkedAt))
+    : null;
+
+  if (snapshot.status === "not_configured") {
+    return <p className="mt-5 rounded-2xl bg-[#fff7e8] p-4 text-sm font-bold leading-6 text-slate-700">{pickLocale(locale, "リアルタイムのエレベーター・快速降車情報は接続準備中です。駅構内の表示と駅員の案内を優先してください。", "실시간 엘리베이터·빠른 하차 정보는 연결 준비 중이에요. 역 안 표지와 역무원 안내를 우선해 주세요.")}</p>;
+  }
+
+  if (snapshot.status === "unavailable") {
+    return <p className="mt-5 rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold leading-6 text-[#852a19]">{pickLocale(locale, "ソウル交通公社の情報を取得できませんでした。車両・設備を推測せず、現地表示を確認してください。", "서울교통공사 정보를 불러오지 못했어요. 차량·설비를 추측하지 말고 현장 표지를 확인해 주세요.")}</p>;
+  }
+
+  return (
+    <div className="mt-5 border-y border-slate-200 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-black text-slate-950">{pickLocale(locale, "ソウル交通公社の公式情報", "서울교통공사 공식 정보")}</p>
+        <p className="text-xs font-bold text-slate-500">{checkedAt ? `${checkedAt} KST` : null}</p>
+      </div>
+      <p className={`mt-2 text-sm font-bold ${hasAttentionStatus ? "text-[#a33b25]" : "text-[#087735]"}`}>
+        {snapshot.elevatorAvailable
+          ? hasAttentionStatus
+            ? pickLocale(locale, "エレベーターに確認が必要な状態があります", "엘리베이터 중 확인이 필요한 상태가 있어요")
+            : pickLocale(locale, `エレベーター情報 ${snapshot.elevators.length}件を確認`, `엘리베이터 정보 ${snapshot.elevators.length}건 확인`)
+          : pickLocale(locale, "エレベーター情報は取得できませんでした", "엘리베이터 정보는 불러오지 못했어요")}
+      </p>
+      {snapshot.quickExitAvailable && snapshot.quickExits.length > 0 ? (
+        <ul className="mt-3 grid gap-2">
+          {snapshot.quickExits.slice(0, 4).map((item, index) => (
+            <li key={`${item.direction}-${item.carDoorNumber}-${index}`} className="grid grid-cols-[1fr_auto] gap-3 rounded-xl bg-slate-50 px-3 py-3 text-sm">
+              <span className="font-bold text-slate-700">{providerLabel(locale, item.direction)} · {providerLabel(locale, item.nextStation)} · {providerLabel(locale, item.facility)}</span>
+              <span className="font-black text-slate-950">{item.carDoorNumber ? pickLocale(locale, `${item.carDoorNumber}ドア`, `${item.carDoorNumber} 문`) : "—"}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-sm font-bold text-slate-500">{pickLocale(locale, "快速降車の車両情報は現地で確認してください。", "빠른 하차 차량 정보는 현장에서 확인해 주세요.")}</p>
+      )}
+      <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{pickLocale(locale, "ドア番号は聖水駅で降りる際の参考情報です。乗車方向と運行状況は別途確認してください。", "문 번호는 성수역에서 내릴 때의 참고 정보예요. 탑승 방향과 운행 상황은 따로 확인해 주세요.")}</p>
+    </div>
+  );
+}
+
 function FloorMap({ floor, location, locale }: { floor: FloorId; location: LocationId; locale: Locale }) {
   const markerFloor = location === "platform" ? "3f" : location === "exit_3" ? "1f" : "2f";
   const markerX = floor === "3f" ? 70 : floor === "2f" ? (location === "inside_gate" ? 132 : 228) : 74;
@@ -146,8 +220,8 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
           <rect x="18" y="166" width="324" height="36" rx="10" fill="#dbe4ea" />
           <line x1="18" y1="116" x2="342" y2="116" stroke="#334155" strokeWidth="6" />
           <line x1="18" y1="146" x2="342" y2="146" stroke="#334155" strokeWidth="6" />
-          <text x="28" y="83" fill="#334155" fontSize="13" fontWeight="800">{pickLocale(locale, "ホーム", "승강장")}</text>
-          <text x="28" y="189" fill="#334155" fontSize="13" fontWeight="800">{pickLocale(locale, "ホーム", "승강장")}</text>
+          <text x="28" y="82" fill="#334155" fontSize="11" fontWeight="800">{pickLocale(locale, "トゥクソム・龍踏方面", "뚝섬·용답 방면")}</text>
+          <text x="28" y="188" fill="#334155" fontSize="11" fontWeight="800">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
           <path d="M70 84 H256" fill="none" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" strokeDasharray="12 9" />
           <rect x="256" y="50" width="86" height="68" rx="14" fill="#ffffff" stroke="#00a84d" strokeWidth="3" />
           <text x="299" y="78" textAnchor="middle" fill="#087735" fontSize="12" fontWeight="900">Way out</text>
@@ -157,17 +231,22 @@ function FloorMap({ floor, location, locale }: { floor: FloorId; location: Locat
 
       {floor === "2f" ? (
         <>
-          <rect x="18" y="64" width="96" height="136" rx="20" fill="#e2e8f0" />
-          <text x="66" y="119" textAnchor="middle" fill="#334155" fontSize="12" fontWeight="900">{pickLocale(locale, "ホーム連絡", "승강장 연결")}</text>
-          <text x="66" y="141" textAnchor="middle" fill="#64748b" fontSize="12" fontWeight="700">3F</text>
-          <path d="M114 132 H144" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" />
-          {[0, 1, 2, 3].map((index) => <rect key={index} x={144 + index * 11} y="98" width="6" height="68" rx="3" fill="#334155" />)}
-          <text x="164" y="86" textAnchor="middle" fill="#334155" fontSize="12" fontWeight="800">{pickLocale(locale, "改札", "개찰구")}</text>
-          <path d="M188 132 H262" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" strokeDasharray="12 9" />
-          <rect x="262" y="79" width="80" height="106" rx="18" fill="#ffffff" stroke="#ffb020" strokeWidth="3" />
-          <text x="302" y="112" textAnchor="middle" fill="#111827" fontSize="12" fontWeight="900">{pickLocale(locale, "出口", "나가는 곳")}</text>
-          <text x="302" y="143" textAnchor="middle" fill="#111827" fontSize="26" fontWeight="950">3</text>
-          <text x="302" y="167" textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="800">Exit 3</text>
+          <rect x="18" y="62" width="74" height="140" rx="18" fill="#e2e8f0" />
+          <text x="55" y="118" textAnchor="middle" fill="#334155" fontSize="11" fontWeight="900">{pickLocale(locale, "3Fから", "3F에서")}</text>
+          <text x="55" y="139" textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="700">Way out</text>
+          <path d="M92 132 H126" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" />
+          {[0, 1, 2, 3].map((index) => <rect key={index} x={126 + index * 11} y="98" width="6" height="68" rx="3" fill="#334155" />)}
+          <text x="146" y="86" textAnchor="middle" fill="#334155" fontSize="12" fontWeight="800">{pickLocale(locale, "改札", "개찰구")}</text>
+          <path d="M170 132 H208" stroke="#00a84d" strokeWidth="9" strokeLinecap="round" strokeDasharray="12 9" />
+          <rect x="208" y="52" width="134" height="160" rx="18" fill="#ffffff" stroke="#ffb020" strokeWidth="3" />
+          <text x="275" y="78" textAnchor="middle" fill="#64748b" fontSize="10" fontWeight="800">{pickLocale(locale, "建大入口方面", "건대입구 방면")}</text>
+          <text x="275" y="105" textAnchor="middle" fill="#111827" fontSize="12" fontWeight="900">{pickLocale(locale, "2・3番出口", "2·3번 출구")}</text>
+          <line x1="226" y1="124" x2="324" y2="124" stroke="#e2e8f0" strokeWidth="2" />
+          <circle cx="248" cy="160" r="21" fill="#f8d469" />
+          <text x="248" y="168" textAnchor="middle" fill="#111827" fontSize="22" fontWeight="950">2</text>
+          <circle cx="302" cy="160" r="25" fill="#ffb020" stroke="#00a84d" strokeWidth="4" />
+          <text x="302" y="169" textAnchor="middle" fill="#111827" fontSize="25" fontWeight="950">3</text>
+          <text x="275" y="200" textAnchor="middle" fill="#64748b" fontSize="10" fontWeight="800">Exit 2 · Exit 3</text>
         </>
       ) : null}
 
@@ -215,7 +294,7 @@ function SignCard({ floor, locale }: { floor: FloorId; locale: Locale }) {
   );
 }
 
-export function SubwayFieldGuide({ quest }: { quest: DemoQuest }) {
+export function SubwayFieldGuide({ quest, stationSnapshot }: { quest: DemoQuest; stationSnapshot: SeoulMetroStationSnapshot }) {
   const { locale } = useLocale();
   const [locationId, setLocationId] = useState<LocationId | null>(null);
   const [floor, setFloor] = useState<FloorId>("3f");
@@ -241,8 +320,10 @@ export function SubwayFieldGuide({ quest }: { quest: DemoQuest }) {
       <p className="text-sm font-black text-[#ff5a36]">{pickLocale(locale, "駅構内サポート · デモ", "역 안 이동 지원 · 데모")}</p>
       <h2 id={`field-guide-${quest.id}`} className="mt-2 text-2xl font-black tracking-tight text-slate-950">{pickLocale(locale, "今いる場所から3番出口まで案内します", "지금 있는 곳에서 3번 출구까지 안내할게요")}</h2>
       <p className="mt-3 text-base font-semibold leading-7 text-slate-600">
-        {pickLocale(locale, "現在地を選ぶと、階ごとの概念図と次に探す表示が変わります。駅工事で動線が変わる場合は現地表示を優先してください。", "현재 위치를 고르면 층별 개념도와 다음에 찾을 표지가 바뀌어요. 역 공사로 동선이 달라졌다면 현장 표지를 우선해 주세요.")}
+        {pickLocale(locale, "現在地を選ぶと、公式案内図から単純化した階・出口方向と次に探す表示が変わります。駅工事で動線が変わる場合は現地表示を優先してください。", "현재 위치를 고르면 공식 안내도에서 단순화한 층·출구 방향과 다음에 찾을 표지가 바뀌어요. 역 공사로 동선이 달라졌다면 현장 표지를 우선해 주세요.")}
       </p>
+
+      <StationDataPanel snapshot={stationSnapshot} locale={locale} />
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "現在地を選択", "현재 위치 선택")}>
         {LOCATIONS.map((item) => {
@@ -302,7 +383,7 @@ export function SubwayFieldGuide({ quest }: { quest: DemoQuest }) {
           </div>
 
           <p className="mt-4 text-sm font-bold leading-6 text-slate-500">
-            {pickLocale(locale, `検証基準日 2026-11-22 · ${quest.transitGuide.stationJa}の3Fホーム、2Fコンコース、1F出口の階層関係だけを示します。正確な通路形状ではありません。`, `검증 기준일 2026-11-22 · ${quest.transitGuide.stationKo}의 3F 승강장, 2F 대합실, 1F 출구 층 관계만 보여 줘요. 정확한 통로 모양은 아니에요.`)}
+            {pickLocale(locale, `公式駅利用案内図の公開日 2026-08-24・画像内基準 2024-04-16・閲覧日 2026-11-22。${quest.transitGuide.stationJa}の階と出口方向を単純化したもので、正確な通路形状ではありません。`, `공식 역이용안내도 게시일 2026-08-24·이미지 내부 기준 2024-04-16·열람일 2026-11-22. ${quest.transitGuide.stationKo}의 층과 출구 방향을 단순화한 것으로 정확한 통로 모양은 아니에요.`)}
           </p>
         </div>
       ) : (

@@ -15,6 +15,7 @@ import {
 } from "@/modules/content/demo-quests";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
+import { getSeongsuStationSnapshot } from "@/modules/transit/seoul-metro.server";
 
 export function generateStaticParams() {
   return DEMO_QUESTS.map((quest) => ({ questId: quest.id }));
@@ -48,6 +49,8 @@ export default async function QuestDetailPage({
   const locale = await getRequestLocale();
 
   if (!quest) notFound();
+
+  const stationSnapshot = await getSeongsuStationSnapshot();
 
   const verifiedDate = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
     year: "numeric",
@@ -96,7 +99,7 @@ export default async function QuestDetailPage({
                 <QuestTransitGuide quest={quest} />
               </div>
               <div className="mt-8 max-w-2xl">
-                <SubwayFieldGuide quest={quest} />
+                <SubwayFieldGuide quest={quest} stationSnapshot={stationSnapshot} />
               </div>
             </div>
 
