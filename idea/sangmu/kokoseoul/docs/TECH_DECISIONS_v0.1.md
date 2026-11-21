@@ -16,7 +16,7 @@
 | 배포 후보 | Vercel | Next.js 서버 렌더링과 서버 함수를 별도 서버 운영 없이 배포 |
 | 운영자 인증 | Auth.js + Google OIDC + DB 세션 | 임시 비밀번호 없이 OIDC subject 허용 목록과 서버 폐기 가능한 세션 사용 |
 | 방문자 인증 | 자체 익명 opaque 세션 쿠키 | 가입 없는 30일 브라우저 기록과 토큰 해시 저장 계약 유지 |
-| 지도 | Google Maps 범용 URL + 한국어 주소 복사 | 앱·브라우저 공통 URL이며 API 키 없이 연결 가능; 실패 시 주소로 진행 |
+| 지도 | 탐색은 Naver Web Dynamic Map, 외부 이동은 Google Maps URL + 한국어 주소 | 서울 탐색은 일본어 지도와 앱 안의 맥락을 유지하고, 실제 이동은 키 없이 외부 앱·브라우저로 연결 |
 | 테스트 | Vitest + 실제 PostgreSQL 통합 테스트 + Playwright | 도메인 트랜잭션과 모바일 브라우저 흐름을 서로 다른 층에서 검증 |
 | 패키지 관리 | pnpm + lockfile | 팀 환경에서 의존성 결과 고정; 실제 착수 시 Corepack으로 버전 고정 |
 
@@ -90,7 +90,15 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 
 ## 지도 연결
 
-첫 구현은 지도 SDK나 위치 권한을 사용하지 않는다.
+탐색 결과에는 Naver Maps JavaScript API v3를 선택적으로 지연 로드하고, 상세·진행 화면의 외부 이동은 Google Maps 범용 URL과 한국어 주소 복사를 유지한다. 두 기능은 서로의 성공에 의존하지 않는다.
+
+- 탐색 기본값은 목록이며 사용자가 `地図`를 눌렀을 때만 SDK를 로드한다.
+- UI locale에 따라 `language=ja` 또는 `language=ko`를 전달한다.
+- Client ID는 browser에 보이는 public config이며 Naver Cloud의 Web 서비스 URL allowlist로 제한한다.
+- 지도 인증을 위해 `/quests` 응답만 `Referrer-Policy: origin`을 사용한다. path·query·사용자 좌표는 전송하지 않는다.
+- key 누락, 인증 실패, SDK·tile network 실패 시 목록 복귀 행동을 제공한다.
+- map marker는 검수된 장소 좌표만 사용하며 시작 화면에서 얻은 사용자 현재 위치를 SDK에 넘기지 않는다.
+- 지도 SDK 응답과 tile은 service worker에 저장하지 않는다.
 
 - 검색 링크: `https://www.google.com/maps/search/?api=1&query=...`
 - 길찾기 링크: `https://www.google.com/maps/dir/?api=1&destination=...`
@@ -98,9 +106,11 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 - 같은 화면에 한국어 주소 복사 버튼을 둔다.
 - `api=1` 누락, 인코딩 오류, 다른 장소 선택을 자동 검수 대상으로 둔다.
 - 일본어 iOS Safari와 Android Chrome에서 링크·주소 복사를 실제 확인한다.
-- 서울 내 경로 품질이 부족하면 Naver Map 링크를 보조 선택지로 추가하되, 진행의 필수 조건으로 만들지 않는다.
+- 서울 내 경로 품질이 부족하면 Naver Map 외부 링크를 보조 선택지로 추가하되, 진행의 필수 조건으로 만들지 않는다.
 
 Google Maps URL은 앱 설치 여부와 관계없이 공통 형식으로 앱 또는 브라우저를 열 수 있고 API 키가 필요 없다. 참고: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started)
+
+Naver Web Dynamic Map은 `ncpKeyId`로 로드하며 Web 서비스 URL 등록이 필요하다. 참고: [Naver Maps JavaScript API v3 시작하기](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [Naver Cloud Maps Application](https://guide.ncloud-docs.com/docs/maps-app)
 
 ## 테스트와 검수 배치
 

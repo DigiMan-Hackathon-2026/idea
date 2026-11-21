@@ -112,6 +112,25 @@ test("switches to Korean and keeps the language across navigation", async ({
   ).toBeVisible();
 });
 
+test("switches between quest list and the recoverable map state", async ({
+  page,
+}) => {
+  const response = await page.goto("/quests");
+
+  expect(response?.headers()["referrer-policy"]).toBe("origin");
+  await expect(page.getByRole("button", { name: "リスト" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "地図" }).click();
+  await expect(
+    page.getByRole("heading", { name: "地図を読み込めませんでした" }),
+  ).toBeVisible();
+  await expect(page.getByText("現在地の共有は必要ありません。", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "リストに戻る" }).click();
+  await expect(page.getByText("デモ体験").first()).toBeVisible();
+});
+
 test("filters the demo and opens its start notice", async ({ page }) => {
   await page.goto("/");
 

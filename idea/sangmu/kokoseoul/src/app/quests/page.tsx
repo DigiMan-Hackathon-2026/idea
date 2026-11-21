@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { FilterForm } from "@/components/filter-form";
-import { QuestCard } from "@/components/quest-card";
+import { QuestResultsView } from "@/components/quest-results-view";
 import { SiteHeader } from "@/components/site-header";
 import {
   DEMO_QUESTS,
@@ -59,11 +59,11 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       </div>
 
       {quests.length > 0 ? (
-        <div className="mt-8 grid max-w-2xl gap-6">
-          {quests.map((quest) => (
-            <QuestCard key={quest.id} quest={quest} filters={filters} />
-          ))}
-        </div>
+        <QuestResultsView
+          quests={quests}
+          filters={filters}
+          naverMapKeyId={process.env.NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID?.trim() || null}
+        />
       ) : (
         <section className="mt-8 max-w-2xl rounded-[2rem] border border-dashed border-slate-900/20 bg-white/65 px-6 py-16 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0eb] text-2xl" aria-hidden="true">↺</span>

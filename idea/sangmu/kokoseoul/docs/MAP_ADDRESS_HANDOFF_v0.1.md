@@ -2,9 +2,19 @@
 
 작성일: 2026-11-21 · 상태: 실제 장소·기기 검수 전 기준
 
-이 문서는 DigiMan이 지도 SDK·API key 없이 검수된 장소를 Google Maps 범용 URL로 열고, 실패해도 한국어 주소를 복사·확인할 수 있게 하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
+이 문서는 DigiMan이 탐색 화면에서는 Naver Web Dynamic Map으로 후보 위치를 비교하고, 상세·진행 화면에서는 검수된 장소를 Google Maps 범용 URL로 열며, 어느 연결이 실패해도 목록과 한국어 주소로 복구하는 계약이다. 시작 화면의 선택적 현재 위치 판정과 지도 기능은 분리하며, 지도는 보조 수단이고 quest 진행·완료의 권한 또는 증거가 아니다.
 
-공식 형식 기준: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started) · 확인일: 2026-11-21
+공식 형식 기준: [Google Maps URLs](https://developers.google.com/maps/documentation/urls/get-started), [Naver Maps JavaScript API v3](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html) · 확인일: 2026-11-21
+
+## 탐색 지도
+
+- `/quests`는 목록을 기본으로 렌더링하고 사용자가 지도 탭을 선택했을 때만 Naver SDK를 불러온다.
+- map locale은 현재 UI와 같은 일본어 또는 한국어로 제한한다.
+- marker에는 검수된 place 좌표만 사용하고 사용자 GPS 좌표는 사용하지 않는다.
+- key 누락·인증 실패·network 실패에는 빈 지도나 가짜 pin을 표시하지 않고 목록 복귀를 제공한다.
+- SDK script·tile·응답은 service worker와 application storage에 저장하지 않는다.
+- 지도 인증을 위한 referrer는 `/quests`의 origin까지만 허용하며 path와 query는 보내지 않는다.
+- 외부 지도 이동과 한국어 주소 fallback은 탐색 지도 상태와 독립적이다.
 
 ## P0 선택
 
@@ -115,7 +125,7 @@ published version의 place snapshot은 기존 run을 위해 불변이다. 장소
 
 - user gesture에서 anchor를 연다.
 - 새 tab/window이면 `rel="noopener noreferrer"`를 사용한다.
-- `Referrer-Policy: no-referrer`로 현재 run path가 전달되지 않게 한다.
+- 외부 링크는 `rel="noreferrer"`로 현재 run path가 전달되지 않게 한다. 탐색 route의 Naver SDK 인증에는 `Referrer-Policy: origin`만 허용한다.
 - Google origin을 CSP `connect-src`, `script-src`, `frame-src`에 추가하지 않는다.
 - 외부 서비스로 이동함을 accessible name 또는 인접 문맥에서 알린다.
 - browser back으로 돌아왔을 때 run state와 focus가 예측 가능해야 한다.

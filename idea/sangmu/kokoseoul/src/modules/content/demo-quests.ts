@@ -130,6 +130,7 @@ export type DemoQuest = {
   walkingLevel: WalkingChoice;
   durationMinutes: number;
   cost: { min: number; max: number; currency: "KRW" };
+  mapPoint: { latitude: number; longitude: number };
   solo: {
     status: "confirmed";
     labelJa: string;
@@ -163,6 +164,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     walkingLevel: "moderate",
     durationMinutes: 90,
     cost: { min: 12000, max: 18000, currency: "KRW" },
+    mapPoint: { latitude: 37.5446, longitude: 127.0557 },
     solo: {
       status: "confirmed",
       labelJa: "一人で利用できることを確認済み",

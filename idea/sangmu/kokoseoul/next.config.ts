@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
       {
+        source: "/quests/:path*",
+        headers: [{ key: "Referrer-Policy", value: "origin" }],
+      },
+      {
         source: "/sw.js",
         headers: [
           {

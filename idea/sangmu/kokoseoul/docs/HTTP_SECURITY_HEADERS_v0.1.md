@@ -111,6 +111,10 @@ style nonce가 framework와 호환되지 않으면 정확한 style hash·외부 
 
 지도는 anchor로 외부 앱·browser를 여는 방식이며 `connect-src`, `script-src`, `frame-src`에 Google Maps를 추가할 이유가 없다. 새 창이면 `rel="noopener noreferrer"`를 사용하고 같은 화면에 한국어 주소 fallback을 둔다.
 
+### Naver Web Dynamic Map
+
+`/quests`에서 사용자가 지도 보기를 선택한 경우에만 `https://oapi.map.naver.com` SDK를 로드한다. 실제 CSP를 도입할 때 network trace와 Naver 공식 host 목록을 근거로 script·image·connect source를 좁게 추가하며 wildcard `https:`를 허용하지 않는다. SDK·tile은 service worker cache 대상이 아니다.
+
 ### Google OIDC
 
 Auth.js의 redirect·callback이 요구하는 domain과 method를 실제 network trace·공식 설정에서 확인한다.
@@ -153,7 +157,7 @@ fullscreen, clipboard-write 등 추가 directive는 browser 지원과 기능을 
 
 ## Referrer Policy
 
-P0는 `no-referrer`를 사용해 외부 지도·OIDC 이동에 현재 path·query가 전달되지 않게 한다. analytics나 provider 편의를 위해 `unsafe-url`로 낮추지 않는다.
+기본 route는 `no-referrer`를 사용해 외부 지도·OIDC 이동에 현재 path·query가 전달되지 않게 한다. Naver Web Dynamic Map의 등록 도메인 인증이 필요한 `/quests`만 `origin`을 사용한다. 이 예외는 scheme·host·port까지만 전달하며 path·query·현재 위치 좌표는 전달하지 않는다. analytics 편의를 위해 `unsafe-url`로 낮추지 않는다.
 
 OIDC가 referrer를 필요로 한다고 가정하지 않고 state·redirect URI 계약을 사용한다. provider 호환 문제가 있으면 auth route만 정확한 대안을 검토하고 개인정보 영향을 기록한다.
 
