@@ -70,7 +70,7 @@ test("installs the PWA shell and shows a bilingual offline fallback", async ({
     const registration = await navigator.serviceWorker.ready;
     return registration.scope;
   });
-  expect(scope).toBe("http://127.0.0.1:3000/");
+  expect(scope).toBe("http://localhost:3000/");
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
 
   await context.setOffline(true);
@@ -128,8 +128,9 @@ test("switches between the quest list and Seoul-scoped map", async ({
   if ((await mapButton.getAttribute("aria-pressed")) !== "true") {
     await mapButton.click();
   }
+  const mapCanvas = page.getByTestId("naver-map");
   async function currentMapState() {
-    if (await page.getByText("ソウル市内のみ").isVisible()) return "map";
+    if (await mapCanvas.locator("img").first().isVisible()) return "map";
     if (
       await page
         .getByRole("heading", { name: "地図を読み込めませんでした" })
@@ -141,11 +142,10 @@ test("switches between the quest list and Seoul-scoped map", async ({
   }
   await expect.poll(currentMapState).not.toBe("loading");
   const result = await currentMapState();
+  await expect(page.getByText("ソウル市内のみ")).toHaveCount(0);
 
   if (result === "map") {
-    await expect(page.getByText("ソウル市内のみ")).toBeVisible();
     await expect(page.getByRole("link", { name: "詳細を見る" })).toBeVisible();
-    const mapCanvas = page.getByTestId("naver-map");
     await expect
       .poll(async () => (await mapCanvas.boundingBox())?.height ?? 0)
       .toBeGreaterThanOrEqual(400);
@@ -180,6 +180,11 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "あなたに合うクエスト" }),
   ).toBeVisible();
+  const listButton = page.getByRole("button", { name: "リスト" });
+  if ((await listButton.getAttribute("aria-pressed")) !== "true") {
+    await listButton.click();
+  }
+  await expect(listButton).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByText("デモ体験").first()).toBeVisible();
 
   await page.getByText("条件をもっと合わせる").click();
@@ -189,6 +194,13 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   await page.getByLabel("歩きたい量").selectOption("moderate");
   await page.getByRole("button", { name: "この条件で探し直す" }).click();
   await expect(page).toHaveURL(/party=solo/);
+  await expect(page.getByRole("button", { name: "地図" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  const updatedListButton = page.getByRole("button", { name: "リスト" });
+  await updatedListButton.click();
+  await expect(updatedListButton).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByText("デモ体験").first()).toBeVisible();
 
   await page.getByRole("link", { name: "クエストの詳細を見る" }).click();
@@ -216,7 +228,7 @@ test("uses current location without putting coordinates in the URL", async ({
   context,
 }) => {
   await context.grantPermissions(["geolocation"], {
-    origin: "http://127.0.0.1:3000",
+    origin: "http://localhost:3000",
   });
   await context.setGeolocation({ latitude: 37.5446, longitude: 127.0557 });
   await page.goto("/");

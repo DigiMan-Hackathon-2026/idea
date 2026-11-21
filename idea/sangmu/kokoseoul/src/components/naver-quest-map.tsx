@@ -156,9 +156,6 @@ export function NaverQuestMap({
         <div className="absolute inset-0">
           <div ref={containerRef} className="h-full w-full" data-testid="naver-map" />
         </div>
-        <p className="absolute left-4 top-4 z-[1] rounded-full bg-white/95 px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
-          {pickLocale(locale, "ソウル市内のみ", "서울 안에서만")}
-        </p>
         {loadState !== "ready" ? (
           <div className="absolute inset-0 grid place-items-center bg-[#eef5f2]" role="status">
             <p className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm">
