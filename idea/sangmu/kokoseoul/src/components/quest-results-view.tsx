@@ -17,7 +17,9 @@ export function QuestResultsView({
   naverMapKeyId: string | null;
 }) {
   const { locale } = useLocale();
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map">(
+    naverMapKeyId ? "map" : "list",
+  );
 
   return (
     <>

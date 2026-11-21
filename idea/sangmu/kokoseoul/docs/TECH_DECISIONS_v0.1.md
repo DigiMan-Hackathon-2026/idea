@@ -92,7 +92,7 @@ Auth.js는 Google을 포함한 OAuth/OIDC 제공자와 DB 세션을 지원하며
 
 탐색 결과에는 Naver Maps JavaScript API v3를 선택적으로 지연 로드하고, 상세·진행 화면의 외부 이동은 Google Maps 범용 URL과 한국어 주소 복사를 유지한다. 두 기능은 서로의 성공에 의존하지 않는다.
 
-- 탐색 기본값은 목록이며 사용자가 `地図`를 눌렀을 때만 SDK를 로드한다.
+- Naver Client ID가 설정된 환경은 탐색 지도로 시작하고, key가 없는 환경은 목록으로 시작한다. 목록을 선택하면 지도 SDK를 화면에서 제거한다.
 - UI locale에 따라 `language=ja` 또는 `language=ko`를 전달한다.
 - Client ID는 browser에 보이는 public config이며 Naver Cloud의 Web 서비스 URL allowlist로 제한한다.
 - 지도 인증을 위해 `/quests` 응답만 `Referrer-Policy: origin`을 사용한다. path·query·사용자 좌표는 전송하지 않는다.

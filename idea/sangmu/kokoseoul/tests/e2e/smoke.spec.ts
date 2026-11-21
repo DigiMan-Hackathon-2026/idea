@@ -124,11 +124,10 @@ test("switches between the quest list and Seoul-scoped map", async ({
   const response = await page.goto("/quests");
 
   expect(response?.headers()["referrer-policy"]).toBe("origin");
-  await expect(page.getByRole("button", { name: "リスト" })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
-  await page.getByRole("button", { name: "地図" }).click();
+  const mapButton = page.getByRole("button", { name: "地図" });
+  if ((await mapButton.getAttribute("aria-pressed")) !== "true") {
+    await mapButton.click();
+  }
   async function currentMapState() {
     if (await page.getByText("ソウル市内のみ").isVisible()) return "map";
     if (
