@@ -1,7 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { Client } from "pg";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
 import { POST as createSession } from "../../src/app/api/v1/visitor-sessions/route";
 import { POST as startRun } from "../../src/app/api/v1/quests/[questId]/runs/route";
@@ -9,6 +17,8 @@ import { GET as getRun } from "../../src/app/api/v1/runs/[runId]/route";
 import { PUT as completeStep } from "../../src/app/api/v1/runs/[runId]/steps/[stepId]/route";
 import { PUT as saveFeedback } from "../../src/app/api/v1/runs/[runId]/feedback/route";
 import { POST as submitReport } from "../../src/app/api/v1/quests/[questId]/reports/route";
+import { GET as listMyRuns } from "../../src/app/api/v1/me/runs/route";
+import { DELETE as deleteMyData } from "../../src/app/api/v1/me/data/route";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 assertSafeDatabaseTarget("test", testDatabaseUrl);
@@ -36,7 +46,7 @@ function mutationRequest(
 describe("visitor HTTP and PostgreSQL vertical flow", () => {
   beforeAll(async () => setupClient.connect());
 
-  afterEach(async () => {
+  const truncateData = async () => {
     await setupClient.query(
       `truncate table
         analytics_events, audit_logs, feedback, run_steps, runs, reports,
@@ -44,7 +54,10 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
         places, admin_principals, supplier_orgs
        cascade`,
     );
-  });
+  };
+
+  beforeEach(truncateData);
+  afterEach(truncateData);
 
   afterAll(async () => setupClient.end());
 
@@ -190,6 +203,7 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
         {
           joyScore: 5,
           feltNewExperience: true,
+          visitExperience: "repeat_2_4",
           comment: "分かりやすかったです。",
         },
         "PUT",
@@ -201,7 +215,12 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
       mutationRequest(
         `/api/v1/runs/${runId}/feedback`,
         cookie,
-        { joyScore: 4, feltNewExperience: false, comment: null },
+        {
+          joyScore: 4,
+          feltNewExperience: false,
+          visitExperience: null,
+          comment: null,
+        },
         "PUT",
       ),
       { params: Promise.resolve({ runId }) },
@@ -261,5 +280,35 @@ describe("visitor HTTP and PostgreSQL vertical flow", () => {
       feedback: 1,
       reports: 1,
     });
-  });
+
+    const myRunsResponse = await listMyRuns(
+      new NextRequest(`${origin}/api/v1/me/runs`, {
+        headers: { cookie },
+      }),
+    );
+    expect(myRunsResponse.status).toBe(200);
+    expect(await myRunsResponse.json()).toMatchObject({
+      items: [
+        {
+          id: runId,
+          status: "completed",
+          completedStepCount: 3,
+          totalStepCount: 3,
+        },
+      ],
+    });
+
+    const deleteResponse = await deleteMyData(
+      new NextRequest(`${origin}/api/v1/me/data`, {
+        method: "DELETE",
+        headers: { cookie, origin },
+      }),
+    );
+    expect(deleteResponse.status).toBe(204);
+    expect(deleteResponse.headers.get("set-cookie")).toContain("Max-Age=0");
+    const deleted = await setupClient.query(
+      "select count(*)::int as visitors from visitors",
+    );
+    expect(deleted.rows[0].visitors).toBe(0);
+  }, 15_000);
 });

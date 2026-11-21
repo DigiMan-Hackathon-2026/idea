@@ -427,16 +427,27 @@ Cookie: digiman_visitor=<opaque-token>
 
 ```json
 {
-  "runId": "66666666-6666-4666-8666-666666666666",
+  "id": "66666666-6666-4666-8666-666666666666",
   "questId": "11111111-1111-4111-8111-111111111111",
+  "questVersionId": "22222222-2222-4222-8222-222222222222",
   "titleJa": "ひとりで楽しむ聖水クラフト散歩",
-  "completedAt": "2026-11-21T09:30:00Z",
-  "stamp": {
-    "code": "seongsu-craft-demo",
-    "labelJa": "聖水クラフト体験"
-  },
   "isDemo": true,
-  "feedback": null
+  "status": "completed",
+  "startedAt": "2026-11-21T09:02:00Z",
+  "completedAt": "2026-11-21T09:30:00Z",
+  "canContinue": false,
+  "unavailableReasonJa": null,
+  "nextStepId": null,
+  "steps": [
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "position": 1,
+      "bodyJa": "場所と利用条件を確認します。",
+      "phrase": null,
+      "place": null,
+      "completedAt": "2026-11-21T09:10:00Z"
+    }
+  ]
 }
 ```
 
@@ -462,9 +473,8 @@ Cookie: digiman_visitor=<opaque-token>
       "startedAt": "2026-11-21T09:02:00Z",
       "completedAt": null,
       "nextStepPosition": 2,
-      "stepCount": 3,
-      "canContinue": true,
-      "unavailableReasonJa": null,
+      "completedStepCount": 1,
+      "totalStepCount": 3,
       "isDemo": true
     }
   ],
@@ -487,6 +497,7 @@ Cookie: digiman_visitor=<opaque-token>
 {
   "joyScore": 4,
   "feltNewExperience": true,
+  "visitExperience": "repeat_2_4",
   "comment": "次にすることが分かりやすかったです。"
 }
 ```
@@ -496,12 +507,13 @@ Cookie: digiman_visitor=<opaque-token>
   "runId": "66666666-6666-4666-8666-666666666666",
   "joyScore": 4,
   "feltNewExperience": true,
+  "visitExperience": "repeat_2_4",
   "comment": "次にすることが分かりやすかったです。",
   "updatedAt": "2026-11-21T09:32:00Z"
 }
 ```
 
-처음 저장과 갱신 모두 200을 사용한다. 서버는 run당 하나의 feedback을 upsert한다. `joyScore`가 1~5가 아니거나 `comment`가 500자를 넘으면 400이다.
+처음 저장과 갱신 모두 200을 사용한다. 서버는 run당 하나의 feedback을 upsert한다. `visitExperience`는 `first`, `repeat_2_4`, `repeat_5_plus`, `resident` 또는 null이다. `joyScore`가 1~5가 아니거나 `comment`가 500자를 넘으면 400이다.
 
 ## 정보 오류 신고
 
