@@ -132,7 +132,11 @@ class ScopeGateVerifierTest(unittest.TestCase):
                 + "A" * 35
                 + "\n/Users/"
                 + "private-name"
-                + "/project\n",
+                + "/project\n"
+                + "/home/"
+                + "private-name/project\n"
+                + "https://example.org/"
+                + "home/exhibitions/current\n",
                 encoding="utf-8",
             )
             secret_relative = secret_probe.relative_to(verifier.ROOT).as_posix()
@@ -141,11 +145,14 @@ class ScopeGateVerifierTest(unittest.TestCase):
             self.assertIn(relative, candidates)
             self.assertIn(secret_relative, candidates)
             secret_errors = verifier.check_secret_patterns(candidates)
-            self.assertEqual(len(secret_errors), 3)
+            self.assertEqual(len(secret_errors), 4)
             self.assertTrue(any("possible AWS access key" in error for error in secret_errors))
             self.assertTrue(any("possible Google API key" in error for error in secret_errors))
             self.assertTrue(
                 any("possible local macOS user path" in error for error in secret_errors)
+            )
+            self.assertTrue(
+                any("possible local Linux user path" in error for error in secret_errors)
             )
 
     def test_contribution_templates_keep_scope_gate_contract(self) -> None:
