@@ -25,6 +25,7 @@ import moodcollect from "@/modules/content/myeongdong-moodcollect-personal-color
 import seoulLibrary from "@/modules/content/city-hall-seoul-library-first-loan.json";
 import soonhee from "@/modules/content/gwangjang-soonhee-bindaetteok.json";
 import cityModel from "@/modules/content/gwanghwamun-seoul-museum-city-model.json";
+import ssamziegil from "@/modules/content/insadong-ssamziegil-craft-gift.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -127,6 +128,12 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.tags.length === 0 &&
     (filters.durationMax === null || filters.durationMax >= kyobo.durationMinutes) &&
     (!filters.budget || filters.budget === "unlimited");
+  const showSsamziegil =
+    (filters.area === "all" || filters.area === "jongno") &&
+    (!filters.purpose || filters.purpose === "shopping") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= ssamziegil.durationMinutes) &&
+    (!filters.budget || filters.budget === "unlimited");
   const showIrotomo =
     (filters.area === "all" || filters.area === "yeouido") &&
     (!filters.purpose || filters.purpose === "discovery") &&
@@ -202,6 +209,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/gwanghwamun-kyobo-find-book",
       label: pickLocale(locale, "鍾路 · ショッピング", "종로 · 쇼핑"),
       detail: pickLocale(locale, "教保生命ビル 地下1階", "교보생명빌딩 지하 1층"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showSsamziegil ? [{
+      quest: ssamziegil,
+      href: "/quests/insadong-ssamziegil-craft-gift",
+      label: pickLocale(locale, "鍾路 · ショッピング", "종로 · 쇼핑"),
+      detail: pickLocale(locale, "仁寺洞 · 値段と包装はお店で確認", "인사동 · 가격과 포장은 매장 확인"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showOliveyoungSkin ? [{

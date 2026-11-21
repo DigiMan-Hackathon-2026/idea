@@ -570,9 +570,19 @@ test("finds the free Seoul city model for a 30-minute visit", async ({ page }) =
 
 test("finds the Gwanghwamun book quest with the correct branch", async ({ page }) => {
   await page.goto("/quests?area=jongno&purpose=shopping&time=30");
-  await expect(page.getByText("教保生命ビル 地下1階", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  const kyoboGuide = page.getByRole("article").filter({ hasText: "教保生命ビル 地下1階" });
+  await kyoboGuide.getByRole("link", { name: "訪問ガイドを見る" }).click();
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://store.kyobobook.co.kr/store-info/001");
+});
+
+test("finds the Insadong craft gift guide with Japanese visitor information", async ({ page }) => {
+  await page.goto("/quests?area=jongno&purpose=shopping&time=30");
+  const craftGiftGuide = page.getByRole("article").filter({ hasText: "仁寺洞 · 値段と包装はお店で確認" });
+  await craftGiftGuide.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://japanese.visitkorea.or.kr/svc/whereToGo/locIntrdn/rgnContentsView.do?vcontsId=104640",
+  );
 });
 
 test("finds the recurring exchange meetup in Yeouido", async ({ page }) => {
