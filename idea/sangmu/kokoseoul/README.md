@@ -177,3 +177,5 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 서울도서관 첫 대출 퀘스트는 `pnpm db:seed:seoul-library`로 로컬에 넣고 `/quests?area=city-hall&purpose=discovery`에서 시작합니다.
 
 광장시장 순희네빈대떡 퀘스트는 `pnpm db:seed:soonhee`로 로컬에 넣고 `/quests?area=jongno&purpose=food`에서 시작합니다.
+
+서울역사박물관 도시모형 퀘스트는 `pnpm db:seed:city-model`로 로컬에 넣고 `/quests?area=jongno&purpose=culture`에서 시작합니다.

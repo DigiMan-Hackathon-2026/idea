@@ -553,9 +553,19 @@ test("finds the Gwangjang Market takeout guide with the Japanese source", async 
 
 test("finds the Changdeokgung tour with the official schedule", async ({ page }) => {
   await page.goto("/quests?area=jongno&purpose=culture&time=120plus");
-  await expect(page.getByText("日本語ガイド · 水・金・日 11:00")).toBeVisible();
-  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  const palaceTour = page.getByRole("article").filter({ hasText: "日本語ガイド · 水・金・日 11:00" });
+  await palaceTour.getByRole("link", { name: "訪問ガイドを見る" }).click();
   await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute("href", "https://royal.khs.go.kr/ROYAL/contents/R706020000.do?schGroupCode=cdg");
+});
+
+test("finds the free Seoul city model for a 30-minute visit", async ({ page }) => {
+  await page.goto("/quests?area=jongno&purpose=culture&time=30&budget=free");
+  await expect(page.getByText("ソウル歴史博物館3階 · 無料")).toBeVisible();
+  await page.getByRole("link", { name: "訪問ガイドを見る" }).click();
+  await expect(page.getByRole("link", { name: "公式ガイドを見る（別タブ）" })).toHaveAttribute(
+    "href",
+    "https://museum.seoul.go.kr/jpn/jpn-guide/jpn-facilities/jpn-floor3rd.jsp",
+  );
 });
 
 test("finds the Gwanghwamun book quest with the correct branch", async ({ page }) => {

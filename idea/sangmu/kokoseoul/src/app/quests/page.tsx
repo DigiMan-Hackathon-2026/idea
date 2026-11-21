@@ -24,6 +24,7 @@ import kyobo from "@/modules/content/gwanghwamun-kyobo-find-book.json";
 import moodcollect from "@/modules/content/myeongdong-moodcollect-personal-color.json";
 import seoulLibrary from "@/modules/content/city-hall-seoul-library-first-loan.json";
 import soonhee from "@/modules/content/gwangjang-soonhee-bindaetteok.json";
+import cityModel from "@/modules/content/gwanghwamun-seoul-museum-city-model.json";
 import {
   DIGIMAN_HACKATHON,
   DIGIMAN_HACKATHON_PATH,
@@ -94,6 +95,11 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
     filters.tags.length === 0 &&
     (filters.durationMax === null || filters.durationMax >= changdeokgung.durationMinutes) &&
     filters.timeAvailable !== "30" && filters.timeAvailable !== "60";
+  const showCityModel =
+    (filters.area === "all" || filters.area === "jongno") &&
+    (!filters.purpose || filters.purpose === "culture") &&
+    filters.tags.length === 0 &&
+    (filters.durationMax === null || filters.durationMax >= cityModel.durationMinutes);
   const showOliveyoungShopping =
     (filters.area === "all" || filters.area === "seongsu") &&
     (!filters.purpose || filters.purpose === "shopping") &&
@@ -175,6 +181,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       href: "/quests/changdeokgung-japanese-tour",
       label: pickLocale(locale, "鍾路 · 文化体験", "종로 · 문화 체험"),
       detail: pickLocale(locale, "日本語ガイド · 水・金・日 11:00", "일본어 해설 · 수·금·일 11:00"),
+      action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
+    }] : []),
+    ...(showCityModel ? [{
+      quest: cityModel,
+      href: "/quests/gwanghwamun-seoul-museum-city-model",
+      label: pickLocale(locale, "鍾路 · 文化体験", "종로 · 문화 체험"),
+      detail: pickLocale(locale, "ソウル歴史博物館3階 · 無料", "서울역사박물관 3층 · 무료"),
       action: pickLocale(locale, "訪問ガイドを見る", "방문 안내 보기"),
     }] : []),
     ...(showOliveyoungShopping ? [{

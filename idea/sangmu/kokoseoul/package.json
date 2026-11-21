@@ -31,6 +31,7 @@
     "db:seed:moodcollect": "node --env-file-if-exists=.env.local scripts/db/seed-myeongdong-moodcollect-personal-color.mjs",
     "db:seed:seoul-library": "node --env-file-if-exists=.env.local scripts/db/seed-city-hall-seoul-library-first-loan.mjs",
     "db:seed:soonhee": "node --env-file-if-exists=.env.local scripts/db/seed-gwangjang-soonhee-bindaetteok.mjs",
+    "db:seed:city-model": "node --env-file-if-exists=.env.local scripts/db/seed-gwanghwamun-seoul-museum-city-model.mjs",
     "audit:dependencies": "pnpm audit --audit-level moderate",
     "verify:docs": "python3 scripts/verify_all.py",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:docs"
