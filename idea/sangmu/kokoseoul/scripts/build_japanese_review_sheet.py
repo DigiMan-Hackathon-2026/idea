@@ -138,6 +138,18 @@ FIELD_JA = re.compile(r'\b(\w*?)Ja\s*:\s*(["`])((?:\\.|(?!\2).)*)\2', re.S)
 MAP_JA = re.compile(r'(\w+)\s*:\s*(["`])((?:\\.|(?!\2).)*)\2', re.S)
 
 
+def nearest_ko(text: str, stem: str, start: int, end: int, reach: int = 600) -> str:
+    """The `<stem>Ko` field closest to a `<stem>Ja` field, written before or after it."""
+    field = re.compile(rf'\b{re.escape(stem)}Ko\s*:\s*(["`])((?:\\.|(?!\1).)*)\1', re.S)
+    after = field.search(text, end, end + reach)
+    before = None
+    for candidate in field.finditer(text, max(0, start - reach), start):
+        before = candidate
+    if after and (not before or after.start() - end <= start - before.end()):
+        return after.group(2)
+    return before.group(2) if before else ""
+
+
 def module_rows() -> list[dict[str, str]]:
     """Japanese strings stored as `fooJa: "..."` fields in TypeScript modules."""
     rows = []
@@ -150,10 +162,9 @@ def module_rows() -> list[dict[str, str]]:
             if not KANA.search(value) and not re.search(r"[一-鿿]", value):
                 continue
             stem = match.group(1)
-            nearby = text[match.end(): match.end() + 600]
-            ko = re.search(rf'\b{re.escape(stem)}Ko\s*:\s*(["`])((?:\\.|(?!\1).)*)\1', nearby, re.S)
+            ko = nearest_ko(text, stem, match.start(), match.end())
             line = text.count("\n", 0, match.start()) + 1
-            rows.append(row(2, "앱 데모·선택지", path, f"line {line}", f"{stem or 'text'}Ja 필드", ko.group(2) if ko else "", value))
+            rows.append(row(2, "앱 데모·선택지", path, f"line {line}", f"{stem or 'text'}Ja 필드", ko, value))
     return rows
 
 
@@ -292,6 +303,7 @@ FIRST_PASS_FILES = {
     "src/components/subway-direction-guide.tsx", "src/components/subway-sign-camera.tsx",
     "src/components/subway-transfer-sign-check.tsx", "src/app/quests/nearby/page.tsx",
     "src/app/quests/nearby/station-quests.tsx", "src/components/quest-access-card.tsx",
+    "src/app/quests/courses/page.tsx", "src/modules/content/quest-courses.ts",
     "src/app/station-album/page.tsx", "src/app/station-album/station-album.tsx",
     "src/app/station-album/stamp-image.tsx", "src/app/station-album/album-data.ts",
 }

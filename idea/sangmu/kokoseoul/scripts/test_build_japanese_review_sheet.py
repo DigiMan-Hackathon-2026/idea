@@ -59,6 +59,24 @@ class UiRowsTest(unittest.TestCase):
         )
 
 
+class ModuleRowsTest(unittest.TestCase):
+    def test_pairs_each_japanese_field_with_the_nearest_korean_field(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "src").mkdir()
+            (root / "src" / "data.ts").write_text(
+                'const a = [\n'
+                '  { titleKo: "하나", titleJa: "一つ" },\n'
+                '  { titleKo: "둘", titleJa: "二つ" },\n'
+                '  { titleJa: "三つ", titleKo: "셋" },\n'
+                '];\n',
+                encoding="utf-8",
+            )
+            with unittest.mock.patch.object(sheet, "ROOT", root):
+                rows = sheet.module_rows()
+        self.assertEqual([(item["ja"], item["ko"]) for item in rows], [("一つ", "하나"), ("二つ", "둘"), ("三つ", "셋")])
+
+
 class StationNameRowsTest(unittest.TestCase):
     def test_every_app_station_has_one_row(self) -> None:
         rows = sheet.station_name_rows()
