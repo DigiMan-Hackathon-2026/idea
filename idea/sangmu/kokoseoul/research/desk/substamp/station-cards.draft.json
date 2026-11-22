@@ -443,8 +443,8 @@
       "readingKoKana": "カンイル",
       "readingJaOn": "こういち",
       "kanjiNoteJa": "江＝川、一＝ひとつ。",
-      "titleJa": "昔の村がアパート街に",
-      "storyJa": "江東区江一洞にある5号線の駅で、2021年3月27日に開業した。江一洞には昔、「カレヨウル（楸灘）」「ポルマル（坪村）」「マルウムル（斗井谷）」などの村があったが、アパートの開発で多くの村が消えた。",
+      "titleJa": "「下」から「江」に変えた町",
+      "storyJa": "江一洞は、上一洞との間を流れる蟹川（ケネ）の下の方にあることから「下一里」と呼ばれ、1975年に江南区下一洞になった。漢字の意味がよくないという住民の声を受けて、2000年に江東区江一洞へ名前を変えた。駅は2021年3月27日に開業した。",
       "storyKind": "history",
       "supplementJa": [],
       "relatedStations": [
@@ -452,7 +452,9 @@
         "상일동"
       ],
       "reviewNotesKo": [],
-      "factChecksKo": [],
+      "factChecksKo": [
+        "옛 마을 이야기에서 '아파트 개발로 많은 마을이 사라졌다'는 서술이 출처(가래여울은 자연마을로 남음)와 달라, 강일동 문서의 하일리→강일동 개칭 유래로 바꿈"
+      ],
       "officialOriginKo": null,
       "source": {
         "type": "wikipedia_facts",
@@ -5283,15 +5285,17 @@
       "readingKoKana": "サピョン",
       "readingJaOn": "さへい",
       "kanjiNoteJa": "砂＝すな、平＝たいら。",
-      "titleJa": "砂の野原だった川辺の村",
-      "storyJa": "駅の近くを通る沙平大路から付いた名前だ。沙平は、新沙洞の名前のもとになった川辺の村の一つだった。",
+      "titleJa": "大通りの名前をとった駅",
+      "storyJa": "駅の近くを通る沙平大路から付いた名前だ。近くの新沙洞の名前も、昔の川辺の村「沙平里」の字からとられている。",
       "storyKind": "history",
       "supplementJa": [],
       "relatedStations": [
         "신사"
       ],
       "reviewNotesKo": [],
-      "factChecksKo": [],
+      "factChecksKo": [
+        "사평대로가 사평리에서 왔다는 연결은 출처에 없어, 역명은 사평대로에서, 신사동 이름은 사평리에서 왔다는 두 사실로 나눠 씀"
+      ],
       "officialOriginKo": null,
       "source": {
         "type": "wikipedia_facts",
