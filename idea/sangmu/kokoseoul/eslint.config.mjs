@@ -10,6 +10,7 @@ export default defineConfig([
     "out/**",
     "build/**",
     "coverage/**",
+    "public/subway-sign-ocr/*.js",
     "next-env.d.ts",
   ]),
 ]);

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionAnimation } from "@/components/subway-direction-animation";
 import { SubwayToggleRow } from "@/components/subway-toggle-row";
+import { SubwayTransferSignCheck } from "@/components/subway-transfer-sign-check";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getSubwayNeighbors, getSubwayStation, getSubwayTransfer, getSubwayTrip, isLineNineExpressStop, subwayStations, type SubwayStation } from "@/modules/transit/subway-network";
@@ -324,6 +325,9 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                       ? pickLocale(locale, "この駅で降りて、乗り換え表示に従ってください。", "이 역에서 내려 환승 표지를 따라가요.")
                       : pickLocale(locale, "乗り換え表示に従い、ホームの駅番号を確認してください。", "환승 표지를 따라가 승강장에서 역번호를 확인해요.")}
                   </p>
+                  {changeNow.from.line !== changeNow.to.line ? (
+                    <SubwayTransferSignCheck key={`${changeNow.from.code}:${changeNow.to.code}`} targetLine={changeNow.to.line} />
+                  ) : null}
                   <button type="button" onClick={() => updateRide({ ...ride, origin: changeNow.to.code, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-4`}>
                     {pickLocale(locale, "乗り換え先のホームに着いた", "갈아탈 승강장에 도착했어요")}
                   </button>
@@ -365,6 +369,7 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                           <p className="mt-1 text-sm text-[var(--foreground-muted)]">
                             {pickLocale(locale, `乗り換え先の駅番号 ${to.code}`, `갈아탈 호선의 역번호 ${to.code}`)}
                           </p>
+                          {index === 0 ? <SubwayTransferSignCheck targetLine={to.line} /> : null}
                         </li>
                       ))}
                     </ol>
