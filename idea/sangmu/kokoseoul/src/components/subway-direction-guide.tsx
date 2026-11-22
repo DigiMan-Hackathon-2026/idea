@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale } from "@/components/locale-provider";
+import { SubwayDirectionAnimation } from "@/components/subway-direction-animation";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getSubwayNeighbors, getSubwayStation, getSubwayTransfer, getSubwayTrip, isLineNineExpressStop, subwayStations, type SubwayStation } from "@/modules/transit/subway-network";
 import { emptySubwayRide, readSavedRide, restoreSubwayRide, saveSubwayRide, subscribeToSavedRide, type SubwayRide } from "@/modules/transit/saved-subway-ride";
@@ -188,6 +189,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
   const [storageFailed, setStorageFailed] = useState(false);
   const ride = draft ?? saved ?? emptySubwayRide;
   const { situation, origin, destination, train } = ride;
+  const originStation = getSubwayStation(origin);
   const [observed, setObserved] = useState("");
   const [otherStation, setOtherStation] = useState("");
   const observedField = useRef<HTMLSelectElement>(null);
@@ -238,7 +240,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
               </p>
             ) : null}
 
-            {origin !== destination && destination && !pendingChange && getSubwayStation(origin)?.line === 9 ? (
+            {origin !== destination && destination && !pendingChange && originStation?.line === 9 ? (
               <fieldset className="mt-4">
                 <legend className="text-sm font-bold">{pickLocale(locale, "9号線の電車", "9호선 열차 종류")}</legend>
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4">
@@ -367,6 +369,14 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                   }}>
                     {pickLocale(locale, "乗った電車の方向を確認する", "탄 열차의 방향 확인하기")}
                   </button>
+                ) : null}
+                {situation === "before" && originStation ? (
+                  <SubwayDirectionAnimation
+                    key={`${origin}:${next.code}`}
+                    locale={locale}
+                    from={stationLabel(originStation, locale)}
+                    to={stationLabel(next, locale)}
+                  />
                 ) : null}
                 {situation === "onboard" ? (
                   <div className="mt-5">
