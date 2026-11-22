@@ -22,6 +22,7 @@
 - **버스 정류장**은 로컬 테스트 전용이다. 가상 정류장 두 곳은 Preview DB에 등록하지 않았고 두 ID 모두 결과를 반환하지 않는 것을 확인했다.
 - **로그인 후 HTTPS 응답 검증은 보류한다.** 비인증 HTTPS 요청은 홈과 성수 검색 API 모두 `302`로 Vercel 로그인으로 이동했다. 접근 권한이 있는 계정으로 로그인한 뒤 위 두 링크의 응답을 확인하면 된다.
 - **역에서 찾기는 DB 없이 동작한다.** `/quests/nearby?station=<역 코드>`는 [출구·시작점 목록](../scripts/db/quest-search-locations.json)을 앱이 직접 읽어 그 역 출구에서 시작하는 퀘스트와 역에서 800m 안의 퀘스트를 보여 준다. 퀘스트 상세에는 노선·출구·직선거리와 지하철 내부 안내(`/subway?station=<역 코드>`), 역 스탬프, 같은 역 퀘스트 링크가 붙는다. 계획은 [역에서 시작하는 퀘스트 개발 계획](QUEST_STATION_PLAN_v0.1.md)에 있다.
+- **퀘스트 문구 수정은 새 버전으로 공개한다.** 콘텐츠 파일과 출구 목록의 `versionId`를 바꾸고 `pnpm db:publish:content --apply`(Preview는 `--preview` 추가)를 실행한다. 서울풍물시장·낙산·남산·윤동주 시인의 언덕 4개가 Preview 공개를 기다린다. 절차는 [앱에 올리는 순서](../research/desk/quest-drafts/PUBLISHING.md).
 
 **자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.
 

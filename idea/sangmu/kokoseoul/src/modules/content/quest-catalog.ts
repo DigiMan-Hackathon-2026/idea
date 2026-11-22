@@ -26,7 +26,7 @@ export type CatalogQuest = {
   durationMinutes?: number;
 };
 
-type QuestContent = Omit<CatalogQuest, "slug" | "durationMinutes"> & { durationMinutes?: number };
+type QuestContent = Omit<CatalogQuest, "slug" | "durationMinutes"> & { durationMinutes?: number; versionId: string };
 
 // Each standalone quest has its own route folder named after the slug.
 const standalone: [QuestContent, string][] = [
@@ -67,4 +67,12 @@ export function findCatalogQuest(id: string): CatalogQuest | undefined {
 
 export function getCatalogQuestPath(quest: Pick<CatalogQuest, "slug">) {
   return `/quests/${quest.slug}`;
+}
+
+/** Quest id → the `versionId` its content file publishes. */
+export function questCatalogVersions(): ReadonlyMap<string, string> {
+  return new Map([
+    ...standalone.map(([quest]) => [quest.id, quest.versionId] as const),
+    ...listVisitGuides().map((guide) => [guide.id, guide.versionId] as const),
+  ]);
 }

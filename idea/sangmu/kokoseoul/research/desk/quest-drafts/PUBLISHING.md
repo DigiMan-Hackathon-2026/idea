@@ -38,6 +38,7 @@
 | `pnpm test` 중 `quest-access.test.ts` | 출구가 없는 퀘스트가 생겼다. 쇼핑 데모만 예외다 |
 | `pnpm test` 중 `quest-exit-mentions.test.ts` | 문구에 적은 출구가 출구 목록과 다른 번호만 말한다 |
 | `pnpm test` 중 `quest-detail-path.test.ts` | 출구 목록의 `slug`와 상세 주소가 맞지 않는다 |
+| `pnpm test` 중 `quest-access.test.ts`의 버전 대조 | 콘텐츠 파일과 출구 목록의 `versionId`가 다르다 |
 | `pnpm test` 중 `quest-courses.test.ts` | 코스에 넣은 퀘스트를 찾지 못하거나, 코스 문구의 정거장 수가 계산과 다르다 |
 | `pnpm test:e2e`의 "shows five ongoing visit guides in each category" | 한 목적에 방문 가이드가 다섯 개가 아니게 됐다. 목적별 개수를 바꾸면 이 테스트도 고친다 |
 | `python3 scripts/build_japanese_review_sheet.py` 뒤 `python3 scripts/check_ko_ja_consistency.py` | 한·일 문구의 숫자나 요일이 다르다 |
@@ -45,8 +46,9 @@
 
 ## 4. DB와 Preview
 
-- 로컬 DB: `pnpm db:seed:visit-guides <목적>`. 이미 있는 퀘스트 버전은 건너뛰므로, 공개된 퀘스트의 문구를 고칠 때는 새 `versionId`로 새 버전을 만든다. 고친 JSON만으로는 진행 화면 문구가 바뀌지 않는다.
-- Preview DB 출구·시작점: `scripts/db/register-preview-quest-locations.mjs --preview`(Preview 전용 접속 정보가 있어야 한다).
+- 새 퀘스트: `pnpm db:seed:visit-guides <목적>`으로 로컬 DB에 넣는다. 시드는 이미 있는 퀘스트를 건너뛴다.
+- 공개된 퀘스트의 문구 수정: 콘텐츠 파일과 [출구·시작점 목록](../../../scripts/db/quest-search-locations.json)의 `versionId`를 같은 새 UUID로 바꾼 뒤 `pnpm db:publish:content`를 실행한다. 기본은 확인만 하고 되돌리는 dry-run이고, `--apply`를 붙이면 바뀐 퀘스트마다 새 버전을 공개한다. 기존 버전과 그 버전으로 시작한 진행 기록은 그대로 남고, 시작점은 새 버전으로 복사된다. `versionId`가 같은 퀘스트는 건드리지 않는다.
+- Preview DB: 같은 명령에 `--preview`를 붙인다(Preview 전용 접속 정보가 있어야 한다). 출구·시작점 등록 `scripts/db/register-preview-quest-locations.mjs --preview`는 새 버전을 공개한 뒤에 실행한다.
 - 초안의 `draft_updated`·현장 확인표의 `app` 열에 앱 데이터 파일을 적어 다음 점검이 앱 문구를 대조하게 한다.
 
 ## 5. 코스와 역 연결

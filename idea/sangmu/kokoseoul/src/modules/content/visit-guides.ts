@@ -8,6 +8,7 @@ import culture from "./visit-guides/culture.json";
 
 type VisitGuide = {
   id: string;
+  versionId: string;
   slug: string;
   areaCode: AreaCode;
   purpose: QuestPurpose;

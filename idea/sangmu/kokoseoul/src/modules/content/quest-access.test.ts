@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import locations from "../../../scripts/db/quest-search-locations.json";
 import { subwayStations } from "../transit/subway-network";
 import { buildStationNextSteps, findQuestStationsFrom, findStationQuests, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
-import { questCatalog } from "./quest-catalog";
+import { questCatalog, questCatalogVersions } from "./quest-catalog";
 
 const codeOf = (ko: string, line: number) => subwayStations.find((station) => station.ko === ko && station.line === line)!.code;
 
@@ -94,6 +94,11 @@ describe("quest catalog", () => {
   it("has unique ids and slugs", () => {
     expect(new Set(questCatalog.map((quest) => quest.id)).size).toBe(questCatalog.length);
     expect(new Set(questCatalog.map((quest) => quest.slug)).size).toBe(questCatalog.length);
+  });
+
+  it("registers start points under the version the content files publish", () => {
+    const versions = new Map([...questCatalogVersions()].map(([id, versionId]) => [id, versionId]));
+    for (const place of locations.places) expect(place.versionId, place.slug).toBe(versions.get(place.questId));
   });
 
   it("gives every quest a subway exit so it can be found from a station", () => {

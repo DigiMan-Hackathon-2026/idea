@@ -37,6 +37,7 @@
     "db:seed:bookbogo": "node --env-file-if-exists=.env.local scripts/db/seed-jamsil-seoul-bookbogo-first-book-talk.mjs",
     "db:seed:sonmat": "node --env-file-if-exists=.env.local scripts/db/seed-tongin-market-sonmat-gimbap.mjs",
     "db:seed:visit-guides": "node --env-file-if-exists=.env.local scripts/db/seed-visit-guides.mjs",
+    "db:publish:content": "node --env-file-if-exists=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/db/publish-content-versions.mjs",
     "audit:dependencies": "pnpm audit --audit-level moderate",
     "verify:docs": "python3 scripts/verify_all.py",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:docs"
