@@ -7,6 +7,7 @@ import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import { getNearbyQuests, listNearbySubwayExits } from "@/modules/content/get-nearby-quests.server";
 import { getQuestDetailPath } from "@/modules/content/quest-detail-path";
+import { StationQuests } from "./station-quests";
 
 const nearbyPath = "/quests/nearby";
 const radii = [300, 800, 1500, 2000] as const;
@@ -35,13 +36,11 @@ async function NearbySearch({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <>
-      <ScenicHero
-        theme="dusk"
-        title={pickLocale(locale, "駅の出口からクエストを探す", "역 출구 주변 퀘스트 찾기")}
-        description={pickLocale(locale, "使う出口を選ぶと、近くのクエストが見つかります。", "이용할 출구를 고르면 가까운 퀘스트를 찾을 수 있어요.")}
-      />
-      <div className="scenic-content grid max-w-3xl gap-4">
-        <section className="seoul-surface rounded-2xl p-5 sm:p-6">
+      <div className="grid max-w-3xl gap-4">
+        <section aria-labelledby="exit-search" className="seoul-surface rounded-2xl p-5 sm:p-6">
+          <h2 id="exit-search" className="mb-3 text-xl font-black tracking-tight">
+            {pickLocale(locale, "出口から探す", "출구에서 찾기")}
+          </h2>
           {exits && exits.length > 0 ? (
             <form action={nearbyPath} method="get" className="grid items-end gap-4 sm:grid-cols-[minmax(0,1fr)_auto_auto]" key={`${exit?.id ?? ""}:${radiusM}`}>
               <label className="grid min-w-0 gap-2 text-sm font-bold">
@@ -143,6 +142,22 @@ async function NearbySearch({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
+async function StationSearch({ searchParams }: { searchParams: SearchParams }) {
+  const [locale, params] = await Promise.all([getRequestLocale(), searchParams]);
+  return (
+    <>
+      <ScenicHero
+        theme="dusk"
+        title={pickLocale(locale, "駅の出口からクエストを探す", "역 출구 주변 퀘스트 찾기")}
+        description={pickLocale(locale, "降りる駅や使う出口を選ぶと、近くのクエストが見つかります。", "내릴 역이나 이용할 출구를 고르면 가까운 퀘스트를 찾을 수 있어요.")}
+      />
+      <div className="scenic-content mb-4 grid max-w-3xl gap-4">
+        <StationQuests path={nearbyPath} stationCode={typeof params.station === "string" ? params.station : undefined} locale={locale} />
+      </div>
+    </>
+  );
+}
+
 async function SearchFallback() {
   const locale = await getRequestLocale();
   return (
@@ -157,6 +172,9 @@ export default function NearbyQuestsPage({ searchParams }: { searchParams: Searc
     <main className="min-h-dvh pb-20">
       <SiteHeader />
       <div className="seoul-page">
+        <Suspense fallback={null}>
+          <StationSearch searchParams={searchParams} />
+        </Suspense>
         <Suspense fallback={<SearchFallback />}>
           <NearbySearch searchParams={searchParams} />
         </Suspense>

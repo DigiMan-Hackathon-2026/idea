@@ -8,9 +8,14 @@ import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
 import { StationInteriorGuide } from "./station-interior-guide";
 
-export function SubwayPageContent({ readings, exitGuide }: { readings: Record<string, string>; exitGuide: ReactNode }) {
+export function SubwayPageContent({ readings, exitGuide, initialStation = "" }: {
+  readings: Record<string, string>;
+  exitGuide: ReactNode;
+  /** Station code to open in the interior guide, e.g. from a quest's exit card. */
+  initialStation?: string;
+}) {
   const { locale } = useLocale();
-  const [guideStation, setGuideStation] = useState("");
+  const [guideStation, setGuideStation] = useState(initialStation);
   const guideTitle = useRef<HTMLHeadingElement>(null);
 
   function viewStation(code: string) {

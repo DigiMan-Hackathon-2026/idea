@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SubwayFieldGuide } from "@/components/subway-field-guide";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
+import { getSubwayStation } from "@/modules/transit/subway-network";
 import { getSeongsuStationSnapshot } from "@/modules/transit/seoul-metro.server";
 import { SubwayPageContent } from "./subway-page-content";
 
@@ -33,11 +34,13 @@ async function SeongsuExitGuide() {
   return <SubwayFieldGuide stationSnapshot={stationSnapshot} />;
 }
 
-export default function SubwayPage() {
+export default async function SubwayPage({ searchParams }: { searchParams: Promise<{ station?: string | string[] }> }) {
+  const { station } = await searchParams;
+  const initialStation = typeof station === "string" && getSubwayStation(station) ? station : "";
   return (
     <main className="min-h-dvh pb-16">
       <SiteHeader />
-      <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} />
+      <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} initialStation={initialStation} />
     </main>
   );
 }

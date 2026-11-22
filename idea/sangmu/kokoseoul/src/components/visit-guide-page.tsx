@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { QuestAccessCard } from "@/components/quest-access-card";
 import { ReportButton } from "@/components/report-button";
 import { SiteHeader } from "@/components/site-header";
 import { StartDemoButton } from "@/components/start-demo-button";
@@ -56,6 +57,7 @@ export function VisitGuidePage({
         <ScenicHero theme="dusk" title={pickLocale(locale, guide.titleJa, guide.titleKo)} />
         <article className="scenic-content seoul-surface rounded-2xl p-5 sm:p-8">
           <p className="leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
+          <QuestAccessCard questId={guide.id} locale={locale} />
           <ol className="mt-6 grid gap-2 border-s-2 border-[var(--primary)] ps-3">
             {guide.steps.map((step, index) => (
               <li key={step.id} className="rounded-lg bg-[var(--surface-muted)] px-4 py-3 font-bold">

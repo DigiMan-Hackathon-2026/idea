@@ -38,6 +38,10 @@ const visitGuides: VisitGuide[] = [
 const budgetLimits = { free: 0, under10000: 10_000, under30000: 30_000 };
 const walkingLevels = { light: 0, moderate: 1, high: 2 };
 
+export function listVisitGuides(): readonly VisitGuide[] {
+  return visitGuides;
+}
+
 export function findVisitGuide(slug: string) {
   return visitGuides.find((guide) => guide.slug === slug);
 }

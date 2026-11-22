@@ -21,6 +21,7 @@
 
 - **버스 정류장**은 로컬 테스트 전용이다. 가상 정류장 두 곳은 Preview DB에 등록하지 않았고 두 ID 모두 결과를 반환하지 않는 것을 확인했다.
 - **로그인 후 HTTPS 응답 검증은 보류한다.** 비인증 HTTPS 요청은 홈과 성수 검색 API 모두 `302`로 Vercel 로그인으로 이동했다. 접근 권한이 있는 계정으로 로그인한 뒤 위 두 링크의 응답을 확인하면 된다.
+- **역에서 찾기는 DB 없이 동작한다.** `/quests/nearby?station=<역 코드>`는 [출구·시작점 목록](../scripts/db/quest-search-locations.json)을 앱이 직접 읽어 그 역 출구에서 시작하는 퀘스트와 역에서 800m 안의 퀘스트를 보여 준다. 퀘스트 상세에는 노선·출구·직선거리와 지하철 내부 안내(`/subway?station=<역 코드>`), 역 스탬프, 같은 역 퀘스트 링크가 붙는다. 계획은 [역에서 시작하는 퀘스트 개발 계획](QUEST_STATION_PLAN_v0.1.md)에 있다.
 
 **자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.
 
@@ -50,7 +51,7 @@
 - F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. 우상단 언어 버튼으로 한국어·일본어를 현재 화면에서 전환하며 선택은 1년 locale cookie로 페이지 이동 뒤에도 유지된다. 진행·완료·피드백·내 기록·삭제·정보 신고는 익명 visitor session과 PostgreSQL API에 연결됐다. 신고는 공개 상세 API의 `versionId`로 보내고 재전송은 같은 `clientRequestId`로 한 건에 수렴한다.
 - 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
-- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 60개 tooling 회귀 테스트, Markdown 106개, JSON block 46개, API endpoint 23개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
+- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 60개 tooling 회귀 테스트, Markdown 107개, JSON block 46개, API endpoint 23개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
 - 외부 서비스의 현재 region·복구·비용 제약과 Singapore 배치 후보는 [외부 서비스 평가 v0.1](EXTERNAL_SERVICES_EVALUATION_v0.1.md)에 정리했다.
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.
