@@ -7,10 +7,10 @@ export type TransferSignResult =
   | { kind: "unclear" };
 
 export function readTransferSign(text: string, confidence: number): TransferSignResult {
-  if (confidence < 70) return { kind: "unclear" };
+  if (!Number.isFinite(confidence) || confidence < 70) return { kind: "unclear" };
 
   const lines = new Set<number>();
-  const explicitLine = /(?<!\d)(\d+)\s*호\s*선|\bline\s+(\d+)\b/gi;
+  const explicitLine = /(?<!\d)(\d+)\s*호\s*선|\bline\s*(\d+)\b/gi;
   const normalized = text.normalize("NFKC");
   if (/\d\s*[,·/&~–-]\s*\d+\s*호\s*선|\blines?\s+\d+\s*[,·/&~–-]\s*\d/i.test(normalized)) {
     return { kind: "unclear" };

@@ -182,3 +182,20 @@ export function getSubwayTrip(origin: string, destination: string, train: Subway
   }
   return null;
 }
+
+// Use the first edge from the boarding platform to distinguish opposite
+// directions using names that can appear on signs beyond the rider's stop.
+export function getSubwaySignDirections(platform: string, destination: string) {
+  const boarding = getSubwayStation(platform);
+  const next = getSubwayTrip(platform, destination)?.next;
+  if (!boarding || !next || next.line !== boarding.line) return null;
+
+  const forward = new Set<string>();
+  const away = new Set<string>();
+  for (const stop of subwayStations) {
+    if (stop.line !== boarding.line || stop.code === platform) continue;
+    const first = getSubwayTrip(platform, stop.code)?.next;
+    if (first) (first.code === next.code ? forward : away).add(stop.code);
+  }
+  return { next, forward: Array.from(forward), away: Array.from(away) };
+}

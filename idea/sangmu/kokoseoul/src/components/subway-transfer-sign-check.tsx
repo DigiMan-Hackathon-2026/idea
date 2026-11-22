@@ -6,32 +6,15 @@ import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import type { SubwayStation } from "@/modules/transit/subway-network";
 import { readTransferSign, type TransferSignResult } from "@/modules/transit/transfer-sign";
+import { findTransferPanels } from "@/modules/transit/transfer-arrow";
+import { selectTransferArrow } from "@/modules/transit/transfer-panel";
 
-const ocrAssets = "/subway-sign-ocr";
-const photoMaxSide = 1600;
-
-async function resizePhoto(file: File) {
-  const photoUrl = URL.createObjectURL(file);
-  try {
-    const image = new Image();
-    image.src = photoUrl;
-    await image.decode();
-    const scale = Math.min(1, photoMaxSide / Math.max(image.naturalWidth, image.naturalHeight));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Photo canvas is unavailable");
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    return canvas;
-  } finally {
-    URL.revokeObjectURL(photoUrl);
-  }
-}
+import { createSignReader, readSignRegion, signPhotoCanvas } from "@/modules/transit/sign-ocr.client";
 
 type Scan = { kind: "idle" | "scanning" } | TransferSignResult;
 
-export function SubwayTransferSignCheck({ targetLine }: { targetLine: SubwayStation["line"] }) {
+export function SubwayTransferSignCheck({ platform, destination }: { platform: SubwayStation; destination: string }) {
+  const targetLine = platform.line;
   const { locale } = useLocale();
   const hintId = useId();
   const [scan, setScan] = useState<Scan>({ kind: "idle" });
@@ -54,20 +37,23 @@ export function SubwayTransferSignCheck({ targetLine }: { targetLine: SubwayStat
         signal.addEventListener("abort", () => reject(signal.reason), { once: true });
       });
       const result = await Promise.race([cancelled, (async () => {
-        const photo = await resizePhoto(file);
+        const photo = await signPhotoCanvas(file);
         signal.throwIfAborted();
-        const { createWorker, OEM } = await import("tesseract.js");
-        signal.throwIfAborted();
-        worker = await createWorker(["kor", "eng"], OEM.LSTM_ONLY, {
-          workerPath: `${ocrAssets}/worker.min.js`,
-          corePath: `${ocrAssets}/tesseract-core-lstm.js`,
-          langPath: ocrAssets,
-          workerBlobURL: false,
-          errorHandler: () => controller.abort(),
-        });
+        const pixels = photo.getContext("2d")?.getImageData(0, 0, photo.width, photo.height);
+        const panels = pixels ? findTransferPanels(pixels, targetLine) : [];
+        if (panels.length === 1 && panels[0].line === targetLine) return { kind: "read", line: targetLine } as const;
+        worker = await createSignReader(() => controller.abort());
         if (signal.aborted) {
           await worker.terminate();
           signal.throwIfAborted();
+        }
+        if (panels.length > 0 && panels.length <= 4) {
+          const readings = [];
+          for (const { label } of panels) {
+            signal.throwIfAborted();
+            readings.push(await readSignRegion(worker, photo, label));
+          }
+          if (selectTransferArrow(panels, readings, targetLine, null)) return { kind: "read", line: targetLine } as const;
         }
         const { data } = await worker.recognize(photo);
         return readTransferSign(data.text, data.confidence);
@@ -117,11 +103,10 @@ export function SubwayTransferSignCheck({ targetLine }: { targetLine: SubwayStat
           "路線番号が写るように撮ってください。写真は端末内で読み取ります。",
           "호선 번호가 보이게 찍어요. 사진은 기기 안에서만 읽어요.")}
       </p>
-      {targetLine === 3 ? (
-        <a href="/subway/sign-camera" target="_top" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
-          {pickLocale(locale, "3号線の矢印をカメラで確認（試験版）", "카메라로 3호선 화살표 확인 (시험판)")}
-        </a>
-      ) : null}
+      <a href={`/subway/sign-camera?platform=${encodeURIComponent(platform.code)}&destination=${encodeURIComponent(destination)}`}
+        target="_top" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
+        {pickLocale(locale, "カメラで乗り換え表示・ホームを確認", "카메라로 환승 표지·승강장 확인")}
+      </a>
       <div role="status" className={resultMessage ? "mt-2 text-sm font-bold leading-6" : undefined}>
         {resultMessage}
       </div>

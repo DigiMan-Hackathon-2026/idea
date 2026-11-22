@@ -326,7 +326,7 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                       : pickLocale(locale, "乗り換え表示に従い、ホームの駅番号を確認してください。", "환승 표지를 따라가 승강장에서 역번호를 확인해요.")}
                   </p>
                   {changeNow.from.line !== changeNow.to.line ? (
-                    <SubwayTransferSignCheck key={`${changeNow.from.code}:${changeNow.to.code}`} targetLine={changeNow.to.line} />
+                    <SubwayTransferSignCheck key={`${changeNow.from.code}:${changeNow.to.code}`} platform={changeNow.to} destination={destination} />
                   ) : null}
                   <button type="button" onClick={() => updateRide({ ...ride, origin: changeNow.to.code, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-4`}>
                     {pickLocale(locale, "乗り換え先のホームに着いた", "갈아탈 승강장에 도착했어요")}
@@ -369,7 +369,7 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                           <p className="mt-1 text-sm text-[var(--foreground-muted)]">
                             {pickLocale(locale, `乗り換え先の駅番号 ${to.code}`, `갈아탈 호선의 역번호 ${to.code}`)}
                           </p>
-                          {index === 0 ? <SubwayTransferSignCheck targetLine={to.line} /> : null}
+                          {index === 0 ? <SubwayTransferSignCheck platform={to} destination={destination} /> : null}
                         </li>
                       ))}
                     </ol>
