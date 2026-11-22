@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import locations from "../../../scripts/db/quest-search-locations.json";
 import { subwayStations } from "../transit/subway-network";
-import { buildStationNextSteps, findStationQuests, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
+import { buildStationNextSteps, findQuestStationsFrom, findStationQuests, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
 import { questCatalog } from "./quest-catalog";
 
 const codeOf = (ko: string, line: number) => subwayStations.find((station) => station.ko === ko && station.line === line)!.code;
@@ -48,6 +48,27 @@ describe("quest access", () => {
 
   it("returns nothing for an unknown code", () => {
     expect(findStationQuests("nope")).toEqual([]);
+  });
+});
+
+describe("quest stations reachable by subway", () => {
+  it("suggests the next station along the same line first", () => {
+    const hops = findQuestStationsFrom(codeOf("경복궁", 3));
+    expect(hops[0]).toMatchObject({ station: { ko: "안국", line: 3 }, rideStops: 1, transfers: 0 });
+  });
+
+  it("leaves out the station itself, far stations and trips with too many changes", () => {
+    const hops = findQuestStationsFrom(codeOf("명동", 4), { limit: 20 });
+    expect(hops.map((hop) => hop.station.ko)).not.toContain("명동");
+    for (const hop of hops) {
+      expect(hop.transfers).toBeLessThanOrEqual(1);
+      expect(hop.rideStops).toBeLessThanOrEqual(12);
+      expect(hop.questCount).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns nothing for an unknown code", () => {
+    expect(findQuestStationsFrom("nope")).toEqual([]);
   });
 });
 

@@ -1,6 +1,6 @@
 import locations from "../../../scripts/db/quest-search-locations.json";
 import { distanceMetres, type GeographicPoint } from "../../lib/geolocation";
-import { getSubwayStation, subwayStations, type SubwayStation } from "../transit/subway-network";
+import { getSubwayStation, getSubwayTrip, subwayStations, type SubwayStation } from "../transit/subway-network";
 import stationCoordinates from "../transit/station-coordinates.json";
 import { findCatalogQuest, getCatalogQuestPath, type CatalogQuest } from "./quest-catalog";
 
@@ -122,4 +122,52 @@ export function buildStationNextSteps(stampHref: (stationKo: string) => string |
       .map(({ quest: other }) => ({ id: other.id, titleKo: other.titleKo, titleJa: other.titleJa, href: getCatalogQuestPath(other) }));
     return [[quest.id, { stationKo: station.ko, stationJa: station.ja, stationCode: station.code, stampHref: stampHref(station.ko), next }]];
   }));
+}
+
+export type QuestStationHop = {
+  /** The destination platform the trip arrives at. */
+  station: SubwayStation;
+  rideStops: number;
+  transfers: number;
+  questCount: number;
+};
+
+/**
+ * Other stations whose exits start quests, reachable from `code` within
+ * `maxTransfers` changes and `maxStops` stops, least effort first (a change
+ * counts as four stops). A transfer station counts as one place:
+ * the trip may leave from any of its lines.
+ */
+const transferCostInStops = 4;
+const effort = (hop: QuestStationHop) => hop.rideStops + hop.transfers * transferCostInStops;
+
+export function findQuestStationsFrom(code: string, { maxTransfers = 1, maxStops = 12, limit = 4 } = {}): QuestStationHop[] {
+  const origin = getSubwayStation(code);
+  if (!origin) return [];
+  const origins = subwayStations.filter((station) => station.ko === origin.ko);
+  const counts = new Map<string, { stations: SubwayStation[]; count: number }>();
+  for (const { exit } of accesses) {
+    if (exit.stationKo === origin.ko || exit.stations.length === 0) continue;
+    const entry = counts.get(exit.stationKo) ?? { stations: exit.stations, count: 0 };
+    entry.count++;
+    counts.set(exit.stationKo, entry);
+  }
+  const hops: QuestStationHop[] = [];
+  for (const { stations, count } of counts.values()) {
+    let best: QuestStationHop | undefined;
+    for (const from of origins) {
+      for (const to of stations) {
+        const trip = getSubwayTrip(from.code, to.code);
+        if (!trip) continue;
+        const hop = { station: to, rideStops: trip.rideStops, transfers: trip.changes.length, questCount: count };
+        if (!best || effort(hop) < effort(best)) {
+          best = hop;
+        }
+      }
+    }
+    if (best && best.transfers <= maxTransfers && best.rideStops <= maxStops) hops.push(best);
+  }
+  return hops
+    .sort((a, b) => effort(a) - effort(b) || a.transfers - b.transfers || a.station.code.localeCompare(b.station.code))
+    .slice(0, limit);
 }

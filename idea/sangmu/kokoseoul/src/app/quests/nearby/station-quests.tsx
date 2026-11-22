@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { pickLocale, type Locale } from "@/lib/locale";
-import { findStationQuests, listQuestAccesses, stationQuestRadiusM } from "@/modules/content/quest-access";
+import { findQuestStationsFrom, findStationQuests, listQuestAccesses, stationQuestRadiusM } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
 import { getSubwayStation, type SubwayStation } from "@/modules/transit/subway-network";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
@@ -28,6 +28,7 @@ function questStations() {
 export function StationQuests({ path, stationCode, locale }: { path: string; stationCode?: string; locale: Locale }) {
   const station = stationCode ? getSubwayStation(stationCode) : undefined;
   const results = station ? findStationQuests(station.code) : [];
+  const hops = station ? findQuestStationsFrom(station.code) : [];
   const number = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP");
   const metres = (value: number) => `${number.format(Math.round(value / 10) * 10)} m`;
   const stationName = station ? pickLocale(locale, station.ja, station.ko) : "";
@@ -98,11 +99,33 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
             <p className="mt-2 leading-7">
               {pickLocale(
                 locale,
-                `この駅の出口や駅から${metres(stationQuestRadiusM)}以内に始まるクエストはまだありません。上の駅から選べます。`,
-                `이 역 출구나 역에서 ${metres(stationQuestRadiusM)} 안에서 시작하는 퀘스트는 아직 없어요. 위의 역에서 골라 보세요.`,
+                `この駅の出口や駅から${metres(stationQuestRadiusM)}以内に始まるクエストはまだありません。${hops.length ? "下の駅まで地下鉄で行けます。" : "上の駅から選べます。"}`,
+                `이 역 출구나 역에서 ${metres(stationQuestRadiusM)} 안에서 시작하는 퀘스트는 아직 없어요. ${hops.length ? "아래 역까지 지하철로 갈 수 있어요." : "위의 역에서 골라 보세요."}`,
               )}
             </p>
           )}
+          {hops.length > 0 ? (
+            <div className="mt-5 border-t border-[var(--border)] pt-4">
+              <h3 className="text-base font-black">{pickLocale(locale, "地下鉄で次の駅へ", "지하철로 다음 역까지")}</h3>
+              <ul className="mt-2 grid gap-2">
+                {hops.map((hop) => (
+                  <li key={hop.station.code}>
+                    <Link href={`${path}?station=${hop.station.code}#station-quests`} className="flex min-h-11 flex-wrap items-center gap-x-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold">
+                      <span className="rounded border-s-4 px-1.5" style={{ borderInlineStartColor: subwayLineColors[hop.station.line] }}>{lineLabel(hop.station.line, locale)}</span>
+                      <span className="text-[var(--primary)] underline">{pickLocale(locale, hop.station.ja, hop.station.ko)}</span>
+                      <span className="text-slate-600">
+                        {pickLocale(
+                          locale,
+                          `${hop.rideStops}駅 · ${hop.transfers ? `乗り換え${hop.transfers}回` : "乗り換えなし"} · クエスト${hop.questCount}件`,
+                          `${hop.rideStops}정거장 · ${hop.transfers ? `환승 ${hop.transfers}번` : "환승 없음"} · 퀘스트 ${hop.questCount}개`,
+                        )}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <Link href={`/subway?station=${station.code}#station-interior-title`} className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
             {pickLocale(locale, "この駅の構内案内を見る", "이 역의 내부 안내 보기")}
           </Link>
