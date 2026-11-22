@@ -46,6 +46,10 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        source: "/subway/sign-camera",
+        headers: [{ key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(self)" }],
+      },
       ...(phonePreviewEnabled ? [{ source: "/mobile-preview/app", headers: phoneFrameHeaders }] : []),
       ...phonePreviewSources.map((source) => ({
         source,

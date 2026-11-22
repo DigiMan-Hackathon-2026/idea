@@ -117,6 +117,11 @@ export function SubwayTransferSignCheck({ targetLine }: { targetLine: SubwayStat
           "路線番号が写るように撮ってください。写真は端末内で読み取ります。",
           "호선 번호가 보이게 찍어요. 사진은 기기 안에서만 읽어요.")}
       </p>
+      {targetLine === 3 ? (
+        <a href="/subway/sign-camera" target="_top" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
+          {pickLocale(locale, "3号線の矢印をカメラで確認（試験版）", "카메라로 3호선 화살표 확인 (시험판)")}
+        </a>
+      ) : null}
       <div role="status" className={resultMessage ? "mt-2 text-sm font-bold leading-6" : undefined}>
         {resultMessage}
       </div>
