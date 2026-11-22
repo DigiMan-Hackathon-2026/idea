@@ -12,6 +12,7 @@ import {
   getPurposeLabel,
   parseQuestFilters,
 } from "@/modules/content/demo-quests";
+import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import myeongdongKyoja from "@/modules/content/myeongdong-kyoja.json";
@@ -318,22 +319,13 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <>
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="seoul-kicker text-sm">
-            {getAreaLabel(filters.area, locale).toUpperCase()}
-            {filters.purpose ? ` · ${getPurposeLabel(filters.purpose, locale).toUpperCase()}` : ""}
-          </p>
-          <p className="rounded-lg bg-[var(--success-soft)] px-3 py-2 text-sm font-bold text-[var(--success)]">
-            {pickLocale(locale, `${resultCount}件`, `${resultCount}개`)}
-          </p>
-        </div>
-        <h1 className="seoul-page-title mt-2 text-balance">
-          {pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}
-        </h1>
-      </div>
-
-      <section className="seoul-surface mt-6 rounded-xl px-4 py-3 sm:px-6">
+      <ScenicHero
+        theme="dusk"
+        title={pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}
+        description={[getAreaLabel(filters.area, locale), filters.purpose ? getPurposeLabel(filters.purpose, locale) : null,
+          pickLocale(locale, `${resultCount}件`, `${resultCount}개`)].filter(Boolean).join(" · ")}
+      />
+      <section className="scenic-content seoul-surface rounded-2xl px-4 py-3 sm:px-6">
         <FilterForm filters={filters} />
       </section>
 

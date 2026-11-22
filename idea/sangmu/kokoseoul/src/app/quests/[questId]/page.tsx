@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ScenicHero } from "@/components/scenic-hero";
 import { SiteHeader } from "@/components/site-header";
 import { ReportButton } from "@/components/report-button";
 import { StartDemoButton } from "@/components/start-demo-button";
@@ -81,7 +82,12 @@ export default async function QuestDetailPage({
           {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
         </Link>
 
-        <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
+        <ScenicHero theme="dusk"
+          title={pickLocale(locale, quest.titleJa, quest.titleKo)}
+          description={pickLocale(locale, quest.summaryJa, quest.summaryKo)}
+        />
+
+        <div className="scenic-content grid gap-5 lg:grid-cols-[1fr_22rem] lg:items-start">
           <article>
             <div className="seoul-surface rounded-2xl p-5 sm:p-8">
               <div className="flex flex-wrap gap-2">
@@ -91,10 +97,6 @@ export default async function QuestDetailPage({
                   <span key={tag} className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-600 shadow-sm">{getTagLabel(tag, locale)}</span>
                 ))}
               </div>
-              <h1 className="seoul-page-title mt-4">
-                {pickLocale(locale, quest.titleJa, quest.titleKo)}
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg font-semibold leading-8 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
               <p className="mt-4 rounded-xl bg-[var(--surface-muted)] p-4 leading-7">{pickLocale(locale, quest.bodyJa, quest.bodyKo)}</p>
               <div className="mt-8 max-w-2xl">
                 <QuestTransitGuide quest={quest} />

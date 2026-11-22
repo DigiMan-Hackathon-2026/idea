@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { ReportButton } from "@/components/report-button";
 import { SiteHeader } from "@/components/site-header";
 import { StartDemoButton } from "@/components/start-demo-button";
+import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { buildNaverPlaceUrl } from "@/lib/naver-map";
 import { getPublicQuest } from "@/modules/content/get-public-quest.server";
@@ -52,15 +53,13 @@ export function VisitGuidePage({
         <Link href={listHref} className="mb-5 inline-flex min-h-11 items-center text-sm font-bold text-slate-600">
           {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
         </Link>
-        <article className="seoul-surface rounded-2xl p-5 sm:p-8">
-          <h1 className="seoul-page-title">
-            {pickLocale(locale, guide.titleJa, guide.titleKo)}
-          </h1>
-          <p className="mt-5 leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
-          <ol className="mt-6 grid gap-2 border-s-2 border-[var(--success)] ps-3">
+        <ScenicHero theme="dusk" title={pickLocale(locale, guide.titleJa, guide.titleKo)} />
+        <article className="scenic-content seoul-surface rounded-2xl p-5 sm:p-8">
+          <p className="leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
+          <ol className="mt-6 grid gap-2 border-s-2 border-[var(--primary)] ps-3">
             {guide.steps.map((step, index) => (
               <li key={step.id} className="rounded-lg bg-[var(--surface-muted)] px-4 py-3 font-bold">
-                <span className="mr-3 text-[var(--success)]">{index + 1}</span>
+                <span className="mr-3 text-[var(--primary)]">{index + 1}</span>
                 {pickLocale(locale, step.titleJa, step.titleKo)}
               </li>
             ))}

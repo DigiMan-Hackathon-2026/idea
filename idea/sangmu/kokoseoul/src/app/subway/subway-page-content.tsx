@@ -4,19 +4,18 @@ import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionGuide } from "@/components/subway-direction-guide";
+import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
 
 export function SubwayPageContent({ readings, exitGuide }: { readings: Record<string, string>; exitGuide: ReactNode }) {
   const { locale } = useLocale();
   return (
     <div className="seoul-page">
-      <div className="mb-6 border-s-4 border-[var(--seoul-namsan)] ps-4 sm:mb-8 sm:ps-5">
-        <p className="text-xs font-bold text-[var(--seoul-namsan)] sm:text-sm">{pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}</p>
-        <h1 className="seoul-page-title mt-1">
-          {pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
-        </h1>
-      </div>
-      <SubwayDirectionGuide readings={readings} />
+      <ScenicHero theme="night"
+        title={pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
+        description={pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}
+      />
+      <div className="scenic-content"><SubwayDirectionGuide readings={readings} /></div>
       <details className="mt-5 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
         <summary className="min-h-12 cursor-pointer py-3.5 font-bold">
           {pickLocale(locale, "聖水駅の構内・3番出口を見る", "성수역 층별 안내·3번 출구 보기")}

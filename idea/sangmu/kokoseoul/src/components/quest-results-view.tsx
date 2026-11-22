@@ -24,10 +24,10 @@ export function QuestResultsView({
   return (
     <>
       <div className="mt-5 inline-flex rounded-xl bg-[var(--surface-muted)] p-1" role="group" aria-label={pickLocale(locale, "表示方法", "보기 방식")}>
-        <button type="button" onClick={() => setView("list")} aria-pressed={view === "list"} className={`min-h-11 rounded-lg px-5 text-sm font-bold ${view === "list" ? "bg-[var(--success)] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
+        <button type="button" onClick={() => setView("list")} aria-pressed={view === "list"} className={`min-h-11 rounded-lg px-5 text-sm font-bold ${view === "list" ? "bg-[var(--primary)] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
           {pickLocale(locale, "リスト", "목록")}
         </button>
-        <button type="button" onClick={() => setView("map")} aria-pressed={view === "map"} className={`min-h-11 rounded-lg px-5 text-sm font-bold ${view === "map" ? "bg-[var(--success)] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
+        <button type="button" onClick={() => setView("map")} aria-pressed={view === "map"} className={`min-h-11 rounded-lg px-5 text-sm font-bold ${view === "map" ? "bg-[var(--primary)] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
           {pickLocale(locale, "地図", "지도")}
         </button>
       </div>

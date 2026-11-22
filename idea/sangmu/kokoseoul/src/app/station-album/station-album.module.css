@@ -4,20 +4,10 @@
   padding: clamp(1.5rem, 4vw, 3.25rem) clamp(1rem, 3vw, 2rem) 0;
 }
 
-.intro h1 {
-  margin: 0;
-  font-size: clamp(2rem, 4vw, 3.6rem);
-  line-height: 1.12;
-  font-weight: 900;
-  letter-spacing: -.05em;
-}
-
-.intro p { margin-top: .45rem; }
 .note { color: var(--seoul-palace-brown); font-size: .875rem; }
 .collectionSummary {
-  margin-top: 1rem;
   padding: .9rem 1rem;
-  background: var(--success);
+  background: linear-gradient(110deg, #514377, #4c5588);
   color: white;
   border-radius: .8rem;
 }

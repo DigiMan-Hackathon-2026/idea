@@ -5,8 +5,8 @@ export default function OfflinePage() {
     <main
       style={{
         alignItems: "center",
-        background: "#f8f5ef",
-        color: "#504e49",
+        background: "radial-gradient(at 20% 0%, #efd6eb, transparent 60%), linear-gradient(140deg, #f7f6fc, #e1e8fb)",
+        color: "#282439",
         display: "flex",
         fontFamily: "system-ui, sans-serif",
         minHeight: "100vh",
@@ -41,7 +41,7 @@ export default function OfflinePage() {
         <Link
           href="/"
           style={{
-            background: "#455f54",
+            background: "linear-gradient(110deg, #62448d, #4f4c87)",
             borderRadius: "16px",
             color: "white",
             cursor: "pointer",

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useLocale } from "@/components/locale-provider";
+import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
 import {
   fetchQuestRun,
@@ -91,18 +92,15 @@ export function DemoCompletion({ runId }: { runId: string }) {
 
   return (
     <div className="mx-auto mt-8 grid max-w-4xl gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
-      <section className="overflow-hidden rounded-2xl bg-[var(--success)] p-6 text-white sm:p-8">
-        <div className="flex items-start justify-between gap-4">
-          <span className="rounded-full bg-white/12 px-3 py-1.5 text-xs font-black">{run.isDemo ? pickLocale(locale, "デモ体験", "데모 체험") : pickLocale(locale, "進行記録", "진행 기록")}</span>
-          <span className="text-sm font-bold text-[#e5b560]">{completedDate}</span>
-        </div>
-        <div className="mt-7 grid size-14 place-items-center rounded-lg bg-white/15 text-3xl text-white" aria-hidden="true">✦</div>
-        <h1 className="mt-4 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">{pickLocale(locale, "クエスト完了", "퀘스트 완료")}</h1>
-        <p className="mt-4 text-xl font-bold leading-8 text-white/80">{pickLocale(locale, run.titleJa, run.titleKo)}</p>
-        <p className="mt-10 border-t border-white/15 pt-6 text-sm leading-6 text-white/90">{run.isDemo
+      <ScenicHero theme="night"
+        title={pickLocale(locale, "クエスト完了", "퀘스트 완료")}
+        description={pickLocale(locale, run.titleJa, run.titleKo)}
+      >
+        <p className="text-sm font-bold">{completedDate}</p>
+        <p className="mt-4 border-t border-white/35 pt-3 text-sm leading-6">{run.isDemo
           ? pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")
           : pickLocale(locale, "ご自身で確認した手順の記録です。", "직접 확인한 단계를 기록했어요.")}</p>
-      </section>
+      </ScenicHero>
 
       <form onSubmit={handleFeedback} className="seoul-surface rounded-xl p-5 sm:p-6">
         <p className="text-xs font-black tracking-[0.16em] text-[#941e34]">{pickLocale(locale, "かんたんフィードバック", "간단한 피드백")}</p>

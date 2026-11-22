@@ -135,9 +135,9 @@ export function DemoRunner({ runId }: { runId: string }) {
   }
 
   return (
-    <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_18rem] lg:items-start">
+    <div className="grid gap-5 lg:grid-cols-[1fr_18rem] lg:items-start">
       <section className="seoul-surface overflow-hidden rounded-2xl">
-        <div className="bg-[var(--success)] px-6 py-5 text-white sm:px-8">
+        <div className="bg-[linear-gradient(115deg,#46375f,#68558a)] px-6 py-5 text-white sm:px-8">
           <div className="flex items-center justify-between gap-4">
             <span className="rounded-md bg-white/15 px-3 py-1.5 text-xs font-bold">{pickLocale(locale, "手順", "진행 단계")}</span>
             <span className="text-sm font-bold text-[#e5b560]">{currentStep.position} / {run.steps.length}</span>

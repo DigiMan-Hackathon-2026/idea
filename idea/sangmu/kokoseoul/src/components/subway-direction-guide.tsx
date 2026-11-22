@@ -82,7 +82,7 @@ function StationPicker({ id, label, code, onSelect, readings }: {
       ) : (
         <>
           <div className="relative mt-2">
-            <span aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 size-3.5 -translate-y-[60%] rounded-full border-2 border-[var(--seoul-namsan)] after:absolute after:-bottom-1 after:-end-1 after:h-0.5 after:w-1.5 after:rotate-45 after:bg-[var(--seoul-namsan)]" />
+            <span aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 size-3.5 -translate-y-[60%] rounded-full border-2 border-[var(--primary)] after:absolute after:-bottom-1 after:-end-1 after:h-0.5 after:w-1.5 after:rotate-45 after:bg-[var(--primary)]" />
             <input
               id={id}
               ref={field}
@@ -160,8 +160,8 @@ const exitSituations = [
 ] as const;
 
 const choiceClass = "min-h-11 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold aria-pressed:border-[var(--primary)] aria-pressed:bg-[var(--primary-soft)] aria-pressed:text-[var(--primary)]";
-const modeClass = "min-h-11 rounded-md px-1 py-2 text-sm font-bold text-[var(--seoul-palace-brown)] aria-pressed:bg-[var(--seoul-namsan)] aria-pressed:text-white";
-const actionClass = "min-h-12 w-full rounded-lg bg-[var(--primary)] px-4 py-2 font-bold text-white hover:bg-[var(--seoul-palace-brown)]";
+const modeClass = "min-h-11 rounded-md px-1 py-2 text-sm font-bold text-[var(--seoul-palace-brown)] aria-pressed:bg-[var(--primary)] aria-pressed:text-white";
+const actionClass = "seoul-button-primary min-h-12 w-full rounded-xl px-4 py-2 font-bold";
 
 function ExitHelp() {
   const { locale } = useLocale();
@@ -216,7 +216,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
   }
 
   return (
-    <section className="rounded-2xl border border-[var(--border)] bg-white p-3 shadow-[0_12px_32px_rgba(80,78,49,0.07)] sm:p-6" aria-label={pickLocale(locale, "地下鉄の現地サポート", "지하철 현장 안내")}>
+    <section className="rounded-2xl border border-[var(--border)] bg-white p-3 shadow-[0_12px_32px_var(--shadow-color)] sm:p-6" aria-label={pickLocale(locale, "地下鉄の現地サポート", "지하철 현장 안내")}>
       <div className="grid w-full grid-cols-3 gap-1 rounded-xl bg-[var(--surface-muted)] p-1 lg:max-w-sm" role="group" aria-label={pickLocale(locale, "今の状況", "지금 상황")}>
         {(Object.keys(situations) as Situation[]).map((item) => (
           <button key={item} type="button" className={modeClass} aria-pressed={item === situation} onClick={() => updateRide({ ...ride, situation: item })}>
@@ -263,8 +263,8 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
 
           <div className="min-w-0">
           {!trip   && situation === "before" ? (
-              <div className="rounded-xl border border-dashed border-[var(--seoul-namsan)] bg-[var(--success-soft)] p-4 sm:p-6">
-                <h2 className="text-lg font-black text-[var(--seoul-namsan)] sm:text-xl">{pickLocale(locale, "次に停まる駅", "다음 정차역")}</h2>
+              <div className="rounded-xl border border-dashed border-[var(--primary)] bg-[var(--success-soft)] p-4 sm:p-6">
+                <h2 className="text-lg font-black text-[var(--primary)] sm:text-xl">{pickLocale(locale, "次に停まる駅", "다음 정차역")}</h2>
                 <p className="mt-1 text-sm leading-6">{pickLocale(locale, "駅を二つ選ぶと、次の停車駅と乗り換えがここに表示されます。", "역 두 곳을 고르면 다음 정차역과 갈아탈 곳이 여기에 표시돼요.")}</p>
               </div>
             ) : null}
@@ -316,11 +316,11 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                       : pickLocale(locale, `${stationLabel(transfer, locale)}で乗り換えます。乗り換え案内に従って次のホームを確認しましょう。`, `${stationLabel(transfer, locale)}에서 갈아타요. 환승 안내를 따라 다음 승강장을 확인해요.`)}
                   </p>
                 ) : null}
-                <div className="overflow-hidden rounded-xl bg-[var(--seoul-namsan)] text-white" role="status">
+                <div className="overflow-hidden rounded-2xl bg-[linear-gradient(115deg,#292f60,#50538c)] text-white" role="status">
                   <div className="border-b border-white/35 px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5">
                     <h2 className="text-sm font-bold">{pickLocale(locale, "次の駅で方向を照合", "다음 역으로 방향 확인")}</h2>
                     <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-3xl leading-tight font-black tracking-tight sm:text-4xl">
-                      <span className="rounded-md bg-white px-2 py-1 text-base leading-6 tracking-normal tabular-nums text-[var(--seoul-namsan)]">{next.code}</span>
+                      <span className="rounded-md bg-white px-2 py-1 text-base leading-6 tracking-normal tabular-nums text-[var(--primary)]">{next.code}</span>
                       {" "}<span>{pickLocale(locale, next.ja, next.ko)}</span>
                     </p>
                     <p className="mt-2 text-sm font-semibold">
@@ -329,7 +329,7 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
                       {" · "}<span lang="en">{next.en}</span>
                     </p>
                   </div>
-                  <div className="bg-[var(--success-soft)] px-4 py-3 text-[var(--foreground)] sm:px-6">
+                  <div className="bg-[var(--surface-muted)] px-4 py-3 text-[var(--foreground)] sm:px-6">
                   {train !== "express" && next.line !== 1 && next.line !== 4 && next.line !== 9 ? (
                     <p className="text-sm leading-6">{pickLocale(locale, "ホームや車内の表示と見比べてください。", "역이나 열차의 안내 화면과 대조해요.")}</p>
                   ) : null}

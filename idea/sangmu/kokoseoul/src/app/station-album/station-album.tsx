@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale, type Locale } from "@/lib/locale";
 import type { AlbumCard, AlbumLine, getStationAlbum } from "./album-data";
 import { refreshStampCollection, useStampCollection } from "./stamp-collection";
@@ -70,9 +71,11 @@ export function StationAlbum({
 
   return (
     <div className={styles.album}>
-      <header className={styles.intro}>
-        <h1>{t("駅スタンプ図鑑", "역 스탬프 도감")}</h1>
-        <p>{t("路線を選んで、駅名にまつわる物語とスタンプを見てみよう。", "호선을 고르고, 역 이름에 담긴 이야기와 스탬프를 만나보세요.")}</p>
+      <ScenicHero theme="dawn"
+        title={t("駅スタンプ図鑑", "역 스탬프 도감")}
+        description={t("路線を選んで、駅名にまつわる物語とスタンプを見てみよう。", "호선을 고르고, 역 이름에 담긴 이야기와 스탬프를 만나보세요.")}
+      />
+      <div className="scenic-content">
         <div className={styles.collectionSummary}>
           <p>
             <strong>{t("全体の収集状況", "전체 수집 현황")}</strong>{" "}
@@ -87,7 +90,7 @@ export function StationAlbum({
             </div>
           )}
         </div>
-      </header>
+      </div>
       <nav className={styles.lines} aria-label={t("路線を選ぶ", "호선 선택")}>
         {lineIndex.map(({ line: item, keys: stationKeys }) => (
           <Link key={item.id} href={albumLink(item.id, { collectedOnly })} prefetch={false}

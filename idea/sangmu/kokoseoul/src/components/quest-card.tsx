@@ -46,7 +46,7 @@ export function QuestCard({
         </h2>
         <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
 
-        <div className="mt-4 rounded-lg bg-[var(--success-soft)] px-4 py-3">
+        <div className="mt-4 rounded-lg bg-[var(--surface-muted)] px-4 py-3">
           <p className="text-xs font-black tracking-[0.08em] text-[#455f54]">
             {pickLocale(locale, "おすすめの理由", "추천하는 이유")}
           </p>
