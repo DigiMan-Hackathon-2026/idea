@@ -74,4 +74,10 @@ describe("quest catalog", () => {
     expect(new Set(questCatalog.map((quest) => quest.id)).size).toBe(questCatalog.length);
     expect(new Set(questCatalog.map((quest) => quest.slug)).size).toBe(questCatalog.length);
   });
+
+  it("gives every quest a subway exit so it can be found from a station", () => {
+    // The shopping demo's start point is seeded with sample exits in scripts/db/seed-demo.mjs instead.
+    const withoutExit = questCatalog.filter((quest) => !getQuestAccess(quest.id)).map((quest) => quest.slug);
+    expect(withoutExit).toEqual(["seongsu-oliveyoung-shopping"]);
+  });
 });

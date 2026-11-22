@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { FilterForm } from "@/components/filter-form";
+import { QuestExitLabel } from "@/components/quest-access-card";
 import { QuestResultsView } from "@/components/quest-results-view";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -349,6 +350,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
           {featured.map(({ quest, href, label, detail, action }) => (
             <article key={quest.id} className="seoul-surface flex flex-col items-start rounded-xl p-5 sm:p-6">
               <p className="seoul-kicker text-sm">{label}</p>
+              <QuestExitLabel questId={quest.id} locale={locale} />
               <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, quest.titleJa, quest.titleKo)}</h2>
               <p className="mt-2 font-bold text-slate-600">{detail}</p>
               <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>

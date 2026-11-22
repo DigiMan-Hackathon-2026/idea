@@ -56,3 +56,20 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
     </section>
   );
 }
+
+/** One-line exit label for quest lists, e.g. "4호선 명동역 8번 출구". */
+export function QuestExitLabel({ questId, locale }: { questId: string; locale: Locale }) {
+  const access = getQuestAccess(questId);
+  if (!access) return null;
+  const { exit } = access;
+  return (
+    <p className="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-bold text-slate-600">
+      {exit.stations.map(({ line, code }) => (
+        <span key={code} className="rounded border-s-4 bg-white px-1.5" style={{ borderInlineStartColor: subwayLineColors[line] }}>
+          {pickLocale(locale, `${line}号線`, `${line}호선`)}
+        </span>
+      ))}
+      <span>{pickLocale(locale, exit.nameJa, exit.nameKo)}</span>
+    </p>
+  );
+}
