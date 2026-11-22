@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import locations from "../../../scripts/db/quest-search-locations.json";
 import { subwayStations } from "../transit/subway-network";
-import { buildStationNextSteps, findQuestStationsFrom, findStationQuests, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
+import { buildStationNextSteps, findQuestStationsFrom, findStationQuests, resolveRouteTarget, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
 import { questCatalog, questCatalogVersions } from "./quest-catalog";
 
 const codeOf = (ko: string, line: number) => subwayStations.find((station) => station.ko === ko && station.line === line)!.code;
@@ -69,6 +69,24 @@ describe("quest stations reachable by subway", () => {
 
   it("returns nothing for an unknown code", () => {
     expect(findQuestStationsFrom("nope")).toEqual([]);
+  });
+});
+
+describe("route targets for the subway guide", () => {
+  it("opens a quest's exit station with every platform and the quest named", () => {
+    expect(resolveRouteTarget({ quest: "dongdaemun-market-small-trim" })).toMatchObject({
+      codes: [codeOf("동대문", 1), codeOf("동대문", 4)],
+      stationKo: "동대문",
+      exitKo: "동대문역 9번 출구",
+      quest: { slug: "dongdaemun-market-small-trim" },
+    });
+  });
+
+  it("falls back to a station code and rejects what it cannot route to", () => {
+    expect(resolveRouteTarget({ to: codeOf("명동", 4) })).toMatchObject({ codes: [codeOf("명동", 4)], quest: null, exitKo: null });
+    expect(resolveRouteTarget({ quest: "seongsu-seoul-forest-walk" })).toBeNull();
+    expect(resolveRouteTarget({ quest: "no-such-quest", to: "nope" })).toBeNull();
+    expect(resolveRouteTarget({})).toBeNull();
   });
 });
 

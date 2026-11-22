@@ -67,6 +67,10 @@ export default async function QuestCoursesPage() {
                 <p className="mt-3 text-sm font-bold">
                   {pickLocale(locale, `出発: ${course.stops[0].access.exit.nameJa}`, `출발: ${course.stops[0].access.exit.nameKo}`)}
                   {" · "}
+                  <Link href={`/subway?quest=${encodeURIComponent(course.stops[0].access.quest.slug)}`} className="inline-flex min-h-11 items-center text-[var(--primary)] underline">
+                    {pickLocale(locale, "ここまでの行き方", "여기까지 가는 길")}
+                  </Link>
+                  {" · "}
                   <Link href={`/subway?station=${course.stops[0].access.exit.stations[0].code}#station-interior-title`} className="inline-flex min-h-11 items-center text-[var(--primary)] underline">
                     {pickLocale(locale, "この駅の構内案内", "이 역의 내부 안내")}
                   </Link>

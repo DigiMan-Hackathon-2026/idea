@@ -1,11 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { NearbyStationPicker } from "@/app/subway/nearby-station-picker";
 import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionAnimation } from "@/components/subway-direction-animation";
 import { SubwayToggleRow } from "@/components/subway-toggle-row";
 import { SubwayTransferSignCheck } from "@/components/subway-transfer-sign-check";
 import { pickLocale, type Locale } from "@/lib/locale";
+import type { RouteTarget } from "@/modules/content/quest-access";
+import { bestDestinationFor } from "@/modules/transit/route-destination";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getSubwayNeighbors, getSubwayStation, getSubwayTransfer, getSubwayTrip, isLineNineExpressStop, subwayStations, type SubwayStation } from "@/modules/transit/subway-network";
 import { emptySubwayRide, readSavedRide, restoreSubwayRide, saveSubwayRide, subscribeToSavedRide, type SubwayRide } from "@/modules/transit/saved-subway-ride";
@@ -197,13 +201,38 @@ function ExitHelp() {
   );
 }
 
-export function SubwayDirectionGuide({ readings, onViewStation }: {
+function RouteTargetNote({ target }: { target: RouteTarget }) {
+  const { locale } = useLocale();
+  const station = pickLocale(locale, `${target.stationJa}駅`, `${target.stationKo}역`);
+  const exit = target.exitJa && target.exitKo ? pickLocale(locale, target.exitJa, target.exitKo) : null;
+  return (
+    <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm leading-6" role="note">
+      {target.quest ? (
+        <p className="font-bold">
+          {pickLocale(locale, "クエスト", "퀘스트")}{" "}
+          <Link href={`/quests/${target.quest.slug}`} className="text-[var(--primary)] underline">{pickLocale(locale, target.quest.titleJa, target.quest.titleKo)}</Link>
+        </p>
+      ) : null}
+      <p>
+        {exit
+          ? pickLocale(locale, `${exit}まで行きます。今いる駅を選ぶと、乗る方向と乗り換えが分かります。`, `${exit}까지 가요. 지금 있는 역을 고르면 타는 방향과 갈아탈 곳이 나와요.`)
+          : pickLocale(locale, `${station}まで行きます。今いる駅を選ぶと、乗る方向と乗り換えが分かります。`, `${station}까지 가요. 지금 있는 역을 고르면 타는 방향과 갈아탈 곳이 나와요.`)}
+      </p>
+    </div>
+  );
+}
+
+export function SubwayDirectionGuide({ readings, onViewStation, routeTarget = null }: {
   readings: Record<string, string>;
   onViewStation: (code: string) => void;
+  /** Open with this destination (e.g. a quest's exit station) instead of the saved ride. */
+  routeTarget?: RouteTarget | null;
 }) {
   const { locale } = useLocale();
   const saved = restoreSubwayRide(useSyncExternalStore(subscribeToSavedRide, readSavedRide, () => null));
-  const [draft, setDraft] = useState<SubwayRide | null>(null);
+  const [draft, setDraft] = useState<SubwayRide | null>(
+    () => routeTarget ? { ...emptySubwayRide, destination: routeTarget.codes[0] } : null,
+  );
   const [storageFailed, setStorageFailed] = useState(false);
   const ride = draft ?? saved ?? emptySubwayRide;
   const { situation, origin, destination, train } = ride;
@@ -230,6 +259,14 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
   const observedStation = getSubwayStation(observed);
   const differs = next && observedStation && next.code !== observedStation.code;
 
+  // A target station with several platforms gets the one this origin reaches most easily.
+  function selectOrigin(code: string) {
+    const destinationFor = routeTarget?.codes.includes(ride.destination)
+      ? bestDestinationFor(code, routeTarget.codes, ride.destination)
+      : ride.destination;
+    updateRide({ ...ride, origin: code, destination: destinationFor, transfer: "", train: "local" });
+  }
+
   function updateRide(next: SubwayRide) {
     setDraft(next);
     setObserved("");
@@ -250,7 +287,9 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
         <div className="mt-4 grid items-start gap-3 sm:mt-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-5">
           <div className="min-w-0 rounded-xl bg-[var(--surface-muted)] p-3 sm:p-5">
             <div className="grid items-start gap-3">
-              <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={(code) => updateRide({ ...ride, origin: code, transfer: "", train: "local" })} readings={readings} />
+              {routeTarget ? <RouteTargetNote target={routeTarget} /> : null}
+              <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={selectOrigin} readings={readings} />
+              {routeTarget && !origin ? <NearbyStationPicker onSelect={selectOrigin} /> : null}
               <StationPicker id="subway-destination" label={pickLocale(locale, "降りたい駅", "내릴 역")} code={destination} readings={readings} onSelect={(code) => updateRide({ ...ride, destination: code, transfer: "" })} />
               {destination ? (
                 <button type="button" className="min-h-11 justify-self-start text-sm font-bold text-[var(--primary)] underline" onClick={() => onViewStation(destination)}>

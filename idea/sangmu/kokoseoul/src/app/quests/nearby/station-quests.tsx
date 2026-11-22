@@ -143,6 +143,9 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
             </div>
           ) : null}
           <div className="mt-2 flex flex-wrap gap-x-5 text-sm font-bold text-[var(--primary)]">
+            <Link href={`/subway?to=${station.code}`} className="inline-flex min-h-11 items-center underline">
+              {pickLocale(locale, "この駅までの行き方を調べる", "이 역까지 가는 길 찾기")}
+            </Link>
             <Link href={`/subway?station=${station.code}#station-interior-title`} className="inline-flex min-h-11 items-center underline">
               {pickLocale(locale, "この駅の構内案内を見る", "이 역의 내부 안내 보기")}
             </Link>

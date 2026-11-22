@@ -201,3 +201,42 @@ export function describeCourseLeg(fromQuestId: string, toQuestId: string): Cours
   }
   return best ?? { kind: "unknown", straightLineM };
 }
+
+/** A destination the subway route guide can open with, plus what to say about it. */
+export type RouteTarget = {
+  /** All Line 1–9 platforms of the destination station; the guide picks one once the origin is known. */
+  codes: string[];
+  stationKo: string;
+  stationJa: string;
+  exitKo: string | null;
+  exitJa: string | null;
+  quest: { slug: string; titleKo: string; titleJa: string } | null;
+};
+
+/** Resolves `?quest=<slug>` (the quest's catalog exit) or `?to=<station code>`; null when neither names a Line 1–9 station. */
+export function resolveRouteTarget({ quest, to }: { quest?: string; to?: string }): RouteTarget | null {
+  if (quest) {
+    const access = accesses.find((item) => item.quest.slug === quest);
+    const station = access?.exit.stations[0];
+    if (access && station) {
+      return {
+        codes: access.exit.stations.map((item) => item.code),
+        stationKo: station.ko,
+        stationJa: station.ja,
+        exitKo: access.exit.nameKo,
+        exitJa: access.exit.nameJa,
+        quest: { slug: access.quest.slug, titleKo: access.quest.titleKo, titleJa: access.quest.titleJa },
+      };
+    }
+  }
+  const station = to ? getSubwayStation(to) : undefined;
+  if (!station) return null;
+  return {
+    codes: subwayStations.filter((item) => item.ko === station.ko).sort((a, b) => a.line - b.line).map((item) => item.code),
+    stationKo: station.ko,
+    stationJa: station.ja,
+    exitKo: null,
+    exitJa: null,
+    quest: null,
+  };
+}

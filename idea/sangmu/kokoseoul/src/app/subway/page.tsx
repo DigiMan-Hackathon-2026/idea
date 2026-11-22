@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SubwayFieldGuide } from "@/components/subway-field-guide";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
+import { resolveRouteTarget } from "@/modules/content/quest-access";
 import { getSubwayStation } from "@/modules/transit/subway-network";
 import { getSeongsuStationSnapshot } from "@/modules/transit/seoul-metro.server";
 import { SubwayPageContent } from "./subway-page-content";
@@ -35,12 +36,18 @@ async function SeongsuExitGuide() {
   return <SubwayFieldGuide stationSnapshot={stationSnapshot} />;
 }
 
-type SearchParams = Promise<{ station?: string | string[] }>;
+type SearchParams = Promise<{ station?: string | string[]; quest?: string | string[]; to?: string | string[] }>;
+
+const single = (value: string | string[] | undefined) => (typeof value === "string" ? value : undefined);
 
 async function SubwayContent({ searchParams }: { searchParams: SearchParams }) {
-  const { station } = await searchParams;
-  const initialStation = typeof station === "string" && getSubwayStation(station) ? station : "";
-  return <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} initialStation={initialStation} />;
+  const params = await searchParams;
+  const station = single(params.station);
+  const initialStation = station && getSubwayStation(station) ? station : "";
+  const routeTarget = resolveRouteTarget({ quest: single(params.quest), to: single(params.to) });
+  return (
+    <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} initialStation={initialStation} routeTarget={routeTarget} />
+  );
 }
 
 async function SubwayFallback() {

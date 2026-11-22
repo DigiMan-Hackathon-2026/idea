@@ -6,13 +6,16 @@ import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionGuide } from "@/components/subway-direction-guide";
 import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
+import type { RouteTarget } from "@/modules/content/quest-access";
 import { StationInteriorGuide } from "./station-interior-guide";
 
-export function SubwayPageContent({ readings, exitGuide, initialStation = "" }: {
+export function SubwayPageContent({ readings, exitGuide, initialStation = "", routeTarget = null }: {
   readings: Record<string, string>;
   exitGuide: ReactNode;
   /** Station code to open in the interior guide, e.g. from a quest's exit card. */
   initialStation?: string;
+  /** Destination to open the route guide with, e.g. a quest's exit station. */
+  routeTarget?: RouteTarget | null;
 }) {
   const { locale } = useLocale();
   const [guideStation, setGuideStation] = useState(initialStation);
@@ -30,7 +33,7 @@ export function SubwayPageContent({ readings, exitGuide, initialStation = "" }: 
         title={pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
         description={pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}
       />
-      <div className="scenic-content"><SubwayDirectionGuide readings={readings} onViewStation={viewStation} /></div>
+      <div className="scenic-content"><SubwayDirectionGuide readings={readings} onViewStation={viewStation} routeTarget={routeTarget} /></div>
       <StationInteriorGuide code={guideStation} onSelect={setGuideStation} onNearbySelect={viewStation} readings={readings} titleRef={guideTitle} />
       <details className="mt-5 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
         <summary className="min-h-12 cursor-pointer py-3.5 font-bold">

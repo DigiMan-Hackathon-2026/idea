@@ -84,3 +84,28 @@ test("reaches station quests from the home shortcuts", async ({ page }) => {
   await expect(page).toHaveURL(/\/quests\/nearby$/);
   await expect(page.getByRole("region", { name: "駅から探す" })).toBeVisible();
 });
+
+test("plans the ride to a quest's exit and picks the platform that avoids a change", async ({ page }) => {
+  await page.goto("/quests/dongdaemun-market-small-trim");
+  await page.getByRole("region", { name: "地下鉄で行く" }).getByRole("link", { name: "ここまでの行き方を調べる" }).click();
+  await expect(page).toHaveURL(/\/subway\?quest=dongdaemun-market-small-trim/);
+  const guide = page.getByRole("region", { name: "地下鉄の現地サポート" });
+  await expect(guide.getByRole("note")).toContainText("東大門駅9番出口まで行きます。");
+  await expect(guide.getByText("128 トンデムン", { exact: true })).toBeVisible();
+
+  await guide.getByRole("textbox", { name: "今いる駅" }).fill("424");
+  await guide.getByRole("button", { name: /^424 / }).click();
+  await expect(guide.getByText("421 トンデムン", { exact: true }).first()).toBeVisible();
+  await expect(guide.getByText("128 トンデムン", { exact: true })).toHaveCount(0);
+});
+
+test("finds the nearest station as the starting point for a quest route", async ({ page, context }) => {
+  await context.grantPermissions(["geolocation"]);
+  await context.setGeolocation({ latitude: 37.5609, longitude: 126.9863, accuracy: 25 });
+  await page.goto("/subway?quest=dongdaemun-market-small-trim");
+  const guide = page.getByRole("region", { name: "地下鉄の現地サポート" });
+  await guide.getByRole("button", { name: "現在地から駅を探す" }).click();
+  await guide.getByRole("button", { name: /4号線 424/ }).click();
+  await expect(guide.getByText("421 トンデムン", { exact: true }).first()).toBeVisible();
+  await expect(guide.getByRole("button", { name: "現在地から駅を探す" })).toHaveCount(0);
+});

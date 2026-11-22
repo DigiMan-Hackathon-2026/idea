@@ -44,6 +44,11 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
       ) : null}
       <div className="mt-1 flex flex-wrap gap-x-5 text-sm">
         {station ? (
+          <Link href={`/subway?quest=${encodeURIComponent(access.quest.slug)}`} className={linkClass}>
+            {pickLocale(locale, "ここまでの行き方を調べる", "여기까지 가는 길 찾기")}
+          </Link>
+        ) : null}
+        {station ? (
           <Link href={`/subway?station=${station.code}#station-interior-title`} className={linkClass}>
             {pickLocale(locale, "この駅の構内案内を見る", "이 역의 내부 안내 보기")}
           </Link>
