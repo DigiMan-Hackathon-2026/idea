@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { getSubwaySignDirections } from "./subway-network";
-import { readPlatformSign } from "./station-sign";
+import { getSubwaySignDirections, getSubwayStation } from "./subway-network";
+import { comparePlatformDirection, readNextStation, readPlatformSign } from "./station-sign";
 import type { SignPanel } from "./transfer-arrow";
 import { selectTransferArrow } from "./transfer-panel";
 
@@ -60,4 +60,21 @@ it("demands an explicit line plus two same-side station names before resolving a
   expect(selectTransferArrow(panels, [bilingual, two], 3, direction)).toEqual(left.arrow);
   expect(selectTransferArrow(panels, [{ ...bilingual, text: "3호선 Jongno 3(Sam)-ga" }, two], 3, direction)).toBeNull();
   expect(selectTransferArrow(panels, [{ ...bilingual, text: "3호선 Line 2" }, two], 3, direction)).toBeNull();
+});
+
+it("requires a verified next station before saying the boarding direction is correct", () => {
+  const station = getSubwayStation("330")!;
+  const expected = getSubwayStation("329")!;
+  const opposite = getSubwayStation("331")!;
+  const otherPlatform = getSubwayStation("203")!;
+  expect(readNextStation("329\n", 95, station.code)).toEqual(expected);
+  expect(readNextStation("331", 92, station.code)).toEqual(opposite);
+  expect(readNextStation("329 331", 99, station.code)).toBeNull();
+  expect(readNextStation("329", 54, station.code)).toBeNull();
+  expect(readNextStation("328", 95, station.code)).toBeNull();
+  expect(comparePlatformDirection({ station, next: null }, station, expected)).toBe("unconfirmed");
+  expect(comparePlatformDirection({ station, next: expected }, station, expected)).toBe("match");
+  expect(comparePlatformDirection({ station, next: opposite }, station, expected)).toBe("different");
+  expect(comparePlatformDirection({ station: otherPlatform, next: expected }, station, expected)).toBe("other-platform");
+  expect(comparePlatformDirection({ station, next: expected }, null, null)).toBe("no-route");
 });

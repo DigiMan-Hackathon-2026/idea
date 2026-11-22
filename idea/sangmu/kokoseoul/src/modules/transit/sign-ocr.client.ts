@@ -92,6 +92,26 @@ function stripInk(context: CanvasRenderingContext2D, width: number, height: numb
   return true;
 }
 
+function codeInkThreshold({ data, width, height }: ImageData) {
+  const centerX = (width - 1) / 2;
+  const centerY = (height - 1) / 2;
+  const radiusX = Math.max(1, centerX - 8);
+  const radiusY = Math.max(1, centerY - 8);
+  const values = [];
+  for (let y = 8; y < height - 8; y++) {
+    for (let x = 8; x < width - 8; x++) {
+      if (((x - centerX) / radiusX) ** 2 + ((y - centerY) / radiusY) ** 2 > 0.87) continue;
+      const i = (y * width + x) * 4;
+      values.push(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+    }
+  }
+  values.sort((a, b) => a - b);
+  if (!values.length) return 100;
+  const dark = values[Math.floor(values.length * 0.18)];
+  const background = values[Math.floor(values.length * 0.54)];
+  return Math.min(background - 11, (dark + background) / 2);
+}
+
 export async function readSignRegion(
   worker: Worker,
   source: HTMLCanvasElement,
@@ -126,22 +146,39 @@ export async function readSignRegion(
       }
     }
   }
-  if (kind !== "label") {
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  const raw = kind === "label" ? null : context.getImageData(0, 0, canvas.width, canvas.height);
+  const inkThreshold = kind === "code" && raw ? codeInkThreshold(raw) : 0;
+  function drawReadableInk(threshold: number) {
+    if (!raw) return;
+    const pixels = new ImageData(new Uint8ClampedArray(raw.data), raw.width, raw.height);
     for (let i = 0; i < pixels.data.length; i += 4) {
-      const [r, g, b] = [pixels.data[i], pixels.data[i + 1], pixels.data[i + 2]];
-      // Color belongs to the badge. Preserve its neutral dark characters.
-      const gray = r * 0.299 + g * 0.587 + b * 0.114;
-      const value = kind === "code" ? (Math.max(r, g, b) < 115 ? 0 : 255) : (gray - 90) * 2.05;
+      const gray = pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114;
+      const value = kind === "code" ? (gray < threshold ? 0 : 255) : (gray - 90) * 2.05;
       pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = value;
     }
-    context.putImageData(pixels, 0, 0);
+    context!.putImageData(pixels, 0, 0);
   }
+  drawReadableInk(inkThreshold);
   const cleanedStrip = kind === "label" && stripInk(context, canvas.width, canvas.height);
   const { PSM } = await import("tesseract.js");
   const mode = kind === "code" ? PSM.SINGLE_WORD : kind === "station" || cleanedStrip ? PSM.SPARSE_TEXT : PSM.SINGLE_BLOCK;
   const options = { tessedit_pageseg_mode: mode, tessedit_char_whitelist: kind === "code" ? "0123456789P-" : "" };
   await worker.setParameters(options);
-  const { data } = await worker.recognize(canvas);
+  let { data } = await worker.recognize(canvas);
+  if (kind === "code" && data.confidence < 76) {
+    // Small station numbers can look narrower after scaling camera frames.
+    const retryCanvas = document.createElement("canvas");
+    const width = Math.round(canvas.width * 1.3);
+    retryCanvas.width = width + 24;
+    retryCanvas.height = canvas.height + 16;
+    const retryContext = retryCanvas.getContext("2d");
+    if (retryContext) {
+      retryContext.fillStyle = "#fff";
+      retryContext.fillRect(0, 0, retryCanvas.width, retryCanvas.height);
+      retryContext.drawImage(canvas, 12, 8, width, canvas.height);
+      const retry = await worker.recognize(retryCanvas);
+      if (retry.data.confidence > data.confidence) data = retry.data;
+    }
+  }
   return { text: data.text, confidence: data.confidence, coloredStrip: cleanedStrip };
 }

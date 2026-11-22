@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { SubwaySignCamera } from "@/components/subway-sign-camera";
 import { getSubwaySignDirections, getSubwayStation } from "@/modules/transit/subway-network";
 
-type CameraParams = Promise<{ platform?: string | string[]; destination?: string | string[] }>;
+type CameraParams = Promise<{ platform?: string | string[]; destination?: string | string[]; view?: string | string[] }>;
 
 async function SignCameraContent({ searchParams }: { searchParams: CameraParams }) {
   const params = await searchParams;
@@ -10,6 +10,7 @@ async function SignCameraContent({ searchParams }: { searchParams: CameraParams 
   const destination = typeof params.destination === "string" ? getSubwayStation(params.destination) : undefined;
   const directions = platform && destination ? getSubwaySignDirections(platform.code, destination.code) : null;
   return <SubwaySignCamera
+    initialMode={params.view === "direction" ? "platform" : "transfer"}
     line={platform?.line ?? 3}
     platform={platform ?? null}
     next={directions?.next ?? null}

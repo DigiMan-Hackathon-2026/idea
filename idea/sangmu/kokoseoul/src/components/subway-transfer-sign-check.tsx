@@ -105,7 +105,7 @@ export function SubwayTransferSignCheck({ platform, destination }: { platform: S
       </p>
       <a href={`/subway/sign-camera?platform=${encodeURIComponent(platform.code)}&destination=${encodeURIComponent(destination)}`}
         target="_top" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
-        {pickLocale(locale, "カメラで乗り換え表示・ホームを確認", "카메라로 환승 표지·승강장 확인")}
+        {pickLocale(locale, "カメラで乗り換え・乗車方向を確認", "카메라로 환승·승차 방향 확인")}
       </a>
       <div role="status" className={resultMessage ? "mt-2 text-sm font-bold leading-6" : undefined}>
         {resultMessage}

@@ -387,6 +387,12 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                       {locale === "ja" ? <> · <span lang="ko">{next.ko}</span></> : null}
                       {" · "}<span lang="en">{next.en}</span>
                     </p>
+                    {originStation && originStation.line === next.line && situation === "before" && train === "local" ? (
+                      <a href={`/subway/sign-camera?platform=${encodeURIComponent(originStation.code)}&destination=${encodeURIComponent(destination)}&view=direction`}
+                        target="_top" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-white underline">
+                        {pickLocale(locale, "カメラで乗る方向を確認", "카메라로 승차 방향 확인")}
+                      </a>
+                    ) : null}
                   </div>
                   <div className="bg-[var(--surface-muted)] px-4 py-3 text-[var(--foreground)] sm:px-6">
                   {train !== "express" && next.line !== 1 && next.line !== 4 && next.line !== 9 ? (

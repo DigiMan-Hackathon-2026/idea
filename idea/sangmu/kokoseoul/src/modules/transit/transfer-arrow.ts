@@ -134,7 +134,7 @@ function rateArrow(mask: Uint8Array, stride: number, box: ImageBox, direction: t
   return common / union;
 }
 
-function readArrow(mask: Uint8Array, stride: number, box: ImageBox): ArrowDirection | null {
+function readArrow(mask: Uint8Array, stride: number, box: ImageBox, minimum = 0.57): ArrowDirection | null {
   const straight = arrowDirections.map((direction) => ({ direction, score: rateArrow(mask, stride, box, direction, 0) }));
   const needsTilt = straight.every(({ score }) => score < 0.64);
   const scores = (needsTilt ? straight.map(({ direction, score }) => ({
@@ -142,7 +142,7 @@ function readArrow(mask: Uint8Array, stride: number, box: ImageBox): ArrowDirect
     score: Math.max(score, ...[-0.18, 0.18].map((tilt) => rateArrow(mask, stride, box, direction, tilt))),
   })) : straight).sort((a, b) => b.score - a.score);
   const [best, runnerUp] = scores;
-  if (best.direction === "down" || best.score < 0.57 || best.score - runnerUp.score < 0.15) return null;
+  if (best.direction === "down" || best.score < minimum || best.score - runnerUp.score < 0.15) return null;
   return best.direction;
 }
 
@@ -258,9 +258,7 @@ export function findTransferPanels(frame: ImageData, line: SubwayLine): SignPane
   });
 }
 
-// Screen-door strips often print a dark station code in a colored disc. Limit
-// the search to the viewfinder and give the central, larger disc priority.
-export function findPlatformSignRegions(frame: ImageData, guide: ImageBox) {
+function coloredMarkers(frame: ImageData, guide: ImageBox) {
   const mask = new Uint8Array(guide.width * guide.height);
   for (let y = 0; y < guide.height; y++) {
     for (let x = 0; x < guide.width; x++) {
@@ -272,7 +270,12 @@ export function findPlatformSignRegions(frame: ImageData, guide: ImageBox) {
       mask[y * guide.width + x] = Number(max > 118 && max - Math.min(red, green, blue) > 34);
     }
   }
-  const markers = components(mask, guide.width, guide.height).filter(({ x, width, height, area }) =>
+  return components(mask, guide.width, guide.height);
+}
+
+// Screen-door strips often print a dark station code in a colored disc.
+export function findPlatformSignRegions(frame: ImageData, guide: ImageBox) {
+  const markers = coloredMarkers(frame, guide).filter(({ x, width, height, area }) =>
     x < guide.width * 0.68 && width >= 16 && width <= guide.width * 0.36
     && width / height >= 0.72 && width / height <= 1.5
     && area / (width * height) >= 0.48 && area / (width * height) <= 0.88)
@@ -288,5 +291,52 @@ export function findPlatformSignRegions(frame: ImageData, guide: ImageBox) {
   return {
     code: { x: badge.x, y: badge.y, width: badge.width, height: badge.height },
     name: { x: nameX, y: nameY, width: nameRight - nameX, height: nameHeight },
+  };
+}
+
+
+export function findPlatformDirectionRegion(frame: ImageData, current: ImageBox, name: ImageBox) {
+  const center = current.y + current.height / 2;
+  const y = Math.max(0, Math.floor(center - current.height * 0.59));
+  const height = Math.min(frame.height - y, Math.ceil(current.height * 1.18));
+  const mask = new Uint8Array(frame.width * height);
+
+  for (let row = 0; row < height; row++) {
+    for (let x = 0; x < frame.width; x++) {
+      const i = ((y + row) * frame.width + x) * 4;
+      const max = Math.max(frame.data[i], frame.data[i + 1], frame.data[i + 2]);
+      const min = Math.min(frame.data[i], frame.data[i + 1], frame.data[i + 2]);
+      mask[row * frame.width + x] = Number(max < 158 && max - min < 42);
+    }
+  }
+
+  const arrows = components(mask, frame.width, height).flatMap((box) => {
+    if (box.width < current.width * 0.36 || box.width > current.width * 1.45
+      || box.height < current.height * 0.39 || box.height > current.height * 1.02
+      || box.area / (box.width * box.height) > 0.56) return [];
+    const direction = readArrow(mask, frame.width, box, 0.54);
+    const leftGap = current.x - (box.x + box.width);
+    const rightGap = box.x - (name.x + name.width);
+    const isAdjacent = direction === "left" && leftGap >= 0 && leftGap <= current.width * 2.1
+      || direction === "right" && box.x > current.x + current.width && rightGap >= -current.width && rightGap <= current.width * 3.7;
+    return isAdjacent ? [{ ...box, y: box.y + y, direction }] : [];
+  });
+  if (arrows.length !== 1) return null;
+
+  const [arrow] = arrows;
+  const x = arrow.direction === "left" ? 0 : arrow.x + arrow.width;
+  const width = arrow.direction === "left" ? arrow.x : frame.width - x;
+  if (width < current.width * 0.32) return null;
+  const side = { x, y, width, height };
+  const markers = coloredMarkers(frame, side).filter((box) =>
+    box.width >= current.width * 0.29 && box.width <= current.width * 0.91
+    && box.height >= current.height * 0.26 && box.height <= current.height * 0.94
+    && box.height / box.width > 0.68 && box.height / box.width < 1.42
+    && box.area / (box.width * box.height) > 0.45 && box.area / (box.width * box.height) < 0.9);
+  if (markers.length !== 1) return null;
+  const [marker] = markers;
+  return {
+    code: { x: x + marker.x, y: y + marker.y, width: marker.width, height: marker.height },
+    arrow,
   };
 }
