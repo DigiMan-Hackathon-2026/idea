@@ -1,5 +1,6 @@
 import "server-only";
 import stationCards from "../../../research/desk/substamp/station-cards.draft.json";
+import { subwayStations } from "@/modules/transit/subway-stations";
 import stationLocations from "./station-points.json";
 import type { StationPoint } from "./stamp-proximity";
 
@@ -20,11 +21,18 @@ type Card = (typeof stationCards.cards)[number];
 type StationName = Pick<Card, "stationKey" | "readingKoKana">;
 export type AlbumCard = Pick<Card, "stationKey" | "readingKoKana" | "hanja" | "titleJa" | "storyJa" | "storyKind" | "officialOriginKo" | "kanjiNoteJa"> & {
   related: (StationName & { lineId: number })[];
+  characterSrc: string | null;
   sourceUrls: string[];
   stationPoints: StationPoint[];
 };
 
 const pointsByKey: Readonly<Record<string, number[][] | undefined>> = stationLocations.stations;
+const stationCodesByLineAndName = new Map(subwayStations.map(({ line, ko, code }) => [`${line}:${ko}`, code]));
+
+function getCharacterSrc(line: number, stationKey: string) {
+  const code = stationCodesByLineAndName.get(`${line}:${stationKey}`);
+  return code ? `/station-characters/${code}.webp` : null;
+}
 
 function numberedLine(name: string) {
   const match = /^0?([1-9])호선(?:\(연장\))?$/.exec(name);
@@ -65,6 +73,7 @@ export function getStationAlbum(requestedLine: unknown) {
       storyKind: card.storyKind,
       officialOriginKo: card.officialOriginKo,
       kanjiNoteJa: card.kanjiNoteJa,
+      characterSrc: getCharacterSrc(line.id, card.stationKey),
       sourceUrls: card.source?.urls ?? [],
       stationPoints: (pointsByKey[card.stationKey] ?? []).flatMap(([latitude, longitude]): StationPoint[] =>
         Number.isFinite(latitude) && Math.abs(latitude) <= 90 &&

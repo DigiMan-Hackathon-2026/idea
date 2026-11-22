@@ -43,7 +43,7 @@ function StationStamp({ line, card, locale, collected }: { line: AlbumLine; card
   return (
     <StampImage key={`${line.id}:${card.stationKey}:${locale}`} color={line.color} motif={line.motif}
       lineId={line.id} lineLabel={lineLabel(locale, line.id)} stationName={card.stationKey}
-      locale={locale} collected={collected} stationPoints={card.stationPoints}>
+      locale={locale} collected={collected} stationPoints={card.stationPoints} characterSrc={card.characterSrc}>
       {pickLocale(locale, line.ja, line.ko)}
       <CollectionStatus collected={collected} locale={locale} />
     </StampImage>

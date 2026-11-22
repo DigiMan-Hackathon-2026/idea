@@ -13,8 +13,10 @@ test("awards station stamps near the station and downloads the saved PNG", async
   await page.getByRole("link", { name: "역 스탬프 도감 보기" }).click();
   await page.getByRole("navigation", { name: "호선 선택" })
     .getByRole("link", { name: /^2호선/ }).click();
+  const characterResponse = page.waitForResponse("**/station-characters/211.webp");
   await page.getByRole("region", { name: "2호선" })
     .getByRole("link", { name: /^성수 미획득$/ }).click();
+  expect((await characterResponse).ok()).toBe(true);
 
   const story = page.getByRole("article", { name: "성수", exact: true });
   const claim = story.getByRole("button", { name: "현재 위치 확인하고 스탬프 받기" });
@@ -32,6 +34,25 @@ test("awards station stamps near the station and downloads the saved PNG", async
   expect(png.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   expect(png.readUInt32BE(16)).toBe(960);
   expect(png.readUInt32BE(20)).toBe(960);
+  const canvas = story.getByRole("img", { name: "2호선 성수" });
+  const matchesDisplay = await canvas.evaluate(async (stamp: HTMLCanvasElement, downloaded: string) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${downloaded}`;
+    await image.decode();
+    const scratch = document.createElement("canvas");
+    scratch.width = stamp.width;
+    scratch.height = stamp.height;
+    const display = stamp.getContext("2d")!;
+    const decoded = scratch.getContext("2d")!;
+    decoded.drawImage(image, 0, 0);
+    // The central area is opaque paper, so PNG and canvas alpha rounding cannot affect this comparison.
+    const saved = decoded.getImageData(260, 260, 440, 400).data;
+    const shown = display.getImageData(260, 260, 440, 400).data;
+    const hasCharacterOutline = shown.some((value, index) => index % 4 === 0 &&
+      value === 21 && shown[index + 1] === 56 && shown[index + 2] === 42);
+    return hasCharacterOutline && saved.every((value, index) => value === shown[index]);
+  }, png.toString("base64"));
+  expect(matchesDisplay).toBe(true);
 
   await page.reload();
   await expect(save).toBeVisible();

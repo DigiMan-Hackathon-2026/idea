@@ -110,8 +110,9 @@ function drawMotif(ctx: CanvasRenderingContext2D, motif: StampMotif) {
 
 export function drawStamp(
   canvas: HTMLCanvasElement,
-  { color, motif, lineLabel, stationName }: {
+  { color, motif, lineLabel, stationName, character }: {
     color: string; motif: StampMotif; lineLabel: string; stationName: string;
+    character?: CanvasImageSource;
   },
 ) {
   const ctx = canvas.getContext("2d");
@@ -145,6 +146,25 @@ export function drawStamp(
   ctx.fillStyle = ink;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  if (character) {
+    for (let index = 0; index < 16; index++) {
+      ctx.save();
+      ctx.translate(120, 120);
+      ctx.rotate(index * Math.PI / 8);
+      ctx.translate(0, -103);
+      ctx.scale(0.12, 0.12);
+      ctx.lineWidth = 4;
+      drawMotif(ctx, motif);
+      ctx.restore();
+    }
+    ctx.drawImage(character, 32, 29, 176, 176);
+    ctx.font = '800 13px system-ui, "Malgun Gothic", "Yu Gothic", sans-serif';
+    ctx.fillText(lineLabel, 120, 48, 158);
+    ctx.font = '900 23px system-ui, "Malgun Gothic", "Yu Gothic", sans-serif';
+    ctx.fillText(stationName, 120, 193, 156);
+    return true;
+  }
+
   ctx.font = '800 14px "Malgun Gothic", "Yu Gothic", sans-serif';
   ctx.fillText(lineLabel, 120, 68, 158);
   ctx.save();

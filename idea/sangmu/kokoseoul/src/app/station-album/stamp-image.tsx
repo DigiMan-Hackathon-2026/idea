@@ -16,6 +16,7 @@ type Props = {
   locale: Locale;
   collected: boolean | null;
   stationPoints: readonly StationPoint[];
+  characterSrc: string | null;
   children: ReactNode;
 };
 
@@ -29,9 +30,10 @@ const locationMessages: Record<LocationIssue, readonly [ja: string, ko: string]>
   "too-far": [`駅の中心から${stampRadiusMetres}m以内で受け取れます。駅に近づいて、もう一度お試しください。`, `역 중심에서 ${stampRadiusMetres}m 이내에서 받을 수 있어요. 역에 가까이 가서 다시 시도해 주세요.`],
 };
 
-export function StampImage({ color, motif, lineId, lineLabel, stationName, locale, collected, stationPoints, children }: Props) {
+export function StampImage({ color, motif, lineId, lineLabel, stationName, locale, collected, stationPoints, characterSrc, children }: Props) {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const painted = useRef(false);
+  const characterLoad = useRef<Promise<void> | null>(null);
   const saving = useRef(false);
   const locating = useRef(false);
   const [status, setStatus] = useState<"idle" | "collected" | "claim-error" | "saving" | "requested" | "export-error">("idle");
@@ -39,8 +41,22 @@ export function StampImage({ color, motif, lineId, lineLabel, stationName, local
   const [locationIssue, setLocationIssue] = useState<LocationIssue | null>(null);
   const attachCanvas = useCallback((element: HTMLCanvasElement | null) => {
     canvas.current = element;
-    painted.current = element !== null && drawStamp(element, { color, motif, lineLabel, stationName });
-  }, [color, motif, lineLabel, stationName]);
+    characterLoad.current = null;
+    const stamp = { color, motif, lineLabel, stationName };
+    painted.current = element !== null && drawStamp(element, stamp);
+    if (!element || !characterSrc || !painted.current) return;
+
+    const character = new Image();
+    character.src = characterSrc;
+    const load = character.decode().then(() => {
+      if (canvas.current === element && characterLoad.current === load) {
+        painted.current = drawStamp(element, { ...stamp, character });
+      }
+    }, () => {
+      // Keep the existing stamp visible and exportable when the image cannot load.
+    });
+    characterLoad.current = load;
+  }, [characterSrc, color, motif, lineLabel, stationName]);
 
   function collect() {
     if (collected !== false || locating.current || stationPoints.length === 0) return;
@@ -82,11 +98,13 @@ export function StampImage({ color, motif, lineId, lineLabel, stationName, local
   }
 
   async function save() {
-    if (!collected || saving.current || !canvas.current) return;
+    const image = canvas.current;
+    if (!collected || saving.current || !image) return;
     saving.current = true;
     setStatus("saving");
     try {
-      const image = canvas.current;
+      await characterLoad.current;
+      if (canvas.current !== image) return;
       if (!painted.current) {
         throw new Error("Canvas context unavailable");
       }
