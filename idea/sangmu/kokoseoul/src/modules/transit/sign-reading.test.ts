@@ -56,4 +56,8 @@ it("demands an explicit line plus two same-side station names before resolving a
   expect(selectTransferArrow(panels, [one, two], 3, getSubwaySignDirections("322", "321"))).toEqual(right.arrow);
   expect(selectTransferArrow(panels, [one, { ...two, text: "Daehwa" }], 3, direction)).toBeNull();
   expect(selectTransferArrow(panels, [one, { ...two, coloredStrip: false }], 3, direction)).toBeNull();
+  const bilingual = { ...one, text: "3호선 갈아타는 곳 / Transfer to Line 3 Jongno 3(Sam)-ga", confidence: 67 };
+  expect(selectTransferArrow(panels, [bilingual, two], 3, direction)).toEqual(left.arrow);
+  expect(selectTransferArrow(panels, [{ ...bilingual, text: "3호선 Jongno 3(Sam)-ga" }, two], 3, direction)).toBeNull();
+  expect(selectTransferArrow(panels, [{ ...bilingual, text: "3호선 Line 2" }, two], 3, direction)).toBeNull();
 });

@@ -6,13 +6,25 @@ import { readTransferSign } from "./transfer-sign";
 type Reading = { text: string; confidence: number; coloredStrip?: boolean };
 export type SignDirections = { forward: string[]; away: string[] };
 
+function readPanelLine(reading: Reading | null) {
+  if (!reading || !Number.isFinite(reading.confidence)) return null;
+  const explicit = readTransferSign(reading.text, reading.confidence);
+  if (explicit.kind === "read" || !reading.coloredStrip || reading.confidence < 64) return explicit;
+  const bilingual = readTransferSign(reading.text, 70);
+  if (bilingual.kind !== "read") return explicit;
+  const label = reading.text.normalize("NFKC");
+  const korean = new RegExp(`(?<!\\d)${bilingual.line}\\s*호\\s*선`);
+  const english = new RegExp(`\\bline\\s*${bilingual.line}\\b`, "i");
+  return korean.test(label) && english.test(label) ? bilingual : explicit;
+}
+
 export function selectTransferArrow(
   panels: SignPanel[],
   readings: (Reading | null)[],
   target: SubwayStation["line"],
   directions: SignDirections | null,
 ): TransferArrow | null {
-  const explicitLines = readings.map((reading) => reading && readTransferSign(reading.text, reading.confidence));
+  const explicitLines = readings.map(readPanelLine);
   const confirmedOrange = target === 3 ? panels.find((_, index) =>
     readings[index]?.coloredStrip && explicitLines[index]?.kind === "read" && explicitLines[index].line === target) : undefined;
   const countNames = (codes: string[], text: string) => codes.filter((code) => {
@@ -24,7 +36,7 @@ export function selectTransferArrow(
   for (const [index, panel] of panels.entries()) {
     const reading = readings[index];
     const explicit = explicitLines[index];
-    const reliableText = reading && reading.confidence >= 70 ? reading.text : "";
+    const reliableText = reading && (reading.confidence >= 70 || explicit?.kind === "read") ? reading.text : "";
     if (explicit?.kind === "read" && explicit.line !== target) continue;
     if (/나가는\s*곳|\bexit\b/i.test(reliableText) && !/갈아타는\s*곳|\btransfer\b/i.test(reliableText)) continue;
 
