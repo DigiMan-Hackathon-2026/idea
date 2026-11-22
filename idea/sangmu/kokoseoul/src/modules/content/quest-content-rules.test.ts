@@ -67,6 +67,10 @@ describe.each(quests)("%s", (_name, quest) => {
     }
   });
 
+  it("has no TODO left from the draft converter", () => {
+    expect(JSON.stringify(quest)).not.toContain('"TODO"');
+  });
+
   it("names a dated place with an https source", () => {
     expect(text(quest.place.addressKo, 500)).toBe(true);
     expect(Number.isNaN(Date.parse(quest.place.verifiedAt ?? ""))).toBe(false);

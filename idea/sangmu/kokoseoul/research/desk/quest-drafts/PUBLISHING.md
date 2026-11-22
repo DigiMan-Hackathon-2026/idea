@@ -13,6 +13,8 @@
 
 `src/modules/content/visit-guides/<목적>.json`(food, culture, shopping, beauty, rest, discovery)에 한 항목을 더한다.
 
+`python3 scripts/draft_to_visit_guide.py research/desk/quest-drafts/<slug>.md --purpose <목적> --area <지역> --minutes <분>`이 초안의 단계·보여 줄 문장·출처를 옮기고 새 UUID를 넣은 뼈대를 출력한다. 초안에 없는 일본어 제목·요약, 완료 버튼 문구, 장소 이름·주소는 `TODO`로 남고, `TODO`가 하나라도 남으면 `quest-content-rules.test.ts`가 실패한다. 보여 줄 문장은 둘째 단계에 넣으므로 맞는 단계로 옮긴다.
+
 | 필드 | 적을 것 |
 | --- | --- |
 | `id`, `versionId`, `place.id`, `steps[].id`, `seed.*` | 새 UUID. 다른 퀘스트와 겹치지 않게 만든다 |
