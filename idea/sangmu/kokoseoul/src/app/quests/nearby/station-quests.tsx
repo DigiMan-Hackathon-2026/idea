@@ -51,7 +51,8 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
                 aria-current={station?.ko === item.ko ? "true" : undefined}
                 style={station?.ko === item.ko ? { borderColor: subwayLineColors[item.line], borderWidth: 2 } : undefined}>
                 {pickLocale(locale, item.ja, item.ko)}
-                <span className="text-slate-500">{count}</span>
+                <span className="text-slate-500" aria-hidden="true">{count}</span>
+                <span className="sr-only">{pickLocale(locale, `クエスト${count}件`, `퀘스트 ${count}개`)}</span>
               </Link>
             </li>
           ))}

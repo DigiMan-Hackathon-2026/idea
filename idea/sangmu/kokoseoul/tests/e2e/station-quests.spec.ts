@@ -12,6 +12,8 @@ test("goes from a quest's exit card to its station's quests and interior guide",
   const results = page.getByRole("region", { name: /駅から行けるクエスト$/ });
   await expect(results.getByRole("link", { name: kyojaTitle })).toBeVisible();
   await expect(results.getByText(/8番出口から直線/).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /ミョンドン\s*クエスト3件/ })).toHaveAttribute("aria-current", "true");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(await page.evaluate(() => window.innerWidth));
 
   await results.getByRole("link", { name: "この駅の構内案内を見る" }).click();
   await expect(page).toHaveURL(/\/subway\?station=424/);
