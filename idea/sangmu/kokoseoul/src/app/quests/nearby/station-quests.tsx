@@ -8,13 +8,10 @@ import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getStationStampHref } from "@/components/quest-station-links";
 import { ClosedTodayNotice } from "@/components/closed-today-notice";
 import { getClosedWeekdays } from "@/modules/content/quest-closures";
+import { formatApproxMetres, QuestLineBadge } from "@/components/quest-line-badge";
 import { StationLocator } from "./station-locator";
 
 const chipClass = "inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--border)] bg-white px-3 text-sm font-bold";
-
-function lineLabel(line: SubwayStation["line"], locale: Locale) {
-  return pickLocale(locale, `${line}号線`, `${line}호선`);
-}
 
 /** Stations whose exits start at least one quest, most quests first. */
 function questStations() {
@@ -35,8 +32,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
   const hops = station ? findQuestStationsFrom(station.code) : [];
   const stampHref = station ? getStationStampHref(station.ko, station.line) : null;
   const courses = station ? findCourseByQuestStation(station.ko) : [];
-  const number = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP");
-  const metres = (value: number) => `${number.format(Math.round(value / 10) * 10)} m`;
+  const metres = (value: number) => formatApproxMetres(value, locale);
   const stationName = station ? pickLocale(locale, station.ja, station.ko) : "";
 
   return (
@@ -84,9 +80,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
                     <p className="flex flex-wrap items-center gap-x-2 text-sm font-bold text-slate-600">
                       {match === "exit"
                         ? <>
-                            {exit.stations.map(({ line, code }) => (
-                              <span key={code} className="rounded border-s-4 px-1.5" style={{ borderInlineStartColor: subwayLineColors[line] }}>{lineLabel(line, locale)}</span>
-                            ))}
+                            {exit.stations.map(({ line, code }) => <QuestLineBadge key={code} line={line} locale={locale} />)}
                             <span>{pickLocale(locale, `${exit.exitNumber}番出口から直線 ${metres(distanceM)}`, `${exit.exitNumber}번 출구에서 직선 ${metres(distanceM)}`)}</span>
                           </>
                         : <span>{pickLocale(locale, `駅から直線 ${metres(distanceM)} · 最寄りは${exit.nameJa}`, `역에서 직선 ${metres(distanceM)} · 가까운 출구는 ${exit.nameKo}`)}</span>}
@@ -133,7 +127,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
                 {hops.map((hop) => (
                   <li key={hop.station.code}>
                     <Link href={`${path}?station=${hop.station.code}#station-quests`} className="flex min-h-11 flex-wrap items-center gap-x-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold">
-                      <span className="rounded border-s-4 px-1.5" style={{ borderInlineStartColor: subwayLineColors[hop.station.line] }}>{lineLabel(hop.station.line, locale)}</span>
+                      <QuestLineBadge line={hop.station.line} locale={locale} />
                       <span className="text-[var(--primary)] underline">{pickLocale(locale, hop.station.ja, hop.station.ko)}</span>
                       <span className="text-slate-600">
                         {pickLocale(

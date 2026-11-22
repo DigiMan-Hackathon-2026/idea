@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ClosedTodayNotice } from "@/components/closed-today-notice";
+import { formatApproxMetres, QuestLineBadge } from "@/components/quest-line-badge";
 import { ScenicHero } from "@/components/scenic-hero";
 import { SiteHeader } from "@/components/site-header";
 import { pickLocale, type Locale } from "@/lib/locale";
@@ -9,20 +10,10 @@ import type { CourseLeg } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
 import { getClosedWeekdays } from "@/modules/content/quest-closures";
 import { questCourses, resolveCourse } from "@/modules/content/quest-courses";
-import { subwayLineColors } from "@/modules/transit/subway-line-colors";
-import type { SubwayLine } from "@/modules/transit/subway-stations";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return { title: pickLocale(locale, "地下鉄の路線でつなぐコース", "지하철 노선으로 잇는 코스") };
-}
-
-function LineBadge({ line, locale }: { line: SubwayLine; locale: Locale }) {
-  return (
-    <span className="rounded border-s-4 bg-white px-1.5 text-sm font-bold" style={{ borderInlineStartColor: subwayLineColors[line] }}>
-      {pickLocale(locale, `${line}号線`, `${line}호선`)}
-    </span>
-  );
 }
 
 function legText(leg: CourseLeg, locale: Locale, metres: (value: number) => string) {
@@ -43,8 +34,7 @@ function legText(leg: CourseLeg, locale: Locale, metres: (value: number) => stri
 
 export default async function QuestCoursesPage() {
   const locale = await getRequestLocale();
-  const number = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP");
-  const metres = (value: number) => `${number.format(Math.round(value / 10) * 10)} m`;
+  const metres = (value: number) => formatApproxMetres(value, locale);
 
   return (
     <main className="min-h-dvh pb-20">
@@ -66,7 +56,7 @@ export default async function QuestCoursesPage() {
           {questCourses.map(resolveCourse).map((course) => (
             <section key={course.slug} id={course.slug} aria-labelledby={`${course.slug}-title`} className="seoul-surface scroll-mt-4 rounded-2xl p-5 sm:p-6">
               <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-600">
-                <LineBadge line={course.line} locale={locale} />
+                <QuestLineBadge line={course.line} locale={locale} />
                 <span>{pickLocale(locale, `クエスト${course.stops.length}件`, `퀘스트 ${course.stops.length}개`)}</span>
                 {course.totalMinutes ? <span>· {pickLocale(locale, `体験だけで約${course.totalMinutes}分`, `체험만 약 ${course.totalMinutes}분`)}</span> : null}
               </p>
@@ -79,7 +69,7 @@ export default async function QuestCoursesPage() {
                     <div className="rounded-xl border border-[var(--border)] bg-white px-4 py-3">
                       <p className="flex flex-wrap items-center gap-x-2 text-sm font-bold text-slate-600">
                         <span className="text-[var(--primary)]">{index + 1}</span>
-                        {access.exit.stations.map(({ line, code }) => <LineBadge key={code} line={line} locale={locale} />)}
+                        {access.exit.stations.map(({ line, code }) => <QuestLineBadge key={code} line={line} locale={locale} />)}
                         <span>{pickLocale(locale, access.exit.nameJa, access.exit.nameKo)}</span>
                         {access.quest.durationMinutes ? <span>· {access.quest.durationMinutes}{pickLocale(locale, "分", "분")}</span> : null}
                       </p>

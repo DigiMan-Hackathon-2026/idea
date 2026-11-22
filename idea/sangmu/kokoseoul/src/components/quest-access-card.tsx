@@ -3,7 +3,7 @@ import { pickLocale, type Locale } from "@/lib/locale";
 import { getQuestAccess } from "@/modules/content/quest-access";
 import { getClosedWeekdays } from "@/modules/content/quest-closures";
 import { ClosedTodayNotice } from "./closed-today-notice";
-import { subwayLineColors } from "@/modules/transit/subway-line-colors";
+import { formatApproxMetres, QuestLineBadge } from "./quest-line-badge";
 import { getStationNameTeaser, getStationStampHref } from "./quest-station-links";
 
 const linkClass = "inline-flex min-h-11 items-center font-bold text-[var(--primary)] underline";
@@ -16,7 +16,7 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
   const station = exit.stations[0];
   const stamp = getStationStampHref(exit.stationKo, station?.line);
   const teaser = stamp ? getStationNameTeaser(exit.stationKo) : null;
-  const metres = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP").format(Math.round(access.straightLineM / 10) * 10);
+  const metres = formatApproxMetres(access.straightLineM, locale);
 
   return (
     <section aria-labelledby="quest-access-title" className="mt-6 rounded-xl border border-[var(--border)] bg-white px-4 py-3">
@@ -24,20 +24,15 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
         {pickLocale(locale, "地下鉄で行く", "지하철로 가기")}
       </h2>
       <p className="mt-1 flex flex-wrap items-center gap-2 text-lg font-black">
-        {exit.stations.map(({ line, code }) => (
-          <span key={code} className="inline-flex items-center rounded-md border-s-4 px-2 py-0.5 text-sm font-bold"
-            style={{ borderInlineStartColor: subwayLineColors[line], backgroundColor: `color-mix(in srgb, ${subwayLineColors[line]} 11%, white)` }}>
-            {pickLocale(locale, `${line}号線`, `${line}호선`)}
-          </span>
-        ))}
+        {exit.stations.map(({ line, code }) => <QuestLineBadge key={code} line={line} locale={locale} tinted />)}
         <span>{pickLocale(locale, exit.nameJa, exit.nameKo)}</span>
       </p>
       <ClosedTodayNotice closedWeekdays={getClosedWeekdays(access.quest.slug)} />
       <p className="mt-1 text-sm leading-6 text-slate-600">
         {pickLocale(
           locale,
-          `出口から開始地点まで直線で約${metres} mです。実際の道のりはこれより長くなります。`,
-          `출구에서 시작 지점까지 직선으로 약 ${metres} m예요. 실제로 걷는 길은 이보다 길어요.`,
+          `出口から開始地点まで直線で約${metres}です。実際の道のりはこれより長くなります。`,
+          `출구에서 시작 지점까지 직선으로 약 ${metres}예요. 실제로 걷는 길은 이보다 길어요.`,
         )}
       </p>
       {teaser && stamp ? (
@@ -75,11 +70,7 @@ export function QuestExitLabel({ questId, locale }: { questId: string; locale: L
   const { exit } = access;
   return (
     <p className="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-bold text-slate-600">
-      {exit.stations.map(({ line, code }) => (
-        <span key={code} className="rounded border-s-4 bg-white px-1.5" style={{ borderInlineStartColor: subwayLineColors[line] }}>
-          {pickLocale(locale, `${line}号線`, `${line}호선`)}
-        </span>
-      ))}
+      {exit.stations.map(({ line, code }) => <QuestLineBadge key={code} line={line} locale={locale} />)}
       <span>{pickLocale(locale, exit.nameJa, exit.nameKo)}</span>
     </p>
   );
