@@ -49,6 +49,8 @@ X-Request-Id: <validated-server-id>
 
 개발 서버와 Vercel Preview에서만 `/mobile-preview`를 제공한다. 브라우저가 같은 origin에서 시작한 iframe 탐색으로 표시한 B2C 화면에 `frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN`, `Cache-Control: private, no-store`를 적용한다. 일반 탐색, 외부 사이트의 프레임 요청, 미리보기 자체, API와 운영 환경에는 `DENY`를 적용한다.
 
+프레임의 첫 화면은 일반 홈과 분리된 `/mobile-preview/app`에서 같은 홈 컴포넌트를 제공한다. 이 전용 화면은 Fetch Metadata 헤더가 없는 브라우저에서도 같은 origin에 한해 프레임 표시를 허용한다. CSP와 X-Frame-Options는 두 경우 모두 외부 origin을 차단한다.
+
 HSTS는 production domain과 모든 대상 subdomain의 HTTPS를 검증한 뒤 켠다. 첫 배포에서 preload를 즉시 요청하지 않는다. local HTTP와 provider preview 전체 parent domain에는 무분별하게 적용하지 않는다.
 
 ### service worker

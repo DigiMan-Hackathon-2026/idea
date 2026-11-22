@@ -34,26 +34,26 @@ const nextConfig: NextConfig = {
       },
     ];
     const privateHtmlSources = ["/", "/quests/:path*", "/runs/:path*", "/my"];
-    const phonePreviewSources =
-      process.env.NODE_ENV === "development" || process.env.APP_ENV === "preview"
-        ? [...privateHtmlSources, "/subway", "/station-album"]
-        : [];
+    const phonePreviewEnabled = process.env.NODE_ENV === "development" || process.env.APP_ENV === "preview";
+    const phonePreviewSources = phonePreviewEnabled ? [...privateHtmlSources, "/subway", "/station-album"] : [];
+    const phoneFrameHeaders = [
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+      { key: "Cache-Control", value: "private, no-store" },
+    ];
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
       },
+      ...(phonePreviewEnabled ? [{ source: "/mobile-preview/app", headers: phoneFrameHeaders }] : []),
       ...phonePreviewSources.map((source) => ({
         source,
         has: [
           { type: "header" as const, key: "sec-fetch-dest", value: "iframe" },
           { type: "header" as const, key: "sec-fetch-site", value: "same-origin" },
         ],
-        headers: [
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
-          { key: "Cache-Control", value: "private, no-store" },
-        ],
+        headers: phoneFrameHeaders,
       })),
       {
         source: "/quests/:path*",

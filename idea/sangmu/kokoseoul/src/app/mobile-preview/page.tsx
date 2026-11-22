@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
+import { PhoneScreen } from "./phone-screen";
 import styles from "./phone-preview.module.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,7 +24,7 @@ export default async function MobilePreviewPage() {
           <span>9:41</span>
           <span className={styles.battery} />
         </div>
-        <iframe className={styles.screen} title={title} src="/" />
+        <PhoneScreen title={title} locale={locale} />
         <div className={styles.homeBar} aria-hidden="true" />
       </div>
       <Link href="/" className={styles.expand}>

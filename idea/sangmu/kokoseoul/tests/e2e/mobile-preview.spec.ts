@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("opens the live app in the phone frame and keeps navigation inside it", async ({ page }) => {
+  await page.goto("/");
   const response = await page.goto("/mobile-preview");
   expect(response?.headers()["x-frame-options"]).toBe("DENY");
 
@@ -36,4 +37,23 @@ test("grants the frame exception only for same-origin iframe requests", async ({
     headers: { "sec-fetch-site": "same-origin", "sec-fetch-dest": "iframe" },
   });
   expect(api.headers()["x-frame-options"]).toBe("DENY");
+});
+
+test("serves the dedicated frame home without depending on Fetch Metadata", async ({ request }) => {
+  const response = await request.get("/mobile-preview/app");
+  expect(response.headers()["x-frame-options"]).toBe("SAMEORIGIN");
+  expect(response.headers()["content-security-policy"]).toBe("frame-ancestors 'self'");
+  expect(response.headers()["cache-control"]).toContain("no-store");
+  expect(await response.text()).toContain("ソウルで、今日したいことを。");
+});
+
+test("offers to retry when the app cannot load inside the frame", async ({ page }) => {
+  await page.route("**/mobile-preview/app", (route) => route.abort(), { times: 1 });
+  await page.goto("/mobile-preview");
+  const retry = page.getByRole("button", { name: "スマートフォン表示を開き直す" });
+  await expect(retry).toBeVisible({ timeout: 15_000 });
+  await retry.click();
+  const app = page.frameLocator("iframe");
+  await expect(app.getByRole("heading", { name: "ソウルで、今日したいことを。" })).toBeVisible();
+  await expect(retry).toBeHidden();
 });
