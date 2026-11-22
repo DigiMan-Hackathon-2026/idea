@@ -8,7 +8,19 @@
 
 ## 비공개 Preview 배포 및 검증
 
-[여기서울 전체 앱 비공개 Preview](https://yeogiseoul-platform-preview-brl0pk25i-koko-seoul.vercel.app/)는 `1d4cc39c93301d304023902b92171607c7d95ff3` 기준 배포다. 데스크톱을 꺼도 열리며 접근 권한이 있는 Vercel 계정으로 로그인해야 한다. 이 Preview에는 테스트 전용 PostgreSQL이 연결되어 있다. 당시 GitHub Quality는 통과했고, GitHub Actions에 Vercel 자격 증명이 없어 같은 커밋을 비공개 프로젝트에 직접 배포했다. 이후 `main` 변경을 반영하려면 새 Preview 배포가 필요하다.
+[여기서울 전체 앱 비공개 Preview](https://yeogiseoul-platform-preview-ddqhmafbv-koko-seoul.vercel.app/)는 `c480a1de52b16f3f473eba031518e0b8749373e6` 기준 배포다. GitHub Quality 통과 후 기존 비공개 Vercel 프로젝트에 직접 배포했고, 테스트 전용 Neon PostgreSQL에 PostGIS 마이그레이션을 적용했다. 데스크톱을 꺼도 열리며 접근 권한이 있는 Vercel 계정이 필요하다. [GitHub Quality 실행 결과](https://github.com/sangmu1126/digiman/actions/runs/45034717344)
+
+### 주변 퀘스트 검색
+
+배포 커밋의 검색 코드를 실제 Preview DB에서 실행해 기본 반경 800m의 결과를 확인했다. 아래 거리는 각 출구에서 퀘스트 시작점까지의 직선거리다.
+
+| 기준점 | Preview DB 검증 결과 |
+| --- | --- |
+| [성수역 3번 출구](https://yeogiseoul-platform-preview-ddqhmafbv-koko-seoul.vercel.app/api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901101) | 올리브영N 성수에서 저장한 화장품 찾기 · 약 215m |
+| [신촌역 3번 출구](https://yeogiseoul-platform-preview-ddqhmafbv-koko-seoul.vercel.app/api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901201) | 신촌 KOREC 해커톤 참가 안내 · 약 379m |
+
+- **버스 정류장**은 로컬 테스트 전용이다. 가상 정류장 두 곳은 Preview DB에 등록하지 않았고 두 ID 모두 결과를 반환하지 않는 것을 확인했다.
+- **로그인 후 HTTPS 응답 검증은 보류한다.** 비인증 HTTPS 요청은 홈과 성수 검색 API 모두 `302`로 Vercel 로그인으로 이동했다. 접근 권한이 있는 계정으로 로그인한 뒤 위 두 링크의 응답을 확인하면 된다.
 
 **자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.
 
@@ -16,6 +28,10 @@
 - Vercel 프로젝트의 Preview 환경 변수에 `APP_ENV=preview`, `DATABASE_URL`, `PREVIEW_DATABASE_HOST`, 세션 key 등 앱 실행 값이 있어야 한다. 배포 때 값을 직접 넘기지 않는다.
 - DB migration은 실행하지 않는다. 새 migration이 들어간 commit은 Preview DB에 먼저 migration을 적용한 뒤 배포를 다시 실행한다.
 - 배포 주소는 매번 바뀌고, 기존과 같이 접근 권한이 있는 Vercel 계정으로 로그인해야 열린다.
+
+### 이전 배포 검증
+
+다음 도감 검증은 이전 배포 커밋 `1d4cc39` 기준이다.
 
 - **역 캐릭터** — 성수역 스탬프에 캐릭터가 표시됐다. 잠실역은 2호선과 8호선에서 각각 해당 호선의 색상으로 캐릭터가 표시됐다.
 - **모의 GPS 획득** — 배포 주소의 모바일 브라우저에서 `홈 → 기록 → 역 스탬프 도감 → 2호선 성수역`으로 이동했다. 역에서 먼 좌표는 획득이 거절되고 가까운 좌표는 스탬프가 지급됐다.
