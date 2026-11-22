@@ -3,6 +3,30 @@ import { expect, test } from "@playwright/test";
 
 const seongsu = { latitude: 37.544581, longitude: 127.055961, accuracy: 10 };
 
+test("shows a station with missing story and GPS data in both languages", async ({ page }) => {
+  const character = page.waitForResponse("**/station-characters/100.webp");
+  await page.goto("/station-album?line=1&station=소요산");
+  expect((await character).ok()).toBe(true);
+  await expect(page.getByRole("heading", { name: "ソヨサン", exact: true })).toBeVisible();
+  await expect(page.getByText("この駅の名前の由来は準備中です。")).toBeVisible();
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  const station = page.getByRole("article", { name: "소요산", exact: true });
+  await expect(station.getByText("이 역의 이름 이야기는 준비 중이에요.")).toBeVisible();
+  await expect(station.getByText("이 역은 위치 데이터를 확인할 수 없어 스탬프를 받을 수 없어요.")).toBeVisible();
+  await expect(station.getByRole("button", { name: "현재 위치 확인하고 스탬프 받기" })).toHaveCount(0);
+});
+
+test("shows a legacy Isu stamp as collected on both transfer lines", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("digiman.station-stamp.v1:이수", "1"));
+  await page.goto("/station-album?line=4&station=총신대입구&filter=collected");
+  await expect(page.getByRole("button", { name: "スタンプをPNGで保存" })).toBeVisible();
+  await page.getByRole("navigation", { name: "路線を選ぶ" })
+    .getByRole("link", { name: /^7号線/ }).click();
+  await expect(page.getByRole("heading", { name: "イス", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "スタンプをPNGで保存" })).toBeVisible();
+  await expect(page.getByText(/^1 \/ 404駅$/)).toBeVisible();
+});
+
 test("awards station stamps near the station and downloads the saved PNG", async ({ context, page }) => {
   await context.grantPermissions(["geolocation"]);
   await context.setGeolocation({ ...seongsu, latitude: seongsu.latitude + 0.05 });
