@@ -5,18 +5,12 @@ import { ScenicHero } from "@/components/scenic-hero";
 import { SiteHeader } from "@/components/site-header";
 import { pickLocale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
-import { findDemoQuest } from "@/modules/content/demo-quests";
-import { DIGIMAN_HACKATHON, DIGIMAN_HACKATHON_PATH } from "@/modules/content/digiman-hackathon";
 import { getNearbyQuests, listNearbySubwayExits } from "@/modules/content/get-nearby-quests.server";
-import oliveyoungShopping from "@/modules/content/seongsu-oliveyoung-shopping.json";
+import { getQuestDetailPath } from "@/modules/content/quest-detail-path";
 
 const nearbyPath = "/quests/nearby";
 const radii = [300, 800, 1500, 2000] as const;
 const defaultRadius = 800;
-const routeByQuestId: Readonly<Record<string, string>> = {
-  [DIGIMAN_HACKATHON.id]: DIGIMAN_HACKATHON_PATH,
-  [oliveyoungShopping.id]: "/quests/seongsu-oliveyoung-shopping",
-};
 const selectClass = "min-h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-base font-semibold text-[var(--foreground)]";
 const submitClass = "seoul-button-primary min-h-12 rounded-xl px-5 text-sm font-black";
 
@@ -110,7 +104,7 @@ async function NearbySearch({ searchParams }: { searchParams: SearchParams }) {
                 <ol className="mt-4 grid gap-3">
                   {result.quests.map((quest) => {
                     const title = pickLocale(locale, quest.titleJa, quest.titleKo);
-                    const href = routeByQuestId[quest.id] ?? (findDemoQuest(quest.id) ? `/quests/${quest.id}` : null);
+                    const href = getQuestDetailPath(quest.id);
                     return (
                       <li key={quest.id} className="rounded-xl border border-[var(--border)] bg-white px-4 py-3">
                         <p className="text-sm font-bold text-slate-600">

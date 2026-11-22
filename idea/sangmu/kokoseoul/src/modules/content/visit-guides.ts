@@ -42,6 +42,10 @@ export function findVisitGuide(slug: string) {
   return visitGuides.find((guide) => guide.slug === slug);
 }
 
+export function findVisitGuideById(id: string) {
+  return visitGuides.find((guide) => guide.id === id);
+}
+
 export function filterVisitGuides(filters: QuestFilters) {
   const timeLimit = filters.timeAvailable === "30" || filters.timeAvailable === "60"
     ? Number(filters.timeAvailable)
