@@ -2,7 +2,7 @@ import locations from "../../../scripts/db/quest-search-locations.json";
 import { distanceMetres, type GeographicPoint } from "../../lib/geolocation";
 import { getSubwayStation, subwayStations, type SubwayStation } from "../transit/subway-network";
 import stationCoordinates from "../transit/station-coordinates.json";
-import { findCatalogQuest, type CatalogQuest } from "./quest-catalog";
+import { findCatalogQuest, getCatalogQuestPath, type CatalogQuest } from "./quest-catalog";
 
 export type QuestExit = {
   id: string;
@@ -101,4 +101,25 @@ export function findStationQuests(code: string, radiusM = stationQuestRadiusM): 
 
 export function countStationQuests(code: string): number {
   return findStationQuests(code).length;
+}
+
+export type QuestNextStep = {
+  stationKo: string;
+  stationJa: string;
+  stationCode: string;
+  stampHref: string | null;
+  next: { id: string; titleKo: string; titleJa: string; href: string }[];
+};
+
+/** For each quest with a Line 1–9 exit: its station, stamp link and up to `limit` more quests from that station. */
+export function buildStationNextSteps(stampHref: (stationKo: string) => string | null, limit = 2): Record<string, QuestNextStep> {
+  return Object.fromEntries(accesses.flatMap(({ quest, exit }) => {
+    const station = exit.stations[0];
+    if (!station) return [];
+    const next = findStationQuests(station.code)
+      .filter((item) => item.quest.id !== quest.id)
+      .slice(0, limit)
+      .map(({ quest: other }) => ({ id: other.id, titleKo: other.titleKo, titleJa: other.titleJa, href: getCatalogQuestPath(other) }));
+    return [[quest.id, { stationKo: station.ko, stationJa: station.ja, stationCode: station.code, stampHref: stampHref(station.ko), next }]];
+  }));
 }

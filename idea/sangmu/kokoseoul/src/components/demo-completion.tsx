@@ -10,8 +10,9 @@ import {
   saveQuestRunFeedback,
   type QuestRunDto,
 } from "@/modules/progress/run-api";
+import type { QuestNextStep } from "./quest-station-links";
 
-export function DemoCompletion({ runId }: { runId: string }) {
+export function DemoCompletion({ runId, nextSteps = {} }: { runId: string; nextSteps?: Record<string, QuestNextStep> }) {
   const { locale } = useLocale();
   const [run, setRun] = useState<QuestRunDto | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -84,6 +85,7 @@ export function DemoCompletion({ runId }: { runId: string }) {
     return <div className="mx-auto mt-10 h-80 max-w-2xl animate-pulse rounded-xl bg-white" aria-label={pickLocale(locale, "完了記録を読み込み中", "완료 기록을 불러오는 중")} />;
   }
 
+  const nextStep = nextSteps[run.questId];
   const completedDate = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
     year: "numeric",
     month: "long",
@@ -92,6 +94,7 @@ export function DemoCompletion({ runId }: { runId: string }) {
 
   return (
     <div className="mx-auto mt-8 grid max-w-4xl gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
+      <div className="grid gap-6">
       <ScenicHero theme="night"
         title={pickLocale(locale, "クエスト完了", "퀘스트 완료")}
         description={pickLocale(locale, run.titleJa, run.titleKo)}
@@ -101,6 +104,8 @@ export function DemoCompletion({ runId }: { runId: string }) {
           ? pickLocale(locale, "これは画面体験用の仮想デモ記録です。実際の訪問・利用・出席を証明するものではありません。", "화면 체험용 가상 데모 기록입니다. 실제 방문·이용·출석을 증명하지 않습니다.")
           : pickLocale(locale, "ご自身で確認した手順の記録です。", "직접 확인한 단계를 기록했어요.")}</p>
       </ScenicHero>
+      {nextStep && !run.isDemo ? <StationNextSteps step={nextStep} /> : null}
+      </div>
 
       <form onSubmit={handleFeedback} className="seoul-surface rounded-xl p-5 sm:p-6">
         <p className="text-xs font-black tracking-[0.16em] text-[#941e34]">{pickLocale(locale, "かんたんフィードバック", "간단한 피드백")}</p>
@@ -155,5 +160,43 @@ export function DemoCompletion({ runId }: { runId: string }) {
         <Link href="/quests" className="mt-2 flex min-h-11 items-center justify-center text-sm font-black text-slate-600">{pickLocale(locale, "別のクエストを探す", "다른 퀘스트 찾기")}</Link>
       </form>
     </div>
+  );
+}
+
+function StationNextSteps({ step }: { step: QuestNextStep }) {
+  const { locale } = useLocale();
+  const station = pickLocale(locale, step.stationJa, step.stationKo);
+  return (
+    <section aria-labelledby="station-next-title" className="seoul-surface rounded-xl p-5 sm:p-6">
+      <h2 id="station-next-title" className="text-lg font-black text-[#504e49]">
+        {pickLocale(locale, `${station}駅に戻ったら`, `${station}역으로 돌아가면`)}
+      </h2>
+      {step.stampHref ? (
+        <p className="mt-2 leading-7 text-slate-600">
+          {pickLocale(locale, "駅の近くにいれば、この駅のスタンプを受け取れます。", "역 근처에 있으면 이 역 스탬프를 받을 수 있어요.")}
+          {" "}
+          <Link href={step.stampHref} className="inline-flex min-h-11 items-center font-black text-[var(--primary)] underline">
+            {pickLocale(locale, `${station}駅のスタンプへ`, `${station}역 스탬프 받으러 가기`)}
+          </Link>
+        </p>
+      ) : null}
+      {step.next.length > 0 ? (
+        <>
+          <p className="mt-3 text-sm font-black text-slate-800">{pickLocale(locale, "同じ駅から続けられるクエスト", "같은 역에서 이어서 할 수 있는 퀘스트")}</p>
+          <ul className="mt-1 grid gap-1">
+            {step.next.map((quest) => (
+              <li key={quest.id}>
+                <Link href={quest.href} className="inline-flex min-h-11 items-center font-bold text-[var(--primary)] underline">
+                  {pickLocale(locale, quest.titleJa, quest.titleKo)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+      <Link href={`/quests/nearby?station=${step.stationCode}#station-quests`} className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-slate-600 underline">
+        {pickLocale(locale, "この駅のクエストをすべて見る", "이 역의 퀘스트 모두 보기")}
+      </Link>
+    </section>
   );
 }

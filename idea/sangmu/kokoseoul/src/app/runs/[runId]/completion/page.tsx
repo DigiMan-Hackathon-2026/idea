@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DemoCompletion } from "@/components/demo-completion";
+import { buildQuestNextSteps } from "@/components/quest-station-links";
 import { SiteHeader } from "@/components/site-header";
 import { isUuid } from "@/server/http-validation";
 import { pickLocale } from "@/lib/locale";
@@ -12,7 +13,7 @@ async function DemoCompletionContent({ params }: { params: Promise<{ runId: stri
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8">
-      <DemoCompletion runId={runId} />
+      <DemoCompletion runId={runId} nextSteps={buildQuestNextSteps()} />
     </div>
   );
 }

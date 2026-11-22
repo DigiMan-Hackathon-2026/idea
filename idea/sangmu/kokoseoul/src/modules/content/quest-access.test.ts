@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import locations from "../../../scripts/db/quest-search-locations.json";
 import { subwayStations } from "../transit/subway-network";
-import { findStationQuests, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
+import { buildStationNextSteps, findStationQuests, getQuestAccess, listQuestAccesses, stationQuestRadiusM } from "./quest-access";
 import { questCatalog } from "./quest-catalog";
 
 const codeOf = (ko: string, line: number) => subwayStations.find((station) => station.ko === ko && station.line === line)!.code;
@@ -48,6 +48,24 @@ describe("quest access", () => {
 
   it("returns nothing for an unknown code", () => {
     expect(findStationQuests("nope")).toEqual([]);
+  });
+});
+
+describe("completion next steps", () => {
+  it("points each located quest to its station stamp and other quests from that station", () => {
+    const steps = buildStationNextSteps((stationKo) => `/stamp/${stationKo}`);
+    expect(steps["eefed158-0357-4440-8d2b-57977a424cf0"]).toMatchObject({ stationKo: "명동", stationCode: "424", stampHref: "/stamp/명동" });
+    expect(steps["eefed158-0357-4440-8d2b-57977a424cf0"].next).toHaveLength(2);
+    for (const [questId, step] of Object.entries(steps)) {
+      expect(step.next.map((quest) => quest.id)).not.toContain(questId);
+      expect(getQuestAccess(questId)?.exit.stationKo).toBe(step.stationKo);
+    }
+  });
+
+  it("skips quests whose exit is not on Lines 1–9", () => {
+    const steps = buildStationNextSteps(() => null);
+    const seoulForest = listQuestAccesses().find((access) => access.exit.stationKo === "서울숲")!;
+    expect(steps[seoulForest.quest.id]).toBeUndefined();
   });
 });
 

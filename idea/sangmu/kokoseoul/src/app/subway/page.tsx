@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import stationCards from "../../../research/desk/substamp/station-cards.draft.json";
 import { SiteHeader } from "@/components/site-header";
 import { SubwayFieldGuide } from "@/components/subway-field-guide";
@@ -34,13 +35,26 @@ async function SeongsuExitGuide() {
   return <SubwayFieldGuide stationSnapshot={stationSnapshot} />;
 }
 
-export default async function SubwayPage({ searchParams }: { searchParams: Promise<{ station?: string | string[] }> }) {
+type SearchParams = Promise<{ station?: string | string[] }>;
+
+async function SubwayContent({ searchParams }: { searchParams: SearchParams }) {
   const { station } = await searchParams;
   const initialStation = typeof station === "string" && getSubwayStation(station) ? station : "";
+  return <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} initialStation={initialStation} />;
+}
+
+async function SubwayFallback() {
+  const locale = await getRequestLocale();
+  return <p role="status" className="seoul-page">{pickLocale(locale, "地下鉄ガイドを読み込んでいます…", "지하철 안내를 불러오고 있어요…")}</p>;
+}
+
+export default function SubwayPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <main className="min-h-dvh pb-16">
       <SiteHeader />
-      <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} initialStation={initialStation} />
+      <Suspense fallback={<SubwayFallback />}>
+        <SubwayContent searchParams={searchParams} />
+      </Suspense>
     </main>
   );
 }

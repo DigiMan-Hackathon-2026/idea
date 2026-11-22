@@ -1,15 +1,10 @@
 import Link from "next/link";
-import { getStationAlbum } from "@/app/station-album/album-data";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getQuestAccess } from "@/modules/content/quest-access";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
+import { getStationStampHref } from "./quest-station-links";
 
 const linkClass = "inline-flex min-h-11 items-center font-bold text-[var(--primary)] underline";
-
-function albumHref(stationKo: string) {
-  const entry = getStationAlbum(undefined).lineIndex.find(({ keys }) => keys.includes(stationKo));
-  return entry ? `/station-album?line=${entry.line.id}&station=${encodeURIComponent(stationKo)}#station-story` : null;
-}
 
 /** Which subway exit a quest starts from, with links to the subway guide and the station stamp. */
 export function QuestAccessCard({ questId, locale }: { questId: string; locale: Locale }) {
@@ -17,7 +12,7 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
   if (!access) return null;
   const { exit } = access;
   const station = exit.stations[0];
-  const stamp = albumHref(exit.stationKo);
+  const stamp = getStationStampHref(exit.stationKo);
   const metres = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP").format(Math.round(access.straightLineM / 10) * 10);
 
   return (
