@@ -29,6 +29,10 @@ export default async function Home() {
               <strong>{pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}</strong>
               <span>{pickLocale(locale, "次の駅と乗り換えを確認する", "다음 역과 갈아탈 곳 확인하기")}</span>
             </Link>
+            <Link href="/quests/nearby" className="seoul-shortcut scenic-shortcut" data-theme="dawn">
+              <strong>{pickLocale(locale, "駅から始めるクエスト", "역에서 시작하는 퀘스트")}</strong>
+              <span>{pickLocale(locale, "降りる駅の出口から行けることを探す", "내릴 역 출구에서 할 수 있는 일 찾기")}</span>
+            </Link>
             <Link href="/station-album" className="seoul-shortcut scenic-shortcut" data-theme="dusk">
               <strong>{pickLocale(locale, "駅スタンプ図鑑", "역 스탬프 도감")}</strong>
               <span>{pickLocale(locale, "訪れた駅をスタンプで記録する", "방문한 역을 스탬프로 기록하기")}</span>

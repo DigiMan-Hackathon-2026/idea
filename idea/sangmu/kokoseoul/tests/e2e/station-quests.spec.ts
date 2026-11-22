@@ -77,3 +77,10 @@ test("warns about a weekly closed day using Seoul time", async ({ page }) => {
   await page.goto("/quests/changdeokgung-japanese-tour");
   await expect(page.getByText("毎週月曜は休みです")).toBeVisible();
 });
+
+test("reaches station quests from the home shortcuts", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: /駅から始めるクエスト/ }).click();
+  await expect(page).toHaveURL(/\/quests\/nearby$/);
+  await expect(page.getByRole("region", { name: "駅から探す" })).toBeVisible();
+});
