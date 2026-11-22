@@ -56,7 +56,7 @@ function Choice({
         style={{ caretColor: "transparent" }}
         className="peer sr-only"
       />
-      <span className="flex min-h-13 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-left text-base font-bold leading-6 text-slate-700 shadow-sm transition peer-checked:border-[#941e34] peer-checked:bg-[#f7ecee] peer-checked:text-[#941e34] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
+      <span className="flex min-h-13 items-center rounded-lg border border-transparent bg-[var(--surface-muted)] px-3 py-2 text-left text-base font-bold leading-6 text-[var(--foreground)] peer-checked:border-[var(--success)] peer-checked:bg-[var(--success-soft)] peer-checked:text-[var(--success)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
         {children}
       </span>
     </label>
@@ -135,7 +135,7 @@ export function QuestOnboarding() {
         {[0, 1, 2].map((index) => (
           <span
             key={index}
-            className={`h-1 ${index <= step ? "bg-[#941e34]" : "bg-[#dfdfdd]"}`}
+            className={`h-1 rounded-full ${index <= step ? "bg-[var(--success)]" : "bg-[var(--border)]"}`}
           />
         ))}
       </div>
@@ -153,7 +153,7 @@ export function QuestOnboarding() {
           <p className="mt-2 text-sm font-semibold text-slate-500">
             {pickLocale(locale, "一つ選んでください。", "하나만 골라주세요.")}
           </p>
-          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-2 gap-2">
             {Object.keys(PURPOSE_LABELS).map((value) => (
               <Choice
                 key={value}
@@ -191,7 +191,7 @@ export function QuestOnboarding() {
           <p className="mt-2 text-sm font-semibold text-slate-500">
             {pickLocale(locale, "まだ決めていなくても大丈夫です。", "아직 정하지 않았어도 괜찮아요.")}
           </p>
-          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-2 gap-2">
             {Object.keys(TIME_LABELS).map((value) => (
               <Choice
                 key={value}

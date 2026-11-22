@@ -12,12 +12,12 @@
   --seoul-ginkgo: #e5b560;
   --seoul-hemp: #d8ccad;
 
-  --background: color-mix(in srgb, var(--seoul-hemp) 34%, white);
-  --surface: color-mix(in srgb, var(--seoul-hangang-silver) 18%, white);
-  --surface-muted: color-mix(in srgb, var(--seoul-hemp) 20%, white);
-  --foreground: var(--seoul-roof-tile);
-  --foreground-muted: color-mix(in srgb, var(--seoul-roof-tile) 72%, white);
-  --border: color-mix(in srgb, var(--seoul-stone-wall) 42%, white);
+  --background: color-mix(in srgb, var(--seoul-hemp) 19%, white);
+  --surface: white;
+  --surface-muted: color-mix(in srgb, var(--seoul-hemp) 25%, white);
+  --foreground: color-mix(in srgb, var(--seoul-roof-tile) 76%, #151917);
+  --foreground-muted: color-mix(in srgb, var(--foreground) 82%, white);
+  --border: color-mix(in srgb, var(--seoul-stone-wall) 36%, white);
   --primary: var(--seoul-dancheong);
   --primary-soft: color-mix(in srgb, var(--seoul-dancheong) 9%, white);
   --success: var(--seoul-namsan);
@@ -26,7 +26,7 @@
   --info-soft: color-mix(in srgb, var(--seoul-sky) 10%, white);
   --warning: var(--seoul-ginkgo);
   --warning-soft: color-mix(in srgb, var(--seoul-ginkgo) 18%, white);
-  --shadow-color: color-mix(in srgb, var(--seoul-roof-tile) 18%, transparent);
+  --shadow-color: color-mix(in srgb, var(--seoul-roof-tile) 9%, transparent);
 }
 
 * {
@@ -45,11 +45,6 @@ body {
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
     "Yu Gothic", "Meiryo", sans-serif;
-  background-image:
-    linear-gradient(90deg, color-mix(in srgb, var(--seoul-stone-wall) 8%, transparent) 1px, transparent 1px),
-    linear-gradient(color-mix(in srgb, var(--seoul-stone-wall) 8%, transparent) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-attachment: fixed;
 }
 
 button,
@@ -69,8 +64,8 @@ a {
 
 .seoul-surface {
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  box-shadow: 0 18px 55px var(--shadow-color);
+  background: var(--surface);
+  box-shadow: 0 6px 22px var(--shadow-color);
 }
 
 .seoul-frame {
@@ -80,27 +75,19 @@ a {
 .seoul-frame::before {
   position: absolute;
   inset: 0 0 auto;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--seoul-dancheong) 0 26%,
-    var(--seoul-ginkgo) 26% 42%,
-    var(--seoul-namsan) 42% 70%,
-    var(--seoul-sky) 70% 100%
-  );
+  height: 3px;
+  background: var(--success);
   content: "";
 }
 
 .seoul-kicker {
-  color: var(--seoul-dancheong);
-  font-weight: 900;
-  letter-spacing: 0.14em;
+  color: var(--success);
+  font-weight: 750;
 }
 
 .seoul-button-primary {
   background: var(--seoul-dancheong);
   color: white;
-  box-shadow: 0 10px 25px color-mix(in srgb, var(--seoul-dancheong) 24%, transparent);
 }
 
 .seoul-button-primary:hover {
@@ -108,12 +95,115 @@ a {
 }
 
 .seoul-button-dark {
-  background: var(--seoul-roof-tile);
+  background: var(--success);
   color: white;
 }
 
 .seoul-button-dark:hover {
   background: var(--seoul-palace-brown);
+}
+
+.seoul-page {
+  width: min(100%, 72rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3.25rem) clamp(1rem, 3vw, 2rem) 0;
+}
+
+.seoul-page-title {
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-weight: 900;
+  letter-spacing: -.045em;
+  line-height: 1.12;
+}
+
+.seoul-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.seoul-header-inner {
+  display: grid;
+  width: min(100%, 72rem);
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "brand language" "nav nav";
+  align-items: center;
+  gap: .45rem 1rem;
+  margin-inline: auto;
+  padding: .65rem clamp(1rem, 3vw, 2rem) .4rem;
+}
+
+.seoul-wordmark {
+  grid-area: brand;
+  display: inline-flex;
+  width: fit-content;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: .65rem;
+  font-size: 1.125rem;
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+
+.seoul-signature {
+  display: grid;
+  width: 2rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: .4rem;
+  background: var(--primary);
+  color: white;
+  font-size: .75rem;
+}
+
+.seoul-nav {
+  grid-area: nav;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .25rem;
+}
+
+.seoul-nav a {
+  display: grid;
+  min-height: 2.75rem;
+  place-items: center;
+  border-radius: .55rem;
+  padding-inline: .45rem;
+  color: var(--foreground-muted);
+  font-size: .875rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.seoul-nav a[aria-current], .seoul-nav a:hover, .seoul-shortcut:hover {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.seoul-header-inner > button { grid-area: language; }
+
+.seoul-shortcut {
+  display: grid;
+  gap: .3rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: .8rem;
+  background: var(--surface);
+}
+
+.seoul-shortcut span {
+  color: var(--foreground-muted);
+  font-size: .875rem;
+}
+
+@media (min-width: 640px) {
+  .seoul-header-inner {
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: "brand nav language";
+    padding-block: .75rem;
+  }
+
+  .seoul-nav a { padding-inline: .95rem; }
+  .seoul-header-inner > button { justify-self: end; }
 }
 
 @media (prefers-reduced-motion: reduce) {
