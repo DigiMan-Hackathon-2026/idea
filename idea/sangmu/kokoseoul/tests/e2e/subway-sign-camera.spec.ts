@@ -7,6 +7,9 @@ test("highlights the arrow beside Line 3 and stops after closing the camera", as
     Object.defineProperty(navigator.mediaDevices, "getUserMedia", {
       value: async () => {
         const canvas = document.createElement("canvas");
+        canvas.hidden = true;
+        canvas.dataset.testFixture = "boarding-sign";
+        document.body.append(canvas);
         canvas.width = 480;
         canvas.height = 280;
         const ctx = canvas.getContext("2d")!;
@@ -104,6 +107,8 @@ test("highlights the arrow beside Line 3 and stops after closing the camera", as
   await page.evaluate(() => window.dispatchEvent(new Event("test-correct-boarding-direction")));
   await expect(page.getByRole("status")).toContainText("乗る方向は合っています", { timeout: 20_000 });
   await expect(overlay).toBeVisible();
+  const photo = await page.locator("canvas[data-test-fixture='boarding-sign']").evaluate((canvas) =>
+    (canvas as HTMLCanvasElement).toDataURL("image/png").split(",")[1]);
   await page.evaluate(() => window.dispatchEvent(new Event("test-opposite-boarding-direction")));
   await expect(page.getByRole("status")).toContainText("予定と違う方向", { timeout: 20_000 });
   await expect(overlay).toBeHidden();
@@ -129,4 +134,12 @@ test("highlights the arrow beside Line 3 and stops after closing the camera", as
   });
   await page.getByRole("button", { name: "カメラを閉じる" }).click();
   expect(await stopped).toBeTruthy();
+
+  const photoInput = page.getByLabel("写真で乗る方向を確認");
+  await expect(photoInput).toBeEnabled();
+  await photoInput.setInputFiles({
+    name: "boarding-sign.png", mimeType: "image/png", buffer: Buffer.from(photo, "base64"),
+  });
+  await expect(page.getByRole("status")).toContainText("乗る方向は合っています", { timeout: 30_000 });
+  await expect(page.getByRole("button", { name: "カメラを開く" })).toBeVisible();
 });

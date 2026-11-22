@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ChangeEvent } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import type { Worker } from "tesseract.js";
-import { createSignReader, readSignRegion } from "@/modules/transit/sign-ocr.client";
+import { createSignReader, readSignRegion, signPhotoCanvas } from "@/modules/transit/sign-ocr.client";
 import { comparePlatformDirection, readNextStation, readPlatformSign } from "@/modules/transit/station-sign";
 import { findPlatformDirectionRegion, findPlatformSignRegions, findTransferPanels, type ImageBox, type SignPanel, type TransferArrow } from "@/modules/transit/transfer-arrow";
 import { selectTransferArrow, type SignDirections } from "@/modules/transit/transfer-panel";
@@ -14,6 +14,30 @@ import type { SubwayStation } from "@/modules/transit/subway-network";
 type State = "idle" | "opening" | "live" | "unavailable";
 type Mode = "transfer" | "platform";
 type PlatformReading = { station: SubwayStation; next: SubwayStation | null };
+type PhotoStatus = "idle" | "reading" | "done";
+type SignReading = Awaited<ReturnType<typeof readSignRegion>>;
+
+function subscribeToHydration() {
+  return () => {};
+}
+
+function platformGuide(width: number, height: number): ImageBox {
+  return { x: Math.floor(width * 0.25), y: Math.floor(height * 0.38),
+    width: Math.ceil(width * 0.5), height: Math.ceil(height * 0.3) };
+}
+
+function readPlatformEvidence(readings: SignReading[], hasStationBadge: boolean): PlatformReading | null {
+  const [first, second, direction] = readings;
+  if (!first || (hasStationBadge && !second)) return null;
+  const station = second
+    ? readPlatformSign(first.text + "\n" + second.text, Math.min(first.confidence, second.confidence))
+    : readPlatformSign(first.text, first.confidence);
+  return station && {
+    station,
+    next: direction ? readNextStation(direction.text, direction.confidence, station.code) : null,
+  };
+}
+
 
 function normalizeArrow(arrow: TransferArrow, width: number, height: number): TransferArrow {
   return { direction: arrow.direction, x: arrow.x / width, y: arrow.y / height,
@@ -53,16 +77,23 @@ type Props = {
 
 export function SubwaySignCamera({ initialMode, line, platform, next, directions }: Props) {
   const { locale } = useLocale();
+  const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [state, setState] = useState<State>("idle");
   const [mode, setMode] = useState<Mode>(initialMode);
   const [arrow, setArrow] = useState<TransferArrow | null>(null);
   const [platformReading, setPlatformReading] = useState<PlatformReading | null>(null);
+  const [photoStatus, setPhotoStatus] = useState<PhotoStatus>("idle");
+  const photoAbort = useRef<AbortController | null>(null);
   const [readerUnavailable, setReaderUnavailable] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const media = useRef<MediaStream | null>(null);
   const request = useRef({ id: 0 });
 
   function stop() {
+    const pending = photoAbort.current;
+    photoAbort.current = null;
+    pending?.abort();
+    setPhotoStatus("idle");
     request.current.id++;
     media.current?.getTracks().forEach((track) => track.stop());
     media.current = null;
@@ -80,10 +111,16 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
     window.addEventListener("pagehide", stop);
     document.addEventListener("visibilitychange", pauseOnHide);
     const videoElement = video.current;
+    const cancelPendingPhoto = () => {
+      const pending = photoAbort.current;
+      photoAbort.current = null;
+      pending?.abort();
+    };
     const cameraRequest = request.current;
     return () => {
       window.removeEventListener("pagehide", stop);
       document.removeEventListener("visibilitychange", pauseOnHide);
+      cancelPendingPhoto();
       cameraRequest.id++;
       media.current?.getTracks().forEach((track) => track.stop());
       media.current = null;
@@ -151,14 +188,7 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
         if (mode === "transfer") {
           selectedArrow = selectTransferArrow(panels, readings, line, directions);
         } else {
-          const first = readings[0];
-          const second = hasStationBadge ? readings[1] : null;
-          const match = first && (!hasStationBadge || second)
-            ? readPlatformSign(second ? first.text + "\n" + second.text : first.text,
-              second ? Math.min(first.confidence, second.confidence) : first.confidence)
-            : null;
-          const direction = readings[2];
-          const candidate = match && { station: match, next: direction && readNextStation(direction.text, direction.confidence, match.code) };
+          const candidate = readPlatformEvidence(readings, hasStationBadge);
           stationSettled = Boolean(candidate && candidate.station.code === previousPlatform?.station.code
             && candidate.next?.code === previousPlatform?.next?.code);
           setPlatformReading(stationSettled ? candidate : null);
@@ -194,8 +224,7 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
       context.drawImage(source, 0, 0, width, height);
       const frame = context.getImageData(0, 0, width, height);
       const panels = mode === "transfer" ? findTransferPanels(frame, line) : [];
-      const guide = { x: Math.floor(width * 0.25), y: Math.floor(height * 0.38),
-        width: Math.ceil(width * 0.5), height: Math.ceil(height * 0.3) };
+      const guide = platformGuide(width, height);
       const stationRegions = mode === "platform" ? findPlatformSignRegions(frame, guide) : null;
       const platformDirection = stationRegions ? findPlatformDirectionRegion(frame, stationRegions.code, stationRegions.name) : null;
       const boxes = mode === "transfer" ? panels.map(({ label }) => label)
@@ -232,6 +261,8 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
   }, [state, mode, line, directions, platform, next]);
 
   async function openCamera() {
+    setPhotoStatus("idle");
+    setPlatformReading(null);
     const cameraRequest = ++request.current.id;
     setState("opening");
     try {
@@ -252,6 +283,62 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
       if (cameraRequest !== request.current.id) return;
       stop();
       setState("unavailable");
+    }
+  }
+
+  async function checkDirectionPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file || photoAbort.current) return;
+    stop();
+    const controller = new AbortController();
+    const { signal } = controller;
+    photoAbort.current = controller;
+    setPhotoStatus("reading");
+    const timeout = window.setTimeout(() => controller.abort(), 25_000);
+    let worker: Worker | undefined;
+
+    try {
+      const aborted = new Promise<never>((_, reject) => {
+        signal.addEventListener("abort", () => reject(signal.reason), { once: true });
+      });
+      const result = await Promise.race([aborted, (async () => {
+        const photo = await signPhotoCanvas(file);
+        signal.throwIfAborted();
+        const context = photo.getContext("2d");
+        if (!context) return null;
+        const frame = context.getImageData(0, 0, photo.width, photo.height);
+        const guide = platformGuide(photo.width, photo.height);
+        const regions = findPlatformSignRegions(frame, guide);
+        const direction = regions && findPlatformDirectionRegion(frame, regions.code, regions.name);
+        worker = await createSignReader(() => controller.abort());
+        if (signal.aborted) {
+          await worker.terminate();
+          signal.throwIfAborted();
+        }
+        const readings = [];
+        if (regions) {
+          readings.push(await readSignRegion(worker, photo, regions.code, "code"));
+          signal.throwIfAborted();
+          readings.push(await readSignRegion(worker, photo, regions.name, "station"));
+          signal.throwIfAborted();
+          if (direction) readings.push(await readSignRegion(worker, photo, direction.code, "code"));
+        } else {
+          readings.push(await readSignRegion(worker, photo, guide, "station"));
+        }
+        return readPlatformEvidence(readings, Boolean(regions));
+      })()]);
+      setPlatformReading(result);
+    } catch {
+      if (photoAbort.current !== controller) return;
+      setPlatformReading(null);
+    } finally {
+      window.clearTimeout(timeout);
+      if (photoAbort.current === controller) {
+        photoAbort.current = null;
+        if (mode === "platform") setPhotoStatus("done");
+      }
+      await worker?.terminate();
     }
   }
 
@@ -294,6 +381,11 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
   }
 
   function chooseMode(selected: Mode) {
+    if (selected === mode) return;
+    const pending = photoAbort.current;
+    photoAbort.current = null;
+    pending?.abort();
+    setPhotoStatus("idle");
     setMode(selected);
     setArrow(null);
     setPlatformReading(null);
@@ -351,10 +443,25 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
             : pickLocale(locale, "今の駅名・矢印・その先の駅番号が見えるように映してください。", "현재 역명과 화살표, 화살표가 가리키는 역번호가 모두 보이게 비춰요."))
       }</p> : null}
       {state === "unavailable" ? <p role="status" className="mt-4 text-sm">{pickLocale(locale, "カメラを開けませんでした。端末のカメラの権限を確認するか、地下鉄案内にお戻りください。", "카메라를 열 수 없어요. 기기의 카메라 권한을 확인하거나 지하철 안내로 돌아가요.")}</p> : null}
-      <button type="button" onClick={active ? stop : openCamera}
-        className="mt-4 min-h-11 rounded-xl bg-[var(--primary)] px-4 py-3 font-bold text-white">
+      {mode === "platform" && photoStatus !== "idle" ? (
+        <p role="status" className="mt-4 text-sm font-bold">
+          {photoStatus === "reading"
+            ? pickLocale(locale, "写真の表示を読み取っています…", "사진 속 표지판을 읽고 있어요…")
+            : stationCaption || pickLocale(locale,
+              "写真から乗る方向を確認できませんでした。今の駅名・矢印・その先の駅番号が入った写真を選んでください。",
+              "사진에서 승차 방향을 확인하기 어려워요. 현재 역명과 화살표, 그 옆 역번호가 함께 나온 사진을 골라요.")}
+        </p>
+      ) : null}
+      <button type="button" onClick={active ? stop : openCamera} disabled={!hydrated || photoStatus === "reading"}
+        className="mt-4 min-h-11 rounded-xl bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-50">
         {active ? pickLocale(locale, "カメラを閉じる", "카메라 닫기") : pickLocale(locale, "カメラを開く", "카메라 열기")}
       </button>
+      {mode === "platform" ? (
+        <label className="relative mt-4 ml-3 inline-flex min-h-11 cursor-pointer items-center rounded-md px-2 text-sm font-bold text-[var(--primary)] underline focus-within:ring-2 focus-within:ring-[var(--primary)]">
+          <input type="file" accept="image/*" className="sr-only" disabled={!hydrated || photoStatus === "reading"} onChange={checkDirectionPhoto} />
+          {pickLocale(locale, "写真で乗る方向を確認", "사진으로 방향 확인")}
+        </label>
+      ) : null}
     </main>
   );
 }
