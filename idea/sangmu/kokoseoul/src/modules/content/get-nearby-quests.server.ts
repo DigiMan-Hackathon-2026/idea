@@ -28,6 +28,32 @@ type NearbyQuestResult = {
   }[];
 };
 
+type NearbySubwayExit = Pick<NearbyQuestResult["origin"], "id" | "nameKo" | "nameJa" | "isSample">;
+
+function allowSearchSamples() {
+  return process.env.APP_ENV === "local" || process.env.APP_ENV === "test";
+}
+
+export async function listNearbySubwayExitsWithClient(
+  client: Pick<PoolClient, "query">,
+  allowSamples: boolean,
+): Promise<NearbySubwayExit[]> {
+  const result = await client.query<NearbySubwayExit>(
+    `select id, name_ko as "nameKo", name_ja as "nameJa", is_sample as "isSample"
+     from quest_search_origins
+     where kind = 'subway_exit' and ($1::boolean or not is_sample)
+     order by name_ko, id`,
+    [allowSamples],
+  );
+  return result.rows;
+}
+
+export function listNearbySubwayExits() {
+  return withDatabaseTransaction((client) =>
+    listNearbySubwayExitsWithClient(client, allowSearchSamples()),
+  );
+}
+
 export async function getNearbyQuestsWithClient(
   client: Pick<PoolClient, "query">,
   input: NearbyQuestSearch,
@@ -70,8 +96,7 @@ export async function getNearbyQuestsWithClient(
 }
 
 export function getNearbyQuests(input: NearbyQuestSearch): Promise<NearbyQuestResult | null> {
-  const allowSamples = process.env.APP_ENV === "local" || process.env.APP_ENV === "test";
   return withDatabaseTransaction((client) =>
-    getNearbyQuestsWithClient(client, input, allowSamples),
+    getNearbyQuestsWithClient(client, input, allowSearchSamples()),
   );
 }

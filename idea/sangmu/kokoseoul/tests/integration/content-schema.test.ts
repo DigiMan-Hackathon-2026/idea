@@ -10,7 +10,10 @@ import {
   it,
 } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
-import { getNearbyQuestsWithClient } from "../../src/modules/content/get-nearby-quests.server";
+import {
+  getNearbyQuestsWithClient,
+  listNearbySubwayExitsWithClient,
+} from "../../src/modules/content/get-nearby-quests.server";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 assertSafeDatabaseTarget("test", testDatabaseUrl);
@@ -127,6 +130,7 @@ describe("PostgreSQL quest content constraints", () => {
   it("searches from subway exits and local bus samples, excluding unpublished and out-of-range quests", async () => {
     const exitId = randomUUID();
     const busId = randomUUID();
+    const sampleExitId = randomUUID();
     const placeId = randomUUID();
     await client.query(
       `insert into quest_search_origins
@@ -135,9 +139,19 @@ describe("PostgreSQL quest content constraints", () => {
          ($1, 'subway_exit', '성수역 3번 출구', '聖水駅3番出口',
           'SRID=4326;POINT(127.05632 37.54418)'::geography, 'integration', $1::uuid::text, false, now()),
          ($2, 'bus_stop', '성수 테스트 정류장', '聖水テストバス停',
-          'SRID=4326;POINT(127.05560 37.54375)'::geography, 'integration', $2::uuid::text, true, null)`,
-      [exitId, busId],
+          'SRID=4326;POINT(127.05560 37.54375)'::geography, 'integration', $2::uuid::text, true, null),
+         ($3, 'subway_exit', '성수 테스트 출구', '聖水テスト出口',
+          'SRID=4326;POINT(127.05560 37.54375)'::geography, 'integration', $3::uuid::text, true, null)`,
+      [exitId, busId, sampleExitId],
     );
+    const knownOriginIds = new Set<string>([exitId, busId, sampleExitId]);
+    const localExits = await listNearbySubwayExitsWithClient(client, true);
+    const previewExits = await listNearbySubwayExitsWithClient(client, false);
+    expect(localExits.map((origin) => origin.id).filter((id) => knownOriginIds.has(id)).sort())
+      .toEqual([exitId, sampleExitId].sort());
+    expect(previewExits.filter((origin) => knownOriginIds.has(origin.id))).toEqual([
+      { id: exitId, nameKo: "성수역 3번 출구", nameJa: "聖水駅3番出口", isSample: false },
+    ]);
     await client.query(
       `insert into places (id, address_ko, verified_at) values ($1, '테스트 주소', now())`,
       [placeId],
