@@ -325,7 +325,7 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
       </p>
       {next ? (
         <p className="mt-2 text-sm font-bold">
-          {pickLocale(locale, `乗り換え後の次の停車駅は ${next.ja}（${next.code}）です。`, `환승 후 다음 정차역은 ${next.ko}(${next.code})예요.`)}
+          {pickLocale(locale, `経路の次の停車駅は ${next.ja}（${next.code}）です。`, `선택한 경로의 다음 역은 ${next.ko}(${next.code})예요.`)}
         </p>
       ) : null}
       <div hidden={!active} className="relative mt-4 overflow-hidden rounded-xl bg-[var(--foreground)]">
