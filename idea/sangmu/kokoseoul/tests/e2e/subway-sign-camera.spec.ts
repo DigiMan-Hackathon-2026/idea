@@ -81,7 +81,11 @@ test("highlights the arrow beside Line 3 and stops after closing the camera", as
   await page.getByRole("textbox", { name: "降りたい駅" }).fill("328");
   await page.getByRole("button", { name: /328 安国.*3号線/ }).click();
   await page.getByRole("link", { name: "カメラで乗り換え・乗車方向を確認" }).click();
-  await page.getByRole("button", { name: "カメラを開く" }).click();
+  await expect(async () => {
+    const openCamera = page.getByRole("button", { name: "カメラを開く" });
+    if (await openCamera.isVisible()) await openCamera.click();
+    await expect(page.getByRole("button", { name: "カメラを閉じる" })).toBeVisible({ timeout: 500 });
+  }).toPass({ timeout: 10_000 });
   const overlay = page.getByTestId("transfer-arrow-overlay");
   await expect(overlay).toBeVisible();
   await expect(page.getByRole("status")).toContainText("上向きの矢印を見つけました。");
@@ -103,6 +107,12 @@ test("highlights the arrow beside Line 3 and stops after closing the camera", as
   await page.evaluate(() => window.dispatchEvent(new Event("test-opposite-boarding-direction")));
   await expect(page.getByRole("status")).toContainText("予定と違う方向", { timeout: 20_000 });
   await expect(overlay).toBeHidden();
+
+  await page.getByRole("button", { name: "한국어로 전환" }).click();
+  await expect(page.getByRole("heading", { name: "카메라로 역 표지 확인" })).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("선택한 경로와 다른 방향이에요.", { timeout: 15_000 });
+  await page.getByRole("button", { name: "日本語に切り替える" }).click();
+  await expect(page.getByRole("status")).toContainText("予定と違う方向", { timeout: 15_000 });
 
   const video = page.locator("video");
   const stopped = video.evaluate(async (element) => {

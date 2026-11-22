@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
 import type { Worker } from "tesseract.js";
@@ -301,10 +302,13 @@ export function SubwaySignCamera({ initialMode, line, platform, next, directions
 
   return (
     <main id="main-content" className="mx-auto min-h-dvh max-w-xl px-4 pb-8 pt-5 sm:px-6">
-      {/* Direct navigation loads the camera policy of the new document. */}
-      <a href="/subway" className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
-        {pickLocale(locale, "地下鉄案内に戻る", "지하철 안내로 돌아가기")}
-      </a>
+      <div className="flex items-center justify-between gap-3">
+        {/* Direct navigation loads the camera policy of the new document. */}
+        <a href="/subway" className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
+          {pickLocale(locale, "地下鉄案内に戻る", "지하철 안내로 돌아가기")}
+        </a>
+        <LanguageSwitcher />
+      </div>
       <h1 className="mt-4 text-2xl font-black">{pickLocale(locale, "駅の案内表示をカメラで確認", "카메라로 역 표지 확인")}</h1>
       <div role="group" aria-label={pickLocale(locale, "読み取る表示", "확인할 표지")}
         className="mt-3 flex gap-2 rounded-xl bg-[var(--surface-muted)] p-1">
