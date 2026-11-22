@@ -29,6 +29,9 @@ function legText(leg: CourseLeg, locale: Locale, metres: (value: number) => stri
   if (leg.kind === "walk") {
     return pickLocale(locale, `歩いて移動 · 直線で約${metres(leg.straightLineM)}`, `걸어서 이동 · 직선 약 ${metres(leg.straightLineM)}`);
   }
+  if (leg.kind === "unknown") {
+    return pickLocale(locale, `地図アプリで経路を確認 · 直線で約${metres(leg.straightLineM)}`, `지도 앱에서 경로 확인 · 직선 약 ${metres(leg.straightLineM)}`);
+  }
   const from = pickLocale(locale, leg.from.ja, leg.from.ko);
   const to = pickLocale(locale, leg.to.ja, leg.to.ko);
   return pickLocale(

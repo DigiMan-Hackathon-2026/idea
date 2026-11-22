@@ -36,6 +36,18 @@ describe("quest courses", () => {
     expect(legsOf("line2-seongsu-walk-day").every((leg) => leg.kind === "walk")).toBe(true);
   });
 
+  it("walks between the line 5 course stops", () => {
+    expect(legsOf("line5-gwanghwamun-books-city").every((leg) => leg.kind === "walk")).toBe(true);
+    expect(legsOf("line5-yeouido-river-sunday")).toMatchObject([{ kind: "walk" }]);
+  });
+
+  it("does not call a long hop without a subway route a walk", async () => {
+    const { describeCourseLeg } = await import("./quest-access");
+    const { questCatalog } = await import("./quest-catalog");
+    const id = (slug: string) => questCatalog.find((quest) => quest.slug === slug)!.id;
+    expect(describeCourseLeg(id("jamsil-seoul-bookbogo-first-book-talk"), id("seongsu-seoul-forest-walk"))).toMatchObject({ kind: "unknown" });
+  });
+
   it("finds courses passing through a station", () => {
     expect(findCourseByQuestStation("안국").map((course) => course.slug)).toEqual(["line3-palace-half-day"]);
     expect(findCourseByQuestStation("홍대입구")).toEqual([]);

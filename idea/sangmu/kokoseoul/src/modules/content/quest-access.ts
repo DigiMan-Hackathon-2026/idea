@@ -174,7 +174,9 @@ export function findQuestStationsFrom(code: string, { maxTransfers = 1, maxStops
 
 export type CourseLeg =
   | { kind: "walk"; straightLineM: number }
-  | { kind: "subway"; from: SubwayStation; to: SubwayStation; rideStops: number; transfers: number };
+  | { kind: "subway"; from: SubwayStation; to: SubwayStation; rideStops: number; transfers: number }
+  /** Too far to walk and no Line 1–9 route between the exits (e.g. an exit on another operator's line). */
+  | { kind: "unknown"; straightLineM: number };
 
 export const courseWalkLimitM = 1_000;
 
@@ -197,5 +199,5 @@ export function describeCourseLeg(fromQuestId: string, toQuestId: string): Cours
       if (!best || cost(leg) < cost(best)) best = leg;
     }
   }
-  return best ?? { kind: "walk", straightLineM };
+  return best ?? { kind: "unknown", straightLineM };
 }

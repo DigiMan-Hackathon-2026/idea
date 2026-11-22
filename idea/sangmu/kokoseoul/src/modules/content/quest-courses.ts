@@ -60,6 +60,28 @@ export const questCourses: readonly QuestCourse[] = [
     noteJa: "東大門総合市場は日曜日、ソウル風物市場は火曜日が休みです。",
     questSlugs: ["gwangjang-soonhee-bindaetteok", "dongdaemun-market-small-trim", "sinseol-seoul-folk-flea-market"],
   },
+  {
+    slug: "line5-gwanghwamun-books-city",
+    line: 5,
+    titleKo: "5호선 광화문·시청 책과 도시",
+    titleJa: "5号線 光化門・市庁 本と街めぐり",
+    summaryKo: "교보문고에서 찾던 책을 확인하고, 서울역사박물관 도시모형에서 서울을 내려다본 뒤, 서울도서관까지 걸어가요.",
+    summaryJa: "教保文庫で探していた本を確かめ、ソウル歴史博物館の都市模型でソウルを見渡したら、ソウル図書館まで歩きます。",
+    noteKo: "서울도서관은 월요일과 공휴일은 쉬어요. 회원증 만들기는 서울에 사는 외국인 등록자를 위한 퀘스트예요.",
+    noteJa: "ソウル図書館は月曜日と祝日が休みです。会員証づくりはソウル在住の外国人登録者向けのクエストです。",
+    questSlugs: ["gwanghwamun-kyobo-find-book", "gwanghwamun-seoul-museum-city-model", "city-hall-seoul-library-first-loan"],
+  },
+  {
+    slug: "line5-yeouido-river-sunday",
+    line: 5,
+    titleKo: "5호선 여의도 강변과 일요일 교류회",
+    titleJa: "5号線 汝矣島の川辺と日曜日の交流会",
+    summaryKo: "여의나루역에서 한강공원에 들러 밤섬을 바라보고, 샛강역 쪽으로 걸어가 한일 교류회에 참여해요.",
+    summaryJa: "汝矣ナル駅から漢江公園でパムソムを眺め、セッカン駅の方へ歩いて日韓交流会に参加します。",
+    noteKo: "교류회는 보통 일요일 15:00~17:30에 열리고 사전 신청이 필요해요.",
+    noteJa: "交流会はふだん日曜日の15:00〜17:30に開かれ、事前申し込みが必要です。",
+    questSlugs: ["yeouido-hangang-bamseom-view", "yeouido-irotomo-first-meetup"],
+  },
 ];
 
 export type ResolvedCourse = QuestCourse & {
