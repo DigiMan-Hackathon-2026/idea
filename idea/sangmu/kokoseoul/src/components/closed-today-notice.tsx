@@ -17,7 +17,11 @@ function useSeoulWeekday(): Weekday | null {
   return useSyncExternalStore(subscribe, () => seoulWeekday(new Date()), () => null);
 }
 
-/** Weekly closed days for a quest; highlighted when today (Seoul time) is one of them. */
+/**
+ * Weekly closed days for a quest, highlighted when today (Seoul time) is one of them.
+ * Worded as the weekly rule plus today's weekday, not as live opening status, because
+ * holidays and one-off changes are not known (see the content verification contract).
+ */
 export function ClosedTodayNotice({ closedWeekdays, compact = false }: { closedWeekdays: Weekday[]; compact?: boolean }) {
   const { locale } = useLocale();
   const today = useSeoulWeekday();
@@ -25,11 +29,16 @@ export function ClosedTodayNotice({ closedWeekdays, compact = false }: { closedW
   const closedToday = today !== null && closedWeekdays.includes(today);
   if (compact && !closedToday) return null;
   const days = closedWeekdays.map((day) => pickLocale(locale, namesJa[day], namesKo[day])).join("·");
+  const todayName = today === null ? "" : pickLocale(locale, namesJa[today], namesKo[today]);
   return (
     <p role={closedToday ? "status" : undefined}
       className={`mt-1 text-sm font-bold ${closedToday ? "text-[#941e34]" : "text-slate-600"}`}>
       {closedToday
-        ? pickLocale(locale, `今日は休みの日です（毎週${days}曜休み）`, `오늘은 쉬는 날이에요 (매주 ${days}요일 휴무)`)
+        ? pickLocale(
+          locale,
+          `今日は${todayName}曜日です。毎週${days}曜は休みなので、出発前に公式案内を確認してください。`,
+          `오늘은 ${todayName}요일이에요. 매주 ${days}요일은 쉬는 곳이라 출발 전에 공식 안내를 확인해 주세요.`,
+        )
         : pickLocale(locale, `毎週${days}曜は休みです`, `매주 ${days}요일은 쉬어요`)}
     </p>
   );

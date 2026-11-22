@@ -69,8 +69,8 @@ test("warns about a weekly closed day using Seoul time", async ({ page }) => {
   await page.goto("/quests/courses");
   const course = page.getByRole("region", { name: "3号線 安国・景福宮の古宮半日コース" });
   const palace = course.getByRole("listitem").filter({ hasText: "昌徳宮の宮殿エリア" });
-  await expect(palace.getByText("今日は休みの日です（毎週月曜休み）")).toBeVisible();
-  await expect(course.getByText(/今日は休みの日です/)).toHaveCount(1);
+  await expect(palace.getByText("今日は月曜日です。毎週月曜は休みなので、出発前に公式案内を確認してください。")).toBeVisible();
+  await expect(course.getByText(/^今日は月曜日です。/)).toHaveCount(1);
 
   // Wednesday: the quest page lists the closed day without the warning.
   await page.clock.setFixedTime(new Date("2026-11-25T01:00:00Z"));
