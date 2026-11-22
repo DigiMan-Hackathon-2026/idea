@@ -47,6 +47,8 @@ X-Request-Id: <validated-server-id>
 
 `frame-ancestors 'none'`가 CSP의 최종 framing 기준이며 `X-Frame-Options: DENY`는 구형 방어 보조다. 둘이 모순되지 않게 한다.
 
+개발 서버와 Vercel Preview에서만 `/mobile-preview`를 제공한다. 브라우저가 같은 origin에서 시작한 iframe 탐색으로 표시한 B2C 화면에 `frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN`, `Cache-Control: private, no-store`를 적용한다. 일반 탐색, 외부 사이트의 프레임 요청, 미리보기 자체, API와 운영 환경에는 `DENY`를 적용한다.
+
 HSTS는 production domain과 모든 대상 subdomain의 HTTPS를 검증한 뒤 켠다. 첫 배포에서 preload를 즉시 요청하지 않는다. local HTTP와 provider preview 전체 parent domain에는 무분별하게 적용하지 않는다.
 
 ### service worker
@@ -239,7 +241,7 @@ remote CSP report endpoint는 P0에 필수 아님이다. 도입하면 report bod
 - [ ] Google Maps 외부 link와 opener 없음
 - [ ] monitoring off·on의 connect-src 최소 차이
 - [ ] 360px Clipboard API와 fallback
-- [ ] iframe embedding 거절
+- [ ] 외부 origin에서 iframe embedding 거절 및 같은 origin의 스마트폰 미리보기 표시
 - [ ] MIME mismatch와 inline script injection fixture 거절
 - [ ] referrer에 quest·run path·query 없음
 - [ ] production response에 내부 host·nonce log·source map 노출 없음

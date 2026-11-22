@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
 
     const port = origin.port ? `:${origin.port}` : "";
     const aliasHost = alias.replaceAll(".", "\\.") + port;
-    return ["/", "/quests/:path*", "/runs/:path*", "/subway", "/station-album", "/my"].map((source) => ({
+    return ["/", "/quests/:path*", "/runs/:path*", "/subway", "/station-album", "/my", "/mobile-preview"].map((source) => ({
       source,
       has: [{ type: "header" as const, key: "host", value: aliasHost }],
       destination: `${origin.origin}${source}`,
@@ -34,11 +34,27 @@ const nextConfig: NextConfig = {
       },
     ];
     const privateHtmlSources = ["/", "/quests/:path*", "/runs/:path*", "/my"];
+    const phonePreviewSources =
+      process.env.NODE_ENV === "development" || process.env.APP_ENV === "preview"
+        ? [...privateHtmlSources, "/subway", "/station-album"]
+        : [];
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
       },
+      ...phonePreviewSources.map((source) => ({
+        source,
+        has: [
+          { type: "header" as const, key: "sec-fetch-dest", value: "iframe" },
+          { type: "header" as const, key: "sec-fetch-site", value: "same-origin" },
+        ],
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+          { key: "Cache-Control", value: "private, no-store" },
+        ],
+      })),
       {
         source: "/quests/:path*",
         headers: [{ key: "Referrer-Policy", value: "origin" }],
