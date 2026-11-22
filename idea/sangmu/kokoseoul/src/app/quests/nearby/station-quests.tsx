@@ -4,6 +4,7 @@ import { findQuestStationsFrom, findStationQuests, listQuestAccesses, stationQue
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
 import { getSubwayStation, type SubwayStation } from "@/modules/transit/subway-network";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
+import { getStationStampHref } from "@/components/quest-station-links";
 import { StationLocator } from "./station-locator";
 
 const chipClass = "inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--border)] bg-white px-3 text-sm font-bold";
@@ -29,6 +30,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
   const station = stationCode ? getSubwayStation(stationCode) : undefined;
   const results = station ? findStationQuests(station.code) : [];
   const hops = station ? findQuestStationsFrom(station.code) : [];
+  const stampHref = station ? getStationStampHref(station.ko, station.line) : null;
   const number = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP");
   const metres = (value: number) => `${number.format(Math.round(value / 10) * 10)} m`;
   const stationName = station ? pickLocale(locale, station.ja, station.ko) : "";
@@ -126,9 +128,16 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
               </ul>
             </div>
           ) : null}
-          <Link href={`/subway?station=${station.code}#station-interior-title`} className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
-            {pickLocale(locale, "この駅の構内案内を見る", "이 역의 내부 안내 보기")}
-          </Link>
+          <div className="mt-2 flex flex-wrap gap-x-5 text-sm font-bold text-[var(--primary)]">
+            <Link href={`/subway?station=${station.code}#station-interior-title`} className="inline-flex min-h-11 items-center underline">
+              {pickLocale(locale, "この駅の構内案内を見る", "이 역의 내부 안내 보기")}
+            </Link>
+            {stampHref ? (
+              <Link href={stampHref} className="inline-flex min-h-11 items-center underline">
+                {pickLocale(locale, "駅名の由来とスタンプを見る", "역 이름 이야기와 스탬프 보기")}
+              </Link>
+            ) : null}
+          </div>
         </section>
       ) : null}
     </>

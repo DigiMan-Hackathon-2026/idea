@@ -4,9 +4,10 @@ import { buildStationNextSteps, type QuestNextStep } from "@/modules/content/que
 
 export type { QuestNextStep };
 
-/** Station stamp page for a station name, or null when the album has no card for it. */
-export function getStationStampHref(stationKo: string): string | null {
-  const entry = getStationAlbum(undefined).lineIndex.find(({ keys }) => keys.includes(stationKo));
+/** Station stamp page for a station name (on `preferredLine` when it serves the station), or null when the album has no card for it. */
+export function getStationStampHref(stationKo: string, preferredLine?: number): string | null {
+  const lines = getStationAlbum(undefined).lineIndex.filter(({ keys }) => keys.includes(stationKo));
+  const entry = lines.find(({ line }) => line.id === preferredLine) ?? lines[0];
   return entry ? `/station-album?line=${entry.line.id}&station=${encodeURIComponent(stationKo)}#station-story` : null;
 }
 
