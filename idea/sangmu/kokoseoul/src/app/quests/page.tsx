@@ -328,6 +328,9 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       <section className="scenic-content seoul-surface rounded-2xl px-4 py-3 sm:px-6">
         <FilterForm filters={filters} />
       </section>
+      <Link href="/subway#station-interior-title" className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline">
+        {pickLocale(locale, "現在地から近くの駅・構内図を探す", "현재 위치에서 가까운 역과 안내도 찾기")}
+      </Link>
 
       {quests.length > 0 ? (
         <QuestResultsView

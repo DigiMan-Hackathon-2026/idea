@@ -26,7 +26,7 @@ export function SubwayPageContent({ readings, exitGuide }: { readings: Record<st
         description={pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}
       />
       <div className="scenic-content"><SubwayDirectionGuide readings={readings} onViewStation={viewStation} /></div>
-      <StationInteriorGuide code={guideStation} onSelect={setGuideStation} readings={readings} titleRef={guideTitle} />
+      <StationInteriorGuide code={guideStation} onSelect={setGuideStation} onNearbySelect={viewStation} readings={readings} titleRef={guideTitle} />
       <details className="mt-5 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
         <summary className="min-h-12 cursor-pointer py-3.5 font-bold">
           {pickLocale(locale, "聖水駅の構内・3番出口を見る", "성수역 층별 안내·3번 출구 보기")}

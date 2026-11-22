@@ -1,15 +1,9 @@
-export type StationPoint = readonly [latitude: number, longitude: number];
+import { distanceMetres, type GeographicPoint } from "../../lib/geolocation";
+
+export type StationPoint = GeographicPoint;
 
 export const stampRadiusMetres = 200;
 export const maxLocationAccuracyMetres = 100;
-
-function distanceMetres(from: StationPoint, to: StationPoint) {
-  const radians = Math.PI / 180;
-  const latitudes = Math.sin(((to[0] - from[0]) * radians) / 2) ** 2;
-  const longitudes = Math.sin(((to[1] - from[1]) * radians) / 2) ** 2;
-  const chord = latitudes + Math.cos(from[0] * radians) * Math.cos(to[0] * radians) * longitudes;
-  return 2 * 6_371_000 * Math.asin(Math.sqrt(Math.min(1, chord)));
-}
 
 export function checkStampProximity(
   { latitude, longitude, accuracy }: Pick<GeolocationCoordinates, "latitude" | "longitude" | "accuracy">,

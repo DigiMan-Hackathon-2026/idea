@@ -4,9 +4,11 @@ import { useState, type Ref } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { StationPicker } from "@/components/subway-direction-guide";
 import { pickLocale, type Locale } from "@/lib/locale";
+import { buildNaverPlaceUrl } from "@/lib/naver-map";
 import planCodes from "@/modules/transit/station-plan-codes.json";
 import platformLevels from "@/modules/transit/station-platform-levels.json";
 import { getSubwayStation, type SubwayStation } from "@/modules/transit/subway-network";
+import { NearbyStationPicker } from "./nearby-station-picker";
 
 const availablePlans = new Set(planCodes);
 const planSource = "https://data.seoul.go.kr/dataList/OA-11984/S/1/datasetView.do";
@@ -86,9 +88,10 @@ function StationPlan({ station, locale }: { station: SubwayStation; locale: Loca
   );
 }
 
-export function StationInteriorGuide({ code, onSelect, readings, titleRef }: {
+export function StationInteriorGuide({ code, onSelect, onNearbySelect, readings, titleRef }: {
   code: string;
   onSelect: (code: string) => void;
+  onNearbySelect: (code: string) => void;
   readings: Record<string, string>;
   titleRef: Ref<HTMLHeadingElement>;
 }) {
@@ -100,11 +103,15 @@ export function StationInteriorGuide({ code, onSelect, readings, titleRef }: {
       <h2 id="station-interior-title" ref={titleRef} tabIndex={-1} className="scroll-mt-4 text-lg font-black">
         {pickLocale(locale, "駅の構内案内", "역 내부 안내")}
       </h2>
+      <NearbyStationPicker onSelect={onNearbySelect} />
       <div className="mt-3 max-w-xl">
         <StationPicker id="station-interior-search" label={pickLocale(locale, "構内を見たい駅", "내부 안내를 볼 역")} code={code} onSelect={onSelect} readings={readings} />
       </div>
       {station ? (
         <>
+          <a href={buildNaverPlaceUrl({ addressKo: `${station.ko}역 ${station.line}호선` })} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-sm font-bold underline">
+            {pickLocale(locale, "駅の場所をNAVERマップで見る（別タブ）", "역 위치를 네이버 지도에서 보기 (새 탭)")}
+          </a>
           <StationFacts code={station.code} locale={locale} />
           {availablePlans.has(station.code) ? <StationPlan key={station.code} station={station} locale={locale} /> : (
             <div className="mt-3">

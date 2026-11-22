@@ -25,3 +25,19 @@ test("shows the official platform floor for a Line 9 station without an in-app p
   await expect(guide.getByRole("link", { name: "공식 자료 보기 (새 탭)" })).toHaveAttribute("href", "https://www.data.go.kr/data/15041202/fileData.do");
   await expect(guide.getByRole("link", { name: "레일포털에서 역 찾기 (새 탭)" })).toBeVisible();
 });
+
+test("finds a nearby transfer station and opens the chosen line's guide", async ({ page, context }) => {
+  await context.grantPermissions(["geolocation"]);
+  await context.setGeolocation({ latitude: 37.561916, longitude: 126.802152, accuracy: 25 });
+  await page.goto("/quests");
+  await page.getByRole("link", { name: "現在地から近くの駅・構内図を探す" }).click();
+  const guide = page.getByRole("region", { name: "駅の構内案内", exact: true });
+  await guide.getByRole("button", { name: "現在地から駅を探す" }).click();
+  const lineNine = guide.getByRole("button", { name: /9号線 902/ });
+  const airport = guide.getByRole("listitem").filter({ has: page.getByRole("button", { name: /9号線 902/ }) });
+  await expect(airport.getByRole("button", { name: /5号線 512/ })).toBeVisible();
+  await lineNine.click();
+  await expect(guide.getByText("B4F · B3F", { exact: true })).toBeVisible();
+  const map = guide.getByRole("link", { name: "駅の場所をNAVERマップで見る（別タブ）" });
+  await expect(map).toHaveAttribute("href", `https://map.naver.com/p/search/${encodeURIComponent("김포공항역 9호선")}`);
+});
