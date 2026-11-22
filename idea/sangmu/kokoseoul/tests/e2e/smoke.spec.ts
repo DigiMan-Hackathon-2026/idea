@@ -429,16 +429,20 @@ test("filters the demo and opens its start notice", async ({ page }) => {
   const connectedTransitData = page.getByText("乗ってきた方向に合わせる");
   await expect(disconnectedTransitData.or(connectedTransitData)).toBeVisible();
   if (await connectedTransitData.isVisible()) {
-    await page.getByRole("button", { name: "トゥクソムから" }).click();
-    await page.getByRole("button", { name: "エレベーターが必要です" }).click();
+    const arrival = page.getByRole("button", { name: "トゥクソムから" });
+    await arrival.click();
+    await expect(arrival).toHaveAttribute("aria-expanded", "true");
+    await arrival.locator("..").getByRole("button", { name: "エレベーターが必要です" }).click();
     await expect(page.getByText("4-4ドア", { exact: true })).toBeVisible();
     await expect(page.getByText("利用可能", { exact: true })).toHaveCount(4);
     await expect(
       page.getByText("3番出口には地上連絡エレベーターの公式情報がありません"),
     ).toBeVisible();
   }
-  await page.getByRole("button", { name: "3Fのホームで降りた" }).click();
-  await expect(page.getByRole("img", { name: "3Fの案内図" })).toBeVisible();
+  const platformLocation = page.getByRole("button", { name: "3Fのホームで降りた" });
+  await platformLocation.click();
+  await expect(platformLocation).toHaveAttribute("aria-expanded", "true");
+  await expect(platformLocation.locator("..").getByRole("img", { name: "3Fの案内図" })).toBeVisible();
   await expect(page.getByText("Way out · 出口")).toBeVisible();
   await expect(page.getByText("改札階への接続")).toBeVisible();
   await expect(page.getByText("非常電話")).toBeVisible();
@@ -522,9 +526,15 @@ test("checks the next Line 2 station and recovers from a different direction", a
   await expect(page.getByText("노선도·역 정보", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "개찰구·출구", exact: true }).click();
   await expect(page.getByRole("heading", { name: "교통카드를 찍기 전에 호선과 방면을 확인해요" })).toBeVisible();
-  await page.getByRole("button", { name: "다른 개찰구로 나왔어요" }).click();
-  await expect(page.getByRole("heading", { name: "교통카드를 다시 찍기 전에 연결 통로를 물어봐요" })).toBeVisible();
+  const wrongGate = page.getByRole("button", { name: "다른 개찰구로 나왔어요" });
+  await wrongGate.click();
+  await expect(page.getByRole("button", { name: "개찰구에 들어가기 전" })).toHaveAttribute("aria-expanded", "false");
+  await expect(wrongGate).toHaveAttribute("aria-expanded", "true");
+  await expect(wrongGate.locator("..").getByRole("heading", { name: "교통카드를 다시 찍기 전에 연결 통로를 물어봐요" })).toBeVisible();
   await expect(page.getByText("다른 개찰구로 나왔어요. 교통카드를 다시 찍지 않고 목표 출구로 갈 수 있나요?")).toBeVisible();
+  await wrongGate.press("Space");
+  await expect(wrongGate).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByText("다른 개찰구로 나왔어요. 교통카드를 다시 찍지 않고 목표 출구로 갈 수 있나요?")).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
 });
 

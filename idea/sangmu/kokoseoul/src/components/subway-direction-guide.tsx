@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionAnimation } from "@/components/subway-direction-animation";
+import { SubwayToggleRow } from "@/components/subway-toggle-row";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getSubwayNeighbors, getSubwayStation, getSubwayTransfer, getSubwayTrip, isLineNineExpressStop, subwayStations, type SubwayStation } from "@/modules/transit/subway-network";
@@ -177,19 +178,21 @@ const actionClass = "seoul-button-primary min-h-12 w-full rounded-xl px-4 py-2 f
 
 function ExitHelp() {
   const { locale } = useLocale();
-  const [selection, setSelection] = useState<(typeof exitSituations)[number]["id"]>("enter");
-  const selected = exitSituations.find(({ id }) => id === selection)!;
+  const [selection, setSelection] = useState<(typeof exitSituations)[number]["id"] | null>("enter");
   return (
-    <div className="mt-5">
-      <div className="grid grid-cols-2 gap-2" role="group" aria-label={pickLocale(locale, "改札・出口での状況", "개찰구·출구 상황")}>
-        {exitSituations.map((item) => <button key={item.id} type="button" className={choiceClass} aria-pressed={item.id === selection} onClick={() => setSelection(item.id)}>{pickLocale(locale, item.ja, item.ko)}</button>)}
-      </div>
-      <div className="mt-5 rounded-xl bg-[var(--success-soft)] p-4" role="status">
-        <h2 className="text-lg font-black">{pickLocale(locale, selected.titleJa, selected.titleKo)}</h2>
-        <p className="mt-2 leading-7">{pickLocale(locale, selected.bodyJa, selected.bodyKo)}</p>
-      </div>
-      <HelpPhrase key={selected.id} ko={selected.phraseKo} ja={selected.phraseJa} />
-    </div>
+    <ul className="mt-5 grid gap-2" aria-label={pickLocale(locale, "改札・出口での状況", "개찰구·출구 상황")}>
+      {exitSituations.map((item) => (
+        <SubwayToggleRow key={item.id} label={pickLocale(locale, item.ja, item.ko)} expanded={selection === item.id} onToggle={() => setSelection(selection === item.id ? null : item.id)}>
+          <div className="p-4">
+            <div className="rounded-xl bg-[var(--success-soft)] p-4">
+              <h2 className="text-lg font-black">{pickLocale(locale, item.titleJa, item.titleKo)}</h2>
+              <p className="mt-2 leading-7">{pickLocale(locale, item.bodyJa, item.bodyKo)}</p>
+            </div>
+            <HelpPhrase ko={item.phraseKo} ja={item.phraseJa} />
+          </div>
+        </SubwayToggleRow>
+      ))}
+    </ul>
   );
 }
 

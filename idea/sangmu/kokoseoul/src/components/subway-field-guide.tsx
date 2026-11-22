@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "@/components/locale-provider";
+import { SubwayToggleRow } from "@/components/subway-toggle-row";
 import { pickLocale, type Locale } from "@/lib/locale";
 import type { SeoulMetroStationSnapshot } from "@/modules/transit/seoul-metro";
 import {
@@ -308,7 +309,7 @@ function StationDataPanel({
   locale: Locale;
   arrival: ArrivalId | null;
   mobility: MobilityId | null;
-  onArrival: (arrival: ArrivalId) => void;
+  onArrival: (arrival: ArrivalId | null) => void;
   onMobility: (mobility: MobilityId) => void;
 }) {
   const [copied, setCopied] = useState(false);
@@ -357,26 +358,22 @@ function StationDataPanel({
       </div>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{pickLocale(locale, "聖水駅の直前に通った駅を選んでください。覚えていなくても進めます。", "성수역 바로 전에 지나온 역을 골라 주세요. 기억나지 않아도 진행할 수 있어요.")}</p>
 
-      <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label={pickLocale(locale, "直前の駅", "직전 역")}>
+      <ul className="mt-3 grid gap-2" aria-label={pickLocale(locale, "直前の駅", "직전 역")}>
         {ARRIVALS.map((item) => (
-          <button key={item.id} type="button" aria-pressed={arrival === item.id} onClick={() => { onArrival(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${arrival === item.id ? "border-[#504e49] bg-[#504e49] text-white" : "border-slate-200 bg-white text-slate-700"}`}>
-            {localize(locale, item.label)}
-          </button>
+          <SubwayToggleRow key={item.id} label={localize(locale, item.label)} expanded={arrival === item.id} onToggle={() => { onArrival(arrival === item.id ? null : item.id); setCopied(false); }}>
+            <div className="p-3">
+              <p className="text-sm font-black text-[#504e49]">{pickLocale(locale, "移動方法を選んでください", "이동 방법을 골라 주세요")}</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "移動方法", "이동 방법")}>
+                {MOBILITY_OPTIONS.map((option) => (
+                  <button key={option.id} type="button" aria-pressed={mobility === option.id} onClick={() => { onMobility(option.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${mobility === option.id ? "border-[#455f54] bg-[#edf1ef] text-[#455f54]" : "border-slate-200 bg-white text-slate-700"}`}>
+                    {localize(locale, option.label)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </SubwayToggleRow>
         ))}
-      </div>
-
-      {arrival ? (
-        <>
-          <p className="mt-5 text-sm font-black text-[#504e49]">{pickLocale(locale, "移動方法を選んでください", "이동 방법을 골라 주세요")}</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "移動方法", "이동 방법")}>
-            {MOBILITY_OPTIONS.map((item) => (
-              <button key={item.id} type="button" aria-pressed={mobility === item.id} onClick={() => { onMobility(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-black ${mobility === item.id ? "border-[#455f54] bg-[#edf1ef] text-[#455f54]" : "border-slate-200 bg-white text-slate-700"}`}>
-                {localize(locale, item.label)}
-              </button>
-            ))}
-          </div>
-        </>
-      ) : null}
+      </ul>
 
       {arrival && mobility ? (
         <div className="mt-5" aria-live="polite">
@@ -649,6 +646,74 @@ export function SubwayFieldGuide({ stationSnapshot }: { stationSnapshot: SeoulMe
     }
   }
 
+  const locationDetails = location ? (
+    <div className="p-3 sm:p-4">
+      <div className="grid grid-cols-3 gap-2" role="group" aria-label={pickLocale(locale, "階を選択", "층 선택")}>
+        {FLOORS.map((item) => (
+          <button key={item.id} type="button" aria-pressed={floor === item.id} onClick={() => setFloor(item.id)} className={`min-h-14 rounded-2xl px-2 py-2 text-sm font-black leading-5 ${floor === item.id ? "bg-[#455f54] text-white" : "bg-[#edf1ef] text-[#455f54]"}`}>
+            {localize(locale, item.label)}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 overflow-hidden rounded-3xl border border-[#455f54]/20 bg-[#f4f0e7] p-2 sm:p-4"><FloorMap floor={floor} location={location.id} locale={locale} /></div>
+      <FloorDetails floor={floor} locale={locale} />
+      <div className="mt-3 flex flex-wrap gap-2 text-sm font-black text-slate-600" aria-label={pickLocale(locale, "移動順序", "이동 순서")}>
+        {FLOORS.map((item, index) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-2">{index + 1}. {localize(locale, item.label)}</span>)}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="font-black text-[#504e49]">{pickLocale(locale, "実際の構造を3Dで確認したいですか？", "실제 구조를 3D로 확인하고 싶나요?")}</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+          {pickLocale(locale, "ソウル市のS-MAPを開き、「성수역」を検索してください。外部サイトに移動し、階ごとの移動は現地の案内表示を優先します。", "서울시 S-MAP을 연 뒤 ‘성수역’을 검색해 주세요. 외부 사이트로 이동하며, 층별 이동은 현장 표지를 우선해요.")}
+        </p>
+        <a
+          href="https://smap.seoul.go.kr/smap/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 text-center text-sm font-black text-slate-800 hover:border-slate-500"
+        >
+          {pickLocale(locale, "S-MAPで聖水駅の3D地図を開く", "S-MAP에서 성수역 3D 지도 열기")}
+        </a>
+      </div>
+
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
+        <div>
+          <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "次に探す表示", "다음에 찾을 표지")}</p>
+          <h3 className="mt-2 text-xl font-black leading-7 text-[#504e49]" aria-live="polite">{localize(locale, locationGuide!.title)}</h3>
+          <p className="mt-4 rounded-2xl border border-[#941e34]/20 bg-[#f7ecee] p-4 text-base font-bold leading-7 text-[#941e34]">{localize(locale, locationGuide!.action)}</p>
+        </div>
+        <SignCard floor={location.floor} locale={locale} />
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-slate-200 p-4">
+        <p className="text-base font-black text-[#504e49]">{pickLocale(locale, "道を間違えたかもしれませんか？", "길을 잘못 든 것 같나요?")}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3" role="group" aria-label={pickLocale(locale, "復旧状況", "복구 상황")}>
+          {RECOVERIES.map((item) => (
+            <button key={item.id} type="button" aria-pressed={recoveryId === item.id} onClick={() => { setRecoveryId(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 text-sm font-black ${recoveryId === item.id ? "border-[#941e34] bg-[#f7ecee] text-[#941e34]" : "border-slate-200 bg-white text-slate-700"}`}>
+              {localize(locale, item.label)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {recovery ? <div className="mt-4 rounded-2xl bg-[#fbf4e6] p-4" role="status"><p className="text-lg font-black text-[#504e49]">{localize(locale, recovery.title)}</p><p className="mt-2 text-base font-semibold leading-7 text-slate-700">{localize(locale, recovery.action)}</p></div> : null}
+
+      <div className="mt-5 rounded-2xl bg-[#eef1f6] p-4">
+        <p className="text-sm font-black text-slate-500">{pickLocale(locale, "駅員に見せる韓国語", "역무원에게 보여 줄 한국어")}</p>
+        <p className="mt-3 text-2xl font-black leading-9 text-[#504e49]" lang="ko">{(recovery ? recovery.phrase : locationGuide!.phrase).ko}</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{(recovery ? recovery.phrase : locationGuide!.phrase).ja}</p>
+        <button type="button" onClick={copyPhrase} className="mt-4 min-h-12 w-full rounded-2xl bg-[#504e49] px-4 text-base font-black text-white">
+          {copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "韓国語をコピー", "한국어 문장 복사")}
+        </button>
+      </div>
+
+      <p className="mt-4 text-sm font-bold leading-6 text-slate-500">
+        {pickLocale(locale, "公式駅利用案内図の公開日 2026-08-24・画像内基準 2024-04-16・閲覧日 2026-11-22。聖水駅の階と出口方向を単純化したもので、正確な通路形状ではありません。", "공식 역이용안내도 게시일 2026-08-24·이미지 내부 기준 2024-04-16·열람일 2026-11-22. 성수역의 층과 출구 방향을 단순화한 것으로 정확한 통로 모양은 아니에요.")}
+      </p>
+    </div>
+  ) : null;
+
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="seongsu-guide-heading">
       <p className="text-sm font-black text-[#941e34]">{pickLocale(locale, "駅構内サポート · デモ", "역 안 이동 지원 · 데모")}</p>
@@ -666,86 +731,21 @@ export function SubwayFieldGuide({ stationSnapshot }: { stationSnapshot: SeoulMe
         onMobility={setMobilityId}
       />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2" role="group" aria-label={pickLocale(locale, "現在地を選択", "현재 위치 선택")}>
-        {LOCATIONS.map((item) => {
-          const active = item.id === locationId;
-          return (
-            <button key={item.id} type="button" aria-pressed={active} onClick={() => { setLocationId(item.id); setFloor(item.floor); setRecoveryId(null); setCopied(false); }} className={`min-h-14 rounded-2xl border px-4 py-3 text-left text-base font-black transition-colors ${active ? "border-[#504e49] bg-[#504e49] text-white" : "border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-400"}`}>
-              {localize(locale, item.label)}
-            </button>
-          );
-        })}
-      </div>
-
-      {location ? (
-        <div className="mt-6">
-          <div className="grid grid-cols-3 gap-2" role="group" aria-label={pickLocale(locale, "階を選択", "층 선택")}>
-            {FLOORS.map((item) => (
-              <button key={item.id} type="button" aria-pressed={floor === item.id} onClick={() => setFloor(item.id)} className={`min-h-14 rounded-2xl px-2 py-2 text-sm font-black leading-5 ${floor === item.id ? "bg-[#455f54] text-white" : "bg-[#edf1ef] text-[#455f54]"}`}>
-                {localize(locale, item.label)}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-3 overflow-hidden rounded-3xl border border-[#455f54]/20 bg-[#f4f0e7] p-2 sm:p-4"><FloorMap floor={floor} location={location.id} locale={locale} /></div>
-          <FloorDetails floor={floor} locale={locale} />
-          <div className="mt-3 flex flex-wrap gap-2 text-sm font-black text-slate-600" aria-label={pickLocale(locale, "移動順序", "이동 순서")}>
-            {FLOORS.map((item, index) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-2">{index + 1}. {localize(locale, item.label)}</span>)}
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="font-black text-[#504e49]">{pickLocale(locale, "実際の構造を3Dで確認したいですか？", "실제 구조를 3D로 확인하고 싶나요?")}</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
-              {pickLocale(locale, "ソウル市のS-MAPを開き、「성수역」を検索してください。外部サイトに移動し、階ごとの移動は現地の案内表示を優先します。", "서울시 S-MAP을 연 뒤 ‘성수역’을 검색해 주세요. 외부 사이트로 이동하며, 층별 이동은 현장 표지를 우선해요.")}
-            </p>
-            <a
-              href="https://smap.seoul.go.kr/smap/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 text-center text-sm font-black text-slate-800 hover:border-slate-500"
-            >
-              {pickLocale(locale, "S-MAPで聖水駅の3D地図を開く", "S-MAP에서 성수역 3D 지도 열기")}
-            </a>
-          </div>
-
-          <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
-            <div>
-              <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "次に探す表示", "다음에 찾을 표지")}</p>
-              <h3 className="mt-2 text-xl font-black leading-7 text-[#504e49]" aria-live="polite">{localize(locale, locationGuide!.title)}</h3>
-              <p className="mt-4 rounded-2xl border border-[#941e34]/20 bg-[#f7ecee] p-4 text-base font-bold leading-7 text-[#941e34]">{localize(locale, locationGuide!.action)}</p>
-            </div>
-            <SignCard floor={location.floor} locale={locale} />
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-slate-200 p-4">
-            <p className="text-base font-black text-[#504e49]">{pickLocale(locale, "道を間違えたかもしれませんか？", "길을 잘못 든 것 같나요?")}</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3" role="group" aria-label={pickLocale(locale, "復旧状況", "복구 상황")}>
-              {RECOVERIES.map((item) => (
-                <button key={item.id} type="button" aria-pressed={recoveryId === item.id} onClick={() => { setRecoveryId(item.id); setCopied(false); }} className={`min-h-12 rounded-xl border px-3 text-sm font-black ${recoveryId === item.id ? "border-[#941e34] bg-[#f7ecee] text-[#941e34]" : "border-slate-200 bg-white text-slate-700"}`}>
-                  {localize(locale, item.label)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {recovery ? <div className="mt-4 rounded-2xl bg-[#fbf4e6] p-4" role="status"><p className="text-lg font-black text-[#504e49]">{localize(locale, recovery.title)}</p><p className="mt-2 text-base font-semibold leading-7 text-slate-700">{localize(locale, recovery.action)}</p></div> : null}
-
-          <div className="mt-5 rounded-2xl bg-[#eef1f6] p-4">
-            <p className="text-sm font-black text-slate-500">{pickLocale(locale, "駅員に見せる韓国語", "역무원에게 보여 줄 한국어")}</p>
-            <p className="mt-3 text-2xl font-black leading-9 text-[#504e49]" lang="ko">{(recovery ? recovery.phrase : locationGuide!.phrase).ko}</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{(recovery ? recovery.phrase : locationGuide!.phrase).ja}</p>
-            <button type="button" onClick={copyPhrase} className="mt-4 min-h-12 w-full rounded-2xl bg-[#504e49] px-4 text-base font-black text-white">
-              {copied ? pickLocale(locale, "韓国語をコピーしました", "한국어 문장을 복사했어요") : pickLocale(locale, "韓国語をコピー", "한국어 문장 복사")}
-            </button>
-          </div>
-
-          <p className="mt-4 text-sm font-bold leading-6 text-slate-500">
-            {pickLocale(locale, "公式駅利用案内図の公開日 2026-08-24・画像内基準 2024-04-16・閲覧日 2026-11-22。聖水駅の階と出口方向を単純化したもので、正確な通路形状ではありません。", "공식 역이용안내도 게시일 2026-08-24·이미지 내부 기준 2024-04-16·열람일 2026-11-22. 성수역의 층과 출구 방향을 단순화한 것으로 정확한 통로 모양은 아니에요.")}
-          </p>
-        </div>
-      ) : (
-        <p className="mt-5 rounded-2xl bg-slate-50 p-4 text-base font-bold leading-7 text-slate-600">{pickLocale(locale, "今いる階と改札の内外を選んでください。", "지금 있는 층과 개찰구 안팎을 골라 주세요.")}</p>
-      )}
+      <p className="mt-5 text-sm font-bold text-[var(--foreground-muted)]">
+        {pickLocale(locale, "今いる階と改札の内外を選んでください。", "지금 있는 층과 개찰구 안팎을 골라 주세요.")}
+      </p>
+      <ul className="mt-2 grid gap-2" aria-label={pickLocale(locale, "現在地を選択", "현재 위치 선택")}>
+        {LOCATIONS.map((item) => (
+          <SubwayToggleRow key={item.id} label={localize(locale, item.label)} expanded={locationId === item.id} onToggle={() => {
+            setLocationId(locationId === item.id ? null : item.id);
+            setFloor(item.floor);
+            setRecoveryId(null);
+            setCopied(false);
+          }}>
+            {locationDetails}
+          </SubwayToggleRow>
+        ))}
+      </ul>
     </section>
   );
 }
