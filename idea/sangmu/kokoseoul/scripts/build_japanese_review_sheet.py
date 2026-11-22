@@ -115,7 +115,7 @@ def app_content_rows() -> list[dict[str, str]]:
 
 
 PICK = re.compile(
-    r'pickLocale\(\s*\w+\s*,\s*(["`])((?:\\.|(?!\1).)*)\1\s*,\s*(["`])((?:\\.|(?!\3).)*)\3\s*\)',
+    r'pickLocale\(\s*\w+\s*,\s*(["`])((?:\\.|(?!\1).)*)\1\s*,\s*(["`])((?:\\.|(?!\3).)*)\3\s*,?\s*\)',
     re.S,
 )
 

@@ -41,6 +41,24 @@ class PairRowsTest(unittest.TestCase):
         self.assertEqual(rows, [])
 
 
+class UiRowsTest(unittest.TestCase):
+    def test_reads_multiline_calls_with_a_trailing_comma(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "src").mkdir()
+            (root / "src" / "card.tsx").write_text(
+                'pickLocale(locale, "開く", "열기");\n'
+                "pickLocale(\n  locale,\n  `約${n} mです。`,\n  `약 ${n} m예요.`,\n);\n",
+                encoding="utf-8",
+            )
+            with unittest.mock.patch.object(sheet, "ROOT", root):
+                rows = sheet.ui_rows()
+        self.assertEqual(
+            [(item["locator"], item["ja"], item["ko"]) for item in rows],
+            [("line 1", "開く", "열기"), ("line 2", "約${n} mです。", "약 ${n} m예요.")],
+        )
+
+
 class StationNameRowsTest(unittest.TestCase):
     def test_every_app_station_has_one_row(self) -> None:
         rows = sheet.station_name_rows()
