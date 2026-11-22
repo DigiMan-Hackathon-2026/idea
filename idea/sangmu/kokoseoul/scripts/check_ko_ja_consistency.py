@@ -5,7 +5,7 @@ Usage:
     python3 scripts/check_ko_ja_consistency.py
 
 Uses the same rows as the Japanese review sheet (app quests, visit guides, UI
-strings, option labels, quest drafts) and compares the numbers (times, prices,
+strings, option labels, ja/ko pairs, subway station names, quest drafts) and compares the numbers (times, prices,
 exits, counts, years) and weekdays on both sides. Station cards are checked
 against the Seoul Metro original instead: every number the Japanese title or
 story writes in digits must appear in the original, unless the card's factChecksKo records the
@@ -48,6 +48,8 @@ JA_COUNTERS = "つ|体|点|人|杯|冊|枚|個|度|品|皿|本|名|軒|回|か�
 JA_KANJI_COUNT = re.compile(rf"([一二三四五六七八九十])(?=(?:{JA_COUNTERS}))")
 JA_BOTH = re.compile(r"両(?=[日名人])")
 JA_KANA_COUNT = {"ひとつ": 1, "ひとり": 1, "ふたつ": 2, "ふたり": 2}
+
+KATAKANA_ONLY = re.compile(r"^[゠-ヿ・ー\s]+$")
 
 KO_DAYS = "월화수목금토일"
 JA_DAYS = "月火水木金土日"
@@ -107,6 +109,9 @@ def pair_issues(rows: list[dict[str, str]]) -> list[dict[str, object]]:
         if not ko.strip():
             continue
         nk, nj = numbers(ko, "ko"), numbers(ja, "ja")
+        # "종로3가" read out as "チョンノサムガ": the number is spelled in katakana.
+        if KATAKANA_ONLY.match(ja):
+            nk = nj
         # "책 한 권 찾기" / "本を見つける": a lone "one" is wording, not information.
         if set((nk - nj) + (nj - nk)) - {"1"}:
             issues.append({"kind": "숫자", "row": item, "only_ko": sorted((nk - nj).elements()), "only_ja": sorted((nj - nk).elements())})
@@ -143,10 +148,9 @@ def card_issues(cards: list[dict]) -> list[dict[str, object]]:
 
 
 def collect() -> list[dict[str, object]]:
-    rows = (
-        sheet.app_content_rows() + sheet.ui_rows() + sheet.label_rows()
-        + sheet.module_rows() + sheet.draft_rows()
-    )
+    rows = sheet.app_content_rows() + sheet.ui_rows() + sheet.label_rows() + sheet.module_rows()
+    rows += sheet.pair_rows({(item["file"], item["ja"]) for item in rows})
+    rows += sheet.station_name_rows() + sheet.draft_rows()
     cards = json.loads(sheet.CARDS.read_text(encoding="utf-8"))["cards"]
     return pair_issues(rows) + card_issues(cards)
 

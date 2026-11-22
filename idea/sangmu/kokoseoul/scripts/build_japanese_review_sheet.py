@@ -20,10 +20,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "research" / "desk" / "japanese-review" / "japanese-review-sheet.csv"
+FIRST_PASS_OUT = OUT.with_name("japanese-review-first-pass.csv")
 CONTENT = ROOT / "src" / "modules" / "content"
 DRAFTS = ROOT / "research" / "desk" / "quest-drafts"
 CARDS = ROOT / "research" / "desk" / "substamp" / "station-cards.draft.json"
 VISIT_GUIDES = CONTENT / "visit-guides"
+TRANSIT = ROOT / "src" / "modules" / "transit"
 
 # Drafts whose quest already ships in the app; review the app text instead.
 # Drafts named like an app quest file or visit-guide slug are skipped automatically,
@@ -228,6 +230,82 @@ def draft_rows() -> list[dict[str, str]]:
     return rows
 
 
+PAIR_OBJECT = re.compile(
+    r'\b(ja|ko)\s*:\s*(["`])((?:\\.|(?!\2).)*)\2\s*,\s*(ja|ko)\s*:\s*(["`])((?:\\.|(?!\5).)*)\5', re.S,
+)
+PAIR_TUPLE = re.compile(
+    r'\[\s*(["`])((?:\\.|(?!\1).)*[぀-ヿ一-鿿](?:\\.|(?!\1).)*)\1\s*,\s*(["`])((?:\\.|(?!\3).)*[가-힣](?:\\.|(?!\3).)*)\3\s*\]',
+    re.S,
+)
+
+
+def pair_rows(seen: set[tuple[str, str]]) -> list[dict[str, str]]:
+    """Strings kept as `{ ja, ko }` objects (either order) or `[ja, ko]` tuples."""
+    rows = []
+    for path in sorted((ROOT / "src").rglob("*.ts*")):
+        if ".test." in path.name or path.name.endswith(".d.ts"):
+            continue
+        text = path.read_text(encoding="utf-8")
+        found = []
+        for match in PAIR_OBJECT.finditer(text):
+            if match.group(1) == match.group(4):
+                continue
+            ja, ko = (match.group(3), match.group(6)) if match.group(1) == "ja" else (match.group(6), match.group(3))
+            found.append((match.start(), ja, ko))
+        for match in PAIR_TUPLE.finditer(text):
+            found.append((match.start(), match.group(2), match.group(4)))
+        for start, ja, ko in sorted(found):
+            if (rel(path), ja) in seen or not (KANA.search(ja) or re.search(r"[一-鿿]", ja)):
+                continue
+            seen.add((rel(path), ja))
+            line = text.count("\n", 0, start) + 1
+            rows.append(row(2, "앱 화면", path, f"line {line}", "화면 문구(ja·ko 쌍)", ko, ja))
+    return rows
+
+
+STATION_CALL = re.compile(r'\b\w*[sS]tation\(\s*"([\w-]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,')
+
+
+def station_name_rows() -> list[dict[str, str]]:
+    """Subway station names shown in the subway guide, by line and station code."""
+    names = []
+    for path in (TRANSIT / "line-two.ts", TRANSIT / "subway-stations.ts"):
+        text = path.read_text(encoding="utf-8")
+        line = "2" if path.name == "line-two.ts" else "3"
+        for match in STATION_CALL.finditer(text):
+            names.append((path, line, match.group(1), match.group(2), match.group(3)))
+    path = TRANSIT / "subway-station-names.json"
+    for code, ko, ja, _ in json.loads(path.read_text(encoding="utf-8")):
+        names.append((path, code.lstrip("P")[0], code, ko, ja))
+    names.sort(key=lambda item: (item[1], item[2]))
+    return [row(2, "지하철 역명", path, f"{line}호선 {code}", "역 이름", ko, ja) for path, line, code, ko, ja in names]
+
+
+# First-pass review: what users read before anything else.
+FIRST_PASS_FILES = {
+    "src/app/page.tsx", "src/app/layout.tsx", "src/app/error.tsx", "src/app/not-found.tsx",
+    "src/components/site-header.tsx", "src/components/language-switcher.tsx",
+    "src/components/quest-onboarding.tsx", "src/components/filter-form.tsx", "src/components/quest-card.tsx",
+    "src/components/quest-results-view.tsx", "src/components/visit-guide-page.tsx",
+    "src/app/quests/[questId]/page.tsx", "src/app/quests/[questId]/not-found.tsx",
+    "src/app/subway/page.tsx", "src/app/subway/subway-page-content.tsx", "src/app/subway/nearby-station-picker.tsx",
+    "src/components/subway-direction-guide.tsx",
+    "src/app/station-album/page.tsx", "src/app/station-album/station-album.tsx",
+    "src/app/station-album/stamp-image.tsx", "src/app/station-album/album-data.ts",
+}
+FIRST_PASS_QUEST_FIELDS = re.compile(
+    r"^(?:\[[^\]]+\]\.)?(?:titleJa|summaryJa|place\.nameJa)$|\.phraseJa$"
+)
+
+
+def is_first_pass(item: dict[str, str]) -> bool:
+    if item["group"] == "앱 퀘스트 목록":
+        return True
+    if item["group"] == "앱 퀘스트":
+        return bool(FIRST_PASS_QUEST_FIELDS.search(item["locator"]))
+    return item["group"] == "앱 화면" and item["file"] in FIRST_PASS_FILES
+
+
 def station_rows() -> list[dict[str, str]]:
     rows = []
     cards = json.loads(CARDS.read_text(encoding="utf-8"))["cards"]
@@ -253,20 +331,29 @@ def row(priority: int, group: str, path: Path, locator: str, context: str, ko: s
     }
 
 
-def main() -> int:
-    rows = app_content_rows() + ui_rows() + label_rows() + module_rows() + draft_rows() + station_rows()
-    rows.sort(key=lambda item: int(item["priority"]))
-    for number, item in enumerate(rows, start=1):
-        item["id"] = f"J{number:04d}"
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", newline="", encoding="utf-8") as handle:
+def write(path: Path, rows: list[dict[str, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
+
+
+def main() -> int:
+    rows = app_content_rows() + ui_rows() + label_rows() + module_rows()
+    rows += pair_rows({(item["file"], item["ja"]) for item in rows})
+    rows += station_name_rows() + draft_rows() + station_rows()
+    rows.sort(key=lambda item: int(item["priority"]))
+    for number, item in enumerate(rows, start=1):
+        item["id"] = f"J{number:04d}"
+    write(OUT, rows)
+    first_pass = [item for item in rows if is_first_pass(item)]
+    write(FIRST_PASS_OUT, first_pass)
     counts: dict[str, int] = {}
     for item in rows:
         counts[item["group"]] = counts.get(item["group"], 0) + 1
     print(f"wrote {len(rows)} rows to {rel(OUT)}: {counts}")
+    print(f"wrote {len(first_pass)} first-pass rows to {rel(FIRST_PASS_OUT)}")
     return 0
 
 

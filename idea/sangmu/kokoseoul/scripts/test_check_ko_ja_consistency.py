@@ -59,6 +59,10 @@ class PairTest(unittest.TestCase):
         issues = check.pair_issues([pair("원하는 책 한 권 찾기", "探している本を見つける")])
         self.assertEqual(issues, [])
 
+    def test_katakana_station_reading_spells_the_number(self) -> None:
+        issues = check.pair_issues([pair("종로3가", "チョンノサムガ"), pair("을지로3가", "乙支路3街")])
+        self.assertEqual(issues, [])
+
     def test_link_urls_are_ignored(self) -> None:
         issues = check.pair_issues([pair(
             "[지도](https://map.naver.com/p/search/%ED%98%9C%ED%99%94%EB%AC%B8) 혜화문",
