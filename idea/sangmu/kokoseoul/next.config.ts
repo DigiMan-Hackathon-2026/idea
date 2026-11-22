@@ -1,10 +1,28 @@
 import type { NextConfig } from "next";
+import { getApplicationOrigin } from "./src/server/http-config";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  async redirects() {
+    if (process.env.APP_ENV !== "local" || !process.env.APP_ORIGIN) return [];
+
+    const origin = getApplicationOrigin(process.env);
+    const alias = origin.hostname === "localhost" ? "127.0.0.1"
+      : origin.hostname === "127.0.0.1" ? "localhost" : null;
+    if (!alias) return [];
+
+    const port = origin.port ? `:${origin.port}` : "";
+    const aliasHost = alias.replaceAll(".", "\\.") + port;
+    return ["/", "/quests/:path*", "/runs/:path*", "/subway", "/station-album", "/my"].map((source) => ({
+      source,
+      has: [{ type: "header" as const, key: "host", value: aliasHost }],
+      destination: `${origin.origin}${source}`,
+      permanent: false,
+    }));
+  },
   async headers() {
     const securityHeaders = [
       { key: "Referrer-Policy", value: "no-referrer" },
