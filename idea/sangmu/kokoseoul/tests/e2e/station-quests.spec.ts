@@ -6,7 +6,8 @@ test("goes from a quest's exit card to its station's quests and interior guide",
   await page.goto("/quests/myeongdong-kyoja");
   const access = page.getByRole("region", { name: "地下鉄で行く" });
   await expect(access.getByText("明洞駅8番出口")).toBeVisible();
-  await expect(access.getByRole("link", { name: "この駅のスタンプを見る" })).toHaveAttribute("href", /\/station-album\?line=4&station=/);
+  await expect(access.getByText("「明礼坊」から生まれた名前")).toBeVisible();
+  await expect(access.getByRole("link", { name: "駅名の由来とスタンプを見る" })).toHaveAttribute("href", /\/station-album\?line=4&station=/);
 
   await access.getByRole("link", { name: "この駅から行けるほかのクエスト" }).click();
   const results = page.getByRole("region", { name: /駅から行けるクエスト$/ });

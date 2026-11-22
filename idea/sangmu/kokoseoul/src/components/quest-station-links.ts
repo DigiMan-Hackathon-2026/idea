@@ -1,4 +1,5 @@
 import "server-only";
+import stationCards from "../../research/desk/substamp/station-cards.draft.json";
 import { getStationAlbum } from "@/app/station-album/album-data";
 import { buildStationNextSteps, type QuestNextStep } from "@/modules/content/quest-access";
 
@@ -14,4 +15,15 @@ export function getStationStampHref(stationKo: string, preferredLine?: number): 
 /** Per-quest completion links; pass the result to client components as a prop. */
 export function buildQuestNextSteps(): Record<string, QuestNextStep> {
   return buildStationNextSteps(getStationStampHref);
+}
+
+const storiesByStation = new Map(stationCards.cards.map((card) => [card.stationKey, card]));
+
+/** A one-line teaser for a station's name story: the Japanese card headline and the first sentence of the official Korean origin. */
+export function getStationNameTeaser(stationKo: string): { ja: string; ko: string } | null {
+  const card = storiesByStation.get(stationKo);
+  const origin = card?.officialOriginKo?.trim();
+  if (!card?.titleJa || !origin) return null;
+  const firstSentence = origin.match(/^.+?(?:다|음|함|됨)\.(?=\s|$)/)?.[0] ?? origin;
+  return { ja: card.titleJa, ko: firstSentence.length > 90 ? `${firstSentence.slice(0, 88)}…` : firstSentence };
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getQuestAccess } from "@/modules/content/quest-access";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
-import { getStationStampHref } from "./quest-station-links";
+import { getStationNameTeaser, getStationStampHref } from "./quest-station-links";
 
 const linkClass = "inline-flex min-h-11 items-center font-bold text-[var(--primary)] underline";
 
@@ -12,7 +12,8 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
   if (!access) return null;
   const { exit } = access;
   const station = exit.stations[0];
-  const stamp = getStationStampHref(exit.stationKo);
+  const stamp = getStationStampHref(exit.stationKo, station?.line);
+  const teaser = stamp ? getStationNameTeaser(exit.stationKo) : null;
   const metres = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP").format(Math.round(access.straightLineM / 10) * 10);
 
   return (
@@ -36,6 +37,13 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
           `출구에서 시작 지점까지 직선으로 약 ${metres} m예요. 실제로 걷는 길은 이보다 길어요.`,
         )}
       </p>
+      {teaser && stamp ? (
+        <p className="mt-2 rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm leading-6">
+          <span className="font-bold">{pickLocale(locale, "駅名の由来", "역 이름 이야기")}</span>
+          {" "}
+          <span lang={locale}>{pickLocale(locale, teaser.ja, teaser.ko)}</span>
+        </p>
+      ) : null}
       <div className="mt-1 flex flex-wrap gap-x-5 text-sm">
         {station ? (
           <Link href={`/subway?station=${station.code}#station-interior-title`} className={linkClass}>
@@ -44,7 +52,7 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
         ) : null}
         {stamp ? (
           <Link href={stamp} className={linkClass}>
-            {pickLocale(locale, "この駅のスタンプを見る", "이 역 스탬프 보기")}
+            {pickLocale(locale, "駅名の由来とスタンプを見る", "역 이름 이야기와 스탬프 보기")}
           </Link>
         ) : null}
         {station ? (
