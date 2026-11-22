@@ -551,9 +551,16 @@ test("confirms a Line 3 transfer before showing the next stop and saves it offli
   await page.getByRole("button", { name: /328 安国.*3号線/ }).click();
   const transfer = page.getByRole("region", { name: "路線の乗り換え · 1回" });
   await expect(transfer.getByText("203 乙支路3街", { exact: true })).toBeVisible();
-  await expect(transfer.getByText("2号線", { exact: true })).toBeVisible();
-  await expect(transfer.getByText("3号線に乗り換え", { exact: true })).toBeVisible();
+  await expect(transfer.getByText("2号線", { exact: true })).toHaveCSS("border-inline-start-color", "rgb(0, 168, 77)");
+  await expect(transfer.getByText("3号線に乗り換え", { exact: true })).toHaveCSS("border-inline-start-color", "rgb(239, 124, 28)");
   await expect(transfer.getByText("乗り換え先の駅番号 330")).toBeVisible();
+  const route = page.locator("details").filter({ has: page.getByText(/^経路を見る ·/) });
+  await route.locator("summary").click();
+  const beforeTransfer = route.getByRole("listitem").filter({ hasText: "203 乙支路3街" });
+  const afterTransfer = route.getByRole("listitem").filter({ hasText: "330 乙支路3街" });
+  await expect(beforeTransfer.getByText("2号線", { exact: true })).toHaveCSS("border-inline-start-color", "rgb(0, 168, 77)");
+  await expect(afterTransfer.getByText("3号線", { exact: true })).toHaveCSS("border-inline-start-color", "rgb(239, 124, 28)");
+  await expect(afterTransfer.getByText("乗り換え", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "乗車中", exact: true }).click();
   await page.getByLabel("案内で確認した次の駅").selectOption("203");
   await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();

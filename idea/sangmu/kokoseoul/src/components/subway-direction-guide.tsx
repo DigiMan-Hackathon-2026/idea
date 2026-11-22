@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionAnimation } from "@/components/subway-direction-animation";
 import { pickLocale, type Locale } from "@/lib/locale";
+import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getSubwayNeighbors, getSubwayStation, getSubwayTransfer, getSubwayTrip, isLineNineExpressStop, subwayStations, type SubwayStation } from "@/modules/transit/subway-network";
 import { emptySubwayRide, readSavedRide, restoreSubwayRide, saveSubwayRide, subscribeToSavedRide, type SubwayRide } from "@/modules/transit/saved-subway-ride";
 
@@ -20,6 +21,16 @@ function stationLabel(station: SubwayStation, locale: Locale) {
 
 function lineLabel(line: SubwayStation["line"], locale: Locale) {
   return pickLocale(locale, `${line}号線`, `${line}호선`);
+}
+
+function LineBadge({ line, children }: { line: SubwayStation["line"]; children: string }) {
+  const color = subwayLineColors[line];
+  return (
+    <span className="inline-flex items-center rounded-md border-s-4 px-2 py-0.5 font-bold text-[var(--foreground)]"
+      style={{ borderInlineStartColor: color, backgroundColor: `color-mix(in srgb, ${color} 11%, white)` }}>
+      {children}
+    </span>
+  );
 }
 
 function normalize(text: string) {
@@ -300,7 +311,11 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
               <div className="space-y-4">
                 <section className="rounded-xl border-s-4 border-[var(--warning)] bg-[var(--warning-soft)] p-4 sm:p-5">
                   <h2 className="text-xl font-black tracking-tight">{pickLocale(locale, `${lineLabel(changeNow.to.line, locale)}に乗り換え`, `${lineLabel(changeNow.to.line, locale)}으로 갈아타요`)}</h2>
-                  <p className="mt-2 text-lg font-bold">{stationLabel(changeNow.from, locale)} → {stationLabel(changeNow.to, locale)}</p>
+                  <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                    <LineBadge line={changeNow.from.line}>{`${lineLabel(changeNow.from.line, locale)} ${stationLabel(changeNow.from, locale)}`}</LineBadge>
+                    <span aria-hidden="true">→</span>
+                    <LineBadge line={changeNow.to.line}>{`${lineLabel(changeNow.to.line, locale)} ${stationLabel(changeNow.to, locale)}`}</LineBadge>
+                  </p>
                   <p className="mt-2 text-sm leading-6">
                     {situation === "onboard"
                       ? pickLocale(locale, "この駅で降りて、乗り換え表示に従ってください。", "이 역에서 내려 환승 표지를 따라가요.")
@@ -338,11 +353,11 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                         <li key={`${index}:${from.code}:${to.code}`} className="rounded-lg bg-[var(--surface-muted)] p-3">
                           <p className="text-sm font-bold">{stationLabel(from, locale)}</p>
                           <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-base font-black">
-                            <span>{lineLabel(from.line, locale)}</span>
+                            <LineBadge line={from.line}>{lineLabel(from.line, locale)}</LineBadge>
                             <span aria-hidden="true">→</span>
-                            <span className="rounded-md bg-[var(--primary-soft)] px-2 py-0.5 text-[var(--primary)]">
+                            <LineBadge line={to.line}>
                               {pickLocale(locale, `${lineLabel(to.line, locale)}に乗り換え`, `${lineLabel(to.line, locale)}으로 갈아타기`)}
-                            </span>
+                            </LineBadge>
                           </p>
                           <p className="mt-1 text-sm text-[var(--foreground-muted)]">
                             {pickLocale(locale, `乗り換え先の駅番号 ${to.code}`, `갈아탈 호선의 역번호 ${to.code}`)}
@@ -459,11 +474,31 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                 ) : null}
                 <details className="mt-6 border-t border-[var(--border)]">
                   <summary className="min-h-12 cursor-pointer py-3 font-bold">{pickLocale(locale, `経路を見る · ${trip.rideStops}駅`, `경로 보기 · ${trip.rideStops}정거장`)}</summary>
-                  <ol className="mb-4 ms-1 grid gap-3 border-s-2 border-[var(--success)] ps-4 text-sm">
-                    {trip.stops.map((item, index) => <li key={`${index}:${item.code}`} className="relative before:absolute before:-start-[21px] before:top-1.5 before:size-2 before:rounded-full before:bg-[var(--success)]">
-                      {stationLabel(item, locale)} · {lineLabel(item.line, locale)}
-                      {locale === "ja" ? <> · <span lang="ko">{item.ko}</span></> : null}
-                    </li>)}
+                  <ol className="mb-4 ms-1 text-sm">
+                    {trip.stops.map((item, index) => {
+                      const arrivingFrom = trip.stops[index - 1];
+                      const departingTo = trip.stops[index + 1];
+                      const color = subwayLineColors[item.line];
+                      return (
+                        <li key={`${index}:${item.code}`} className="relative pb-3 ps-5 last:pb-0">
+                          {departingTo ? (
+                            <span aria-hidden="true" className="absolute start-[3px] top-2.5 h-full border-s-2"
+                              style={{
+                                borderInlineStartColor: departingTo.line === item.line ? color : "var(--foreground-muted)",
+                                borderInlineStartStyle: departingTo.line === item.line ? "solid" : "dashed",
+                              }} />
+                          ) : null}
+                          <span aria-hidden="true" className="absolute start-0 top-1.5 size-2.5 rounded-full border-2 bg-white" style={{ borderColor: color }} />
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span>{stationLabel(item, locale)}{locale === "ja" ? <> · <span lang="ko">{item.ko}</span></> : null}</span>
+                            <LineBadge line={item.line}>{lineLabel(item.line, locale)}</LineBadge>
+                            {arrivingFrom && arrivingFrom.line !== item.line ? (
+                              <span className="font-black">{pickLocale(locale, "乗り換え", "환승")}</span>
+                            ) : null}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ol>
                 </details>
                 <HelpPhrase

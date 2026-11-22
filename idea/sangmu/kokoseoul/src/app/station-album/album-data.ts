@@ -1,19 +1,20 @@
 import "server-only";
 import stationCards from "../../../research/desk/substamp/station-cards.draft.json";
+import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { subwayStations } from "@/modules/transit/subway-stations";
 import stationLocations from "./station-points.json";
 import type { StationPoint } from "./stamp-proximity";
 
 const lines = [
-  { id: 1, color: "#0052a4", motif: "dancheong", ko: "단청 연꽃", ja: "丹青の蓮" },
-  { id: 2, color: "#00a84d", motif: "pine", ko: "소나무", ja: "松" },
-  { id: 3, color: "#ef7c1c", motif: "roof", ko: "한옥 지붕", ja: "韓屋の屋根" },
-  { id: 4, color: "#00a5de", motif: "cloud", ko: "구름무늬", ja: "雲文" },
-  { id: 5, color: "#996cac", motif: "knot", ko: "전통 매듭", ja: "伝統の組紐" },
-  { id: 6, color: "#cd7c2f", motif: "tile", ko: "연꽃 수막새", ja: "蓮の軒丸瓦" },
-  { id: 7, color: "#747f00", motif: "lattice", ko: "한옥 창살", ja: "韓屋の格子窓" },
-  { id: 8, color: "#e6186c", motif: "flower", ko: "매화무늬", ja: "梅花文" },
-  { id: 9, color: "#bdb092", motif: "wave", ko: "물결무늬", ja: "波文" },
+  { id: 1, color: subwayLineColors[1], motif: "dancheong", ko: "단청 연꽃", ja: "丹青の蓮" },
+  { id: 2, color: subwayLineColors[2], motif: "pine", ko: "소나무", ja: "松" },
+  { id: 3, color: subwayLineColors[3], motif: "roof", ko: "한옥 지붕", ja: "韓屋の屋根" },
+  { id: 4, color: subwayLineColors[4], motif: "cloud", ko: "구름무늬", ja: "雲文" },
+  { id: 5, color: subwayLineColors[5], motif: "knot", ko: "전통 매듭", ja: "伝統の組紐" },
+  { id: 6, color: subwayLineColors[6], motif: "tile", ko: "연꽃 수막새", ja: "蓮の軒丸瓦" },
+  { id: 7, color: subwayLineColors[7], motif: "lattice", ko: "한옥 창살", ja: "韓屋の格子窓" },
+  { id: 8, color: subwayLineColors[8], motif: "flower", ko: "매화무늬", ja: "梅花文" },
+  { id: 9, color: subwayLineColors[9], motif: "wave", ko: "물결무늬", ja: "波文" },
 ] as const;
 
 export type AlbumLine = (typeof lines)[number];
