@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { StartDemoButton } from "@/components/start-demo-button";
@@ -20,6 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function HackathonGuide() {
   const locale = await getRequestLocale();
+  await connection();
   const ended = hasDigimanHackathonEnded(event.id);
   const quest = ended ? null : await getPublicQuest({ questId: event.id, visitorId: null }).catch(() => null);
 
@@ -30,7 +32,7 @@ async function HackathonGuide() {
           ? pickLocale(locale, "開催終了", "행사 종료")
           : pickLocale(locale, "本選参加者向け · 応募受付終了", "본선 참가자용 · 모집 마감")}
       </p>
-      <h1 className="mt-3 text-3xl font-black tracking-tight text-[#504e49] sm:text-4xl">
+      <h1 className="seoul-page-title mt-3">
         {pickLocale(locale, event.titleJa, event.titleKo)}
       </h1>
       <p className="mt-3 font-bold text-slate-600">{pickLocale(locale, event.scheduleJa, event.scheduleKo)}</p>

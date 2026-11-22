@@ -23,17 +23,17 @@ export function QuestResultsView({
 
   return (
     <>
-      <div className="mt-6 inline-flex rounded-xl border border-[var(--border)] bg-white p-1" role="group" aria-label={pickLocale(locale, "表示方法", "보기 방식")}>
-        <button type="button" onClick={() => setView("list")} aria-pressed={view === "list"} className={`min-h-10 rounded-lg px-4 text-sm font-black transition ${view === "list" ? "bg-[#504e49] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
+      <div className="mt-5 inline-flex rounded-xl bg-[var(--surface-muted)] p-1" role="group" aria-label={pickLocale(locale, "表示方法", "보기 방식")}>
+        <button type="button" onClick={() => setView("list")} aria-pressed={view === "list"} className={`min-h-11 rounded-lg px-5 text-sm font-bold ${view === "list" ? "bg-[var(--success)] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
           {pickLocale(locale, "リスト", "목록")}
         </button>
-        <button type="button" onClick={() => setView("map")} aria-pressed={view === "map"} className={`min-h-10 rounded-lg px-4 text-sm font-black transition ${view === "map" ? "bg-[#504e49] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
+        <button type="button" onClick={() => setView("map")} aria-pressed={view === "map"} className={`min-h-11 rounded-lg px-5 text-sm font-bold ${view === "map" ? "bg-[var(--success)] text-white" : "text-slate-500 hover:bg-[var(--surface-muted)] hover:text-slate-800"}`}>
           {pickLocale(locale, "地図", "지도")}
         </button>
       </div>
 
       {view === "list" ? (
-        <div className="mt-6 grid max-w-2xl gap-4">
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           {quests.map((quest) => (
             <QuestCard key={quest.id} quest={quest} filters={filters} />
           ))}

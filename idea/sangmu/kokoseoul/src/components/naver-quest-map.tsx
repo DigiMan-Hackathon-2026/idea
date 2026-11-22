@@ -387,8 +387,8 @@ export function NaverQuestMap({
   }
 
   return (
-    <section className="mt-6 grid max-w-5xl gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
-      <div className="relative min-h-[28rem] overflow-hidden rounded-2xl border border-slate-900/15 bg-slate-100">
+    <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
+      <div className="seoul-surface relative min-h-[26rem] overflow-hidden rounded-xl lg:min-h-[32rem]">
         <div className="absolute inset-0">
           <div ref={containerRef} className="h-full w-full" data-testid="naver-map" />
         </div>
@@ -436,7 +436,7 @@ export function NaverQuestMap({
       </div>
 
       {selectedQuest ? (
-        <article className="self-start rounded-2xl border border-slate-900/10 bg-white p-5">
+        <article className="seoul-surface self-start rounded-xl p-5">
           <p className="text-xs font-black tracking-[0.12em] text-[#941e34]">
             {getAreaLabel(selectedQuest.areaCode, locale).toUpperCase()}
           </p>

@@ -135,15 +135,15 @@ export function DemoRunner({ runId }: { runId: string }) {
   }
 
   return (
-    <div className="mx-auto mt-8 grid max-w-4xl gap-6 lg:grid-cols-[1fr_18rem] lg:items-start">
-      <section className="overflow-hidden rounded-xl border border-slate-900/8 bg-white shadow-[0_24px_70px_rgba(41,37,31,0.09)]">
-        <div className="bg-[#504e49] px-6 py-5 text-white sm:px-8">
+    <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_18rem] lg:items-start">
+      <section className="seoul-surface overflow-hidden rounded-2xl">
+        <div className="bg-[var(--success)] px-6 py-5 text-white sm:px-8">
           <div className="flex items-center justify-between gap-4">
-            <span className="rounded-full bg-white/12 px-3 py-1.5 text-xs font-black">STEP {currentStep.position}</span>
+            <span className="rounded-md bg-white/15 px-3 py-1.5 text-xs font-bold">{pickLocale(locale, "手順", "진행 단계")}</span>
             <span className="text-sm font-bold text-[#e5b560]">{currentStep.position} / {run.steps.length}</span>
           </div>
           <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/15">
-            <div className="h-full rounded-full bg-[#941e34] transition-all" style={{ width: `${(currentStep.position / run.steps.length) * 100}%` }} />
+            <div className="h-full rounded-full bg-[var(--warning)] transition-all" style={{ width: `${(currentStep.position / run.steps.length) * 100}%` }} />
           </div>
         </div>
 
@@ -204,7 +204,7 @@ export function DemoRunner({ runId }: { runId: string }) {
                   : pickLocale(locale, "現在、このクエストを続けることができません。", "현재 이 퀘스트를 계속 진행할 수 없어요.")}
             </p>
           ) : null}
-          <button type="button" onClick={handleComplete} disabled={isSaving || !run.canContinue} className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#941e34] px-6 text-base font-black text-white shadow-[0_12px_30px_rgba(148,30,52,0.25)] disabled:cursor-wait disabled:opacity-65">
+          <button type="button" onClick={handleComplete} disabled={isSaving || !run.canContinue} className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#941e34] px-6 text-base font-black text-white  disabled:cursor-wait disabled:opacity-65">
             {isSaving
               ? pickLocale(locale, "保存しています…", "저장하는 중…")
               : pickLocale(locale, currentStep.completionLabelJa, currentStep.completionLabelKo)}

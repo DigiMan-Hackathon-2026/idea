@@ -23,9 +23,9 @@ export function QuestCard({
   const reasons = getMatchReasons(quest, filters, locale);
 
   return (
-    <article className="seoul-surface seoul-frame overflow-hidden rounded-xl p-5 pt-7 sm:p-6 sm:pt-8">
+    <article className="seoul-surface flex flex-col overflow-hidden rounded-xl p-5 sm:p-6">
       <div className="flex items-center justify-between gap-4 text-xs font-black">
-        <span className="text-[#941e34]">
+        <span className="text-[var(--success)]">
           {pickLocale(locale, "デモ体験", "데모 체험")}
         </span>
         <span className="text-slate-500">
@@ -46,7 +46,7 @@ export function QuestCard({
         </h2>
         <p className="mt-3 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
 
-        <div className="mt-5 border-l-4 border-[#455f54] bg-[#edf1ef] px-4 py-3">
+        <div className="mt-4 rounded-lg bg-[var(--success-soft)] px-4 py-3">
           <p className="text-xs font-black tracking-[0.08em] text-[#455f54]">
             {pickLocale(locale, "おすすめの理由", "추천하는 이유")}
           </p>
@@ -60,13 +60,13 @@ export function QuestCard({
           </ul>
         </div>
 
-        <div className="mt-6 flex flex-col items-start justify-between gap-4 border-t border-slate-900/8 pt-5 sm:flex-row sm:items-center">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
           <span className="text-xs font-bold text-slate-500">
             {pickLocale(locale, quest.solo.labelJa, quest.solo.labelKo)}
           </span>
           <Link
             href={`/quests/${quest.id}`}
-            className="seoul-button-primary inline-flex min-h-11 shrink-0 items-center rounded-lg px-5 text-sm font-black transition"
+            className="seoul-button-dark inline-flex min-h-11 shrink-0 items-center rounded-lg px-5 text-sm font-black transition"
           >
             {pickLocale(locale, "クエストの詳細を見る", "퀘스트 자세히 보기")}
           </Link>

@@ -5,7 +5,7 @@ export default function OfflinePage() {
     <main
       style={{
         alignItems: "center",
-        background: "#f4f0e7",
+        background: "#f8f5ef",
         color: "#504e49",
         display: "flex",
         fontFamily: "system-ui, sans-serif",
@@ -17,32 +17,15 @@ export default function OfflinePage() {
         style={{
           background: "white",
           border: "1px solid rgba(15, 23, 42, 0.08)",
-          borderRadius: "28px",
-          boxShadow: "0 24px 80px rgba(41, 37, 31, 0.09)",
+          borderRadius: "16px",
+          boxShadow: "0 6px 22px rgba(80, 78, 73, 0.09)",
           margin: "0 auto",
           maxWidth: "560px",
           padding: "32px",
           width: "100%",
         }}
       >
-        <div
-          aria-hidden="true"
-          style={{
-            alignItems: "center",
-            background: "#941e34",
-            borderRadius: "16px",
-            color: "white",
-            display: "flex",
-            fontSize: "24px",
-            fontWeight: 900,
-            height: "48px",
-            justifyContent: "center",
-            width: "48px",
-          }}
-        >
-          ✦
-        </div>
-        <h1 style={{ fontSize: "28px", lineHeight: 1.25, margin: "24px 0 0" }}>
+        <h1 style={{ fontSize: "28px", lineHeight: 1.25, margin: 0 }}>
           オフラインです
         </h1>
         <p style={{ color: "#594743", lineHeight: 1.7, margin: "12px 0 0" }}>
@@ -58,7 +41,7 @@ export default function OfflinePage() {
         <Link
           href="/"
           style={{
-            background: "#504e49",
+            background: "#455f54",
             borderRadius: "16px",
             color: "white",
             cursor: "pointer",

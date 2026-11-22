@@ -76,40 +76,26 @@ export default async function QuestDetailPage({
   return (
     <main className="min-h-dvh pb-24">
       <SiteHeader />
-      <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8 sm:pt-10">
+      <div className="seoul-page">
         <Link href="/quests" className="inline-flex items-center gap-2 rounded-full text-sm font-black text-slate-600 hover:text-[#504e49]">
           {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
         </Link>
 
         <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
           <article>
-            <div className="quest-detail-visual seoul-frame relative min-h-72 overflow-hidden rounded-2xl border border-[#a4a199] bg-[#d8ccad] p-7 pt-10 sm:min-h-96 sm:p-10 sm:pt-12">
-              <div className="absolute right-[8%] top-[22%] h-[48%] w-[44%] border border-[#a4a199] bg-[#dfdfdd] shadow-[12px_12px_0_#e5b560]" aria-hidden="true" />
-              <div className="absolute right-[14%] top-[30%] h-4 w-[32%] bg-[#504e49]" aria-hidden="true" />
-              <div className="absolute right-[14%] top-[43%] h-4 w-[32%] bg-[#455f54]" aria-hidden="true" />
-              <div className="absolute right-[14%] top-[56%] h-4 w-[32%] bg-[#941e34]" aria-hidden="true" />
-              <div className="relative flex items-start justify-between gap-3">
-                <span className="rounded-md border-l-4 border-[#941e34] bg-white px-3 py-1.5 text-xs font-black text-[#941e34] shadow-sm">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
-                <span className="text-xs font-black tracking-[0.16em] text-slate-800/65">SEOUL · SEONGSU</span>
-              </div>
-              <p className="absolute bottom-8 left-7 max-w-64 text-4xl font-black leading-[0.92] tracking-[-0.065em] text-[#504e49] sm:bottom-10 sm:left-10 sm:text-6xl">
-                GO SMALL,
-                <br />FEEL MORE.
-              </p>
-            </div>
-
-            <div className="mt-8">
+            <div className="seoul-surface rounded-2xl p-5 sm:p-8">
               <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-[var(--success-soft)] px-3 py-1.5 text-xs font-bold text-[var(--success)]">{pickLocale(locale, "デモ体験", "데모 체험")}</span>
                 <span className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-600 shadow-sm">{getAreaLabel(quest.areaCode, locale)}</span>
                 {quest.tags.map((tag) => (
                   <span key={tag} className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-600 shadow-sm">{getTagLabel(tag, locale)}</span>
                 ))}
               </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.08] tracking-[-0.055em] text-[#504e49] sm:text-6xl">
+              <h1 className="seoul-page-title mt-4">
                 {pickLocale(locale, quest.titleJa, quest.titleKo)}
               </h1>
               <p className="mt-5 max-w-2xl text-lg font-semibold leading-8 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
-              <p className="mt-5 max-w-2xl rounded-xl border-l-4 border-[#941e34] bg-[#f7ecee] p-5 leading-7 text-[#941e34]">{pickLocale(locale, quest.bodyJa, quest.bodyKo)}</p>
+              <p className="mt-4 rounded-xl bg-[var(--surface-muted)] p-4 leading-7">{pickLocale(locale, quest.bodyJa, quest.bodyKo)}</p>
               <div className="mt-8 max-w-2xl">
                 <QuestTransitGuide quest={quest} />
               </div>

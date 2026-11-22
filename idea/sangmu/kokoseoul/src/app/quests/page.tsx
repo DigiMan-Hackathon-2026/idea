@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { FilterForm } from "@/components/filter-form";
 import { QuestResultsView } from "@/components/quest-results-view";
@@ -57,6 +58,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
   const quests = filterDemoQuests(DEMO_QUESTS, filters);
   const locale = await getRequestLocale();
   const event = DIGIMAN_HACKATHON;
+  await connection();
   const showHackathon =
     (filters.area === "all" || filters.area === "sinchon") &&
     (!filters.purpose || filters.purpose === "discovery") &&
@@ -316,45 +318,48 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <>
-      <section className="seoul-surface rounded-xl p-5 sm:p-7">
+      <div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="seoul-kicker text-sm">
+            {getAreaLabel(filters.area, locale).toUpperCase()}
+            {filters.purpose ? ` · ${getPurposeLabel(filters.purpose, locale).toUpperCase()}` : ""}
+          </p>
+          <p className="rounded-lg bg-[var(--success-soft)] px-3 py-2 text-sm font-bold text-[var(--success)]">
+            {pickLocale(locale, `${resultCount}件`, `${resultCount}개`)}
+          </p>
+        </div>
+        <h1 className="seoul-page-title mt-2 text-balance">
+          {pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}
+        </h1>
+      </div>
+
+      <section className="seoul-surface mt-6 rounded-xl px-4 py-3 sm:px-6">
         <FilterForm filters={filters} />
       </section>
 
-      <div className="mt-8 flex items-end justify-between gap-6 sm:mt-10">
-        <div>
-          <p className="text-xs font-black tracking-[0.18em] text-[#941e34]">
-            {getAreaLabel(filters.area, locale).toUpperCase()}
-            {filters.purpose
-              ? ` · ${getPurposeLabel(filters.purpose, locale).toUpperCase()}`
-              : ""}
-          </p>
-          <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#504e49] sm:text-4xl">
-            {pickLocale(locale, "あなたに合うクエスト", "나에게 맞는 퀘스트")}
-          </h1>
-        </div>
-        <p className="shrink-0 text-sm font-bold text-slate-500">
-          {pickLocale(locale, `${resultCount}件`, `${resultCount}개`)}
-        </p>
-      </div>
-
-      {featured.map(({ quest, href, label, detail, action }) => (
-        <article key={quest.id} className="seoul-surface mt-6 max-w-2xl rounded-xl p-5 sm:p-7">
-          <p className="text-sm font-black text-[#941e34]">{label}</p>
-          <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, quest.titleJa, quest.titleKo)}</h2>
-          <p className="mt-2 font-bold text-slate-600">{detail}</p>
-          <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
-          <Link href={href} className="seoul-button-primary mt-4 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-black">
-            {action}
-          </Link>
-        </article>
-      ))}
       {quests.length > 0 ? (
         <QuestResultsView
           quests={quests}
           filters={filters}
           naverMapKeyId={process.env.NEXT_PUBLIC_NAVER_MAP_NCP_KEY_ID?.trim() || null}
         />
-      ) : featured.length > 0 ? null : (
+      ) : null}
+      {featured.length > 0 ? (
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {featured.map(({ quest, href, label, detail, action }) => (
+            <article key={quest.id} className="seoul-surface flex flex-col items-start rounded-xl p-5 sm:p-6">
+              <p className="seoul-kicker text-sm">{label}</p>
+              <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, quest.titleJa, quest.titleKo)}</h2>
+              <p className="mt-2 font-bold text-slate-600">{detail}</p>
+              <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
+              <Link href={href} className="seoul-button-dark mt-4 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-black">
+                {action}
+              </Link>
+            </article>
+          ))}
+        </div>
+      ) : null}
+      {quests.length === 0 && featured.length === 0 ? (
         <section className="seoul-surface mt-8 max-w-2xl rounded-xl border-dashed px-6 py-16 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-xl bg-[#f7ecee] text-2xl text-[#941e34]" aria-hidden="true">↺</span>
           <h2 className="mt-5 text-2xl font-black tracking-tight text-[#504e49]">
@@ -367,7 +372,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
             {pickLocale(locale, "条件を変更する", "조건 변경하기")}
           </Link>
         </section>
-      )}
+      ) : null}
     </>
   );
 }
@@ -386,7 +391,7 @@ export default function QuestsPage({ searchParams }: { searchParams: SearchParam
   return (
     <main className="min-h-dvh pb-20">
       <SiteHeader />
-      <div className="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-8 sm:pt-10">
+      <div className="seoul-page">
         <Suspense fallback={<ResultsFallback />}>
           <QuestResults searchParams={searchParams} />
         </Suspense>

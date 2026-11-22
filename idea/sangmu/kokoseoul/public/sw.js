@@ -1,4 +1,4 @@
-const SHELL_CACHE = "yeogiseoul-shell-v6";
+const SHELL_CACHE = "yeogiseoul-shell-v7";
 const OFFLINE_URL = "/offline";
 const SUBWAY_OFFLINE_URL = "/subway-offline.html";
 const SUBWAY_OFFLINE_SCRIPT = "/subway-offline.js";

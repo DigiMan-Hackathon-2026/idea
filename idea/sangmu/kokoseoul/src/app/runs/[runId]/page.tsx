@@ -13,11 +13,11 @@ async function DemoRunContent({ params }: { params: Promise<{ runId: string }> }
   const locale = await getRequestLocale();
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8 sm:pt-8">
+    <div className="seoul-page">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#941e34] shadow-sm">{pickLocale(locale, "クエスト進行", "퀘스트 진행")}</span>
-            <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] text-[#504e49] sm:text-5xl">{pickLocale(locale, "次の体験へ進みましょう", "다음 체험으로 진행해요")}</h1>
+            <h1 className="seoul-page-title mt-3">{pickLocale(locale, "次の体験へ進みましょう", "다음 체험으로 진행해요")}</h1>
           </div>
           <Link href="/quests" className="rounded-full px-4 py-2 text-sm font-black text-slate-600">{pickLocale(locale, "クエスト一覧へ", "퀘스트 목록으로")}</Link>
         </div>

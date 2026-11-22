@@ -48,19 +48,19 @@ export function VisitGuidePage({
   return (
     <main className="min-h-dvh pb-24">
       <SiteHeader />
-      <div className="mx-auto w-full max-w-2xl px-5 pt-5 sm:px-8 sm:pt-10">
+      <div className="seoul-page max-w-3xl">
         <Link href={listHref} className="mb-5 inline-flex min-h-11 items-center text-sm font-bold text-slate-600">
           {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
         </Link>
-        <article className="seoul-surface rounded-xl p-5 sm:p-8">
-          <h1 className="text-3xl font-black tracking-tight text-[#504e49] sm:text-4xl">
+        <article className="seoul-surface rounded-2xl p-5 sm:p-8">
+          <h1 className="seoul-page-title">
             {pickLocale(locale, guide.titleJa, guide.titleKo)}
           </h1>
           <p className="mt-5 leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
-          <ol className="mt-5 grid gap-2">
+          <ol className="mt-6 grid gap-2 border-s-2 border-[var(--success)] ps-3">
             {guide.steps.map((step, index) => (
-              <li key={step.id} className="rounded-lg border border-[var(--border)] bg-white px-4 py-3 font-bold text-[#504e49]">
-                <span className="mr-3 text-[#941e34]">{index + 1}</span>
+              <li key={step.id} className="rounded-lg bg-[var(--surface-muted)] px-4 py-3 font-bold">
+                <span className="mr-3 text-[var(--success)]">{index + 1}</span>
                 {pickLocale(locale, step.titleJa, step.titleKo)}
               </li>
             ))}

@@ -9,10 +9,10 @@ import { pickLocale } from "@/lib/locale";
 export function SubwayPageContent({ readings, exitGuide }: { readings: Record<string, string>; exitGuide: ReactNode }) {
   const { locale } = useLocale();
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-7 sm:px-8 sm:pt-12">
+    <div className="seoul-page">
       <div className="mb-6 border-s-4 border-[var(--seoul-namsan)] ps-4 sm:mb-8 sm:ps-5">
         <p className="text-xs font-bold text-[var(--seoul-namsan)] sm:text-sm">{pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}</p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-5xl">
+        <h1 className="seoul-page-title mt-1">
           {pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
         </h1>
       </div>
