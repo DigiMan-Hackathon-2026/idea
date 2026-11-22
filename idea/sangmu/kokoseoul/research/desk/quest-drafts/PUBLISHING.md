@@ -35,6 +35,7 @@
 
 | 검사 | 실패하는 경우 |
 | --- | --- |
+| `pnpm test` 중 `quest-content-rules.test.ts` | DB가 거절할 내용이다: 단계 3~5개, 단계마다 한·일 제목·안내·완료 문구, 짝이 맞는 보여 줄 문장, 길이 제한, 소요 시간 15~240분, 알려진 지역·목적, 겹치지 않는 UUID, https 출처 |
 | `pnpm test` 중 `quest-access.test.ts` | 출구가 없는 퀘스트가 생겼다. 쇼핑 데모만 예외다 |
 | `pnpm test` 중 `quest-exit-mentions.test.ts` | 문구에 적은 출구가 출구 목록과 다른 번호만 말한다 |
 | `pnpm test` 중 `quest-detail-path.test.ts` | 출구 목록의 `slug`와 상세 주소가 맞지 않는다 |
