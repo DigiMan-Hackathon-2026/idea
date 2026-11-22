@@ -301,12 +301,15 @@ a {
 .scenic-shortcut span { color: inherit; }
 
 @media (max-width: 639px) {
+  .seoul-page { padding-top: 1rem; }
+
   .scenic-hero {
-    min-height: 16.25rem;
-    background-position: center, 68% 92%, center;
+    min-height: 14rem;
+    background-position: center, 72% 94%, center;
   }
 
-  .scenic-hero-copy { padding-bottom: 3.4rem; }
+  .scenic-hero-copy { padding-top: 1.15rem; padding-bottom: 3.2rem; }
+  .scenic-hero p { margin-top: .5rem; font-size: .9375rem; }
   .scenic-content { margin-top: -1rem; }
 }
 

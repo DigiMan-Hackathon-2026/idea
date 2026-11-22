@@ -56,7 +56,7 @@ function Choice({
         style={{ caretColor: "transparent" }}
         className="peer sr-only"
       />
-      <span className="flex min-h-13 items-center rounded-lg border border-transparent bg-[var(--surface-muted)] px-3 py-2 text-left text-base font-bold leading-6 text-[var(--foreground)] peer-checked:border-[var(--primary)] peer-checked:bg-[var(--primary-soft)] peer-checked:text-[var(--primary)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
+      <span className="flex h-full min-h-12 items-center rounded-lg border border-transparent bg-[var(--surface-muted)] px-3 py-2 text-left text-sm font-bold leading-5 text-[var(--foreground)] peer-checked:border-[var(--primary)] peer-checked:bg-[var(--primary-soft)] peer-checked:text-[var(--primary)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca] sm:min-h-13 sm:text-base sm:leading-6">
         {children}
       </span>
     </label>
@@ -141,12 +141,12 @@ export function QuestOnboarding() {
       </div>
 
       {step === 0 ? (
-        <fieldset className="mt-6">
+        <fieldset className="mt-4 sm:mt-6">
           <legend
             ref={headingRef}
             id="quest-onboarding-title"
             tabIndex={-1}
-            className="text-2xl font-black leading-tight tracking-[-0.035em] text-[#504e49]"
+            className="text-xl font-black leading-tight tracking-[-0.035em] text-[#504e49] sm:text-2xl"
           >
             {pickLocale(locale, "今日は何をしたいですか？", "오늘 무엇을 하고 싶어요?")}
           </legend>
@@ -164,7 +164,7 @@ export function QuestOnboarding() {
               >
                 <span className="grid gap-0.5">
                   <span>{getPurposeLabel(value as QuestPurpose, locale)}</span>
-                  <span className="text-sm font-semibold text-slate-500">
+                  <span className="text-xs leading-5 font-semibold text-slate-500 sm:text-sm">
                     {pickLocale(
                       locale,
                       PURPOSE_DESCRIPTIONS[value as QuestPurpose].ja,
@@ -287,7 +287,7 @@ export function QuestOnboarding() {
         </fieldset>
       ) : null}
 
-      <div className="mt-6 grid gap-2">
+      <div className="mt-4 grid gap-2 sm:mt-6">
         <button
           type="button"
           disabled={!canContinue || locationStatus === "loading"}
