@@ -289,7 +289,8 @@ FIRST_PASS_FILES = {
     "src/components/quest-results-view.tsx", "src/components/visit-guide-page.tsx",
     "src/app/quests/[questId]/page.tsx", "src/app/quests/[questId]/not-found.tsx",
     "src/app/subway/page.tsx", "src/app/subway/subway-page-content.tsx", "src/app/subway/nearby-station-picker.tsx",
-    "src/components/subway-direction-guide.tsx",
+    "src/components/subway-direction-guide.tsx", "src/components/subway-sign-camera.tsx",
+    "src/components/subway-transfer-sign-check.tsx", "src/app/quests/nearby/page.tsx",
     "src/app/station-album/page.tsx", "src/app/station-album/station-album.tsx",
     "src/app/station-album/stamp-image.tsx", "src/app/station-album/album-data.ts",
 }
