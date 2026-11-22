@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { stationCollectionKey } from "./station-identity";
 
 const prefix = "digiman.station-stamp.v1:";
 const changed = "digiman:station-stamps-changed";
@@ -45,6 +46,8 @@ export function useStampCollection() {
   const snapshot = useSyncExternalStore(subscribe, readSnapshot, () => null);
   return {
     availability: snapshot === null ? "loading" : snapshot === "unavailable" ? "unavailable" : "ready",
-    keys: new Set<string>(snapshot && snapshot !== "unavailable" ? JSON.parse(snapshot) as string[] : []),
+    keys: new Set<string>(snapshot && snapshot !== "unavailable"
+      ? (JSON.parse(snapshot) as string[]).map(stationCollectionKey)
+      : []),
   };
 }

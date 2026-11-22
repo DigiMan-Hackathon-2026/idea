@@ -7,6 +7,7 @@ import { pickLocale, type Locale } from "@/lib/locale";
 import type { AlbumCard, AlbumLine, getStationAlbum } from "./album-data";
 import { refreshStampCollection, useStampCollection } from "./stamp-collection";
 import { StampImage } from "./stamp-image";
+import { stationCollectionKey } from "./station-identity";
 import styles from "./station-album.module.css";
 
 function lineLabel(locale: Locale, id: number) {
@@ -26,8 +27,8 @@ function albumLink(
   };
 }
 
-function stationName(card: Pick<AlbumCard, "stationKey" | "readingKoKana">, locale: Locale) {
-  return pickLocale(locale, card.readingKoKana, card.stationKey);
+function stationName(card: Pick<AlbumCard, "stationKey" | "stationNameJa">, locale: Locale) {
+  return pickLocale(locale, card.stationNameJa, card.stationKey);
 }
 
 function CollectionStatus({ collected, locale }: { collected: boolean | null; locale: Locale }) {
@@ -61,13 +62,14 @@ export function StationAlbum({
   const t = (ja: string, ko: string) => pickLocale(locale, ja, ko);
   const { line, cards, lineIndex, totalStations, coordinateSource } = album;
   const { availability, keys } = useStampCollection();
-  const isCollected = (key: string) => keys.has(key);
+  const isCollected = (key: string) => keys.has(stationCollectionKey(key));
   const collectedCount = (stationKeys: string[]) => stationKeys.filter(isCollected).length;
   const ready = availability === "ready";
   const collected = collectedCount(cards.map(({ stationKey }) => stationKey));
   const totalCollected = new Set(lineIndex.flatMap(({ keys }) => keys.filter(isCollected))).size;
   const visibleCards = collectedOnly ? cards.filter(({ stationKey }) => isCollected(stationKey)) : cards;
   const selected = visibleCards.find(({ stationKey }) => stationKey === station) ?? visibleCards[0];
+  const story = selected?.story;
 
   return (
     <div className={styles.album}>
@@ -134,30 +136,32 @@ export function StationAlbum({
           <article id="station-story" className={styles.story} aria-labelledby="station-heading">
             <StationStamp line={line} card={selected} locale={locale} collected={ready ? isCollected(selected.stationKey) : null} />
             <h2 id="station-heading">{stationName(selected, locale)}</h2>
-            {selected.hanja && <p className={styles.hanja}>{selected.hanja}</p>}
-            <p className={styles.note}>
-              {t("韓国語の読み方", "한국어 발음의 가타카나 표기")}{" "}
-              <span lang="ja">{selected.readingKoKana}</span>
-            </p>
-            <p className={styles.note}>{t("駅名の読みもの・確認中", "역 이름 이야기 · 검수 중")}</p>
-            <div className={styles.storyBody}>
-              <h3>{selected.storyKind === "legend" ? t("伝承", "전해지는 이야기") : t("駅名の由来", "역 이름의 유래")}</h3>
-              {locale === "ja" && <p className={styles.storyTitle}>{selected.titleJa}</p>}
-              {locale === "ja" ? <p>{selected.storyJa}</p> : selected.officialOriginKo ? (
-                <p>{selected.officialOriginKo}</p>
-              ) : (
-                <details>
-                  <summary>한국어 원문이 없어요. 일본어 이야기 보기</summary>
-                  <p lang="ja">{selected.storyJa}</p>
-                </details>
-              )}
-              {selected.kanjiNoteJa && (
-                <details>
-                  <summary>{t("漢字の意味を見る", "한자 풀이 보기 (일본어)")}</summary>
-                  <p lang="ja">{selected.kanjiNoteJa}</p>
-                </details>
-              )}
-            </div>
+            {story ? <>
+              {story.hanja && <p className={styles.hanja}>{story.hanja}</p>}
+              {story.readingKoKana && <p className={styles.note}>
+                {t("韓国語の読み方", "한국어 발음의 가타카나 표기")}{" "}
+                <span lang="ja">{story.readingKoKana}</span>
+              </p>}
+              <p className={styles.note}>{t("駅名の読みもの・確認中", "역 이름 이야기 · 검수 중")}</p>
+              <div className={styles.storyBody}>
+                <h3>{story.storyKind === "legend" ? t("伝承", "전해지는 이야기") : t("駅名の由来", "역 이름의 유래")}</h3>
+                {locale === "ja" && <p className={styles.storyTitle}>{story.titleJa}</p>}
+                {locale === "ja" ? <p>{story.storyJa}</p> : story.officialOriginKo ? (
+                  <p>{story.officialOriginKo}</p>
+                ) : (
+                  <details>
+                    <summary>한국어 원문이 없어요. 일본어 이야기 보기</summary>
+                    <p lang="ja">{story.storyJa}</p>
+                  </details>
+                )}
+                {story.kanjiNoteJa && (
+                  <details>
+                    <summary>{t("漢字の意味を見る", "한자 풀이 보기 (일본어)")}</summary>
+                    <p lang="ja">{story.kanjiNoteJa}</p>
+                  </details>
+                )}
+              </div>
+            </> : <p className={styles.note}>{t("この駅の名前の由来は準備中です。", "이 역의 이름 이야기는 준비 중이에요.")}</p>}
             {selected.related.length > 0 && (
               <nav className={styles.related} aria-label={t("関連する駅", "관련 역")}>
                 <h3>{t("関連する駅", "관련 역")}</h3>
@@ -176,11 +180,11 @@ export function StationAlbum({
                 </ul>
               </nav>
             )}
-            {selected.officialOriginKo ? (
+            {story?.officialOriginKo ? (
               <a className={styles.source} href="https://data.seoul.go.kr/dataList/OA-12036/S/1/datasetView.do">
                 {t("出典：ソウル交通公社「駅名の由来」", "출처: 서울교통공사 「역명의 유래」")}
               </a>
-            ) : selected.sourceUrls.map((url, index) => (
+            ) : story?.sourceUrls.map((url, index) => (
               <p key={url}>
                 <a className={styles.source} href={url}>
                   {t(`参考資料 ${index + 1}`, `참고 자료 ${index + 1}`)}

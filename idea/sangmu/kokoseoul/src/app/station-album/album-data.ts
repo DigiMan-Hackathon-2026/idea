@@ -1,7 +1,8 @@
 import "server-only";
 import stationCards from "../../../research/desk/substamp/station-cards.draft.json";
-import { subwayLineColors } from "@/modules/transit/subway-line-colors";
-import { subwayStations } from "@/modules/transit/subway-stations";
+import { subwayLineColors } from "../../modules/transit/subway-line-colors";
+import { subwayStations } from "../../modules/transit/subway-stations";
+import { stationCollectionKey } from "./station-identity";
 import stationLocations from "./station-points.json";
 import type { StationPoint } from "./stamp-proximity";
 
@@ -19,75 +20,68 @@ const lines = [
 
 export type AlbumLine = (typeof lines)[number];
 type Card = (typeof stationCards.cards)[number];
-type StationName = Pick<Card, "stationKey" | "readingKoKana">;
-export type AlbumCard = Pick<Card, "stationKey" | "readingKoKana" | "hanja" | "titleJa" | "storyJa" | "storyKind" | "officialOriginKo" | "kanjiNoteJa"> & {
-  related: (StationName & { lineId: number })[];
-  characterSrc: string | null;
+type StationName = { stationKey: string; stationNameJa: string };
+type StationStory = Pick<Card, "readingKoKana" | "hanja" | "titleJa" | "storyJa" | "storyKind" | "officialOriginKo" | "kanjiNoteJa"> & {
   sourceUrls: string[];
+};
+export type AlbumCard = StationName & {
+  related: (StationName & { lineId: number })[];
+  characterSrc: string;
+  story: StationStory | null;
   stationPoints: StationPoint[];
 };
 
 const pointsByKey: Readonly<Record<string, number[][] | undefined>> = stationLocations.stations;
-const stationCodesByLineAndName = new Map(subwayStations.map(({ line, ko, code }) => [`${line}:${ko}`, code]));
-
-function getCharacterSrc(line: number, stationKey: string) {
-  const code = stationCodesByLineAndName.get(`${line}:${stationKey}`);
-  return code ? `/station-characters/${code}.webp` : null;
-}
-
-function numberedLine(name: string) {
-  const match = /^0?([1-9])호선(?:\(연장\))?$/.exec(name);
-  return match ? Number(match[1]) : undefined;
-}
-
+const storiesByName = new Map(stationCards.cards.map((card) => [card.stationKey, card]));
+const stationsByName = Map.groupBy(subwayStations, ({ ko }) => ko);
 const lineAlbums = lines.map((line) => ({
   line,
-  cards: stationCards.cards.flatMap((card) => {
-    const memberships: { line: string; subwayId?: string }[] = card.lines;
-    const entry = memberships.find((item) => numberedLine(item.line) === line.id);
-    return entry ? [{ card, code: entry.subwayId }] : [];
-  }).sort((a, b) =>
-    Number(a.code ?? Infinity) - Number(b.code ?? Infinity) || a.card.stationKey.localeCompare(b.card.stationKey, "ko"),
-  ).map(({ card }) => card),
+  stations: subwayStations.filter((station) => station.line === line.id),
 }));
-const cardsByKey = new Map(lineAlbums.flatMap(({ cards }) =>
-  cards.map((card) => [card.stationKey, card] as const),
-));
-const lineIndex = lineAlbums.map(({ line, cards }) => ({
+const lineIndex = lineAlbums.map(({ line, stations }) => ({
   line,
-  keys: cards.map(({ stationKey }) => stationKey),
+  keys: stations.map(({ ko }) => stationCollectionKey(ko)),
 }));
+const totalStations = new Set(lineIndex.flatMap(({ keys }) => keys)).size;
 
 export function getStationAlbum(requestedLine: unknown) {
-  const { line, cards } = lineAlbums.find(({ line }) => String(line.id) === requestedLine) ?? lineAlbums[0];
+  const { line, stations } = lineAlbums.find(({ line }) => String(line.id) === requestedLine) ?? lineAlbums[0];
   return {
     line,
     lineIndex,
-    totalStations: cardsByKey.size,
+    totalStations,
     coordinateSource: stationLocations.source.dataset,
-    cards: cards.map((card): AlbumCard => ({
-      stationKey: card.stationKey,
-      readingKoKana: card.readingKoKana,
-      hanja: card.hanja,
-      titleJa: card.titleJa,
-      storyJa: card.storyJa,
-      storyKind: card.storyKind,
-      officialOriginKo: card.officialOriginKo,
-      kanjiNoteJa: card.kanjiNoteJa,
-      characterSrc: getCharacterSrc(line.id, card.stationKey),
-      sourceUrls: card.source?.urls ?? [],
-      stationPoints: (pointsByKey[card.stationKey] ?? []).flatMap(([latitude, longitude]): StationPoint[] =>
-        Number.isFinite(latitude) && Math.abs(latitude) <= 90 &&
-        Number.isFinite(longitude) && Math.abs(longitude) <= 180
-          ? [[latitude, longitude]] : [],
-      ),
-      related: card.relatedStations.flatMap((key) => {
-        const other = cardsByKey.get(key);
-        if (!other) return [];
-        const memberships = other.lines.map((entry) => numberedLine(entry.line));
-        const lineId = memberships.find((id) => id === line.id) ?? memberships.find((id) => id !== undefined);
-        return lineId ? [{ stationKey: key, readingKoKana: other.readingKoKana, lineId }] : [];
-      }),
-    })),
+    cards: stations.map(({ code, ko, ja }): AlbumCard => {
+      const story = storiesByName.get(ko);
+      return {
+        stationKey: ko,
+        stationNameJa: story?.readingKoKana || ja,
+        characterSrc: `/station-characters/${code}.webp`,
+        story: story ? {
+          readingKoKana: story.readingKoKana,
+          hanja: story.hanja,
+          titleJa: story.titleJa,
+          storyJa: story.storyJa,
+          storyKind: story.storyKind,
+          officialOriginKo: story.officialOriginKo,
+          kanjiNoteJa: story.kanjiNoteJa,
+          sourceUrls: story.source?.urls ?? [],
+        } : null,
+        stationPoints: (pointsByKey[ko] ?? []).flatMap(([latitude, longitude]): StationPoint[] =>
+          Number.isFinite(latitude) && Math.abs(latitude) <= 90 &&
+          Number.isFinite(longitude) && Math.abs(longitude) <= 180
+            ? [[latitude, longitude]] : [],
+        ),
+        related: (story?.relatedStations ?? []).flatMap((key) => {
+          const matches = stationsByName.get(key);
+          const related = matches?.find((station) => station.line === line.id) ?? matches?.[0];
+          return related ? [{
+            stationKey: key,
+            stationNameJa: storiesByName.get(key)?.readingKoKana || related.ja,
+            lineId: related.line,
+          }] : [];
+        }),
+      };
+    }),
   };
 }
