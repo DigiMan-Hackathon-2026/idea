@@ -39,7 +39,7 @@ function subscribeToHydration() {
   return () => {};
 }
 
-function StationPicker({ id, label, code, onSelect, readings }: {
+export function StationPicker({ id, label, code, onSelect, readings }: {
   id: string;
   label: string;
   code: string;
@@ -182,7 +182,10 @@ function ExitHelp() {
   );
 }
 
-export function SubwayDirectionGuide({ readings }: { readings: Record<string, string> }) {
+export function SubwayDirectionGuide({ readings, onViewStation }: {
+  readings: Record<string, string>;
+  onViewStation: (code: string) => void;
+}) {
   const { locale } = useLocale();
   const saved = restoreSubwayRide(useSyncExternalStore(subscribeToSavedRide, readSavedRide, () => null));
   const [draft, setDraft] = useState<SubwayRide | null>(null);
@@ -232,6 +235,11 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
             <div className="grid items-start gap-3">
               <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={(code) => updateRide({ ...ride, origin: code, transfer: "", train: "local" })} readings={readings} />
               <StationPicker id="subway-destination" label={pickLocale(locale, "降りたい駅", "내릴 역")} code={destination} readings={readings} onSelect={(code) => updateRide({ ...ride, destination: code, transfer: "" })} />
+              {destination ? (
+                <button type="button" className="min-h-11 justify-self-start text-sm font-bold text-[var(--primary)] underline" onClick={() => onViewStation(destination)}>
+                  {pickLocale(locale, "降りる駅の構内案内を見る", "내릴 역 내부 안내 보기")}
+                </button>
+              ) : null}
             </div>
 
             {!trip && !storageFailed ? (

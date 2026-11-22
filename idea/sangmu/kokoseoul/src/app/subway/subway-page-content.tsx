@@ -1,21 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, type ReactNode } from "react";
+import { Suspense, useRef, useState, type ReactNode } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { SubwayDirectionGuide } from "@/components/subway-direction-guide";
 import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
+import { StationInteriorGuide } from "./station-interior-guide";
 
 export function SubwayPageContent({ readings, exitGuide }: { readings: Record<string, string>; exitGuide: ReactNode }) {
   const { locale } = useLocale();
+  const [guideStation, setGuideStation] = useState("");
+  const guideTitle = useRef<HTMLHeadingElement>(null);
+
+  function viewStation(code: string) {
+    setGuideStation(code);
+    guideTitle.current?.focus({ preventScroll: true });
+    guideTitle.current?.scrollIntoView({ block: "start" });
+  }
+
   return (
     <div className="seoul-page">
       <ScenicHero theme="night"
         title={pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
         description={pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}
       />
-      <div className="scenic-content"><SubwayDirectionGuide readings={readings} /></div>
+      <div className="scenic-content"><SubwayDirectionGuide readings={readings} onViewStation={viewStation} /></div>
+      <StationInteriorGuide code={guideStation} onSelect={setGuideStation} readings={readings} titleRef={guideTitle} />
       <details className="mt-5 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
         <summary className="min-h-12 cursor-pointer py-3.5 font-bold">
           {pickLocale(locale, "聖水駅の構内・3番出口を見る", "성수역 층별 안내·3번 출구 보기")}
