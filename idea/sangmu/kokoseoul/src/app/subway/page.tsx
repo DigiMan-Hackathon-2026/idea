@@ -35,7 +35,7 @@ async function SeongsuExitGuide() {
 
 export default function SubwayPage() {
   return (
-    <main className="min-h-dvh bg-[var(--surface)] pb-16">
+    <main className="min-h-dvh bg-[color-mix(in_srgb,var(--seoul-hemp)_22%,white)] pb-16">
       <SiteHeader />
       <SubwayPageContent readings={stationReadings} exitGuide={<SeongsuExitGuide />} />
     </main>

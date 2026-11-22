@@ -70,7 +70,7 @@ function StationPicker({ id, label, code, onSelect, readings }: {
     <div className="min-w-0">
       <p className="block text-sm font-bold" id={`${id}-label`}>{label}</p>
       {selected ? (
-        <div className="mt-2 flex min-h-12 items-center justify-between gap-2 rounded-lg bg-[var(--surface-muted)] px-3">
+        <div className="mt-2 flex min-h-12 items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-white px-3">
           <div className="min-w-0 py-2 leading-5">
             <span className="block font-bold">{stationLabel(selected, locale)}</span>
             <span className="block text-xs text-[var(--seoul-palace-brown)]">{lineLabel(selected.line, locale)}</span>
@@ -81,17 +81,20 @@ function StationPicker({ id, label, code, onSelect, readings }: {
         </div>
       ) : (
         <>
-          <input
-            id={id}
-            ref={field}
-            aria-labelledby={`${id}-label`}
-            readOnly={!hydrated}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={pickLocale(locale, "駅名・駅番号", "역 이름·역번호")}
-            className="mt-2 min-h-13 w-full rounded-lg border border-[var(--border)] bg-white px-3 font-medium placeholder:text-[var(--seoul-palace-brown)]"
-            autoComplete="off"
-          />
+          <div className="relative mt-2">
+            <span aria-hidden="true" className="pointer-events-none absolute start-4 top-1/2 size-3.5 -translate-y-[60%] rounded-full border-2 border-[var(--seoul-namsan)] after:absolute after:-bottom-1 after:-end-1 after:h-0.5 after:w-1.5 after:rotate-45 after:bg-[var(--seoul-namsan)]" />
+            <input
+              id={id}
+              ref={field}
+              aria-labelledby={`${id}-label`}
+              readOnly={!hydrated}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={pickLocale(locale, "駅名・駅番号", "역 이름·역번호")}
+              className="min-h-13 w-full rounded-lg border border-[var(--border)] bg-white ps-10 pe-3 font-medium placeholder:text-[var(--seoul-palace-brown)]"
+              autoComplete="off"
+            />
+          </div>
           {normalized ? (
             <ul className="mt-2 max-h-56 divide-y divide-[var(--border)] overflow-y-auto rounded-lg border border-[var(--border)] bg-white">
               {results.map(({ item }) => (
@@ -157,8 +160,8 @@ const exitSituations = [
 ] as const;
 
 const choiceClass = "min-h-11 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold aria-pressed:border-[var(--primary)] aria-pressed:bg-[var(--primary-soft)] aria-pressed:text-[var(--primary)]";
-const modeClass = "min-h-11 rounded-lg border border-transparent px-1 py-2 text-sm font-bold text-[var(--seoul-palace-brown)] aria-pressed:border-[var(--border)] aria-pressed:bg-white aria-pressed:text-[var(--foreground)]";
-const actionClass = "seoul-button-primary min-h-12 w-full rounded-lg px-4 py-2 font-bold";
+const modeClass = "min-h-11 rounded-md px-1 py-2 text-sm font-bold text-[var(--seoul-palace-brown)] aria-pressed:bg-[var(--seoul-namsan)] aria-pressed:text-white";
+const actionClass = "min-h-12 w-full rounded-lg bg-[var(--primary)] px-4 py-2 font-bold text-white hover:bg-[var(--seoul-palace-brown)]";
 
 function ExitHelp() {
   const { locale } = useLocale();
@@ -213,8 +216,8 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
   }
 
   return (
-    <section aria-label={pickLocale(locale, "地下鉄の現地サポート", "지하철 현장 안내")}>
-      <div className="grid grid-cols-3 gap-1 rounded-xl bg-[var(--surface-muted)] p-1" role="group" aria-label={pickLocale(locale, "今の状況", "지금 상황")}>
+    <section className="rounded-2xl border border-[var(--border)] bg-white p-3 shadow-[0_12px_32px_rgba(80,78,49,0.07)] sm:p-6" aria-label={pickLocale(locale, "地下鉄の現地サポート", "지하철 현장 안내")}>
+      <div className="grid w-full grid-cols-3 gap-1 rounded-xl bg-[var(--surface-muted)] p-1 lg:max-w-sm" role="group" aria-label={pickLocale(locale, "今の状況", "지금 상황")}>
         {(Object.keys(situations) as Situation[]).map((item) => (
           <button key={item} type="button" className={modeClass} aria-pressed={item === situation} onClick={() => updateRide({ ...ride, situation: item })}>
             {pickLocale(locale, situations[item].ja, situations[item].ko)}
@@ -222,204 +225,221 @@ export function SubwayDirectionGuide({ readings }: { readings: Record<string, st
         ))}
       </div>
       {situation === "exit" ? <ExitHelp /> : (
-        <>
-          <div className="mt-6 grid items-start gap-4 sm:grid-cols-2">
-            <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={(code) => updateRide({ ...ride, origin: code, transfer: "", train: "local" })} readings={readings} />
-            <StationPicker id="subway-destination" label={pickLocale(locale, "降りたい駅", "내릴 역")} code={destination} readings={readings} onSelect={(code) => updateRide({ ...ride, destination: code, transfer: "" })} />
+        <div className="mt-4 grid items-start gap-3 sm:mt-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-5">
+          <div className="min-w-0 rounded-xl bg-[var(--surface-muted)] p-3 sm:p-5">
+            <div className="grid items-start gap-3">
+              <StationPicker id="subway-origin" label={pickLocale(locale, situation === "onboard" ? "最後に停車した駅" : "今いる駅", situation === "onboard" ? "마지막으로 정차한 역" : "지금 있는 역")} code={origin} onSelect={(code) => updateRide({ ...ride, origin: code, transfer: "", train: "local" })} readings={readings} />
+              <StationPicker id="subway-destination" label={pickLocale(locale, "降りたい駅", "내릴 역")} code={destination} readings={readings} onSelect={(code) => updateRide({ ...ride, destination: code, transfer: "" })} />
+            </div>
+
+            {!trip && !storageFailed ? (
+              <p className="mt-3 text-sm text-[var(--seoul-palace-brown)]">
+                {pickLocale(locale, "駅を二つ選ぶと、この端末に案内を保存します。", "역 두 곳을 고르면 이 기기에 안내를 저장해요.")}
+              </p>
+            ) : null}
+
+            {origin !== destination && destination && !pendingChange && getSubwayStation(origin)?.line === 9 ? (
+              <fieldset className="mt-4">
+                <legend className="text-sm font-bold">{pickLocale(locale, "9号線の電車", "9호선 열차 종류")}</legend>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4">
+                  <div className="flex gap-2">
+                    <button type="button" className={choiceClass} aria-pressed={train === "local"} onClick={() => { if (train !== "local") updateRide({ ...ride, train: "local", transfer: "" }); }}>
+                      {pickLocale(locale, "各駅停車", "일반")}
+                    </button>
+                    <button type="button" className={`${choiceClass} disabled:opacity-50`} aria-pressed={train === "express"} disabled={!isLineNineExpressStop(origin)} onClick={() => { if (train !== "express") updateRide({ ...ride, train: "express", transfer: "" }); }}>
+                      {pickLocale(locale, "急行", "급행")}
+                    </button>
+                  </div>
+                  <a href="https://www.metro9.co.kr/prog/subwayTm/kor/sub01_02/list.do" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-sm underline">
+                    {pickLocale(locale, "9号線の公式時刻表（別タブ）", "9호선 공식 시간표 (새 탭)")}
+                  </a>
+                </div>
+                {!isLineNineExpressStop(origin) ? (
+                  <p className="mt-2 text-sm text-[var(--seoul-palace-brown)]">{pickLocale(locale, "この駅には各駅停車が停まります。", "이 역에서는 일반열차를 타요.")}</p>
+                ) : null}
+              </fieldset>
+            ) : null}
           </div>
 
-          {!trip && !storageFailed ? (
-            <p className="mt-3 text-sm text-[var(--seoul-palace-brown)]">
-              {pickLocale(locale, "駅を二つ選ぶと、この端末に案内を保存します。", "역 두 곳을 고르면 이 기기에 안내를 저장해요.")}
-            </p>
-          ) : null}
-
-          {origin !== destination && destination && !pendingChange && getSubwayStation(origin)?.line === 9 ? (
-            <fieldset className="mt-4">
-              <legend className="text-sm font-bold">{pickLocale(locale, "9号線の電車", "9호선 열차 종류")}</legend>
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4">
-                <div className="flex gap-2">
-                  <button type="button" className={choiceClass} aria-pressed={train === "local"} onClick={() => { if (train !== "local") updateRide({ ...ride, train: "local", transfer: "" }); }}>
-                    {pickLocale(locale, "各駅停車", "일반")}
-                  </button>
-                  <button type="button" className={`${choiceClass} disabled:opacity-50`} aria-pressed={train === "express"} disabled={!isLineNineExpressStop(origin)} onClick={() => { if (train !== "express") updateRide({ ...ride, train: "express", transfer: "" }); }}>
-                    {pickLocale(locale, "急行", "급행")}
-                  </button>
-                </div>
-                <a href="https://www.metro9.co.kr/prog/subwayTm/kor/sub01_02/list.do" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-sm underline">
-                  {pickLocale(locale, "9号線の公式時刻表（別タブ）", "9호선 공식 시간표 (새 탭)")}
-                </a>
+          <div className="min-w-0">
+          {!trip   && situation === "before" ? (
+              <div className="rounded-xl border border-dashed border-[var(--seoul-namsan)] bg-[var(--success-soft)] p-4 sm:p-6">
+                <h2 className="text-lg font-black text-[var(--seoul-namsan)] sm:text-xl">{pickLocale(locale, "次に停まる駅", "다음 정차역")}</h2>
+                <p className="mt-1 text-sm leading-6">{pickLocale(locale, "駅を二つ選ぶと、次の停車駅と乗り換えがここに表示されます。", "역 두 곳을 고르면 다음 정차역과 갈아탈 곳이 여기에 표시돼요.")}</p>
               </div>
-              {!isLineNineExpressStop(origin) ? (
-                <p className="mt-2 text-sm text-[var(--seoul-palace-brown)]">{pickLocale(locale, "この駅には各駅停車が停まります。", "이 역에서는 일반열차를 타요.")}</p>
-              ) : null}
-            </fieldset>
-          ) : null}
+            ) : null}
+            {trip && origin === destination ? (
+              <p role="status" className="rounded-xl bg-[var(--success-soft)] p-4 font-bold">
+                {situation === "onboard"
+                  ? pickLocale(locale, "最後に停車した駅が目的の駅です。すでに発車した場合は、次に停車した駅を入力して調べ直しましょう。", "마지막으로 정차한 역이 목적지예요. 이미 출발했다면 다음 정차역에서 역 이름을 확인하고 다시 입력해요.")
+                  : pickLocale(locale, "今いる駅と降りたい駅が同じです。駅名・駅番号を確認し、出口を探してください。", "지금 있는 역과 내릴 역이 같아요. 역 이름과 번호를 확인하고 출구를 찾아요.")}
+              </p>
+            ) : null}
 
-          {trip && origin === destination ? (
-            <p role="status" className="mt-5 rounded-xl bg-[var(--success-soft)] p-4 font-bold">
-              {situation === "onboard"
-                ? pickLocale(locale, "最後に停車した駅が目的の駅です。すでに発車した場合は、次に停車した駅を入力して調べ直しましょう。", "마지막으로 정차한 역이 목적지예요. 이미 출발했다면 다음 정차역에서 역 이름을 확인하고 다시 입력해요.")
-                : pickLocale(locale, "今いる駅と降りたい駅が同じです。駅名・駅番号を確認し、出口を探してください。", "지금 있는 역과 내릴 역이 같아요. 역 이름과 번호를 확인하고 출구를 찾아요.")}
-            </p>
-          ) : null}
+            {!trip && situation === "onboard" ? (
+              <details className="rounded-xl border border-[var(--border)] p-4">
+                <summary className="cursor-pointer font-black">{pickLocale(locale, "今いる駅が分からない", "지금 어느 역인지 모르겠어요")}</summary>
+                <p className="mt-3 leading-7">{pickLocale(locale, "次に停車したとき、窓の外の駅名か車内表示を確認してください。駅名が分かれば「最後に停車した駅」に入力できます。", "다음 정차 때 창밖 역 이름이나 열차 안내 화면을 확인해요. 이름을 알게 되면 ‘마지막으로 정차한 역’에 입력해요.")}</p>
+                <HelpPhrase ko="제가 지금 어느 역에 있는지 알려 주실 수 있나요?" ja="今どの駅にいるか教えていただけますか？" />
+              </details>
+            ) : null}
 
-          {!trip && situation === "onboard" ? (
-            <details className="mt-5 rounded-xl border border-[var(--border)] p-4">
-              <summary className="cursor-pointer font-black">{pickLocale(locale, "今いる駅が分からない", "지금 어느 역인지 모르겠어요")}</summary>
-              <p className="mt-3 leading-7">{pickLocale(locale, "次に停車したとき、窓の外の駅名か車内表示を確認してください。駅名が分かれば「最後に停車した駅」に入力できます。", "다음 정차 때 창밖 역 이름이나 열차 안내 화면을 확인해요. 이름을 알게 되면 ‘마지막으로 정차한 역’에 입력해요.")}</p>
-              <HelpPhrase ko="제가 지금 어느 역에 있는지 알려 주실 수 있나요?" ja="今どの駅にいるか教えていただけますか？" />
-            </details>
-          ) : null}
+            {changeNow ? (
+              <div className="space-y-4">
+                <section className="rounded-xl border-s-4 border-[var(--warning)] bg-[var(--warning-soft)] p-4 sm:p-5">
+                  <h2 className="text-xl font-black tracking-tight">{pickLocale(locale, `${lineLabel(changeNow.to.line, locale)}に乗り換え`, `${lineLabel(changeNow.to.line, locale)}으로 갈아타요`)}</h2>
+                  <p className="mt-2 text-lg font-bold">{stationLabel(changeNow.from, locale)} → {stationLabel(changeNow.to, locale)}</p>
+                  <p className="mt-2 text-sm leading-6">
+                    {situation === "onboard"
+                      ? pickLocale(locale, "この駅で降りて、乗り換え表示に従ってください。", "이 역에서 내려 환승 표지를 따라가요.")
+                      : pickLocale(locale, "乗り換え表示に従い、ホームの駅番号を確認してください。", "환승 표지를 따라가 승강장에서 역번호를 확인해요.")}
+                  </p>
+                  <button type="button" onClick={() => updateRide({ ...ride, origin: changeNow.to.code, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-4`}>
+                    {pickLocale(locale, "乗り換え先のホームに着いた", "갈아탈 승강장에 도착했어요")}
+                  </button>
+                </section>
+                <HelpPhrase
+                  key={changeNow.to.code}
+                  collapsible
+                  ko={`${changeNow.to.line}호선으로 갈아타려고 해요. 어느 쪽으로 가면 되나요?`}
+                  ja={`${changeNow.to.line}号線に乗り換えたいです。どちらへ行けばいいですか？`}
+                />
+              </div>
+            ) : null}
 
-          {changeNow ? (
-            <div className="mt-6 space-y-4">
-              <section className="rounded-xl border-s-4 border-[var(--warning)] bg-[var(--warning-soft)] p-4 sm:p-5">
-                <h2 className="text-xl font-black tracking-tight">{pickLocale(locale, `${lineLabel(changeNow.to.line, locale)}に乗り換え`, `${lineLabel(changeNow.to.line, locale)}으로 갈아타요`)}</h2>
-                <p className="mt-2 text-lg font-bold">{stationLabel(changeNow.from, locale)} → {stationLabel(changeNow.to, locale)}</p>
-                <p className="mt-2 text-sm leading-6">
-                  {situation === "onboard"
-                    ? pickLocale(locale, "この駅で降りて、乗り換え表示に従ってください。", "이 역에서 내려 환승 표지를 따라가요.")
-                    : pickLocale(locale, "乗り換え表示に従い、ホームの駅番号を確認してください。", "환승 표지를 따라가 승강장에서 역번호를 확인해요.")}
-                </p>
-                <button type="button" onClick={() => updateRide({ ...ride, origin: changeNow.to.code, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-4`}>
-                  {pickLocale(locale, "乗り換え先のホームに着いた", "갈아탈 승강장에 도착했어요")}
-                </button>
-              </section>
-              <HelpPhrase
-                key={changeNow.to.code}
-                collapsible
-                ko={`${changeNow.to.line}호선으로 갈아타려고 해요. 어느 쪽으로 가면 되나요?`}
-                ja={`${changeNow.to.line}号線に乗り換えたいです。どちらへ行けばいいですか？`}
-              />
-            </div>
-          ) : null}
-
-          {trip && next && alight && !changeNow ? (
-            <>
-              {transfer ? (
-                <p className="mt-5 rounded-lg bg-[var(--warning-soft)] p-3 text-sm font-bold" role="status">
-                  {transfer.line === 9 && train === "local"
-                    ? pickLocale(locale, `${stationLabel(transfer, locale)}で各駅停車に乗り換えます。`, `${stationLabel(transfer, locale)}에서 일반열차로 갈아타요.`)
-                    : pickLocale(locale, `${stationLabel(transfer, locale)}で乗り換えます。乗り換え案内に従って次のホームを確認しましょう。`, `${stationLabel(transfer, locale)}에서 갈아타요. 환승 안내를 따라 다음 승강장을 확인해요.`)}
-                </p>
-              ) : null}
-              <div className="mt-5 rounded-xl border-s-4 border-[var(--success)] bg-[var(--success-soft)] p-4 sm:p-5" role="status">
-                <h2 className="text-sm font-bold text-[var(--success)]">{pickLocale(locale, "次の駅で方向を照合", "다음 역으로 방향 확인")}</h2>
-                <p className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{stationLabel(next, locale)}</p>
-                <p className="mt-2 text-sm font-semibold">
-                  {lineLabel(next.line, locale)}
-                  {locale === "ja" ? <> · <span lang="ko">{next.ko}</span></> : null}
-                  {" · "}<span lang="en">{next.en}</span>
-                </p>
-                {train !== "express" && next.line !== 1 && next.line !== 4 && next.line !== 9 ? (
-                  <p className="mt-3 text-sm leading-6">{pickLocale(locale, "ホームや車内の表示と見比べてください。", "역이나 열차의 안내 화면과 대조해요.")}</p>
-                ) : null}
-                {train === "express" ? (
-                  <p className="mt-1 text-sm font-bold">{pickLocale(locale, "車内やホームの「급행（急行）」表示を確認してください。", "열차나 승강장의 ‘급행’ 표시를 확인해요.")}</p>
-                ) : next.line === 1 || next.line === 4 || next.line === 9 ? (
-                  <p className="mt-1 text-sm font-bold">{pickLocale(locale, "各駅停車の案内です。電車の種別を確認してください。", "일반열차 기준이에요. 열차 종류를 확인해요.")}</p>
-                ) : null}
-                {!localChange && (next.line === 1 || next.line === 4 || next.line === 5 || next.line === 9 || trip.changes.length > 0) ? (
-                  <p className="mt-2 text-sm font-bold">{pickLocale(locale, `行先表示を見て「${stationLabel(alight, locale)}」まで行くか確かめてください。`, `행선지 표시를 보고 ‘${stationLabel(alight, locale)}’까지 가는지 확인해요.`)}</p>
-                ) : null}
-                {localChange ? (
-                  <div className="mt-3 border-t border-[var(--border)] pt-3 text-sm">
-                    <p className="font-black">{pickLocale(locale, `${stationLabel(localChange, locale)}で降りて、各駅停車に乗り換えてください。`, `${stationLabel(localChange, locale)}에서 내려 일반열차로 갈아타요.`)}</p>
-                    {situation === "before" && getSubwayStation(destination)?.line === 9 ? (
-                      <p className="mt-1">{pickLocale(locale, "乗る前なら、最初から各駅停車でも行けます。", "아직 타기 전이라면 일반열차로 한 번에 갈 수 있어요.")}</p>
-                    ) : null}
-                  </div>
-                ) : null}
-                {trip.changes.length > 0 && !localChange ? (
-                  <p className="mt-2 text-sm font-black text-[#504e49]">
-                    {trip.changes.some(({ from, to }) => from.line !== to.line)
-                      ? pickLocale(locale, "乗り換え駅", "갈아탈 역")
-                      : pickLocale(locale, `${lineLabel(next.line, locale)}の乗り換え駅`, `${lineLabel(next.line, locale)} 안에서 갈아탈 역`)} · {trip.changes.map(({ from, to }) =>
-                      from.line === to.line ? stationLabel(from, locale) : `${stationLabel(from, locale)} → ${lineLabel(to.line, locale)} ${to.code}`,
-                    ).join(" / ")}
+            {trip && next && alight && !changeNow ? (
+              <>
+                {transfer ? (
+                  <p className="mb-3 rounded-lg bg-[var(--warning-soft)] p-3 text-sm font-bold" role="status">
+                    {transfer.line === 9 && train === "local"
+                      ? pickLocale(locale, `${stationLabel(transfer, locale)}で各駅停車に乗り換えます。`, `${stationLabel(transfer, locale)}에서 일반열차로 갈아타요.`)
+                      : pickLocale(locale, `${stationLabel(transfer, locale)}で乗り換えます。乗り換え案内に従って次のホームを確認しましょう。`, `${stationLabel(transfer, locale)}에서 갈아타요. 환승 안내를 따라 다음 승강장을 확인해요.`)}
                   </p>
                 ) : null}
-              </div>
-              {situation === "before" ? (
-                <button type="button" className={`${actionClass} mt-4`} onClick={() => {
-                  focusObserved.current = true;
-                  updateRide({ ...ride, situation: "onboard", transfer: "" });
-                }}>
-                  {pickLocale(locale, "乗った電車の方向を確認する", "탄 열차의 방향 확인하기")}
-                </button>
-              ) : null}
-              {situation === "onboard" ? (
-                <div className="mt-5">
-                  <label className="block font-black" htmlFor="subway-observed">{pickLocale(locale, "案内で確認した次の駅", "안내에서 확인한 다음 역")}</label>
-                  <select ref={observedField} id="subway-observed" value={observed} onChange={(event) => { setObserved(event.target.value); setOtherStation(""); }} className="mt-2 min-h-12 w-full rounded-lg border border-[var(--border)] bg-white px-3">
-                    <option value="">{pickLocale(locale, "まだ分かりません", "아직 모르겠어요")}</option>
-                    {getSubwayNeighbors(origin, train).map((item) => <option key={item.code} value={item.code}>{stationLabel(item, locale)} · {item.ko}</option>)}
-                    <option value="other">{pickLocale(locale, "一覧にない駅が案内された", "목록에 없는 역이 안내됐어요")}</option>
-                  </select>
-                  <div className={`mt-3 text-sm leading-6 ${observed ? `rounded-xl p-4 ${differs || observed === "other" ? "bg-[var(--warning-soft)]" : "bg-[var(--success-soft)]"}` : "text-[var(--seoul-palace-brown)]"}`} role="status">
-                    {differs ? (
-                      <>
-                        <p>{pickLocale(locale, `選んだ方向と異なります。次の停車駅が「${stationLabel(observedStation, locale)}」と確認できたら、そこで降りて方向を確かめましょう。`, `고른 방향과 달라요. 다음 정차역이 ‘${stationLabel(observedStation, locale)}’가 맞으면 그 역에서 내려 방향을 확인해요.`)}</p>
-                        <button type="button" onClick={() => updateRide({ ...ride, origin: observedStation.code, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-3`}>
-                          {pickLocale(locale, "降りた駅から調べ直す", "내린 역에서 다시 찾기")}
-                        </button>
-                      </>
-                    ) : observedStation ? (
-                      <>
-                        <p>{pickLocale(locale, "次の駅は選んだ方向と一致しています。行先表示も確かめましょう。", "다음 역이 고른 방향과 일치해요. 열차 행선지도 확인해요.")}</p>
-                        <button type="button" onClick={() => {
-                          const change = trip.changes[0];
-                          const changeTrains = change?.from.code === observedStation.code;
-                          updateRide({
-                            ...ride,
-                            origin: observedStation.code,
-                            transfer: changeTrains ? change.to.code : "",
-                            situation: changeTrains ? "before" : "onboard",
-                            train: changeTrains ? "local" : train,
-                          });
-                        }} className={`${actionClass} mt-3`}>
-                          {pickLocale(locale, "この駅に着いたら、次を確認", "이 역에 도착했어요")}
-                        </button>
-                      </>
-                    ) : observed === "other" ? (
-                      <>
-                        <p className="mb-3">{pickLocale(locale, "急行や別の路線かもしれません。停車したら、駅の名前と駅番号で調べ直してください。", "급행이나 다른 호선일 수 있어요. 정차하면 역 이름과 역번호를 확인하고 다시 찾아요.")}</p>
-                        <StationPicker id="subway-other-station" label={pickLocale(locale, "実際に停車した駅", "실제로 정차한 역")} code={otherStation} onSelect={setOtherStation} readings={readings} />
-                        {otherStation ? (
-                          <button type="button" onClick={() => updateRide({ ...ride, origin: otherStation, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-3`}>
-                            {pickLocale(locale, "この駅から調べ直す", "이 역에서 다시 찾기")}
-                          </button>
-                        ) : null}
-                      </>
-                    ) : (
-                      <p>{pickLocale(locale, "車内表示か停車駅の駅名・駅番号を確認してください。判断できなければ駅員に聞きましょう。", "열차 화면이나 정차한 역에서 이름·번호를 확인해요. 판단하기 어렵다면 역무원에게 물어봐요.")}</p>
-                    )}
+                <div className="overflow-hidden rounded-xl bg-[var(--seoul-namsan)] text-white" role="status">
+                  <div className="border-b border-white/35 px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5">
+                    <h2 className="text-sm font-bold">{pickLocale(locale, "次の駅で方向を照合", "다음 역으로 방향 확인")}</h2>
+                    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-3xl leading-tight font-black tracking-tight sm:text-4xl">
+                      <span className="rounded-md bg-white px-2 py-1 text-base leading-6 tracking-normal tabular-nums text-[var(--seoul-namsan)]">{next.code}</span>
+                      {" "}<span>{pickLocale(locale, next.ja, next.ko)}</span>
+                    </p>
+                    <p className="mt-2 text-sm font-semibold">
+                      {lineLabel(next.line, locale)}
+                      {locale === "ja" ? <> · <span lang="ko">{next.ko}</span></> : null}
+                      {" · "}<span lang="en">{next.en}</span>
+                    </p>
+                  </div>
+                  <div className="bg-[var(--success-soft)] px-4 py-3 text-[var(--foreground)] sm:px-6">
+                  {train !== "express" && next.line !== 1 && next.line !== 4 && next.line !== 9 ? (
+                    <p className="text-sm leading-6">{pickLocale(locale, "ホームや車内の表示と見比べてください。", "역이나 열차의 안내 화면과 대조해요.")}</p>
+                  ) : null}
+                  {train === "express" ? (
+                    <p className="mt-1 text-sm font-bold">{pickLocale(locale, "車内やホームの「급행（急行）」表示を確認してください。", "열차나 승강장의 ‘급행’ 표시를 확인해요.")}</p>
+                  ) : next.line === 1 || next.line === 4 || next.line === 9 ? (
+                    <p className="mt-1 text-sm font-bold">{pickLocale(locale, "各駅停車の案内です。電車の種別を確認してください。", "일반열차 기준이에요. 열차 종류를 확인해요.")}</p>
+                  ) : null}
+                  {!localChange && (next.line === 1 || next.line === 4 || next.line === 5 || next.line === 9 || trip.changes.length > 0) ? (
+                    <p className="mt-2 text-sm font-bold">{pickLocale(locale, `行先表示を見て「${stationLabel(alight, locale)}」まで行くか確かめてください。`, `행선지 표시를 보고 ‘${stationLabel(alight, locale)}’까지 가는지 확인해요.`)}</p>
+                  ) : null}
+                  {localChange ? (
+                    <div className="mt-3 border-t border-[var(--border)] pt-3 text-sm">
+                      <p className="font-black">{pickLocale(locale, `${stationLabel(localChange, locale)}で降りて、各駅停車に乗り換えてください。`, `${stationLabel(localChange, locale)}에서 내려 일반열차로 갈아타요.`)}</p>
+                      {situation === "before" && getSubwayStation(destination)?.line === 9 ? (
+                        <p className="mt-1">{pickLocale(locale, "乗る前なら、最初から各駅停車でも行けます。", "아직 타기 전이라면 일반열차로 한 번에 갈 수 있어요.")}</p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {trip.changes.length > 0 && !localChange ? (
+                    <p className="mt-2 text-sm font-black text-[#504e49]">
+                      {trip.changes.some(({ from, to }) => from.line !== to.line)
+                        ? pickLocale(locale, "乗り換え駅", "갈아탈 역")
+                        : pickLocale(locale, `${lineLabel(next.line, locale)}の乗り換え駅`, `${lineLabel(next.line, locale)} 안에서 갈아탈 역`)} · {trip.changes.map(({ from, to }) =>
+                        from.line === to.line ? stationLabel(from, locale) : `${stationLabel(from, locale)} → ${lineLabel(to.line, locale)} ${to.code}`,
+                      ).join(" / ")}
+                    </p>
+                  ) : null}
                   </div>
                 </div>
-              ) : null}
-              <details className="mt-6 border-t border-[var(--border)]">
-                <summary className="min-h-12 cursor-pointer py-3 font-bold">{pickLocale(locale, `経路を見る · ${trip.rideStops}駅`, `경로 보기 · ${trip.rideStops}정거장`)}</summary>
-                <ol className="mb-4 ms-1 grid gap-3 border-s-2 border-[var(--success)] ps-4 text-sm">
-                  {trip.stops.map((item, index) => <li key={`${index}:${item.code}`} className="relative before:absolute before:-start-[21px] before:top-1.5 before:size-2 before:rounded-full before:bg-[var(--success)]">
-                    {stationLabel(item, locale)} · {lineLabel(item.line, locale)}
-                    {locale === "ja" ? <> · <span lang="ko">{item.ko}</span></> : null}
-                  </li>)}
-                </ol>
-              </details>
-              <HelpPhrase
-                key={`${situation}:${origin}:${destination}:${train}`}
-                collapsible
-                ko={situation === "onboard"
-                  ? `${alight.ko}역에 가고 싶어요. 지금 탄 ${train === "express" ? "급행열차" : "열차"}가 거기까지 가나요?`
-                  : `${alight.ko}역에 가려고 해요. 다음 역이 ${next.ko}역인 ${train === "express" ? "급행열차" : "열차"}를 타면 되나요?`}
-                ja={situation === "onboard"
-                  ? `${alight.ja}駅へ行きたいです。この${train === "express" ? "急行" : "電車"}で行けますか？`
-                  : `${alight.ja}駅へ行きたいです。次が${next.ja}駅の${train === "express" ? "急行" : "電車"}に乗ればいいですか？`}
-              />
-            </>
-          ) : null}
-        </>
+                {situation === "before" ? (
+                  <button type="button" className={`${actionClass} mt-4`} onClick={() => {
+                    focusObserved.current = true;
+                    updateRide({ ...ride, situation: "onboard", transfer: "" });
+                  }}>
+                    {pickLocale(locale, "乗った電車の方向を確認する", "탄 열차의 방향 확인하기")}
+                  </button>
+                ) : null}
+                {situation === "onboard" ? (
+                  <div className="mt-5">
+                    <label className="block font-black" htmlFor="subway-observed">{pickLocale(locale, "案内で確認した次の駅", "안내에서 확인한 다음 역")}</label>
+                    <select ref={observedField} id="subway-observed" value={observed} onChange={(event) => { setObserved(event.target.value); setOtherStation(""); }} className="mt-2 min-h-12 w-full rounded-lg border border-[var(--border)] bg-white px-3">
+                      <option value="">{pickLocale(locale, "まだ分かりません", "아직 모르겠어요")}</option>
+                      {getSubwayNeighbors(origin, train).map((item) => <option key={item.code} value={item.code}>{stationLabel(item, locale)} · {item.ko}</option>)}
+                      <option value="other">{pickLocale(locale, "一覧にない駅が案内された", "목록에 없는 역이 안내됐어요")}</option>
+                    </select>
+                    <div className={`mt-3 text-sm leading-6 ${observed ? `rounded-xl p-4 ${differs || observed === "other" ? "bg-[var(--warning-soft)]" : "bg-[var(--success-soft)]"}` : "text-[var(--seoul-palace-brown)]"}`} role="status">
+                      {differs ? (
+                        <>
+                          <p>{pickLocale(locale, `選んだ方向と異なります。次の停車駅が「${stationLabel(observedStation, locale)}」と確認できたら、そこで降りて方向を確かめましょう。`, `고른 방향과 달라요. 다음 정차역이 ‘${stationLabel(observedStation, locale)}’가 맞으면 그 역에서 내려 방향을 확인해요.`)}</p>
+                          <button type="button" onClick={() => updateRide({ ...ride, origin: observedStation.code, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-3`}>
+                            {pickLocale(locale, "降りた駅から調べ直す", "내린 역에서 다시 찾기")}
+                          </button>
+                        </>
+                      ) : observedStation ? (
+                        <>
+                          <p>{pickLocale(locale, "次の駅は選んだ方向と一致しています。行先表示も確かめましょう。", "다음 역이 고른 방향과 일치해요. 열차 행선지도 확인해요.")}</p>
+                          <button type="button" onClick={() => {
+                            const change = trip.changes[0];
+                            const changeTrains = change?.from.code === observedStation.code;
+                            updateRide({
+                              ...ride,
+                              origin: observedStation.code,
+                              transfer: changeTrains ? change.to.code : "",
+                              situation: changeTrains ? "before" : "onboard",
+                              train: changeTrains ? "local" : train,
+                            });
+                          }} className={`${actionClass} mt-3`}>
+                            {pickLocale(locale, "この駅に着いたら、次を確認", "이 역에 도착했어요")}
+                          </button>
+                        </>
+                      ) : observed === "other" ? (
+                        <>
+                          <p className="mb-3">{pickLocale(locale, "急行や別の路線かもしれません。停車したら、駅の名前と駅番号で調べ直してください。", "급행이나 다른 호선일 수 있어요. 정차하면 역 이름과 역번호를 확인하고 다시 찾아요.")}</p>
+                          <StationPicker id="subway-other-station" label={pickLocale(locale, "実際に停車した駅", "실제로 정차한 역")} code={otherStation} onSelect={setOtherStation} readings={readings} />
+                          {otherStation ? (
+                            <button type="button" onClick={() => updateRide({ ...ride, origin: otherStation, situation: "before", transfer: "", train: "local" })} className={`${actionClass} mt-3`}>
+                              {pickLocale(locale, "この駅から調べ直す", "이 역에서 다시 찾기")}
+                            </button>
+                          ) : null}
+                        </>
+                      ) : (
+                        <p>{pickLocale(locale, "車内表示か停車駅の駅名・駅番号を確認してください。判断できなければ駅員に聞きましょう。", "열차 화면이나 정차한 역에서 이름·번호를 확인해요. 판단하기 어렵다면 역무원에게 물어봐요.")}</p>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+                <details className="mt-6 border-t border-[var(--border)]">
+                  <summary className="min-h-12 cursor-pointer py-3 font-bold">{pickLocale(locale, `経路を見る · ${trip.rideStops}駅`, `경로 보기 · ${trip.rideStops}정거장`)}</summary>
+                  <ol className="mb-4 ms-1 grid gap-3 border-s-2 border-[var(--success)] ps-4 text-sm">
+                    {trip.stops.map((item, index) => <li key={`${index}:${item.code}`} className="relative before:absolute before:-start-[21px] before:top-1.5 before:size-2 before:rounded-full before:bg-[var(--success)]">
+                      {stationLabel(item, locale)} · {lineLabel(item.line, locale)}
+                      {locale === "ja" ? <> · <span lang="ko">{item.ko}</span></> : null}
+                    </li>)}
+                  </ol>
+                </details>
+                <HelpPhrase
+                  key={`${situation}:${origin}:${destination}:${train}`}
+                  collapsible
+                  ko={situation === "onboard"
+                    ? `${alight.ko}역에 가고 싶어요. 지금 탄 ${train === "express" ? "급행열차" : "열차"}가 거기까지 가나요?`
+                    : `${alight.ko}역에 가려고 해요. 다음 역이 ${next.ko}역인 ${train === "express" ? "급행열차" : "열차"}를 타면 되나요?`}
+                  ja={situation === "onboard"
+                    ? `${alight.ja}駅へ行きたいです。この${train === "express" ? "急行" : "電車"}で行けますか？`
+                    : `${alight.ja}駅へ行きたいです。次が${next.ja}駅の${train === "express" ? "急行" : "電車"}に乗ればいいですか？`}
+                />
+              </>
+            ) : null}
+          </div>
+        </div>
       )}
       {storageFailed || saved || origin || destination ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 border-t border-[var(--border)] text-sm text-[var(--seoul-palace-brown)]">

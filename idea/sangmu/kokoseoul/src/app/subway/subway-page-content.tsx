@@ -9,18 +9,16 @@ import { pickLocale } from "@/lib/locale";
 export function SubwayPageContent({ readings, exitGuide }: { readings: Record<string, string>; exitGuide: ReactNode }) {
   const { locale } = useLocale();
   return (
-    <div className="mx-auto max-w-2xl px-5 pt-8 sm:px-8 sm:pt-12">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+    <div className="mx-auto max-w-5xl px-4 pt-7 sm:px-8 sm:pt-12">
+      <div className="mb-6 border-s-4 border-[var(--seoul-namsan)] ps-4 sm:mb-8 sm:ps-5">
+        <p className="text-xs font-bold text-[var(--seoul-namsan)] sm:text-sm">{pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}</p>
+        <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-5xl">
           {pickLocale(locale, "地下鉄の現地ガイド", "지하철 현장 안내")}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[var(--seoul-palace-brown)] sm:text-base">
-          {pickLocale(locale, "ソウル地下鉄1〜9号線の次の駅と乗り換えを確認できます。", "서울 지하철 1~9호선의 다음 역과 환승을 확인해요.")}
-        </p>
       </div>
       <SubwayDirectionGuide readings={readings} />
-      <details className="mt-8 border-t border-[var(--border)]">
-        <summary className="min-h-12 cursor-pointer py-3 font-bold">
+      <details className="mt-5 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
+        <summary className="min-h-12 cursor-pointer py-3.5 font-bold">
           {pickLocale(locale, "聖水駅の構内・3番出口を見る", "성수역 층별 안내·3번 출구 보기")}
         </summary>
         <div className="pb-4">
@@ -29,8 +27,8 @@ export function SubwayPageContent({ readings, exitGuide }: { readings: Record<st
           </Suspense>
         </div>
       </details>
-      <details className="border-t border-[var(--border)]">
-        <summary className="min-h-12 cursor-pointer py-3 font-bold">
+      <details className="mt-2 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
+        <summary className="min-h-12 cursor-pointer py-3.5 font-bold">
           {pickLocale(locale, "路線図・駅の情報", "노선도·역 정보")}
         </summary>
         <p className="text-sm leading-6 text-[var(--seoul-palace-brown)]">
