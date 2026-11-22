@@ -10,6 +10,13 @@
 
 [여기서울 전체 앱 비공개 Preview](https://yeogiseoul-platform-preview-p26ui8cnr-koko-seoul.vercel.app/)는 `5d4e19e6837630f608b5e350e316879abc8732be` 기준 배포다. 데스크톱을 꺼도 열리며 접근 권한이 있는 Vercel 계정으로 로그인해야 한다. 이 Preview에는 테스트 전용 PostgreSQL이 연결되어 있다. 이후 `main` 변경을 반영하려면 새 Preview 배포가 필요하다.
 
+**자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.
+
+- 처음 한 번 GitHub 저장소 secret에 `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`를 넣어야 한다. 값은 저장소에 기록하지 않는다. 세 값이 없으면 배포 job은 건너뛰고 실패로 표시하지 않는다.
+- Vercel 프로젝트의 Preview 환경 변수에 `APP_ENV=preview`, `DATABASE_URL`, `PREVIEW_DATABASE_HOST`, 세션 key 등 앱 실행 값이 있어야 한다. 배포 때 값을 직접 넘기지 않는다.
+- DB migration은 실행하지 않는다. 새 migration이 들어간 commit은 Preview DB에 먼저 migration을 적용한 뒤 배포를 다시 실행한다.
+- 배포 주소는 매번 바뀌고, 기존과 같이 접근 권한이 있는 Vercel 계정으로 로그인해야 열린다.
+
 - **지하철 안내** — 홈에서 지하철 화면으로 이동해 2호선의 다음 역으로 방향 확인, 반대 방향 탑승 시 복구, 성수지선 환승, 개찰구 통과 전 안내와 역무원에게 보여줄 한국어 문장을 확인했다. 한국어·일본어 화면을 확인했고, 새로고침 후 마지막으로 확인한 역과 탑승 안내가 복원됐다. 오프라인에서도 저장된 다음 역과 역무원에게 보여줄 문장이 표시됐다.
 - **GPS 획득** — 배포 주소의 모바일 브라우저에서 `홈 → 기록 → 역 스탬프 도감 → 2호선 성수역`으로 이동했다. 모의 GPS로 역에서 멀면 획득이 거절되고 가까우면 스탬프가 지급되는 것을 확인했다.
 - **PNG 저장** — 획득한 스탬프를 960×960 PNG로 다운로드했다. 새로고침 후 획득 표시와 저장 버튼이 유지됐고, 도감의 한·일 전환도 확인했다.
