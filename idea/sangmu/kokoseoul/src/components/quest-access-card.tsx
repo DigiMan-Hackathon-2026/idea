@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getQuestAccess } from "@/modules/content/quest-access";
+import { getClosedWeekdays } from "@/modules/content/quest-closures";
+import { ClosedTodayNotice } from "./closed-today-notice";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getStationNameTeaser, getStationStampHref } from "./quest-station-links";
 
@@ -30,6 +32,7 @@ export function QuestAccessCard({ questId, locale }: { questId: string; locale: 
         ))}
         <span>{pickLocale(locale, exit.nameJa, exit.nameKo)}</span>
       </p>
+      <ClosedTodayNotice closedWeekdays={getClosedWeekdays(access.quest.slug)} />
       <p className="mt-1 text-sm leading-6 text-slate-600">
         {pickLocale(
           locale,

@@ -6,6 +6,8 @@ import { findCourseByQuestStation } from "@/modules/content/quest-courses";
 import { getSubwayStation, type SubwayStation } from "@/modules/transit/subway-network";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getStationStampHref } from "@/components/quest-station-links";
+import { ClosedTodayNotice } from "@/components/closed-today-notice";
+import { getClosedWeekdays } from "@/modules/content/quest-closures";
 import { StationLocator } from "./station-locator";
 
 const chipClass = "inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--border)] bg-white px-3 text-sm font-bold";
@@ -96,6 +98,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
                       </Link>
                     </h3>
                     <p className="text-sm leading-6 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
+                    <ClosedTodayNotice closedWeekdays={getClosedWeekdays(quest.slug)} compact />
                   </li>
                 ))}
               </ol>

@@ -62,3 +62,18 @@ test("follows a line course from a station to its quests", async ({ page }) => {
   await course.getByRole("link", { name: "仁寺洞のサムジキルで工芸小物の贈り物を選ぶ" }).click();
   await expect(page).toHaveURL(/\/quests\/insadong-ssamziegil-craft-gift/);
 });
+
+test("warns about a weekly closed day using Seoul time", async ({ page }) => {
+  // Monday 10:00 in Seoul: Changdeokgung is closed, Ssamziegil is open.
+  await page.clock.setFixedTime(new Date("2026-11-23T01:00:00Z"));
+  await page.goto("/quests/courses");
+  const course = page.getByRole("region", { name: "3号線 安国・景福宮の古宮半日コース" });
+  const palace = course.getByRole("listitem").filter({ hasText: "昌徳宮の宮殿エリア" });
+  await expect(palace.getByText("今日は休みの日です（毎週月曜休み）")).toBeVisible();
+  await expect(course.getByText(/今日は休みの日です/)).toHaveCount(1);
+
+  // Wednesday: the quest page lists the closed day without the warning.
+  await page.clock.setFixedTime(new Date("2026-11-25T01:00:00Z"));
+  await page.goto("/quests/changdeokgung-japanese-tour");
+  await expect(page.getByText("毎週月曜は休みです")).toBeVisible();
+});

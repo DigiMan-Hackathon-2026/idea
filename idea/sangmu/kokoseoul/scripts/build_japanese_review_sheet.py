@@ -304,6 +304,7 @@ FIRST_PASS_FILES = {
     "src/components/subway-transfer-sign-check.tsx", "src/app/quests/nearby/page.tsx",
     "src/app/quests/nearby/station-quests.tsx", "src/components/quest-access-card.tsx",
     "src/app/quests/courses/page.tsx", "src/modules/content/quest-courses.ts",
+    "src/components/closed-today-notice.tsx",
     "src/app/station-album/page.tsx", "src/app/station-album/station-album.tsx",
     "src/app/station-album/stamp-image.tsx", "src/app/station-album/album-data.ts",
 }

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ClosedTodayNotice } from "@/components/closed-today-notice";
 import { ScenicHero } from "@/components/scenic-hero";
 import { SiteHeader } from "@/components/site-header";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import type { CourseLeg } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
+import { getClosedWeekdays } from "@/modules/content/quest-closures";
 import { questCourses, resolveCourse } from "@/modules/content/quest-courses";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import type { SubwayLine } from "@/modules/transit/subway-stations";
@@ -83,6 +85,7 @@ export default async function QuestCoursesPage() {
                           {pickLocale(locale, access.quest.titleJa, access.quest.titleKo)}
                         </Link>
                       </h3>
+                      <ClosedTodayNotice closedWeekdays={getClosedWeekdays(access.quest.slug)} compact />
                     </div>
                     {legToNext ? (
                       <p className="ms-6 border-s-2 border-dashed border-[var(--border)] py-2 ps-4 text-sm font-bold text-slate-600">
