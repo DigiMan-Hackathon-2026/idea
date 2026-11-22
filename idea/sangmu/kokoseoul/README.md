@@ -165,6 +165,15 @@ DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` �
 
 디지망 해커톤을 로컬에서 리허설하려면 DB 설정 후 `pnpm db:seed:hackathon`을 실행하고 `/quests?area=sinchon&purpose=discovery`를 엽니다. 본선 종료 시각인 2026년 11월 29일 20시(한국 시간)부터 탐색과 새 진행을 닫고 완료 기록은 계속 볼 수 있습니다.
 
+같은 시드로 신촌 KOREC 행사 안내 퀘스트를 주변 검색에서 확인할 수 있습니다. 출구와 건물 좌표는 테스트용 근사값입니다. [KOREC 신촌 오시는 길](https://bwell-i.com/korec/magazine/archives/3710) · [출구 좌표 참고](https://dh.aks.ac.kr/~jisun/edu/index.php/Maps) · [건물 좌표 참고](https://jusoga.com/b/1141011600100050046000001/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C-%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC-%EB%AA%85%EB%AC%BC%EA%B8%B8-46-%EC%B0%BD%EC%B2%9C%EB%8F%99)
+
+| 기준점 | 요청 경로 |
+| --- | --- |
+| 2호선 신촌역 3번 출구 샘플 | `/api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901201` |
+| 신촌 가상 버스 정류장 (테스트) | `/api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901202` |
+
+두 기준점은 local·test에서만 조회할 수 있습니다. 행사 종료 후에는 주변 검색도 이 퀘스트를 제외합니다.
+
 명동교자 퀘스트는 DB 설정 후 `pnpm db:seed:myeongdong-kyoja`로 로컬에 넣고 `/quests?area=myeongdong&purpose=food`에서 시작합니다.
 
 사유의 방 퀘스트는 `pnpm db:seed:museum-room`으로 로컬에 넣고 `/quests?area=yongsan&purpose=culture`에서 시작합니다.

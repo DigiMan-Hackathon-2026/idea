@@ -4,7 +4,7 @@ export async function seedLocalQuest(quest, {
   supplierId, supplierName, editorId, editorSubject, requestId,
   areaCode, durationMinutes, tags, soloEvidence, soloStatus = "unknown",
   cost = null, costMax = cost,
-}) {
+}, seedAdditionalData) {
   const environment = process.env.APP_ENV;
   if (environment !== "local" && environment !== "test") {
     throw new Error("Quest setup requires APP_ENV=local or APP_ENV=test");
@@ -94,6 +94,7 @@ export async function seedLocalQuest(quest, {
         [quest.id, quest.versionId],
       );
     }
+    if (seedAdditionalData) await seedAdditionalData(client);
     await client.query("commit");
     process.stdout.write(`${quest.titleKo}: local/test database ready.\n`);
   } catch (error) {
