@@ -2,6 +2,7 @@ import Link from "next/link";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { findQuestStationsFrom, findStationQuests, listQuestAccesses, stationQuestRadiusM } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
+import { findCourseByQuestStation } from "@/modules/content/quest-courses";
 import { getSubwayStation, type SubwayStation } from "@/modules/transit/subway-network";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
 import { getStationStampHref } from "@/components/quest-station-links";
@@ -31,6 +32,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
   const results = station ? findStationQuests(station.code) : [];
   const hops = station ? findQuestStationsFrom(station.code) : [];
   const stampHref = station ? getStationStampHref(station.ko, station.line) : null;
+  const courses = station ? findCourseByQuestStation(station.ko) : [];
   const number = new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "ja-JP");
   const metres = (value: number) => `${number.format(Math.round(value / 10) * 10)} m`;
   const stationName = station ? pickLocale(locale, station.ja, station.ko) : "";
@@ -107,6 +109,20 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
               )}
             </p>
           )}
+          {courses.length > 0 ? (
+            <div className="mt-5 border-t border-[var(--border)] pt-4">
+              <h3 className="text-base font-black">{pickLocale(locale, "この駅を通るコース", "이 역을 지나는 코스")}</h3>
+              <ul className="mt-1 grid gap-1">
+                {courses.map((course) => (
+                  <li key={course.slug}>
+                    <Link href={`/quests/courses#${course.slug}`} className="inline-flex min-h-11 items-center font-bold text-[var(--primary)] underline">
+                      {pickLocale(locale, course.titleJa, course.titleKo)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {hops.length > 0 ? (
             <div className="mt-5 border-t border-[var(--border)] pt-4">
               <h3 className="text-base font-black">{pickLocale(locale, "地下鉄で次の駅へ", "지하철로 다음 역까지")}</h3>

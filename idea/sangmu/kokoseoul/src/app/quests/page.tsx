@@ -333,6 +333,9 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
         <Link href="/quests/nearby" className="inline-flex min-h-11 items-center underline">
           {pickLocale(locale, "駅の出口からクエストを探す", "역 출구 주변 퀘스트 찾기")}
         </Link>
+        <Link href="/quests/courses" className="inline-flex min-h-11 items-center underline">
+          {pickLocale(locale, "地下鉄の路線でつなぐコース", "지하철 노선으로 잇는 코스")}
+        </Link>
         <Link href="/subway#station-interior-title" className="inline-flex min-h-11 items-center underline">
           {pickLocale(locale, "現在地から近くの駅・構内図を探す", "현재 위치에서 가까운 역과 안내도 찾기")}
         </Link>

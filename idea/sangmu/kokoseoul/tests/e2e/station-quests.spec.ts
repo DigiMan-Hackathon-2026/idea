@@ -50,3 +50,14 @@ test("previews a step's Korean phrase card before starting the quest", async ({ 
   await expect(step.getByText("한 명인데 여기서 기다리면 될까요?")).toBeVisible();
   await expect(step.getByText("1人ですが、ここで待てばいいですか？")).toBeVisible();
 });
+
+test("follows a line course from a station to its quests", async ({ page }) => {
+  await page.goto("/quests/nearby?station=327");
+  await page.getByRole("link", { name: "3号線 安国・景福宮の古宮半日コース" }).click();
+  const course = page.getByRole("region", { name: "3号線 安国・景福宮の古宮半日コース" });
+  await expect(course.getByText("3号線 安国→景福宮 · 1駅")).toBeVisible();
+  await expect(course.getByRole("listitem")).toHaveCount(4);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(await page.evaluate(() => window.innerWidth));
+  await course.getByRole("link", { name: "仁寺洞のサムジキルで工芸小物の贈り物を選ぶ" }).click();
+  await expect(page).toHaveURL(/\/quests\/insadong-ssamziegil-craft-gift/);
+});

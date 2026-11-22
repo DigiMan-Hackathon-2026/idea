@@ -171,3 +171,31 @@ export function findQuestStationsFrom(code: string, { maxTransfers = 1, maxStops
     .sort((a, b) => effort(a) - effort(b) || a.transfers - b.transfers || a.station.code.localeCompare(b.station.code))
     .slice(0, limit);
 }
+
+export type CourseLeg =
+  | { kind: "walk"; straightLineM: number }
+  | { kind: "subway"; from: SubwayStation; to: SubwayStation; rideStops: number; transfers: number };
+
+export const courseWalkLimitM = 1_000;
+
+/** How to get from one quest's start to the next: walk when close, otherwise the least-effort subway ride between their exits' stations. */
+export function describeCourseLeg(fromQuestId: string, toQuestId: string): CourseLeg | null {
+  const from = byQuestId.get(fromQuestId);
+  const to = byQuestId.get(toQuestId);
+  if (!from || !to) return null;
+  const straightLineM = distanceMetres(from.start, to.start);
+  if (straightLineM <= courseWalkLimitM || from.exit.stationKo === to.exit.stationKo) {
+    return { kind: "walk", straightLineM };
+  }
+  let best: Extract<CourseLeg, { kind: "subway" }> | null = null;
+  for (const origin of from.exit.stations) {
+    for (const destination of to.exit.stations) {
+      const trip = getSubwayTrip(origin.code, destination.code);
+      if (!trip) continue;
+      const leg = { kind: "subway" as const, from: origin, to: destination, rideStops: trip.rideStops, transfers: trip.changes.length };
+      const cost = (item: typeof leg) => item.rideStops + item.transfers * transferCostInStops;
+      if (!best || cost(leg) < cost(best)) best = leg;
+    }
+  }
+  return best ?? { kind: "walk", straightLineM };
+}
