@@ -16,7 +16,15 @@ type VisitGuide = {
   bodyJa: string;
   bodyKo: string;
   place: Parameters<typeof buildNaverPlaceUrl>[0];
-  steps: { id: string; titleJa: string; titleKo: string }[];
+  steps: {
+    id: string;
+    titleJa: string;
+    titleKo: string;
+    bodyJa?: string;
+    bodyKo?: string;
+    phraseJa?: string;
+    phraseKo?: string;
+  }[];
 };
 
 async function VisitActions({ questId, locale }: { questId: string; locale: Locale }) {
@@ -59,12 +67,39 @@ export function VisitGuidePage({
           <p className="leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
           <QuestAccessCard questId={guide.id} locale={locale} />
           <ol className="mt-6 grid gap-2 border-s-2 border-[var(--primary)] ps-3">
-            {guide.steps.map((step, index) => (
-              <li key={step.id} className="rounded-lg bg-[var(--surface-muted)] px-4 py-3 font-bold">
-                <span className="mr-3 text-[var(--primary)]">{index + 1}</span>
-                {pickLocale(locale, step.titleJa, step.titleKo)}
-              </li>
-            ))}
+            {guide.steps.map((step, index) => {
+              const body = step.bodyJa && step.bodyKo ? pickLocale(locale, step.bodyJa, step.bodyKo) : null;
+              const title = (
+                <>
+                  <span className="mr-3 text-[var(--primary)]">{index + 1}</span>
+                  {pickLocale(locale, step.titleJa, step.titleKo)}
+                </>
+              );
+              return (
+                <li key={step.id} className="rounded-lg bg-[var(--surface-muted)] font-bold">
+                  {body ? (
+                    <details className="group">
+                      <summary className="flex min-h-12 cursor-pointer items-center px-4 py-3">
+                        <span className="flex-1">{title}</span>
+                        <span className="ms-3 shrink-0 text-xs text-slate-500 group-open:hidden">{pickLocale(locale, "詳しく", "자세히")}</span>
+                      </summary>
+                      <div className="px-4 pb-4 font-normal">
+                        <p className="leading-7 text-slate-600">{body}</p>
+                        {step.phraseKo ? (
+                          <div className="mt-3 rounded-xl border-2 border-[#504e49] bg-white p-4 text-center">
+                            <p className="text-xs font-black tracking-[0.12em] text-[#504e49]">{pickLocale(locale, "見せる韓国語カード", "보여 주는 한국어 카드")}</p>
+                            <p lang="ko" className="mt-2 text-xl font-black leading-snug text-[#504e49]">{step.phraseKo}</p>
+                            {locale === "ja" && step.phraseJa ? <p className="mt-2 text-sm font-semibold text-slate-500">{step.phraseJa}</p> : null}
+                          </div>
+                        ) : null}
+                      </div>
+                    </details>
+                  ) : (
+                    <p className="px-4 py-3">{title}</p>
+                  )}
+                </li>
+              );
+            })}
           </ol>
           <div className="mt-6">
             <Suspense fallback={<p role="status">{pickLocale(locale, "訪問ガイドを読み込み中", "방문 안내를 불러오는 중")}</p>}>

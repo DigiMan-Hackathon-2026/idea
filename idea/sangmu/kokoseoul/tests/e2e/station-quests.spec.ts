@@ -41,3 +41,12 @@ test("points a station without quests to stations reachable by subway", async ({
   await expect(page).not.toHaveURL(/station=239/);
   await expect(page.getByRole("region", { name: /駅から行けるクエスト$/ }).getByRole("listitem").first()).toBeVisible();
 });
+
+test("previews a step's Korean phrase card before starting the quest", async ({ page }) => {
+  await page.goto("/quests/myeongdong-kyoja");
+  const step = page.getByRole("listitem").filter({ hasText: "1人だと伝える" });
+  await expect(step.getByText("한 명인데 여기서 기다리면 될까요?")).toBeHidden();
+  await step.getByText("1人だと伝える").click();
+  await expect(step.getByText("한 명인데 여기서 기다리면 될까요?")).toBeVisible();
+  await expect(step.getByText("1人ですが、ここで待てばいいですか？")).toBeVisible();
+});
