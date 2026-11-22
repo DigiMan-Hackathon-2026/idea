@@ -37,6 +37,7 @@ JSON·query·Unicode·UUID·body 크기와 idempotency canonical 비교는 [입�
 | --- | --- | --- | --- | --- | --- |
 | `GET /quests` | 공개, visitor 선택 | 200 목록 | cursor는 필터와 결합, 완료 quest 제외는 서버 판단 | 400 필터·cursor, 429, 503 | AC01, AC02, AC19 |
 | `GET /quests/:questId` | 공개, visitor 선택 | 200 상세 | 현재 공개본과 ownRun을 한 응답에서 판단 | 404 미공개·없음, 429, 503 | AC01, AC06~AC08, AC14, AC19 |
+| `GET /quests/nearby` | 공개, 익명 | 200 출구 주변 목록 | 현재 공개 버전을 직선거리·퀘스트 ID 순으로 반환, 버스 기준점은 로컬·테스트 전용 | 400 입력, 404 기준점 없음, 503 | AC01, AC02 |
 | `POST /routes/walking` | 인증 없음, same-origin | 200 TMAP 경로 | 검수된 demo `questId`만 허용, 서버 5분 cache, browser 저장 없음 | 400, 403 Origin, 404, 503 | AC01, AC02 |
 | `POST /visitor-sessions` | 인증 없음 | 201 신규, 200 기존 | 기존 cookie는 같은 session, 만료 연장 없음 | 400, 403 Origin, 429, 503 | AC01, AC16 |
 | `POST /quests/:questId/runs` | visitor | 201 신규, 200 기존 | DB `(visitor_id, quest_id)` unique, 두 탭 모두 같은 run | 401, 403 Origin, 404, 409 `QUEST_UNAVAILABLE`, 503 | AC03, AC07, AC08 |
@@ -49,6 +50,8 @@ JSON·query·Unicode·UUID·body 크기와 idempotency canonical 비교는 [입�
 | `DELETE /me/data` | visitor | 204 | 단일 트랜잭션, 성공 뒤 cookie 만료; 응답 유실 시 재로그인 없이 상태 확인 불가 | 401, 403 Origin, 503 | AC16, AC20 |
 
 `POST /visitor-sessions`의 첫 응답이 cookie 전달 전에 유실되면 재요청에서 새 visitor가 생길 수 있다. 앞선 visitor에는 사용자 데이터가 없고 만료 정리 대상이므로 P0에서 이를 병합하지 않는다. 세션 생성 뒤 run 생성 전까지 개인 상태를 추가하지 않는다.
+
+`GET /quests/nearby`는 visitor cookie와 사용자 GPS를 읽지 않으며 `Cache-Control: no-store`로 응답한다. 유효한 기준점 주변에 퀘스트가 없으면 빈 목록을 반환한다.
 
 ## 운영 endpoint
 

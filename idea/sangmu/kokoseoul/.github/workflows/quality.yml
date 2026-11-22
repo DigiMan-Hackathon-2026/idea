@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        image: postgres:17.12-alpine3.24@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32
+        image: postgis/postgis:17-3.7-alpine@sha256:05c73e6e309fb978eb3555f42e7725fb74a9bdc8ef99fac11397dbbd3edb95bc
         env:
           POSTGRES_DB: digiman_test_ci
           POSTGRES_USER: digiman_migration

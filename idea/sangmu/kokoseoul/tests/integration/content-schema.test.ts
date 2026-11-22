@@ -10,6 +10,7 @@ import {
   it,
 } from "vitest";
 import { assertSafeDatabaseTarget } from "../../src/db/config";
+import { getNearbyQuestsWithClient } from "../../src/modules/content/get-nearby-quests.server";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 assertSafeDatabaseTarget("test", testDatabaseUrl);
@@ -121,6 +122,64 @@ describe("PostgreSQL quest content constraints", () => {
 
   afterEach(async () => {
     await client.query("rollback");
+  });
+
+  it("searches from subway exits and local bus samples, excluding unpublished and out-of-range quests", async () => {
+    const exitId = randomUUID();
+    const busId = randomUUID();
+    const placeId = randomUUID();
+    await client.query(
+      `insert into quest_search_origins
+         (id, kind, name_ko, name_ja, location, source, source_key, is_sample, verified_at)
+       values
+         ($1, 'subway_exit', '성수역 3번 출구', '聖水駅3番出口',
+          'SRID=4326;POINT(127.05632 37.54418)'::geography, 'integration', $1::uuid::text, false, now()),
+         ($2, 'bus_stop', '성수 테스트 정류장', '聖水テストバス停',
+          'SRID=4326;POINT(127.05560 37.54375)'::geography, 'integration', $2::uuid::text, true, null)`,
+      [exitId, busId],
+    );
+    await client.query(
+      `insert into places (id, address_ko, verified_at) values ($1, '테스트 주소', now())`,
+      [placeId],
+    );
+    const near = await createContentFixture();
+    const farther = await createContentFixture();
+    const paused = await createContentFixture();
+    for (const fixture of [near, farther, paused]) {
+      await addSteps(fixture.versionId);
+      await publishVersion(fixture.versionId, fixture.adminId);
+      await client.query(
+        `update quests set status = 'published', published_version_id = $2,
+           first_published_at = now() where id = $1`,
+        [fixture.questId, fixture.versionId],
+      );
+    }
+    await client.query(
+      `update quests set status = 'paused', pause_reason_ja = '準備中' where id = $1`,
+      [paused.questId],
+    );
+    await client.query(
+      `insert into quest_start_points (quest_version_id, place_id, location, verified_at)
+       values
+         ($1, $4, 'SRID=4326;POINT(127.05570 37.54380)'::geography, now()),
+         ($2, $4, 'SRID=4326;POINT(127.05540 37.54330)'::geography, now()),
+         ($3, $4, 'SRID=4326;POINT(127.05632 37.54418)'::geography, now())`,
+      [near.versionId, farther.versionId, paused.versionId, placeId],
+    );
+
+    const search = (originId: string, radiusM: number, allowSamples = true) =>
+      getNearbyQuestsWithClient(client, { originId, radiusM, limit: 10 }, allowSamples);
+    const fromExit = await search(exitId, 150);
+    expect(fromExit?.origin.kind).toBe("subway_exit");
+    expect(fromExit?.quests.map((quest) => quest.id)).toEqual([near.questId, farther.questId]);
+    expect(fromExit?.quests[0].straightLineDistanceM).toBeGreaterThan(50);
+    expect(fromExit?.quests[0].straightLineDistanceM).toBeLessThan(100);
+    const fromBus = await search(busId, 50);
+    expect(fromBus?.origin.kind).toBe("bus_stop");
+    expect(fromBus?.quests.map((quest) => quest.id)).toEqual([near.questId]);
+    expect((await search(exitId, 1))?.quests).toEqual([]);
+    expect(await search(busId, 800, false)).toBeNull();
+    expect((await search(exitId, 800, false))?.quests).toEqual([]);
   });
 
   it("allows at most one draft version for a quest", async () => {

@@ -107,6 +107,40 @@ X-Request-Id: 01KAMELIST0000000000000000
 }
 ```
 
+## 출구 주변 퀘스트
+
+```http
+GET /api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901101&radiusM=800&limit=10 HTTP/1.1
+Host: example.test
+Accept: application/json
+```
+
+```json
+{
+  "origin": {
+    "id": "561a6218-3882-4db6-a0d4-0f70f7901101",
+    "kind": "subway_exit",
+    "nameKo": "성수역 3번 출구",
+    "nameJa": "聖水駅3番出口",
+    "isSample": true
+  },
+  "radiusM": 800,
+  "quests": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "versionId": "22222222-2222-4222-8222-222222222222",
+      "titleKo": "혼자 즐기는 성수 크래프트 산책",
+      "titleJa": "ひとりで楽しむ聖水クラフト散歩",
+      "durationMinutes": 90,
+      "straightLineDistanceM": 216,
+      "isDemo": true
+    }
+  ]
+}
+```
+
+`originId`는 필수 UUID다. `radiusM`은 1~2,000의 정수(기본 800), `limit`은 1~20의 정수(기본 10)다. 거리(미터)와 퀘스트 ID 순으로 정렬한다. 기준점이 등록되어 있고 결과가 없으면 200과 `quests: []`를 반환한다. 잘못된 입력은 400, 조회할 수 없는 기준점은 404다. 가상 버스 정류장과 성수역 출구 샘플은 로컬과 테스트 DB에서만 사용한다.
+
 ## 공개 퀘스트 상세
 
 ```http

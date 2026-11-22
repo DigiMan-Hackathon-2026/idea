@@ -142,7 +142,7 @@ pnpm audit:dependencies
 
 ## 로컬 PostgreSQL
 
-PostgreSQL 17.12 이미지를 digest로 고정했습니다. `.env.local` 또는 현재 shell에 `LOCAL_POSTGRES_PASSWORD`, `APP_ENV`, `DATABASE_DIRECT_URL`, `TEST_DATABASE_URL`을 실제 값으로 설정하고 비밀값은 커밋하지 않습니다.
+PostgreSQL 17 + PostGIS 이미지(linux/amd64)를 digest로 고정했습니다. `.env.local` 또는 현재 shell에 `LOCAL_POSTGRES_PASSWORD`, `APP_ENV`, `DATABASE_DIRECT_URL`, `TEST_DATABASE_URL`을 실제 값으로 설정하고 비밀값은 커밋하지 않습니다.
 
 ```bash
 docker compose up -d --wait postgres
