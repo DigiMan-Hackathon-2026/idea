@@ -77,6 +77,27 @@
 | 14:30 | [남산 성곽길](../quest-drafts/namsan-city-wall-walk.md) | 장충체육관~국립극장 실제 시간, 시간 제한 구간 출입구 |
 | 17:00 | [코코리컬러 홍대 퍼스널컬러](../quest-drafts/hongdae-cocory-mini-personal-color.md) | 예약 언어, 해외 결제·취소, 결과 안내 형식. 예약 필요 |
 
+### F. 역 이름 이야기 · 화~일
+
+[역 이름 이야기 초안](../quest-drafts/README.md#역-이름-이야기--5개)을 한 번에 돈다. 선릉과 정릉, 한성백제박물관, 강감찬 전시관은 월요일에 쉰다.
+
+| 시간 | 초안 | 확인할 것 |
+| --- | --- | --- |
+| 10:00 | [독립문과 영은문 기둥돌](../quest-drafts/dongnimmun-gate-and-pillar-stones.md) | 독립문역 출구와 동선, 안내판 언어 |
+| 11:00 | [동묘 관우 사당](../quest-drafts/dongmyo-guan-yu-shrine.md) | 관람 시간·휴관일·요금, 동묘앞역 출구, 정전 내부 관람 범위 |
+| 13:00 | [선릉과 정릉](../quest-drafts/seolleung-royal-tombs-walk.md) | 관람 시간·요금, 선릉역 출구와 정문 동선, 일본어 리플릿 |
+| 14:30 | [낙성대 강감찬 생가 터](../quest-drafts/nakseongdae-gang-gamchan-star.md) | 낙성대역 출구와 동선, 공원 개방 시간 |
+| 16:00 | [몽촌토성](../quest-drafts/mongchontoseong-earthen-wall-walk.md) | 1번 출구에서 남2문까지 시간, 은행나무 보호수 위치, 공원 개방 시간 |
+
+### 역 · 어느 역에서나
+
+[역 안에서 끝나는 퀘스트](../quest-drafts/README.md#역-안에서-끝나는-퀘스트--2개)는 위 동선 중 들르는 역에서 확인한다.
+
+| 초안 | 확인할 것 |
+| --- | --- |
+| [기후동행카드 단기권 사기](../quest-drafts/station-kiosk-climate-card-short-pass.md) | 신형 키오스크 모습과 일본어 화면, 해외 카드 수수료·영수증, 단기권 종류·요금 |
+| [물품보관함에 짐 맡기기](../quest-drafts/station-t-locker-bag-drop.md) | 단말기 언어·결제 수단, 꺼낼 때 인증 방식, 현재 요금 |
+
 ### 문의·온라인 확인
 
 현장 방문 전에 공식 안내나 문의로 확인한다.
@@ -104,7 +125,7 @@
 
 | 열 | 적을 것 |
 | --- | --- |
-| `id`, `route`, `draft`, `place`, `check_item` | 미리 채워 둔 항목. `route`는 위 동선(A~E, 문의, 공통). `draft`가 `-`이면 초안이 없다 |
+| `id`, `route`, `draft`, `place`, `check_item` | 미리 채워 둔 항목. `route`는 위 동선(A~F, 역, 문의, 공통). `draft`가 `-`이면 초안이 없다 |
 | `app` | 결과를 반영할 앱 데이터 파일(`src/modules/content/` 기준). 앱에 없으면 `(앱 없음)` |
 | `value` | 확인한 값. 확인하지 못했으면 `미확인`과 이유 |
 | `method` | 현장 관찰, 직원 답변, 안내판, 공식 문의 중 하나 |
