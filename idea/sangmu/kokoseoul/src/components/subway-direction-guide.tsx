@@ -205,6 +205,8 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
   }, [situation]);
   const transfer = getSubwayStation(ride.transfer);
   const trip = useMemo(() => getSubwayTrip(origin, destination, train), [origin, destination, train]);
+  const lineTransfers = trip?.changes.filter(({ from, to }) => from.line !== to.line) ?? [];
+  const sameLineTransfers = trip?.changes.filter(({ from, to }) => from.line === to.line) ?? [];
   const next = trip?.next;
   const pendingChange = getSubwayTransfer(origin, ride.transfer);
   const changeNow = pendingChange ?? trip?.changeNow;
@@ -326,6 +328,30 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                       : pickLocale(locale, `${stationLabel(transfer, locale)}で乗り換えます。乗り換え案内に従って次のホームを確認しましょう。`, `${stationLabel(transfer, locale)}에서 갈아타요. 환승 안내를 따라 다음 승강장을 확인해요.`)}
                   </p>
                 ) : null}
+                {lineTransfers.length > 0 ? (
+                  <section aria-labelledby="subway-line-transfers" className="mb-3 rounded-xl border border-[var(--border)] bg-white p-4 sm:px-6">
+                    <h2 id="subway-line-transfers" className="text-sm font-black">
+                      {pickLocale(locale, `路線の乗り換え · ${lineTransfers.length}回`, `호선 환승 · ${lineTransfers.length}회`)}
+                    </h2>
+                    <ol className="mt-2 grid gap-2">
+                      {lineTransfers.map(({ from, to }, index) => (
+                        <li key={`${index}:${from.code}:${to.code}`} className="rounded-lg bg-[var(--surface-muted)] p-3">
+                          <p className="text-sm font-bold">{stationLabel(from, locale)}</p>
+                          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-base font-black">
+                            <span>{lineLabel(from.line, locale)}</span>
+                            <span aria-hidden="true">→</span>
+                            <span className="rounded-md bg-[var(--primary-soft)] px-2 py-0.5 text-[var(--primary)]">
+                              {pickLocale(locale, `${lineLabel(to.line, locale)}に乗り換え`, `${lineLabel(to.line, locale)}으로 갈아타기`)}
+                            </span>
+                          </p>
+                          <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+                            {pickLocale(locale, `乗り換え先の駅番号 ${to.code}`, `갈아탈 호선의 역번호 ${to.code}`)}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+                ) : null}
                 <div className="overflow-hidden rounded-2xl bg-[linear-gradient(115deg,#292f60,#50538c)] text-white" role="status">
                   <div className="border-b border-white/35 px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5">
                     <h2 className="text-sm font-bold">{pickLocale(locale, "次の駅で方向を照合", "다음 역으로 방향 확인")}</h2>
@@ -359,13 +385,9 @@ export function SubwayDirectionGuide({ readings, onViewStation }: {
                       ) : null}
                     </div>
                   ) : null}
-                  {trip.changes.length > 0 && !localChange ? (
+                  {sameLineTransfers.length > 0 && !localChange ? (
                     <p className="mt-2 text-sm font-black text-[#504e49]">
-                      {trip.changes.some(({ from, to }) => from.line !== to.line)
-                        ? pickLocale(locale, "乗り換え駅", "갈아탈 역")
-                        : pickLocale(locale, `${lineLabel(next.line, locale)}の乗り換え駅`, `${lineLabel(next.line, locale)} 안에서 갈아탈 역`)} · {trip.changes.map(({ from, to }) =>
-                        from.line === to.line ? stationLabel(from, locale) : `${stationLabel(from, locale)} → ${lineLabel(to.line, locale)} ${to.code}`,
-                      ).join(" / ")}
+                      {pickLocale(locale, "同じ路線内で乗り換える駅", "같은 호선에서 갈아탈 역")} · {sameLineTransfers.map(({ from }) => stationLabel(from, locale)).join(" / ")}
                     </p>
                   ) : null}
                   </div>

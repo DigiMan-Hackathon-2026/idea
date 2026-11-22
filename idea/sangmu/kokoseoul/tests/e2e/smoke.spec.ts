@@ -535,7 +535,7 @@ test("keeps the transfer instruction when arriving from the Seongsu branch", asy
   await page.getByRole("button", { name: /211-1 龍踏/ }).click();
   await page.getByRole("textbox", { name: "降りたい駅" }).fill("208");
   await page.getByRole("button", { name: /208 往十里/ }).click();
-  await expect(page.getByText("2号線の乗り換え駅 · 211 聖水")).toBeVisible();
+  await expect(page.getByText("同じ路線内で乗り換える駅 · 211 聖水")).toBeVisible();
   await page.getByLabel("案内で確認した次の駅").selectOption("211");
   await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();
   await expect(page.getByText("211 聖水で乗り換えます。乗り換え案内に従って次のホームを確認しましょう。")).toBeVisible();
@@ -549,7 +549,11 @@ test("confirms a Line 3 transfer before showing the next stop and saves it offli
   await page.getByRole("button", { name: /202 乙支路入口/ }).click();
   await page.getByRole("textbox", { name: "降りたい駅" }).fill("アングク");
   await page.getByRole("button", { name: /328 安国.*3号線/ }).click();
-  await expect(page.getByText(/乗り換え駅 · 203 乙支路3街 → 3号線 330/)).toBeVisible();
+  const transfer = page.getByRole("region", { name: "路線の乗り換え · 1回" });
+  await expect(transfer.getByText("203 乙支路3街", { exact: true })).toBeVisible();
+  await expect(transfer.getByText("2号線", { exact: true })).toBeVisible();
+  await expect(transfer.getByText("3号線に乗り換え", { exact: true })).toBeVisible();
+  await expect(transfer.getByText("乗り換え先の駅番号 330")).toBeVisible();
   await page.getByRole("button", { name: "乗車中", exact: true }).click();
   await page.getByLabel("案内で確認した次の駅").selectOption("203");
   await page.getByRole("button", { name: "この駅に着いたら、次を確認" }).click();
