@@ -15,7 +15,7 @@ type VisitGuide = {
   titleKo: string;
   bodyJa: string;
   bodyKo: string;
-  place: Parameters<typeof buildNaverPlaceUrl>[0];
+  place: Parameters<typeof buildNaverPlaceUrl>[0] & { verifiedAt?: string };
   steps: {
     id: string;
     titleJa: string;
@@ -42,6 +42,15 @@ async function VisitActions({ questId, locale }: { questId: string; locale: Loca
       <ReportButton questId={questId} versionId={quest.versionId} />
     </>
   );
+}
+
+function formatCheckedDate(value: string, locale: Locale) {
+  return new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(value));
 }
 
 export function VisitGuidePage({
@@ -107,6 +116,15 @@ export function VisitGuidePage({
             </Suspense>
           </div>
           <div className="mt-5 border-t border-[var(--border)] pt-4 text-sm text-slate-600">
+            {guide.place.verifiedAt ? (
+              <p className="mb-2 leading-6">
+                {pickLocale(
+                  locale,
+                  `${formatCheckedDate(guide.place.verifiedAt, locale)}時点の公式案内に基づく情報です。行く前に公式案内で最新の情報を確認してください。`,
+                  `${formatCheckedDate(guide.place.verifiedAt, locale)} 공식 안내 기준 정보예요. 가기 전에 공식 안내에서 최신 정보를 확인해 주세요.`,
+                )}
+              </p>
+            ) : null}
             <p lang="ko" className="select-all font-bold">{guide.place.addressKo}</p>
             <div className="flex flex-wrap gap-x-5">
               <a href={buildNaverPlaceUrl(guide.place)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-bold underline">
