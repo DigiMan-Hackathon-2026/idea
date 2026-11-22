@@ -97,6 +97,8 @@
 | --- | --- |
 | [기후동행카드 단기권 사기](../quest-drafts/station-kiosk-climate-card-short-pass.md) | 신형 키오스크 모습과 일본어 화면, 해외 카드 수수료·영수증, 단기권 종류·요금 |
 | [물품보관함에 짐 맡기기](../quest-drafts/station-t-locker-bag-drop.md) | 단말기 언어·결제 수단, 꺼낼 때 인증 방식, 현재 요금 |
+| [고투몰 작은 물건 사기](../quest-drafts/express-bus-terminal-goto-mall-gift.md) | 개찰구에서 상가 입구까지 표지, 해외 카드, 교환·환불, 일본어 안내도 |
+| [망원시장 간식](../quest-drafts/mangwon-market-snack.md) | 망원역 2번 출구 동선, 현재 영업시간, 카드 결제, 먹고 갈 자리 |
 
 ### 문의·온라인 확인
 
