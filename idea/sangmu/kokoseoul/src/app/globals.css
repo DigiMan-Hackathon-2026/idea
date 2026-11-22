@@ -12,21 +12,22 @@
   --seoul-ginkgo: #e5b560;
   --seoul-hemp: #d8ccad;
 
-  --background: color-mix(in srgb, var(--seoul-hemp) 19%, white);
+  --background: #f7f6fc;
   --surface: white;
-  --surface-muted: color-mix(in srgb, var(--seoul-hemp) 25%, white);
-  --foreground: color-mix(in srgb, var(--seoul-roof-tile) 76%, #151917);
-  --foreground-muted: color-mix(in srgb, var(--foreground) 82%, white);
-  --border: color-mix(in srgb, var(--seoul-stone-wall) 36%, white);
-  --primary: var(--seoul-dancheong);
-  --primary-soft: color-mix(in srgb, var(--seoul-dancheong) 9%, white);
+  --surface-muted: #f1eef8;
+  --foreground: #282439;
+  --foreground-muted: #59536e;
+  --border: #ded9eb;
+  --primary: #62448d;
+  --primary-soft: #efe7f9;
   --success: var(--seoul-namsan);
   --success-soft: color-mix(in srgb, var(--seoul-namsan) 10%, white);
   --info: var(--seoul-sky);
   --info-soft: color-mix(in srgb, var(--seoul-sky) 10%, white);
   --warning: var(--seoul-ginkgo);
   --warning-soft: color-mix(in srgb, var(--seoul-ginkgo) 18%, white);
-  --shadow-color: color-mix(in srgb, var(--seoul-roof-tile) 9%, transparent);
+  --shadow-color: #3d2d7120;
+  --action-fill: linear-gradient(120deg, #68468f, #594d9c);
 }
 
 * {
@@ -41,7 +42,10 @@ html {
 body {
   min-width: 320px;
   margin: 0;
-  background: var(--background);
+  background:
+    radial-gradient(ellipse at 8% 12%, #f6e7f2 0, transparent 38rem),
+    radial-gradient(ellipse at 95% 22%, #e5ebfa 0, transparent 43rem),
+    var(--background);
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
     "Yu Gothic", "Meiryo", sans-serif;
@@ -65,7 +69,7 @@ a {
 .seoul-surface {
   border: 1px solid var(--border);
   background: var(--surface);
-  box-shadow: 0 6px 22px var(--shadow-color);
+  box-shadow: 0 12px 32px -16px var(--shadow-color);
 }
 
 .seoul-frame {
@@ -76,31 +80,31 @@ a {
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: var(--success);
+  background: var(--action-fill);
   content: "";
 }
 
 .seoul-kicker {
-  color: var(--success);
+  color: var(--primary);
   font-weight: 750;
 }
 
 .seoul-button-primary {
-  background: var(--seoul-dancheong);
+  background: var(--action-fill);
   color: white;
 }
 
 .seoul-button-primary:hover {
-  background: color-mix(in srgb, var(--seoul-dancheong) 88%, black);
+  background: #493571;
 }
 
 .seoul-button-dark {
-  background: var(--success);
+  background: #34335c;
   color: white;
 }
 
 .seoul-button-dark:hover {
-  background: var(--seoul-palace-brown);
+  background: #252447;
 }
 
 .seoul-page {
@@ -118,7 +122,7 @@ a {
 
 .seoul-header {
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: linear-gradient(110deg, #fff8fb, #f7f9ff 82%);
 }
 
 .seoul-header-inner {
@@ -149,8 +153,8 @@ a {
   width: 2rem;
   aspect-ratio: 1;
   place-items: center;
-  border-radius: .4rem;
-  background: var(--primary);
+  border-radius: .8rem;
+  background: var(--action-fill);
   color: white;
   font-size: .75rem;
 }
@@ -175,8 +179,8 @@ a {
 }
 
 .seoul-nav a[aria-current], .seoul-nav a:hover, .seoul-shortcut:hover {
-  background: var(--success-soft);
-  color: var(--success);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .seoul-header-inner > button { grid-area: language; }
@@ -193,6 +197,127 @@ a {
 .seoul-shortcut span {
   color: var(--foreground-muted);
   font-size: .875rem;
+}
+
+.scenic-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: start;
+  min-height: clamp(19rem, 34vw, 27rem);
+  overflow: hidden;
+  border-radius: clamp(1.25rem, 3vw, 2.1rem);
+  background: var(--scenic-tint), var(--scenic-art) center 92% / cover no-repeat, var(--scenic-gradient);
+  color: var(--scenic-ink);
+}
+
+[data-theme="dawn"] {
+  --scenic-art: url("/scenes/seoul-dawn.webp");
+  --scenic-gradient: linear-gradient(155deg, #fbdce5, #dce3fb);
+  --scenic-tint: linear-gradient(110deg, #fff2f6e8, #f7eff7a3 42%, transparent 77%);
+  --scenic-ink: #352745;
+}
+
+[data-theme="dusk"] {
+  --scenic-art: url("/scenes/seoul-dusk.webp");
+  --scenic-gradient: linear-gradient(155deg, #382243, #a65362 70%, #e19276);
+  --scenic-tint: linear-gradient(105deg, #30213ce8, #35233d96 45%, transparent 82%);
+  --scenic-ink: #fffafa;
+}
+
+[data-theme="night"] {
+  --scenic-art: url("/scenes/seoul-night.webp");
+  --scenic-gradient: linear-gradient(155deg, #161d41, #354985 73%, #6b79b2);
+  --scenic-tint: linear-gradient(105deg, #181c3be8, #21284d8a 48%, transparent 87%);
+  --scenic-ink: #f9faff;
+}
+
+.scenic-hero::after {
+  position: absolute;
+  inset: auto -12% -4rem;
+  z-index: -1;
+  height: 6.1rem;
+  border-radius: 48% 67% 0 0 / 65% 90% 0 0;
+  background: var(--background);
+  content: "";
+  transform: rotate(-2.5deg);
+}
+
+.scenic-hero::before {
+  position: absolute;
+  inset: auto -10% -4.6rem;
+  z-index: -1;
+  height: 7.9rem;
+  border-radius: 73% 50% 0 0 / 70% 90% 0 0;
+  background: #f7f6fc58;
+  content: "";
+  transform: rotate(4deg);
+}
+
+.scenic-hero-copy {
+  width: 100%;
+  max-width: 46rem;
+  padding: clamp(1.35rem, 5vw, 3.6rem) clamp(1.2rem, 5vw, 3.6rem) 4rem;
+}
+
+.scenic-hero h1 {
+  font-size: clamp(1.9rem, 4.7vw, 3.7rem);
+  font-weight: 780;
+  letter-spacing: -.04em;
+  line-height: 1.13;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+:lang(ko) .scenic-hero h1 { word-break: keep-all; }
+
+.scenic-hero p {
+  max-width: 34ch;
+  margin-top: .75rem;
+  line-height: 1.6;
+}
+
+.scenic-content {
+  position: relative;
+  z-index: 1;
+  margin-top: -1.7rem;
+}
+
+.scenic-shortcut {
+  min-height: 6.5rem;
+  align-content: center;
+  border-color: transparent;
+  border-radius: 1rem;
+  background: var(--scenic-tint), var(--scenic-art) center 86% / cover no-repeat, var(--scenic-gradient);
+  color: var(--scenic-ink);
+}
+
+.scenic-shortcut:hover {
+  background: var(--scenic-tint), var(--scenic-art) center 86% / cover no-repeat, var(--scenic-gradient);
+  color: var(--scenic-ink);
+  box-shadow: 0 5px 18px var(--shadow-color);
+}
+
+.scenic-shortcut span { color: inherit; }
+
+@media (max-width: 639px) {
+  .scenic-hero {
+    min-height: 16.25rem;
+    background-position: center, 68% 92%, center;
+  }
+
+  .scenic-hero-copy { padding-bottom: 3.4rem; }
+  .scenic-content { margin-top: -1rem; }
+}
+
+@media (forced-colors: active) {
+  .scenic-hero, .scenic-shortcut, .scenic-shortcut:hover {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .scenic-hero::before, .scenic-hero::after { display: none; }
 }
 
 @media (min-width: 640px) {

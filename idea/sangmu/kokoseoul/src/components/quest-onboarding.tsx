@@ -56,7 +56,7 @@ function Choice({
         style={{ caretColor: "transparent" }}
         className="peer sr-only"
       />
-      <span className="flex min-h-13 items-center rounded-lg border border-transparent bg-[var(--surface-muted)] px-3 py-2 text-left text-base font-bold leading-6 text-[var(--foreground)] peer-checked:border-[var(--success)] peer-checked:bg-[var(--success-soft)] peer-checked:text-[var(--success)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
+      <span className="flex min-h-13 items-center rounded-lg border border-transparent bg-[var(--surface-muted)] px-3 py-2 text-left text-base font-bold leading-6 text-[var(--foreground)] peer-checked:border-[var(--primary)] peer-checked:bg-[var(--primary-soft)] peer-checked:text-[var(--primary)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#6789ca]">
         {children}
       </span>
     </label>
@@ -124,7 +124,7 @@ export function QuestOnboarding() {
   return (
     <section aria-labelledby="quest-onboarding-title">
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-black text-[#941e34]">
+        <p className="text-sm font-bold text-[var(--primary)]">
           {pickLocale(locale, "今日の選び方", "오늘의 선택")}
         </p>
         <p className="text-sm font-bold text-slate-400" aria-label={pickLocale(locale, `全3問の${step + 1}問目`, `총 3개 중 ${step + 1}번째 질문`)}>
@@ -135,7 +135,7 @@ export function QuestOnboarding() {
         {[0, 1, 2].map((index) => (
           <span
             key={index}
-            className={`h-1 rounded-full ${index <= step ? "bg-[var(--success)]" : "bg-[var(--border)]"}`}
+            className={`h-1 rounded-full ${index <= step ? "bg-[var(--primary)]" : "bg-[var(--border)]"}`}
           />
         ))}
       </div>
