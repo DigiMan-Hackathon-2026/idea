@@ -454,7 +454,7 @@ J0452,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-
 J0453,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].detailJa,목록 카드 보조 문구,신설동 · 가격과 상태는 매장 확인,新設洞 · 値段と状態は店頭で確認,,,,
 J0454,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].place.nameJa,장소 이름,서울풍물시장,ソウル風物市場,,,,
 J0455,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].steps[0].titleJa,단계 제목,서울풍물시장 입구 찾기,ソウル風物市場の入口を探す,,,,
-J0456,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].steps[0].bodyJa,단계 안내,신설동역 6번 출구에서 천호대로4길 21로 가요. 공식 안내에서 방문일 영업 여부를 확인해요.,新設洞駅6番出口から「천호대로4길 21」へ。来店日の営業は公式案内で確認します。,,,,
+J0456,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].steps[0].bodyJa,단계 안내,"1호선은 신설동역 6번 출구, 2호선은 9·10번 출구에서 천호대로4길 21로 가요. 공식 안내에서 방문일 영업 여부를 확인해요.",1号線は新設洞駅6番出口、2号線は9・10番出口から「천호대로4길 21」へ。来店日の営業は公式案内で確認します。,,,,
 J0457,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].steps[0].completionLabelJa,단계 완료 버튼,시장에 도착했어요,市場に着きました,,,,
 J0458,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].steps[1].titleJa,단계 제목,오래된 물건 하나 고르기,昔の品を一つ選ぶ,,,,
 J0459,1,앱 퀘스트,src/modules/content/visit-guides/shopping.json,[1:sinseol-seoul-folk-flea-market].steps[1].bodyJa,단계 안내,생활용품이나 오래된 소품 중에서 궁금한 물건 하나를 골라요. 만져봐도 되는지 먼저 물어봐요.,生活用品や昔の小物から気になる品を一つ選びます。触ってよいか、先に聞きましょう。,,,,
