@@ -154,6 +154,15 @@ pnpm test:integration
 DB 도구는 `local`·`test`, local host와 `digiman_local`·`digiman_test_*` 이름만 허용합니다. 통합 테스트 DB에는 `digiman:test` database comment marker가 있어야 합니다.
 데모 콘텐츠는 migration에 포함하지 않으며 위 명령으로 local·test DB에만 명시적으로 넣습니다. preview·production 환경이나 허용 목록 밖의 DB에서는 seed가 시작 전에 실패합니다.
 
+`pnpm db:seed:demo` 실행 후 로컬 앱에서 성수 주변 퀘스트 API를 확인할 수 있습니다.
+
+| 기준점 | 요청 경로 |
+| --- | --- |
+| 성수역 3번 출구 샘플 | `/api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901101` |
+| 가상 버스 정류장 (테스트) | `/api/v1/quests/nearby?originId=561a6218-3882-4db6-a0d4-0f70f7901102` |
+
+`radiusM`은 기본 800m (최대 2,000m), `limit`은 기본 10개 (최대 20개)입니다. 결과의 `straightLineDistanceM`은 직선거리입니다. 두 샘플 기준점은 local·test에서만 조회할 수 있습니다.
+
 디지망 해커톤을 로컬에서 리허설하려면 DB 설정 후 `pnpm db:seed:hackathon`을 실행하고 `/quests?area=sinchon&purpose=discovery`를 엽니다. 본선 종료 시각인 2026년 11월 29일 20시(한국 시간)부터 탐색과 새 진행을 닫고 완료 기록은 계속 볼 수 있습니다.
 
 명동교자 퀘스트는 DB 설정 후 `pnpm db:seed:myeongdong-kyoja`로 로컬에 넣고 `/quests?area=myeongdong&purpose=food`에서 시작합니다.

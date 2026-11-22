@@ -3,6 +3,9 @@ import pg from "pg";
 const { Client } = pg;
 const DEMO_QUEST_ID = "11111111-1111-4111-8111-111111111111";
 const DEMO_VERSION_ID = "22222222-2222-4222-8222-222222222222";
+const DEMO_PLACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+const SEONGSU_EXIT_ID = "561a6218-3882-4db6-a0d4-0f70f7901101";
+const SEONGSU_TEST_BUS_STOP_ID = "561a6218-3882-4db6-a0d4-0f70f7901102";
 const allowedHosts = new Set(["127.0.0.1", "localhost", "::1"]);
 const allowedDatabase = /^(digiman_local|digiman_test)(_[a-z0-9_]+)?$/;
 
@@ -66,8 +69,6 @@ try {
     ) {
       throw new Error("Demo seed IDs already exist with an unexpected state");
     }
-    await client.query("commit");
-    process.stdout.write("Demo content is already present and valid.\n");
   } else {
     await client.query(
       `insert into supplier_orgs (id, name, kind, status)
@@ -139,9 +140,35 @@ try {
          first_published_at = now() where id = $1`,
       [DEMO_QUEST_ID, DEMO_VERSION_ID],
     );
-    await client.query("commit");
-    process.stdout.write("Seeded local/test demo content.\n");
   }
+
+  // The exit point comes from the existing Seongsu demo guide. The bus stop is synthetic.
+  await client.query(
+    `insert into quest_search_origins
+       (id, kind, name_ko, name_ja, location, source, source_key, is_sample)
+     values
+       ($1, 'subway_exit', '성수역 3번 출구', '聖水駅3番出口',
+        ST_SetSRID(ST_MakePoint(127.05632, 37.54418), 4326)::geography,
+        'seongsu-demo', '211:3', true),
+       ($2, 'bus_stop', '성수 버스 정류장 (테스트)', '聖水バス停（テスト用）',
+        ST_SetSRID(ST_MakePoint(127.05560, 37.54375), 4326)::geography,
+        'seongsu-demo', 'synthetic-bus-stop', true)
+     on conflict (id) do nothing`,
+    [SEONGSU_EXIT_ID, SEONGSU_TEST_BUS_STOP_ID],
+  );
+  await client.query(
+    `insert into quest_start_points (quest_version_id, place_id, location, verified_at)
+     select $1, $2,
+       ST_SetSRID(ST_MakePoint(places.longitude, places.latitude), 4326)::geography,
+       places.verified_at
+     from (select $2::uuid as id) sample
+     left join places on places.id = sample.id
+     on conflict (quest_version_id) do nothing`,
+    [DEMO_VERSION_ID, DEMO_PLACE_ID],
+  );
+
+  await client.query("commit");
+  process.stdout.write("Seeded local/test demo content and Seongsu search samples.\n");
 } catch (error) {
   await client.query("rollback").catch(() => undefined);
   throw error;
