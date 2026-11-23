@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { KoreanAwareText } from "@/components/korean-text";
 import { Suspense } from "react";
 import { QuestAccessCard } from "@/components/quest-access-card";
 import { ReportButton } from "@/components/report-button";
@@ -96,7 +97,7 @@ export function VisitGuidePage({
         </Link>
         <ScenicHero theme="dusk" title={pickLocale(locale, guide.titleJa, guide.titleKo)} />
         <article className="scenic-content seoul-surface rounded-2xl p-5 sm:p-8">
-          <p className="leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
+          <p className="leading-7 text-slate-600"><KoreanAwareText text={pickLocale(locale, guide.bodyJa, guide.bodyKo)} locale={locale} /></p>
           <QuestAccessCard questId={guide.id} locale={locale} />
           <SaveQuestOffline quest={toOfflineQuest(guide)} />
           <ol className="mt-6 grid gap-2 border-s-2 border-[var(--primary)] ps-3">
@@ -114,10 +115,10 @@ export function VisitGuidePage({
                     <details className="group">
                       <summary className="flex min-h-12 cursor-pointer items-center px-4 py-3">
                         <span className="flex-1">{title}</span>
-                        <span className="ms-3 shrink-0 text-xs text-slate-500 group-open:hidden">{pickLocale(locale, "詳しく", "자세히")}</span>
+                        <span className="ms-3 shrink-0 text-xs text-slate-600 group-open:hidden">{pickLocale(locale, "詳しく", "자세히")}</span>
                       </summary>
                       <div className="px-4 pb-4 font-normal">
-                        <p className="leading-7 text-slate-600">{body}</p>
+                        <p className="leading-7 text-slate-600"><KoreanAwareText text={body} locale={locale} /></p>
                         {step.phraseKo ? (
                           <div className="mt-3 rounded-xl border-2 border-[#504e49] bg-white p-4 text-center">
                             <p className="text-xs font-black tracking-[0.12em] text-[#504e49]">{pickLocale(locale, "見せる韓国語カード", "보여 주는 한국어 카드")}</p>

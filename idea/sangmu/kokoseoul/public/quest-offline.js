@@ -53,6 +53,21 @@ function el(tag, props, ...children) {
 
 const ko = (text, tag = "span") => el(tag, { lang: "ko", textContent: text });
 
+// Same pattern as src/lib/korean-runs.ts: Hangul words inside Japanese copy get lang="ko".
+const HANGUL_RUN = /[\uac00-\ud7a3\u3131-\u318e]+(?:[\s\d.,·-]*[\uac00-\ud7a3\u3131-\u318e\d]+)*/g;
+
+function jaWithKorean(text) {
+  const parts = [];
+  let last = 0;
+  for (const match of text.matchAll(HANGUL_RUN)) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    parts.push(ko(match[0]));
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
 function seoulWeekday() {
   return WEEKDAY[new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "Asia/Seoul" }).format(new Date())];
 }
@@ -108,7 +123,7 @@ function renderQuest(quest, onRemove) {
   const steps = el("ol");
   quest.steps.forEach((step, index) => {
     const item = el("li", {}, el("strong", { textContent: `${index + 1}. ${step.titleJa}` }), ko(step.titleKo, "span"));
-    if (step.bodyJa) item.append(el("p", { textContent: step.bodyJa }));
+    if (step.bodyJa) item.append(el("p", {}, ...jaWithKorean(step.bodyJa)));
     if (step.bodyKo) item.append(ko(step.bodyKo, "p"));
     if (step.phraseKo) {
       item.append(el("div", { className: "phrase" },

@@ -16,6 +16,11 @@ import {
   type DemoQuest,
 } from "@/modules/content/demo-quests";
 
+/** Marker icons are HTML strings, so quest text in an attribute must be escaped. */
+function escapeAttribute(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 type NaverMapInstance = {
   destroy(): void;
   fitBounds(bounds: unknown, padding?: number): void;
@@ -254,7 +259,7 @@ export function NaverQuestMap({
           position,
           title: pickLocale(locale, quest.titleJa, quest.titleKo),
           icon: {
-            content: `<button type="button" aria-label="${index + 1}" style="display:grid;place-items:center;width:38px;height:38px;border:3px solid white;border-radius:999px;background:#941e34;color:white;font:900 14px system-ui;box-shadow:0 8px 20px rgba(15,23,42,.24)">${index + 1}</button>`,
+            content: `<button type="button" aria-label="${escapeAttribute(`${index + 1}. ${pickLocale(locale, quest.titleJa, quest.titleKo)}`)}" style="display:grid;place-items:center;width:38px;height:38px;border:3px solid white;border-radius:999px;background:#941e34;color:white;font:900 14px system-ui;box-shadow:0 8px 20px rgba(15,23,42,.24)">${index + 1}</button>`,
             anchor: new maps.Point(19, 19),
           },
         });

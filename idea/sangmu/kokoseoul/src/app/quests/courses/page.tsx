@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { KoreanAwareText } from "@/components/korean-text";
 import Link from "next/link";
 import { ClosedTodayNotice } from "@/components/closed-today-notice";
 import { formatApproxMetres, QuestLineBadge } from "@/components/quest-line-badge";
@@ -62,8 +63,8 @@ export default async function QuestCoursesPage() {
                 {course.totalMinutes ? <span>· {pickLocale(locale, `体験だけで約${course.totalMinutes}分`, `체험만 약 ${course.totalMinutes}분`)}</span> : null}
               </p>
               <h2 id={`${course.slug}-title`} className="mt-2 text-xl font-black tracking-tight">{pickLocale(locale, course.titleJa, course.titleKo)}</h2>
-              <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, course.summaryJa, course.summaryKo)}</p>
-              <p className="mt-2 rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm font-bold leading-6">{pickLocale(locale, course.noteJa, course.noteKo)}</p>
+              <p className="mt-2 leading-7 text-slate-600"><KoreanAwareText text={pickLocale(locale, course.summaryJa, course.summaryKo)} locale={locale} /></p>
+              <p className="mt-2 rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm font-bold leading-6"><KoreanAwareText text={pickLocale(locale, course.noteJa, course.noteKo)} locale={locale} /></p>
               {course.stops[0].access.exit.stations[0] ? (
                 <p className="mt-3 text-sm font-bold">
                   {pickLocale(locale, `出発: ${course.stops[0].access.exit.nameJa}`, `출발: ${course.stops[0].access.exit.nameKo}`)}
