@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { KoreanAwareText } from "@/components/korean-text";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { findQuestStationsFrom, findStationQuests, listQuestAccesses, stationQuestRadiusM } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
@@ -93,7 +94,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
                         {pickLocale(locale, quest.titleJa, quest.titleKo)}
                       </Link>
                     </h3>
-                    <p className="text-sm leading-6 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
+                    <p className="text-sm leading-6 text-slate-600"><KoreanAwareText text={pickLocale(locale, quest.summaryJa, quest.summaryKo)} locale={locale} /></p>
                     <ClosedTodayNotice closedWeekdays={getClosedWeekdays(quest.slug)} compact />
                   </li>
                 ))}

@@ -169,3 +169,30 @@ test("lists saved quests online and marks them in station results", async ({ pag
   await page.goto("/quests/dongdaemun-market-small-trim");
   await expect(page.getByRole("button", { name: "オフライン用に保存する" })).toBeVisible();
 });
+
+test("marks Korean words for screen readers and reflows at 200% text on quest screens", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  for (const path of ["/quests?area=myeongdong&purpose=food", "/quests/nearby?station=128", "/quests/courses", "/quests/changdeokgung-japanese-tour"]) {
+    await page.goto(path);
+    await expect(page.locator("h1")).toHaveCount(1);
+    await page.evaluate(() => document.querySelectorAll("main details").forEach((details) => { (details as HTMLDetailsElement).open = true; }));
+    const unmarked = await page.evaluate(() => {
+      const found: string[] = [];
+      const walker = document.createTreeWalker(document.querySelector("main")!, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const parent = node.parentElement!;
+        if (parent.closest("[aria-hidden=true]")) continue;
+        if (/[가-힣]/.test(node.textContent ?? "") && parent.closest("[lang]")?.getAttribute("lang") !== "ko") {
+          found.push((node.textContent ?? "").trim());
+        }
+      }
+      return found;
+    });
+    expect(unmarked, path).toEqual([]);
+
+    await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, path).toBeLessThanOrEqual(4);
+  }
+  await expect(page.locator("main [lang=ko]", { hasText: "금호문" }).first()).toBeAttached();
+});

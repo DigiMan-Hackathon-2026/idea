@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { KoreanAwareText } from "@/components/korean-text";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -358,8 +359,8 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
               <QuestExitLabel questId={quest.id} locale={locale} />
               <SavedQuestMark path={href} className="mt-1.5" />
               <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, quest.titleJa, quest.titleKo)}</h2>
-              <p className="mt-2 font-bold text-slate-600">{detail}</p>
-              <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>
+              <p className="mt-2 font-bold text-slate-600"><KoreanAwareText text={detail} locale={locale} /></p>
+              <p className="mt-2 leading-7 text-slate-600"><KoreanAwareText text={pickLocale(locale, quest.summaryJa, quest.summaryKo)} locale={locale} /></p>
               <Link href={href} className="seoul-button-dark mt-4 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-black">
                 {action}
               </Link>

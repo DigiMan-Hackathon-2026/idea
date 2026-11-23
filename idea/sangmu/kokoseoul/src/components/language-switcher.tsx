@@ -30,6 +30,7 @@ export function LanguageSwitcher() {
       onClick={switchLocale}
       disabled={isPending}
       aria-label={accessibleLabel}
+      lang={nextLocale}
       className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm font-bold text-[var(--foreground)] hover:bg-[var(--surface-muted)] disabled:cursor-wait disabled:opacity-65"
     >
       <span aria-hidden="true">◎</span>

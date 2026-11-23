@@ -38,12 +38,12 @@ function SelectField({
   children: React.ReactNode;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-bold text-slate-800">
+    <label className="grid min-w-0 gap-2 text-sm font-bold text-slate-800">
       <span>{label}</span>
       <select
         name={name}
         defaultValue={defaultValue}
-        className="min-h-12 rounded-xl border border-[var(--border)] bg-white px-4 text-base font-semibold text-slate-900 shadow-sm"
+        className="min-h-12 w-full min-w-0 rounded-xl border border-[var(--border)] bg-white px-4 text-base font-semibold text-slate-900 shadow-sm"
       >
         {children}
       </select>
