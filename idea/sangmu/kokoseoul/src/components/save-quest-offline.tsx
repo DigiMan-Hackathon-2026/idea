@@ -1,51 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
-import {
-  offlineQuestsKey,
-  parseOfflineQuests,
-  withOfflineQuest,
-  withoutOfflineQuest,
-  type OfflineQuest,
-} from "@/modules/content/offline-quests";
-
-const changed = "yeogiseoul:offline-quests-changed";
-
-function subscribe(listener: () => void) {
-  function onStorage(event: StorageEvent) {
-    if (event.key === offlineQuestsKey || event.key === null) listener();
-  }
-  window.addEventListener("storage", onStorage);
-  window.addEventListener(changed, listener);
-  return () => {
-    window.removeEventListener("storage", onStorage);
-    window.removeEventListener(changed, listener);
-  };
-}
-
-/** The stored string, `""` when empty, or `null` where this browser cannot keep it. */
-function readStored(): string | null {
-  if (!("serviceWorker" in navigator)) return null;
-  try {
-    return window.localStorage.getItem(offlineQuestsKey) ?? "";
-  } catch {
-    return null;
-  }
-}
-
-function write(list: OfflineQuest[]) {
-  try {
-    if (list.length) window.localStorage.setItem(offlineQuestsKey, JSON.stringify(list));
-    else window.localStorage.removeItem(offlineQuestsKey);
-    window.dispatchEvent(new Event(changed));
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { withOfflineQuest, withoutOfflineQuest, type OfflineQuest } from "@/modules/content/offline-quests";
+import { useOfflineQuests, writeOfflineQuests as write } from "@/modules/content/offline-quests-store";
 
 const buttonClass =
   "min-h-11 rounded-xl px-4 text-sm font-black focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#6789ca]";
@@ -57,10 +17,9 @@ const buttonClass =
 export function SaveQuestOffline({ quest }: { quest: Omit<OfflineQuest, "path" | "savedAt"> }) {
   const { locale } = useLocale();
   const path = usePathname();
-  const stored = useSyncExternalStore(subscribe, readStored, () => null);
+  const list = useOfflineQuests();
   const [failed, setFailed] = useState(false);
-  if (stored === null) return null;
-  const list = parseOfflineQuests(stored);
+  if (list === null) return null;
   const saved = list.some((item) => item.path === path);
 
   return (
