@@ -26,6 +26,7 @@
 - **퀘스트 화면.** `/quests/courses`에 노선 코스 6개(퀘스트 사이는 1km 안이면 걷기, 아니면 출구 역 사이 지하철), 퀘스트 상세에 단계 미리 보기·보여 줄 한국어 문장·공식 안내 확인일·역 이름 이야기, 코스·역 결과·상세에 매주 쉬는 요일(오늘이 그 요일이면 공식 안내 확인 권유)을 더했다. 홈에서 역 퀘스트로 바로 간다.
 - **퀘스트까지 가는 길.** 지하철 안내는 `?quest=<slug>`나 `?to=<역 코드>`로 도착역을 미리 채워 연다. 환승역은 출발역에 맞춰 갈아타기가 가장 적은 승강장을 고르고, 출발역이 비어 있으면 현재 위치로 가까운 역을 고를 수 있다. 저장된 이동 정보는 출발역을 고른 뒤에만 덮어쓴다.
 - **오프라인 퀘스트.** 퀘스트 상세의 저장 버튼을 누르면 공개 문구(출구·단계·한국어 카드·주소·정기 휴무)만 이 기기 `localStorage`에 남는다. 전파가 없을 때 그 상세 경로를 열면 service worker가 `/quest-offline.html`을 돌려주고 저장한 내용을 보여 준다. 퀘스트 HTML은 여전히 cache storage에 넣지 않는다.
+- **팀 idea 저장소 복사본.** 공개 저장소 `DigiMan-Hackathon-2026/idea`의 `idea/sangmu/kokoseoul`은 이 저장소의 커밋을 git 기록 없이 복사한 것이다. `pnpm idea:sync`는 `origin/main`을 복사했을 때 바뀌는 파일 수만 보여 주고, `pnpm idea:sync --push`가 커밋·푸시한다. 비밀값·로컬 경로·`.env` 파일·실제 이메일 주소가 있거나 폴더 밖이 바뀌면 멈추며, 커밋 작성자는 GitHub noreply 주소다.
 - **퀘스트 콘텐츠 검사.** `quest-content-rules.test.ts`가 DB 공개 규칙(단계 3~5개, 한·일 필수 문구, 길이, 소요 시간, 지역·목적, UUID, https 출처, 남은 `TODO`)을, `quest-exit-mentions.test.ts`가 문구 속 출구 번호를 확인한다. 초안을 JSON 뼈대로 바꾸는 `scripts/draft_to_visit_guide.py`가 있다.
 
 **자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.
@@ -56,7 +57,7 @@
 - F0 scaffold와 품질 workflow, 명시적 가상 demo의 일본어 랜딩·탐색·상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있고 code scope는 `UNRESTRICTED`다. 우상단 언어 버튼으로 한국어·일본어를 현재 화면에서 전환하며 선택은 1년 locale cookie로 페이지 이동 뒤에도 유지된다. 진행·완료·피드백·내 기록·삭제·정보 신고는 익명 visitor session과 PostgreSQL API에 연결됐다. 신고는 공개 상세 API의 `versionId`로 보내고 재전송은 같은 `clientRequestId`로 한 건에 수렴한다.
 - 고정 도구는 Node.js `24.19.0`, pnpm `12.21.0`, Next.js `16.4.6`, React `19.3.0`, TypeScript `5.9.3`, Vitest `5.1.1`, Playwright `1.65.1`이다. `4a33be9`를 새 디렉터리에 clone해 frozen install·전체 검사·360px smoke·clean status를 확인했고, CI 수정 `5622316`의 Actions run `44809901153`도 통과했다.
 - 조사 실행 게이트는 `DRAFT_ONLY`다. `JRxx @ commit` 일본어 검수 근거와 완료 시각을 기록하기 전에는 공개 모집·실제 인터뷰 기록을 시작하지 않는다.
-- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 64개 tooling 회귀 테스트, Markdown 118개, JSON block 46개, API endpoint 23개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
+- 현재 통합 검증은 `python3 scripts/verify_all.py`다. 68개 tooling 회귀 테스트, Markdown 118개, JSON block 46개, API endpoint 23개, 오류 code 14개와 조사 안전·evidence 참조·실행 gate·사전 코드 범위·대표 credential 패턴을 외부 package 없이 검사한다.
 - 구현 작업 기준은 Next.js App Router·TypeScript·PostgreSQL·Drizzle로 정리했다. Neon·Vercel은 계정과 요금제 확인 전 후보이며, 자세한 근거와 착수 게이트는 [기술 결정 v0.1](TECH_DECISIONS_v0.1.md)에 있다.
 - 외부 서비스의 현재 region·복구·비용 제약과 Singapore 배치 후보는 [외부 서비스 평가 v0.1](EXTERNAL_SERVICES_EVALUATION_v0.1.md)에 정리했다.
 - 세로 흐름별 의존성, 커밋 경계와 AC 연결은 [B2C 구현 계획 v0.1](IMPLEMENTATION_PLAN_v0.1.md)에 정리했다.

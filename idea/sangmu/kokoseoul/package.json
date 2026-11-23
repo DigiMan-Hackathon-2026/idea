@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.mts",
     "test:e2e": "playwright test",
+    "idea:sync": "python3 scripts/sync_idea_repo.py",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed:demo": "node --env-file-if-exists=.env.local scripts/db/seed-demo.mjs",
