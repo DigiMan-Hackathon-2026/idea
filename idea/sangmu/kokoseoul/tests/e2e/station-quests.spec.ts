@@ -45,6 +45,9 @@ test("points a station without quests to stations reachable by subway", async ({
 
 test("previews a step's Korean phrase card before starting the quest", async ({ page }) => {
   await page.goto("/quests/myeongdong-kyoja");
+  // A tap before hydration opens the <details> natively, then React replays the click and closes it
+  // (seen on the slow CI dev server). The offline-save box renders only once the page has hydrated.
+  await expect(page.getByRole("region", { name: "電波がないときのために" })).toBeVisible();
   const step = page.getByRole("listitem").filter({ hasText: "1人だと伝える" });
   await expect(step.getByText("한 명인데 여기서 기다리면 될까요?")).toBeHidden();
   await step.getByText("1人だと伝える").click();
