@@ -21,7 +21,7 @@ class SyncIdeaRepoTest(unittest.TestCase):
             (root / ".env.local").write_text("TMAP_APP_KEY=x\n", encoding="utf-8")
             (root / "notes.md").write_text("contact: someone" + "@gmail.com\n", encoding="utf-8")
             (root / "key.txt").write_text("AKIA" + "A" * 16 + "\n", encoding="utf-8")
-            (root / "image.bin").write_bytes(b"\0someone@gmail.com")
+            (root / "image.bin").write_bytes(b"\0someone" + b"@gmail.com")
 
             self.assertEqual(
                 sync.scan_snapshot(root),
