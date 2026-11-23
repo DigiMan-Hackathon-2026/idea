@@ -328,7 +328,10 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
         description={[getAreaLabel(filters.area, locale), filters.purpose ? getPurposeLabel(filters.purpose, locale) : null,
           pickLocale(locale, `${resultCount}件`, `${resultCount}개`)].filter(Boolean).join(" · ")}
       />
-      <section className="scenic-content seoul-surface rounded-2xl px-4 py-3 sm:px-6">
+      <Link href="/quests/adventure" className="scenic-content seoul-surface flex min-h-12 items-center rounded-2xl px-4 py-3 font-bold text-[var(--primary)] underline">
+        {pickLocale(locale, "路線別の冒険ノートを見る", "호선별 모험의 서 보기")}
+      </Link>
+      <section className="seoul-surface mt-3 rounded-2xl px-4 py-3 sm:px-6">
         <FilterForm filters={filters} />
       </section>
       <div className="mt-2 flex flex-wrap gap-x-5 text-sm font-bold text-[var(--primary)]">
