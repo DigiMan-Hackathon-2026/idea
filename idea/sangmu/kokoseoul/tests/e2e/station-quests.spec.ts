@@ -172,7 +172,7 @@ test("lists saved quests online and marks them in station results", async ({ pag
 
 test("marks Korean words for screen readers and reflows at 200% text on quest screens", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  for (const path of ["/quests?area=myeongdong&purpose=food", "/quests/nearby?station=128", "/quests/courses", "/quests/changdeokgung-japanese-tour"]) {
+  for (const path of ["/quests", "/quests?area=myeongdong&purpose=food", "/quests/nearby?station=128", "/quests/courses", "/quests/changdeokgung-japanese-tour"]) {
     await page.goto(path);
     await expect(page.locator("h1")).toHaveCount(1);
     await page.evaluate(() => document.querySelectorAll("main details").forEach((details) => { (details as HTMLDetailsElement).open = true; }));
@@ -190,7 +190,8 @@ test("marks Korean words for screen readers and reflows at 200% text on quest sc
     });
     expect(unmarked, path).toEqual([]);
 
-    await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+    // Slightly wider letters stand in for the wider CJK fonts on Linux CI.
+    await page.addStyleTag({ content: "html { font-size: 200% !important; } * { letter-spacing: 0.06em !important; }" });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, path).toBeLessThanOrEqual(4);
   }

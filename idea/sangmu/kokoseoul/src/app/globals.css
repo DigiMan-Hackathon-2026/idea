@@ -161,13 +161,16 @@ a {
 
 .seoul-nav {
   grid-area: nav;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Equal tabs in one row; when enlarged text no longer fits, whole tabs move to the next row. */
+  display: flex;
+  flex-wrap: wrap;
   gap: .25rem;
 }
 
 .seoul-nav a {
   display: grid;
+  flex: 1 1 0;
+  min-width: max-content;
   min-height: 2.75rem;
   place-items: center;
   border-radius: .55rem;
@@ -330,6 +333,7 @@ a {
     padding-block: .75rem;
   }
 
+  .seoul-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .seoul-nav a { padding-inline: .95rem; }
   .seoul-header-inner > button { justify-self: end; }
 }
