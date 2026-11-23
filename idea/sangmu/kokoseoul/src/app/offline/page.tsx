@@ -61,6 +61,10 @@ export default function OfflinePage() {
         <a href="/subway" style={{ display: "inline-flex", alignItems: "center", minHeight: "44px", marginTop: "12px", color: "#941e34" }}>
           地下鉄の保存情報を開く · 저장한 지하철 안내 열기
         </a>
+        <br />
+        <a href="/quest-offline.html" style={{ display: "inline-flex", alignItems: "center", minHeight: "44px", color: "#941e34" }}>
+          保存したクエストを開く · 저장한 퀘스트 열기
+        </a>
       </section>
     </main>
   );

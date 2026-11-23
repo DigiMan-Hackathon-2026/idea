@@ -109,3 +109,36 @@ test("finds the nearest station as the starting point for a quest route", async 
   await expect(guide.getByText("421 トンデムン", { exact: true }).first()).toBeVisible();
   await expect(guide.getByRole("button", { name: "現在地から駅を探す" })).toHaveCount(0);
 });
+
+test("keeps a saved quest readable offline without caching quest pages", async ({ page, context }) => {
+  // Sunday 10:00 in Seoul, the market's weekly closed day.
+  await page.clock.setFixedTime(new Date("2026-11-29T01:00:00Z"));
+  await page.goto("/quests/dongdaemun-market-small-trim");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  const save = page.getByRole("region", { name: "電波がないときのために" });
+  await save.getByRole("button", { name: "オフライン用に保存する" }).click();
+  await expect(save.getByRole("status")).toContainText("この端末に保存しました。");
+  expect(await page.evaluate(async () => (await caches.match("/quests/dongdaemun-market-small-trim")) === undefined)).toBe(true);
+
+  try {
+    await context.setOffline(true);
+    await page.reload();
+    const quest = page.getByRole("article", { name: /東大門総合市場でリボンやパーツを少量選ぶ/ });
+    await expect(quest).toContainText("東大門駅9番出口");
+    await expect(quest).toContainText("1号線 · 1호선");
+    await expect(quest.getByText(/^今日は日曜日です。毎週日曜は休みなので/)).toBeVisible();
+    await expect(quest.getByText("조금만 사고 싶어요. 최소 몇 개부터 살 수 있고 얼마인가요?")).toBeVisible();
+    await expect(quest.getByText("서울 종로구 종로 266")).toBeVisible();
+
+    // A quest page that was not saved points back to the saved one.
+    await page.goto("/quests/myeongdong-kyoja");
+    await expect(page.getByText(/^このページは保存されていません。/)).toBeVisible();
+    await page.getByRole("link", { name: /東大門総合市場でリボンやパーツを少量選ぶ/ }).click();
+    await page.getByRole("button", { name: /この端末から消す/ }).click();
+    await expect(page.getByText(/^この端末に保存したクエストはありません。/)).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
+  await page.goto("/quests/dongdaemun-market-small-trim");
+  await expect(page.getByRole("button", { name: "オフライン用に保存する" })).toBeVisible();
+});

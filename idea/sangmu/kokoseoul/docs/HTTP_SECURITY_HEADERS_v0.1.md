@@ -63,7 +63,7 @@ Cache-Control: no-cache, no-store, must-revalidate
 Content-Security-Policy: default-src 'self'; script-src 'self'
 ```
 
-worker는 offline fallback과 공개 설치 asset만 precache한다. `quests`, `runs`, `my`, API response와 locale·visitor별 HTML은 Cache Storage에 저장하지 않는다. navigation은 network-first이며 network 오류에서만 offline fallback을 반환한다.
+worker는 offline fallback과 공개 설치 asset만 precache한다. `quests`, `runs`, `my`, API response와 locale·visitor별 HTML은 Cache Storage에 저장하지 않는다. navigation은 network-first이며 network 오류에서만 offline fallback을 반환한다. `/quests/<slug>`의 fallback인 `/quest-offline.html`은 방문자가 직접 저장한 공개 퀘스트 문구를 `localStorage`에서 읽을 뿐이며 개인 상태나 퀘스트 HTML을 저장하지 않는다.
 
 ## CSP 목표
 
