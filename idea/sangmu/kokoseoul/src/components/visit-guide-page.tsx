@@ -6,6 +6,7 @@ import { ReportButton } from "@/components/report-button";
 import { SaveQuestOffline } from "@/components/save-quest-offline";
 import { SiteHeader } from "@/components/site-header";
 import { StartDemoButton } from "@/components/start-demo-button";
+import { AdventureReturnLink } from "@/components/adventure-return-link";
 import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { buildNaverPlaceUrl } from "@/lib/naver-map";
@@ -92,9 +93,11 @@ export function VisitGuidePage({
     <main className="min-h-dvh pb-24">
       <SiteHeader />
       <div className="seoul-page max-w-3xl">
-        <Link href={listHref} className="mb-5 inline-flex min-h-11 items-center text-sm font-bold text-slate-600">
+        <AdventureReturnLink locale={locale} className="mb-5 inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline" fallback={
+          <Link href={listHref} className="mb-5 inline-flex min-h-11 items-center text-sm font-bold text-slate-600">
           {pickLocale(locale, "クエスト一覧に戻る", "퀘스트 목록으로 돌아가기")}
-        </Link>
+          </Link>
+        } />
         <ScenicHero theme="dusk" title={pickLocale(locale, guide.titleJa, guide.titleKo)} />
         <article className="scenic-content seoul-surface rounded-2xl p-5 sm:p-8">
           <p className="leading-7 text-slate-600"><KoreanAwareText text={pickLocale(locale, guide.bodyJa, guide.bodyKo)} locale={locale} /></p>

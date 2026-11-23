@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { useModalDialog } from "@/hooks/use-modal-dialog";
+import { readAdventureOrigin, withAdventureOrigin } from "@/lib/adventure-origin";
 import { pickLocale } from "@/lib/locale";
 import {
   ensureVisitorSession,
@@ -43,7 +44,7 @@ export function StartDemoButton({
     try {
       await ensureVisitorSession();
       const run = await startQuestRun(questId);
-      router.push(run.completionPath ?? `/runs/${run.id}`);
+      router.push(withAdventureOrigin(run.completionPath ?? `/runs/${run.id}`, readAdventureOrigin(new URLSearchParams(window.location.search))));
     } catch (error) {
       setStartError(error instanceof QuestRunApiError && error.code === "QUEST_UNAVAILABLE" ? "unavailable" : "retry");
       setIsStarting(false);

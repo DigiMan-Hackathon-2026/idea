@@ -25,6 +25,7 @@ type StationStory = Pick<Card, "readingKoKana" | "hanja" | "titleJa" | "storyJa"
   sourceUrls: string[];
 };
 export type AlbumCard = StationName & {
+  code: string;
   related: (StationName & { lineId: number })[];
   characterSrc: string;
   story: StationStory | null;
@@ -54,6 +55,7 @@ export function getStationAlbum(requestedLine: unknown) {
     cards: stations.map(({ code, ko, ja }): AlbumCard => {
       const story = storiesByName.get(ko);
       return {
+        code,
         stationKey: ko,
         stationNameJa: story?.readingKoKana || ja,
         characterSrc: `/station-characters/${code}.webp`,

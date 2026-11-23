@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
-import { bookLink } from "@/lib/adventure-origin";
+import { bookLink, withAdventureOrigin } from "@/lib/adventure-origin";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { fetchMyRuns, QuestRunApiError, type MyRunSummaryDto } from "@/modules/progress/run-api";
 import { AlbumBackLink } from "./album-back-link";
@@ -251,15 +251,17 @@ export function AdventureBook({ line, station, missions, locale, book, missionId
 
   function missionActions(mission: AdventureMission, expanded = false) {
     const props = { locale, completed: isComplete(mission), storageAvailable: fieldAvailable, expanded };
+    const tab = adventureTabs.find(({ categories }) => categories.includes(mission.category));
+    const origin = tab ? { line: line.id, book: tab.id, mission: mission.id, station: stationCode } : null;
     if (mission.type === "field") {
-      const stationHref = expanded ? `/subway?station=${mission.station.code}#station-interior-title` : undefined;
+      const stationHref = expanded ? withAdventureOrigin(`/subway?station=${mission.station.code}#station-album-entry`, origin) : undefined;
       return <FieldMissionCard key={mission.id} mission={mission} {...props} stationHref={stationHref} />;
     }
-    if (mission.type === "quiz") return <QuizMissionCard key={mission.id} mission={mission} {...props} guideHref={mission.href} />;
+    if (mission.type === "quiz") return <QuizMissionCard key={mission.id} mission={mission} {...props} guideHref={withAdventureOrigin(mission.href, origin)} />;
     if (mission.type !== "quest") return null;
     const run = runs.get(mission.id);
     return <Link className={expanded ? styles.bookAction : styles.adventureLink} prefetch={false}
-      href={run?.status === "in_progress" ? `/runs/${run.id}` : mission.href}>
+      href={withAdventureOrigin(run?.status === "in_progress" ? `/runs/${run.id}` : mission.href, origin)}>
       {run?.status === "in_progress" ? t("クエストの続きへ", "퀘스트 이어하기") : t("訪問ガイドを見る", "방문 안내 보기")}
     </Link>;
   }
@@ -307,6 +309,11 @@ export function AdventureBook({ line, station, missions, locale, book, missionId
         {missionMeta(selectedMission)}
         {selectedMission.type === "quest" && <p className={styles.questSummary}>{selectedMission.summary[locale]}</p>}
         {missionActions(selectedMission, true)}
+        <p><Link className={styles.adventureLink} prefetch={false} href={{
+          pathname: "/station-album",
+          query: { line: line.id, station: selectedMission.station.ko, fromLine: line.id, fromBook: activeTab.id, fromMission: selectedMission.id, fromStation: stationCode },
+          hash: "station-story",
+        }}>{t(`${selectedMission.station.ja}駅のスタンプを見る`, `${selectedMission.station.ko}역 스탬프 보기`)}</Link></p>
       </> : <>
         {missionId && <p role="status">{t("この項目は開けません。体験できる項目を一覧から選べます。", "이 항목은 열 수 없어요. 목록에서 지금 할 수 있는 항목을 골라보세요.")}</p>}
         <p className={styles.note}>{t(`今できる項目 ${readyMissions.length}件`, `지금 할 수 있는 항목 ${readyMissions.length}개`)}</p>

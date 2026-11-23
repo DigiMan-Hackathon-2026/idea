@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense, useRef, useState, type ReactNode } from "react";
 import { useLocale } from "@/components/locale-provider";
+import { AdventureReturnLink } from "@/components/adventure-return-link";
 import { SubwayDirectionGuide } from "@/components/subway-direction-guide";
 import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale } from "@/lib/locale";
@@ -34,7 +35,10 @@ export function SubwayPageContent({ readings, exitGuide, initialStation = "", ro
         description={pickLocale(locale, "ソウル地下鉄1〜9号線", "서울 지하철 1~9호선")}
       />
       <div className="scenic-content"><SubwayDirectionGuide readings={readings} onViewStation={viewStation} routeTarget={routeTarget} /></div>
-      <StationInteriorGuide code={guideStation} onSelect={setGuideStation} onNearbySelect={viewStation} readings={readings} titleRef={guideTitle} />
+      <div id="station-album-entry" className="scroll-mt-4">
+        <AdventureReturnLink locale={locale} className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline" />
+        <StationInteriorGuide code={guideStation} onSelect={setGuideStation} onNearbySelect={viewStation} readings={readings} titleRef={guideTitle} />
+      </div>
       <details className="mt-5 rounded-xl border border-[var(--border)] bg-white px-4 sm:px-6">
         <summary className="min-h-12 cursor-pointer py-3.5 font-bold">
           {pickLocale(locale, "聖水駅の構内・3番出口を見る", "성수역 층별 안내·3번 출구 보기")}

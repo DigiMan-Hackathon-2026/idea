@@ -106,7 +106,7 @@ export function getLineTwoExtraSlots(): AdventureMission[] {
       title: words(`${name}역에서 환승하기`, `${stop.ja}駅で乗り換える`),
       question: words("이 역에서 2호선과 갈아탈 수 있는 호선은 무엇일까요?", "この駅で2号線から乗り換えられるのは何号線でしょう？"),
       options: options.map((line) => words(`${line}호선`, `${line}号線`)),
-      href: `/subway?station=${stop.code}#station-interior-title`,
+      href: `/subway?station=${stop.code}#station-album-entry`,
     };
   });
   return [...pending, ...walks, ...nameQuizzes, ...transferQuizzes];
