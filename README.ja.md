@@ -16,6 +16,7 @@ idea/
 ├── sangmu/     이상무（イ・サンム）
 │   └── kokoseoul/       1. 地下鉄案内サービス（ココソウル：案内・クエスト・スタンプ）
 ├── jonghoon/   임종훈（イム・ジョンフン）
+│   └── handcarry/       3. ハンドキャリー仲介
 ├── minyoung/   허민영（ホ・ミニョン）
 └── yeeun/      유예은（ユ・イェウン）
 ```
@@ -68,6 +69,8 @@ idea/
 - **提案:** 임종훈
 - **内容:** 日本人旅行者が日本限定の商品を持ってきて韓国の購入者に渡し、ウォンで精算を受ける。
 - **状況:** 企画書（PRD）あり、デモあり
+- **コード:** [`idea/jonghoon/handcarry`](idea/jonghoon/handcarry)（デモ画面と説明は [`idea/jonghoon/README.md`](idea/jonghoon/README.md)、韓国語）
+- **デモ:** https://handcarry-prototype.vercel.app/buyer
 - **検討が必要:** 本人確認、購入の証明、安全な受け渡し方法
 
 ### 4. クスリ

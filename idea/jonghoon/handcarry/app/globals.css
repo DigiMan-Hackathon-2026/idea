@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* DESIGN.md (ShopVibe) tokens. Fuchsia primary is reserved for actionable targets. */
+@theme {
+  --color-primary: #d946ef;
+  --color-primary-hover: #c026d3;
+  --color-primary-active: #a21caf;
+  --color-primary-soft: #fdf4ff;
+  --color-secondary: #22d3ee;
+  --color-tertiary: #facc15;
+  --color-canvas: #fafafa;
+  --color-surface: #ffffff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  --color-ink: #171717;
+  --color-ink-2: #525252;
+  --color-ink-3: #a3a3a3;
+  --color-line: #e5e5e5;
+  --color-line-strong: #d4d4d4;
+  --color-muted: #f5f5f5;
+
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-subtle: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-medium: 0 4px 6px rgb(0 0 0 / 0.07), 0 2px 4px rgb(0 0 0 / 0.05);
+  --shadow-large: 0 10px 25px rgb(0 0 0 / 0.1), 0 6px 10px rgb(0 0 0 / 0.06);
+  --shadow-overlay: 0 25px 50px rgb(0 0 0 / 0.15), 0 12px 24px rgb(0 0 0 / 0.08);
+}
+
+/* Latin glyphs come from the DESIGN.md fonts; Korean and Japanese fall back to Noto Sans.
+   Japanese screens put Noto Sans JP first so shared Han characters use Japanese forms. */
+@theme inline {
+  --font-display: var(--font-poppins), var(--font-noto-kr), var(--font-noto-jp), sans-serif;
+  --font-body: var(--font-nunito), var(--font-noto-kr), var(--font-noto-jp), sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+}
+
+:lang(ja) {
+  --font-display: var(--font-poppins), var(--font-noto-jp), var(--font-noto-kr), sans-serif;
+  --font-body: var(--font-nunito), var(--font-noto-jp), var(--font-noto-kr), sans-serif;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}

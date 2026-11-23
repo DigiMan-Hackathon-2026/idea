@@ -16,6 +16,7 @@ idea/
 ├── sangmu/     이상무
 │   └── kokoseoul/       1. 지하철 안내 서비스 (여기서울: 안내·퀘스트·스탬프)
 ├── jonghoon/   임종훈
+│   └── handcarry/       3. 핸드캐리 중개
 ├── minyoung/   허민영
 └── yeeun/      유예은
 ```
@@ -68,6 +69,8 @@ idea/
 - **제안:** 임종훈
 - **내용:** 일본인 여행자가 일본 한정 상품을 가져와 한국 구매자에게 전달하고 원화로 정산받는다.
 - **상태:** 기획서(PRD) 있음, 데모 있음
+- **코드:** [`idea/jonghoon/handcarry`](idea/jonghoon/handcarry) (시연 화면과 설명은 [`idea/jonghoon/README.md`](idea/jonghoon/README.md))
+- **데모:** https://handcarry-prototype.vercel.app/buyer
 - **검토 필요:** 본인 인증, 구매 증빙, 안전한 전달 방식
 
 ### 4. 쿠스리
