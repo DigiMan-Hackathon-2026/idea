@@ -259,7 +259,7 @@ export function NaverQuestMap({
           position,
           title: pickLocale(locale, quest.titleJa, quest.titleKo),
           icon: {
-            content: `<button type="button" aria-label="${escapeAttribute(`${index + 1}. ${pickLocale(locale, quest.titleJa, quest.titleKo)}`)}" style="display:grid;place-items:center;width:38px;height:38px;border:3px solid white;border-radius:999px;background:#941e34;color:white;font:900 14px system-ui;box-shadow:0 8px 20px rgba(15,23,42,.24)">${index + 1}</button>`,
+            content: `<button type="button" lang="${locale}" aria-label="${escapeAttribute(`${index + 1}. ${pickLocale(locale, quest.titleJa, quest.titleKo)}`)}" style="display:grid;place-items:center;width:38px;height:38px;border:3px solid white;border-radius:999px;background:#941e34;color:white;font:900 14px system-ui;box-shadow:0 8px 20px rgba(15,23,42,.24)">${index + 1}</button>`,
             anchor: new maps.Point(19, 19),
           },
         });
@@ -279,7 +279,7 @@ export function NaverQuestMap({
             `${quest.transitGuide.stationKo} ${quest.transitGuide.exitKo}`,
           ),
           icon: {
-            content: `<div style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#504e49;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:${quest.transitGuide.lineColor};color:white;font-size:14px">${quest.transitGuide.lineCode}</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
+            content: `<div lang="${locale}" style="display:grid;grid-template-columns:28px auto;align-items:center;gap:7px;padding:5px 10px 5px 5px;border:3px solid white;border-radius:999px;background:#fff;color:#504e49;font:800 12px system-ui;white-space:nowrap;box-shadow:0 8px 20px rgba(15,23,42,.2)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:${quest.transitGuide.lineColor};color:white;font-size:14px">${quest.transitGuide.lineCode}</span>${pickLocale(locale, quest.transitGuide.stationJa, quest.transitGuide.stationKo)}</div>`,
             anchor: new maps.Point(19, 19),
           },
         });
@@ -392,10 +392,11 @@ export function NaverQuestMap({
   }
 
   return (
-    <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
+    <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-label={pickLocale(locale, "クエスト地図", "퀘스트 지도")}>
       <div className="seoul-surface relative min-h-[26rem] overflow-hidden rounded-xl lg:min-h-[32rem]">
         <div className="absolute inset-0">
-          <div ref={containerRef} className="h-full w-full" data-testid="naver-map" />
+          {/* The NAVER map draws its own Korean legend and links; our markers set their own language. */}
+          <div ref={containerRef} lang="ko" className="h-full w-full" data-testid="naver-map" />
         </div>
         {loadState !== "ready" ? (
           <div className="absolute inset-0 grid place-items-center bg-[#edf1ef]" role="status">
@@ -441,7 +442,7 @@ export function NaverQuestMap({
       </div>
 
       {selectedQuest ? (
-        <article className="seoul-surface self-start rounded-xl p-5">
+        <article className="seoul-surface min-w-0 self-start rounded-xl p-5 [overflow-wrap:anywhere]">
           <p className="text-xs font-black tracking-[0.12em] text-[#941e34]">
             {getAreaLabel(selectedQuest.areaCode, locale).toUpperCase()}
           </p>

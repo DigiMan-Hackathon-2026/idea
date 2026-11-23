@@ -45,6 +45,9 @@ test("points a station without quests to stations reachable by subway", async ({
 
 test("previews a step's Korean phrase card before starting the quest", async ({ page }) => {
   await page.goto("/quests/myeongdong-kyoja");
+  // A tap before hydration opens the <details> natively, then React replays the click and closes it
+  // (seen on the slow CI dev server). The offline-save box renders only once the page has hydrated.
+  await expect(page.getByRole("region", { name: "電波がないときのために" })).toBeVisible();
   const step = page.getByRole("listitem").filter({ hasText: "1人だと伝える" });
   await expect(step.getByText("한 명인데 여기서 기다리면 될까요?")).toBeHidden();
   await step.getByText("1人だと伝える").click();
@@ -172,7 +175,7 @@ test("lists saved quests online and marks them in station results", async ({ pag
 
 test("marks Korean words for screen readers and reflows at 200% text on quest screens", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  for (const path of ["/quests?area=myeongdong&purpose=food", "/quests/nearby?station=128", "/quests/courses", "/quests/changdeokgung-japanese-tour"]) {
+  for (const path of ["/quests", "/quests?area=myeongdong&purpose=food", "/quests/nearby?station=128", "/quests/courses", "/quests/changdeokgung-japanese-tour"]) {
     await page.goto(path);
     await expect(page.locator("h1")).toHaveCount(1);
     await page.evaluate(() => document.querySelectorAll("main details").forEach((details) => { (details as HTMLDetailsElement).open = true; }));
@@ -190,7 +193,8 @@ test("marks Korean words for screen readers and reflows at 200% text on quest sc
     });
     expect(unmarked, path).toEqual([]);
 
-    await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+    // Slightly wider letters stand in for the wider CJK fonts on Linux CI.
+    await page.addStyleTag({ content: "html { font-size: 200% !important; } * { letter-spacing: 0.06em !important; }" });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, path).toBeLessThanOrEqual(4);
   }

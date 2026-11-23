@@ -354,7 +354,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
       {featured.length > 0 ? (
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {featured.map(({ quest, href, label, detail, action }) => (
-            <article key={quest.id} className="seoul-surface flex flex-col items-start rounded-xl p-5 sm:p-6">
+            <article key={quest.id} className="seoul-surface flex min-w-0 flex-col items-start rounded-xl p-5 [overflow-wrap:anywhere] sm:p-6">
               <p className="seoul-kicker text-sm">{label}</p>
               <QuestExitLabel questId={quest.id} locale={locale} />
               <SavedQuestMark path={href} className="mt-1.5" />
