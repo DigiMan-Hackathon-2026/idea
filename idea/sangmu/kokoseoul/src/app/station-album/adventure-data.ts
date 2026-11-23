@@ -1,8 +1,8 @@
 import "server-only";
 
-import { getQuestAccess } from "@/modules/content/quest-access";
+import { findStationQuests, getQuestAccess } from "@/modules/content/quest-access";
 import { getCatalogQuestPath, questCatalog } from "@/modules/content/quest-catalog";
-import { subwayStations, type SubwayLine } from "@/modules/transit/subway-stations";
+import { subwayStations, type SubwayLine, type SubwayStation } from "@/modules/transit/subway-stations";
 import { getLineTwoExtraSlots } from "./line-two-book";
 
 export type AdventureCategory = "journey" | "food" | "sights" | "culture" | "shopping" | "show"
@@ -142,4 +142,18 @@ export function getLineAdventureMissions(line: SubwayLine): AdventureMission[] {
     return { ...mission, type: "field", station };
   });
   return [...quests, ...fields, ...(line === 2 ? getLineTwoExtraSlots() : [])];
+}
+
+export function getStationAdventureMissions(station: SubwayStation): AdventureMission[] {
+  const missions = getLineAdventureMissions(station.line).filter((mission) => mission.station.code === station.code);
+  const seen = new Set(missions.map(({ id }) => id));
+  for (const { quest, match } of findStationQuests(station.code)) {
+    if (match !== "exit" || seen.has(quest.id)) continue;
+    missions.push({
+      type: "quest", id: quest.id, station, category: "journey", optional: optionalQuests.has(quest.slug),
+      title: { ko: quest.titleKo, ja: quest.titleJa }, href: getCatalogQuestPath(quest),
+      summary: { ko: quest.summaryKo, ja: quest.summaryJa }, durationMinutes: quest.durationMinutes,
+    });
+  }
+  return missions;
 }

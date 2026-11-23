@@ -6,6 +6,7 @@ import { bookLink } from "@/lib/adventure-origin";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { fetchMyRuns, QuestRunApiError, type MyRunSummaryDto } from "@/modules/progress/run-api";
 import { AlbumBackLink } from "./album-back-link";
+import type { SubwayStation } from "@/modules/transit/subway-stations";
 import type { AlbumLine } from "./album-data";
 import type { AdventureCategory, AdventureMission } from "./adventure-data";
 import styles from "./station-album.module.css";
@@ -155,19 +156,22 @@ function QuizMissionCard({ mission, locale, completed, storageAvailable, expande
   );
 }
 
-export function AdventureBook({ line, missions, locale, book, missionId }: {
+export function AdventureBook({ line, station, missions, locale, book, missionId }: {
   line: AlbumLine;
+  station?: SubwayStation;
   missions: AdventureMission[];
   locale: Locale;
   book?: string;
   missionId?: string;
 }) {
   const t = (ja: string, ko: string) => pickLocale(locale, ja, ko);
-  const name = t(`${line.id}号線`, `${line.id}호선`);
+  const lineName = t(`${line.id}号線`, `${line.id}호선`);
+  const name = station ? t(`${station.ja}駅`, `${station.ko}역`) : lineName;
   const bookTitle = t(`${name}の冒険ノート`, `${name} 모험의 서`);
+  const stationCode = station?.code;
   const [request, setRequest] = useState(0);
   const [history, setHistory] = useState<{ request: number; runs: MyRunSummaryDto[]; error?: true }>();
-  const openedFrom = useRef<{ lineId: number; tabId: string; missionId: string; scrollY: number }>(null);
+  const openedFrom = useRef<{ lineId: number; stationCode?: string; tabId: string; missionId: string; scrollY: number }>(null);
   const fieldSnapshot = useSyncExternalStore(subscribe, readFieldRecords, () => null);
   const fieldAvailable = fieldSnapshot !== null && fieldSnapshot !== "unavailable";
   const fields = new Set<string>(fieldAvailable ? JSON.parse(fieldSnapshot) as string[] : []);
@@ -204,7 +208,7 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
   useEffect(() => {
     const previous = openedFrom.current;
     if (!previous) return;
-    if (previous.lineId !== line.id || previous.tabId !== activeTabId) {
+    if (previous.lineId !== line.id || previous.stationCode !== stationCode || previous.tabId !== activeTabId) {
       openedFrom.current = null;
       return;
     }
@@ -215,7 +219,7 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
       openedFrom.current = null;
     });
     return () => cancelAnimationFrame(frame);
-  }, [activeTabId, line.id, selectedMissionId]);
+  }, [activeTabId, line.id, selectedMissionId, stationCode]);
   const readyMissions = tabMissions.filter(({ type }) => type !== "planned");
   const plannedMissions = tabMissions.filter(({ type }) => type === "planned");
   const ongoing = missions.find(({ id, type }) => type === "quest" && runs.get(id)?.status === "in_progress");
@@ -272,7 +276,7 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
   const progressNote = plannedCount > 0
     ? t("今できる必須項目の達成数を表示します。路線の称号はすべての項目がそろったら公開します。", "지금 할 수 있는 필수 항목의 완료 수를 보여줘요. 호선 칭호는 모든 항목이 준비되면 열려요.")
     : t("必須のクエストや体験を完了すると達成率に反映されます。", "필수 퀘스트와 체험을 완료하면 달성률에 반영돼요.");
-  const milestoneList = total > 0 && plannedCount === 0 && <ul className={styles.adventureGoals}>
+  const milestoneList = !station && total > 0 && plannedCount === 0 && <ul className={styles.adventureGoals}>
     {milestones.map((goal) => (
       <li key={goal.percent} data-earned={percent !== null && percent >= goal.percent}>
         <strong>{goal.title}</strong>
@@ -280,11 +284,18 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
       </li>
     ))}
   </ul>;
+  const stationIndexLink = <Link className={styles.adventureLink} href={{ ...bookLink(line.id, "stations"), hash: "book-page" }} prefetch={false}>
+    {t("駅からクエストを探す", "역별 모험의 서 보기")}
+  </Link>;
+  const nearbyLink = station && <Link className={styles.adventureLink} href={{ pathname: "/quests/nearby", query: { station: station.code }, hash: "station-quests" }} prefetch={false}>
+    {t("この駅の近くのクエストを探す", "이 역 주변 퀘스트 찾기")}
+  </Link>;
+
   if (activeTab) return (
     <section id="book-page" className={styles.bookPage} style={{ "--line-color": line.color } as CSSProperties} aria-labelledby="book-page-title">
       <header className={styles.albumPageHeader}>
         <AlbumBackLink
-          href={{ ...bookLink(line.id, selectedMission ? activeTab.id : undefined, undefined), hash: selectedMission ? "book-page" : "adventure-book" }}
+          href={{ ...bookLink(line.id, selectedMission ? activeTab.id : undefined, undefined, stationCode), hash: selectedMission ? "book-page" : "adventure-book" }}
           label={selectedMission ? t(`${activeTab.ja}の一覧に戻る`, `${activeTab.ko} 목록으로 돌아가기`) : t("冒険ノートの目次に戻る", "모험의 서 목차로 돌아가기")}
         />
         <div>
@@ -304,9 +315,9 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
           return items.length > 0 && <section key={id} className={styles.bookList} aria-labelledby={`book-list-${id}`}>
             <h3 id={`book-list-${id}`}>{t(ja, ko)}</h3>
             <ul>{items.map((mission) => <li key={mission.id}>
-              <Link id={`book-mission-${mission.id}`} href={{ ...bookLink(line.id, activeTab.id, mission.id), hash: "book-page" }} prefetch={false}
+              <Link id={`book-mission-${mission.id}`} href={{ ...bookLink(line.id, activeTab.id, mission.id, stationCode), hash: "book-page" }} prefetch={false}
                 onNavigate={() => {
-                  openedFrom.current = { lineId: line.id, tabId: activeTab.id, missionId: mission.id, scrollY: window.scrollY };
+                  openedFrom.current = { lineId: line.id, stationCode, tabId: activeTab.id, missionId: mission.id, scrollY: window.scrollY };
                 }}>
                 <strong>{mission.title[locale]}</strong>
                 {missionMeta(mission)}
@@ -330,23 +341,27 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
     <section id="adventure-book" className={styles.adventureBook} style={{ "--line-color": line.color } as CSSProperties}
       aria-label={bookTitle}>
       <div className={styles.bookContents}>
+        {station && <AlbumBackLink href={{ ...bookLink(line.id, "stations"), hash: "book-page" }} label={t("駅の一覧に戻る", "역 목록으로 돌아가기")} />}
         <h1>{bookTitle}</h1>
         {plannedCount > 0 && <p className={styles.note}>{availabilityText}</p>}
         {percent !== null && <p className={styles.note}>{t(`必須の目標 ${done} / ${total}`, `필수 목표 ${done} / ${total}`)}</p>}
+        {station && total === 0 && missions.every(({ type }) => type === "planned") &&
+          <p className={styles.note}>{t("この駅の体験は準備中です。", "이 역의 체험은 준비 중이에요.")}</p>}
         {ongoing && missionActions(ongoing, true)}
         {suggested && suggestedTab && <Link className={styles.adventureSuggestion} prefetch={false}
-          href={{ ...bookLink(line.id, suggestedTab.id, suggested.id), hash: "book-page" }}>
+          href={{ ...bookLink(line.id, suggestedTab.id, suggested.id, stationCode), hash: "book-page" }}>
           <span>{t("今できる体験", "지금 할 수 있는 체험")}</span>
           <strong>{suggested.title[locale]}</strong>
         </Link>}
         <nav aria-label={t("冒険ノートの項目", "모험 수첩 항목")}>
-          {tabs.map((tab) => <Link key={tab.id} href={{ ...bookLink(line.id, tab.id, undefined), hash: "book-page" }} prefetch={false}>
+          {tabs.map((tab) => <Link key={tab.id} href={{ ...bookLink(line.id, tab.id, undefined, stationCode), hash: "book-page" }} prefetch={false}>
             <strong>{t(tab.ja, tab.ko)}</strong>
             <span>{tab.id === "experiences" && tab.available < tab.count
               ? t(`今できる ${tab.available}件 · 全${tab.count}件`, `지금 가능 ${tab.available}개 · 전체 ${tab.count}개`)
               : t(`${tab.count}枠`, `${tab.count}칸`)}</span>
           </Link>)}
         </nav>
+        {station ? nearbyLink : stationIndexLink}
         {total > 0 && <details className={styles.bookProgressInfo}>
           <summary>{t("達成率と報酬について", "달성률과 보상 안내")}</summary>
           <p className={styles.note}>{progressNote}</p>
@@ -368,7 +383,10 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
           {progressReady && <p>{t(`必須の目標 ${done} / ${total}`, `필수 목표 ${done} / ${total}`)}</p>}
           {milestoneList}
         </>}
-        <p className={styles.note}>{progressNote}</p>
+        {station && !missions.length
+          ? <p className={styles.note}>{t("この駅の体験は準備中です。", "이 역의 체험은 준비 중이에요.")}</p>
+          : <p className={styles.note}>{progressNote}</p>}
+        {station ? <>{nearbyLink}<p>{stationIndexLink}</p></> : stationIndexLink}
         {historyStatus}
       </div>
       <div className={styles.adventurePages}>
@@ -384,7 +402,7 @@ export function AdventureBook({ line, missions, locale, book, missionId }: {
                     <li key={mission.id} className={mission.type === "planned" ? styles.plannedMission : undefined}>
                       {missionMeta(mission)}
                       <h4>{mission.type !== "planned" && tab
-                        ? <Link href={{ ...bookLink(line.id, tab.id, mission.id), hash: "book-page" }} prefetch={false}>{mission.title[locale]}</Link>
+                        ? <Link href={{ ...bookLink(line.id, tab.id, mission.id, stationCode), hash: "book-page" }} prefetch={false}>{mission.title[locale]}</Link>
                         : mission.title[locale]}</h4>
                       {missionActions(mission)}
                     </li>
