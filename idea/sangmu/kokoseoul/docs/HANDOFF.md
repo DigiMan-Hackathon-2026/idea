@@ -28,7 +28,7 @@
 - **오프라인 퀘스트.** 퀘스트 상세의 저장 버튼을 누르면 공개 문구(출구·단계·한국어 카드·주소·정기 휴무)만 이 기기 `localStorage`에 남는다. 전파가 없을 때 그 상세 경로를 열면 service worker가 `/quest-offline.html`을 돌려주고 저장한 내용을 보여 준다. 퀘스트 HTML은 여전히 cache storage에 넣지 않는다. 저장한 퀘스트는 `/quests` 위의 "保存したクエスト / 저장한 퀘스트" 칸에 모이고(오늘이 정기 휴무면 강조, 칸에서 지우기), 퀘스트 목록·역 결과·코스에는 "オフライン保存済み / 오프라인 저장됨" 표시가 붙는다.
 - **팀 idea 저장소 복사본.** 공개 저장소 `DigiMan-Hackathon-2026/idea`의 `idea/sangmu/kokoseoul`은 이 저장소의 커밋을 git 기록 없이 복사한 것이다. `pnpm idea:sync`는 `origin/main`을 복사했을 때 바뀌는 파일 수만 보여 주고, `pnpm idea:sync --push`가 커밋·푸시한다. 비밀값·로컬 경로·`.env` 파일·실제 이메일 주소가 있거나 폴더 밖이 바뀌면 멈추며, 커밋 작성자는 GitHub noreply 주소다.
 - **퀘스트 화면 접근성 점검.** axe-core를 임시로 주입해 퀘스트 화면을 점검했고 위반은 0건이다. 일본어 문장 속 한국어는 `KoreanAwareText`로 `lang="ko"`가 붙고, 단계 `詳しく` 대비, 지도 marker 이름, 200% 확대 시 필터 넘침을 고쳤다. 기록과 남은 항목은 [접근성 문서](ACCESSIBILITY_VERIFICATION_v0.1.md#퀘스트-화면-자동-점검-기록-2026-11-23)에 있다.
-- **노선 도감 기획.** 호선별로 퀘스트·역 방문·맛집·전망·체험을 칸으로 채우는 수집 화면의 기획은 [노선 도감 기획](LINE_BOOK_PLAN_v0.1.md)에 있다. 아직 구현하지 않았다.
+- **노선 도감 기획.** 호선별로 퀘스트·역 방문·맛집·전망·체험을 칸으로 채우는 수집 화면의 기획은 [노선 도감 기획](LINE_BOOK_PLAN_v0.1.md)에 있다. 2·3·4호선 칸 데이터와 달성률 계산(`src/modules/content/line-book/`)은 구현했다. 화면은 아직 없다.
 - **퀘스트 콘텐츠 검사.** `quest-content-rules.test.ts`가 DB 공개 규칙(단계 3~5개, 한·일 필수 문구, 길이, 소요 시간, 지역·목적, UUID, https 출처, 남은 `TODO`)을, `quest-exit-mentions.test.ts`가 문구 속 출구 번호를 확인한다. 초안을 JSON 뼈대로 바꾸는 `scripts/draft_to_visit_guide.py`가 있다.
 
 **자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.

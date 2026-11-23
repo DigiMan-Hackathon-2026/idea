@@ -1,6 +1,6 @@
 # 노선 도감 기획 v0.1
 
-작성일: 2026-11-23 · 상태: 구현 착수용 기획 초안 · 기준 커밋: `8c481c2`
+작성일: 2026-11-23 · 상태: 기획 초안, 콘텐츠 데이터 구현 · 기준 커밋: `8c481c2`
 
 로스트아크 모험의 서처럼 **한 지역을 얼마나 경험했는지 퍼센트와 칸 채우기로 보여 주는 수집 화면**을 여기서울에 만든다. 로스트아크는 대륙별로 나누지만 여기서울은 **지하철 호선별**로 나눈다. 각 호선의 대표 역 주변에서 할 수 있는 맛집, 공연장, 문화생활, 관광지 경험으로 칸을 채운다.
 
@@ -152,41 +152,54 @@
 
 ## 6. 데이터와 구현
 
-```ts
-type LineBookCategory =
-  | "course" | "station" | "food" | "view" | "experience" | "local-item"
-  | "landmark" | "series" | "story" | "regular" | "transfer";
+실제 타입은 [`types.ts`](../src/modules/content/line-book/types.ts)에 있다. 칸 하나는 다음 필드를 가진다.
 
-type LineBookEntry = {
-  id: string;                    // 안정적인 슬러그
-  lines: SubwayLine[];           // 환승역 항목은 여러 호선
-  category: LineBookCategory;
-  stationCode: string;           // 대표 역
-  titleJa: string; titleKo: string;
-  check:
-    | { kind: "quest"; questSlugs: string[]; mode?: "basic" | "challenge" }
-    | { kind: "location"; point: GeographicPoint; radiusM: number }
-    | { kind: "self"; requiresLocation?: { point: GeographicPoint; radiusM: number } }
-    | { kind: "transfer"; stationCodes: string[] }
-    | { kind: "unlock"; afterEntryIds: string[] };
-  weight: number;
-  verifiedAt: string; sourceUrl: string;   // 콘텐츠 확인 기준
-};
-```
+- `id`, `lines`(환승역 항목은 여러 호선), `category`, `stationCode`, `titleJa`/`titleKo`, `weight`
+- `check`: 완료 조건. 다음 다섯 가지 중 하나다.
+  - `quest`(퀘스트 완료)
+  - `location`(좌표·반경)
+  - `unlock`(다른 칸 완료 후 열림)
+  - `transfer`(환승역 목록, 부분 점수)
+  - `revisit`(다른 날 횟수, 부분 점수)
 
-- **콘텐츠:** `src/modules/content/line-book/<호선>.json`(호선별 파일). 퀘스트·출구는 `quest-access`의 연결을 그대로 쓰고, 좌표는 `station-coordinates.json`과 `quest-search-locations.json`을 쓴다.
+본인 확인(`self`)은 수집품 칸에 퀘스트가 아닌 항목이 생길 때 추가한다. 출처와 확인일은 칸이 아니라 참조하는 퀘스트·역 데이터에 있다.
+
+- **콘텐츠:** 아래 "구현된 콘텐츠 데이터"를 따른다. 사람이 정하는 부분은 `curation.json` 하나에 두고, 나머지는 기존 데이터에서 만든다.
 - **진행:** 퀘스트 완료는 서버 진행 기록에서 계산한다. 위치·본인·환승·숨은 이야기는 기기 저장소(`yeogiseoul.line-book.v1`)에 `{entryId, checkedAt}`만 남긴다. 오프라인 퀘스트 저장과 같은 방식으로 `useSyncExternalStore` 저장소를 만든다.
-- **달성률 계산:** 순수 함수 `computeLineProgress(entries, progress)`로 만들고 단위 테스트를 붙인다. 보상 구간 계산과 `보상 모두 받기`(받은 구간 기록)도 같은 모듈에 둔다.
+- **달성률 계산:** 순수 함수 `computeLineProgress(book, progress)`로 구현했다(단위 테스트 포함). `보상 모두 받기`로 받은 구간 기록은 화면 쪽에서 기기 저장소에 둔다.
 - **화면:** `/line-book`(호선 칩), `/line-book/[line]`. 칸 상세 시트에서 `/subway?to=<역코드>`와 퀘스트 상세로 이어 준다.
 - **다른 담당과의 경계:**
   - 역 방문과 스탬프는 같은 위치 확인을 쓴다. 스탬프 담당과 "스탬프를 받으면 역 방문 칸도 채운다"를 합의한다.
   - 환승 마스터는 지하철 안내에서 환승 완료 이벤트가 나와야 한다. 안내 담당과 이벤트 형식을 맞춘다.
 
+### 구현된 콘텐츠 데이터 (2026-11-23)
+
+화면보다 먼저 칸에 들어갈 데이터와 달성률 계산을 만들었다. 새 장소는 넣지 않았다. 이미 공개 기준을 통과한 퀘스트, 역 데이터, 역 이름 유래 카드, 노선 코스만 엮었다.
+
+| 파일 | 역할 |
+| --- | --- |
+| `src/modules/content/line-book/curation.json` | 사람이 정하는 부분만 둔다: 열린 호선, 퀘스트별 항목, 노선 코스·대표 명소, 연작 묶음, 역 방문 15곳, 이야기 7곳, 가중치 |
+| `src/modules/content/line-book/build.ts` | 위 파일과 기존 데이터로 칸 목록을 만든다. `getLineBook(line)`은 열리지 않은 호선이면 `null`을 돌려준다 |
+| `src/modules/content/line-book/progress.ts` | `computeLineProgress(book, progress)`: 칸별 완료(0~1), 항목별 개수, 달성률(소수 한 자리), 받은 10% 보상 단계 |
+| `src/modules/content/line-book/types.ts` | 칸과 완료 조건 타입 |
+
+- **자동으로 정해지는 것:** 칸 제목은 퀘스트·코스 제목과 역 이름에서 가져온다. 역 방문 좌표는 `station-coordinates.json`에서, 반경은 스탬프와 같은 200m다. 숨은 이야기 제목은 역 카드의 일본어 제목에서 가져오고, 그 역 방문 칸을 채우면 열린다. 환승 마스터는 1~9호선 안에서 같은 이름의 역이 다른 호선에도 있으면 환승역으로 센다.
+- **칸 id는 저장 기록이 참조한다.** 형식은 `quest:<slug>`, `station:<역코드>`, `story:<역코드>`, `course:<slug>`, `landmark:<slug>`, `series:<id>`, `regular:<호선>`, `transfer:<호선>`이다. 바꾸면 저장된 진행이 끊긴다.
+- **환승역 퀘스트:** 퀘스트 칸 하나가 열린 호선 전부에 들어간다. 지금은 동대문(1·4호선)이 1호선이 닫혀 있어 4호선에만 나온다. 연작 `한양도성 성곽 두 구간`은 3·4호선에 함께 들어간다.
+- **대표 명소로 고른 퀘스트**는 그 호선에서는 체험 칸이 아니라 대표 명소 칸으로만 나온다.
+- `build.ts`는 역 카드 전체(약 320개)를 읽는다. 화면에서는 서버 컴포넌트에서 `getLineBook`을 부르고, 결과만 클라이언트로 넘긴다.
+
+| 호선 | 칸 | 가중치 합 | 구성 | 비어 있는 곳 |
+| --- | --- | --- | --- | --- |
+| 2호선 | 33 | 81 | 코스 1, 역 방문 15, 맛집 1, 체험 5, 수집품 1, 연작 1, 이야기 7, 단골·환승(19곳) | 전망 0, 대표 명소 없음, 맛집 1 |
+| 3호선 | 34 | 82 | 코스 1, 역 방문 15, 맛집 2, 전망 2, 체험 1, 수집품 1, 명소(창덕궁) 1, 연작 2, 이야기 7, 단골·환승(10곳) | 체험·맛집 보강 |
+| 4호선 | 36 | 98 | 코스 1, 역 방문 15, 맛집 1, 전망 1, 체험 5, 수집품 1, 명소(국립중앙박물관 사유의 방) 1, 연작 2, 이야기 7, 단골·환승(10곳) | 맛집·전망 보강 |
+
 ## 7. 단계
 
 | 단계 | 내용 | 완료 기준 |
 | --- | --- | --- |
-| 1 | 데이터 형식, 달성률·보상 계산, 4호선 항목 작성(기존 퀘스트 + 역 방문 + 숨은 이야기) | 단위 테스트, 4호선 도감 화면 e2e |
+| 1 | 데이터 형식, 달성률·보상 계산, 2·3·4호선 항목 작성(기존 퀘스트 + 역 방문 + 숨은 이야기) **— 데이터와 계산 완료** | 단위 테스트(완료), 4호선 도감 화면 e2e |
 | 2 | 3·2호선 추가, 위치 확인 칸, 칸 상세 시트, 보상 트랙 | 위치 확인 e2e(가짜 위치), 접근성 점검 |
 | 3 | 스탬프·환승 연동, 단골도 | 담당자 합의 후 e2e |
 | 4 | 1·5호선과 새 퀘스트(후보 검증 후) | 콘텐츠 확인 기록 |
