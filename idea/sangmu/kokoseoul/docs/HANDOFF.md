@@ -25,6 +25,7 @@
 - **퀘스트 문구 수정은 새 버전으로 공개한다.** 콘텐츠 파일과 출구 목록의 `versionId`를 바꾸고 `pnpm db:publish:content --apply`(Preview는 `--preview` 추가)를 실행한다. 서울풍물시장·낙산·남산·윤동주 시인의 언덕 4개가 Preview 공개를 기다린다. 절차는 [앱에 올리는 순서](../research/desk/quest-drafts/PUBLISHING.md).
 - **퀘스트 화면.** `/quests/courses`에 노선 코스 6개(퀘스트 사이는 1km 안이면 걷기, 아니면 출구 역 사이 지하철), 퀘스트 상세에 단계 미리 보기·보여 줄 한국어 문장·공식 안내 확인일·역 이름 이야기, 코스·역 결과·상세에 매주 쉬는 요일(오늘이 그 요일이면 공식 안내 확인 권유)을 더했다. 홈에서 역 퀘스트로 바로 간다.
 - **퀘스트까지 가는 길.** 지하철 안내는 `?quest=<slug>`나 `?to=<역 코드>`로 도착역을 미리 채워 연다. 환승역은 출발역에 맞춰 갈아타기가 가장 적은 승강장을 고르고, 출발역이 비어 있으면 현재 위치로 가까운 역을 고를 수 있다. 저장된 이동 정보는 출발역을 고른 뒤에만 덮어쓴다.
+- **오프라인 퀘스트.** 퀘스트 상세의 저장 버튼을 누르면 공개 문구(출구·단계·한국어 카드·주소·정기 휴무)만 이 기기 `localStorage`에 남는다. 전파가 없을 때 그 상세 경로를 열면 service worker가 `/quest-offline.html`을 돌려주고 저장한 내용을 보여 준다. 퀘스트 HTML은 여전히 cache storage에 넣지 않는다.
 - **퀘스트 콘텐츠 검사.** `quest-content-rules.test.ts`가 DB 공개 규칙(단계 3~5개, 한·일 필수 문구, 길이, 소요 시간, 지역·목적, UUID, https 출처, 남은 `TODO`)을, `quest-exit-mentions.test.ts`가 문구 속 출구 번호를 확인한다. 초안을 JSON 뼈대로 바꾸는 `scripts/draft_to_visit_guide.py`가 있다.
 
 **자동 Preview 배포.** `main`에 push되고 `Quality` workflow가 통과하면 [Preview Deploy](../.github/workflows/preview-deploy.yml)가 같은 commit을 Vercel Preview 환경 변수(테스트 전용 PostgreSQL)로 빌드해 배포한다. Production에는 배포하지 않는다. 배포 주소는 GitHub의 `preview` environment와 workflow 실행 요약에 남고, 웹 화면은 `<배포 주소>/`, 스마트폰 틀 화면은 `<배포 주소>/mobile-preview`다. Actions 탭에서 수동 실행도 된다.

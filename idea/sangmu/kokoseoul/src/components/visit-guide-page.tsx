@@ -2,12 +2,16 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { QuestAccessCard } from "@/components/quest-access-card";
 import { ReportButton } from "@/components/report-button";
+import { SaveQuestOffline } from "@/components/save-quest-offline";
 import { SiteHeader } from "@/components/site-header";
 import { StartDemoButton } from "@/components/start-demo-button";
 import { ScenicHero } from "@/components/scenic-hero";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { buildNaverPlaceUrl } from "@/lib/naver-map";
 import { getPublicQuest } from "@/modules/content/get-public-quest.server";
+import type { OfflineQuest } from "@/modules/content/offline-quests";
+import { getQuestAccess } from "@/modules/content/quest-access";
+import { getClosedWeekdays } from "@/modules/content/quest-closures";
 
 type VisitGuide = {
   id: string;
@@ -53,6 +57,25 @@ function formatCheckedDate(value: string, locale: Locale) {
   }).format(new Date(value));
 }
 
+/** The guide's public text in the shape the offline quest screen reads. */
+function toOfflineQuest(guide: VisitGuide): Omit<OfflineQuest, "path" | "savedAt"> {
+  const access = getQuestAccess(guide.id);
+  return {
+    titleJa: guide.titleJa,
+    titleKo: guide.titleKo,
+    exitJa: access?.exit.nameJa ?? null,
+    exitKo: access?.exit.nameKo ?? null,
+    lines: access?.exit.stations.map((station) => station.line) ?? [],
+    straightLineM: access ? Math.round(access.straightLineM / 10) * 10 : null,
+    closedWeekdays: access ? getClosedWeekdays(access.quest.slug) : [],
+    addressKo: guide.place.addressKo,
+    verifiedAt: guide.place.verifiedAt ?? null,
+    steps: guide.steps.map(({ titleJa, titleKo, bodyJa, bodyKo, phraseJa, phraseKo }) => ({
+      titleJa, titleKo, bodyJa, bodyKo, phraseJa, phraseKo,
+    })),
+  };
+}
+
 export function VisitGuidePage({
   guide,
   locale,
@@ -75,6 +98,7 @@ export function VisitGuidePage({
         <article className="scenic-content seoul-surface rounded-2xl p-5 sm:p-8">
           <p className="leading-7 text-slate-600">{pickLocale(locale, guide.bodyJa, guide.bodyKo)}</p>
           <QuestAccessCard questId={guide.id} locale={locale} />
+          <SaveQuestOffline quest={toOfflineQuest(guide)} />
           <ol className="mt-6 grid gap-2 border-s-2 border-[var(--primary)] ps-3">
             {guide.steps.map((step, index) => {
               const body = step.bodyJa && step.bodyKo ? pickLocale(locale, step.bodyJa, step.bodyKo) : null;
