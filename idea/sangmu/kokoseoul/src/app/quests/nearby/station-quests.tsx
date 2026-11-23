@@ -2,6 +2,7 @@ import Link from "next/link";
 import { pickLocale, type Locale } from "@/lib/locale";
 import { findQuestStationsFrom, findStationQuests, listQuestAccesses, stationQuestRadiusM } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
+import { SavedQuestMark } from "@/components/saved-quests";
 import { findCourseByQuestStation } from "@/modules/content/quest-courses";
 import { getSubwayStation, type SubwayStation } from "@/modules/transit/subway-network";
 import { subwayLineColors } from "@/modules/transit/subway-line-colors";
@@ -85,6 +86,7 @@ export function StationQuests({ path, stationCode, locale }: { path: string; sta
                           </>
                         : <span>{pickLocale(locale, `駅から直線 ${metres(distanceM)} · 最寄りは${exit.nameJa}`, `역에서 직선 ${metres(distanceM)} · 가까운 출구는 ${exit.nameKo}`)}</span>}
                       {quest.durationMinutes ? <span>· {quest.durationMinutes}{pickLocale(locale, "分", "분")}</span> : null}
+                      <SavedQuestMark path={getCatalogQuestPath(quest)} />
                     </p>
                     <h3 className="mt-1 break-words text-base font-black">
                       <Link href={getCatalogQuestPath(quest)} className="inline-flex min-h-11 items-center text-[var(--primary)] underline">

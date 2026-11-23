@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { FilterForm } from "@/components/filter-form";
 import { QuestExitLabel } from "@/components/quest-access-card";
 import { QuestResultsView } from "@/components/quest-results-view";
+import { SavedQuestMark, SavedQuestsPanel } from "@/components/saved-quests";
 import { SiteHeader } from "@/components/site-header";
 import {
   DEMO_QUESTS,
@@ -340,6 +341,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
           {pickLocale(locale, "現在地から近くの駅・構内図を探す", "현재 위치에서 가까운 역과 안내도 찾기")}
         </Link>
       </div>
+      <SavedQuestsPanel />
 
       {quests.length > 0 ? (
         <QuestResultsView
@@ -354,6 +356,7 @@ async function QuestResults({ searchParams }: { searchParams: SearchParams }) {
             <article key={quest.id} className="seoul-surface flex flex-col items-start rounded-xl p-5 sm:p-6">
               <p className="seoul-kicker text-sm">{label}</p>
               <QuestExitLabel questId={quest.id} locale={locale} />
+              <SavedQuestMark path={href} className="mt-1.5" />
               <h2 className="mt-2 text-2xl font-black text-[#504e49]">{pickLocale(locale, quest.titleJa, quest.titleKo)}</h2>
               <p className="mt-2 font-bold text-slate-600">{detail}</p>
               <p className="mt-2 leading-7 text-slate-600">{pickLocale(locale, quest.summaryJa, quest.summaryKo)}</p>

@@ -142,3 +142,30 @@ test("keeps a saved quest readable offline without caching quest pages", async (
   await page.goto("/quests/dongdaemun-market-small-trim");
   await expect(page.getByRole("button", { name: "オフライン用に保存する" })).toBeVisible();
 });
+
+test("lists saved quests online and marks them in station results", async ({ page }) => {
+  // Sunday 10:00 in Seoul, the market's weekly closed day.
+  await page.clock.setFixedTime(new Date("2026-11-29T01:00:00Z"));
+  await page.goto("/quests");
+  await expect(page.getByRole("heading", { name: /^(?:あなたに合うクエスト)/ })).toBeVisible();
+  await expect(page.getByRole("region", { name: /^保存したクエスト/ })).toHaveCount(0);
+
+  await page.goto("/quests/dongdaemun-market-small-trim");
+  await page.getByRole("button", { name: "オフライン用に保存する" }).click();
+  await expect(page.getByText("この端末に保存しました。", { exact: false })).toBeVisible();
+
+  await page.goto("/quests/nearby?station=128");
+  const result = page.getByRole("listitem").filter({ has: page.getByRole("link", { name: "東大門総合市場でリボンやパーツを少量選ぶ" }) });
+  await expect(result.getByText("オフライン保存済み")).toBeVisible();
+
+  await page.goto("/quests");
+  const saved = page.getByRole("region", { name: "保存したクエスト（1件）" });
+  await expect(saved.getByRole("link", { name: "東大門総合市場でリボンやパーツを少量選ぶ" })).toBeVisible();
+  await expect(saved).toContainText("東大門駅9番出口");
+  await expect(saved.getByText(/^今日は日曜日です。/)).toBeVisible();
+  await saved.getByRole("button", { name: "「東大門総合市場でリボンやパーツを少量選ぶ」をこの端末から消す" }).click();
+  await expect(page.getByRole("region", { name: /^保存したクエスト/ })).toHaveCount(0);
+
+  await page.goto("/quests/dongdaemun-market-small-trim");
+  await expect(page.getByRole("button", { name: "オフライン用に保存する" })).toBeVisible();
+});

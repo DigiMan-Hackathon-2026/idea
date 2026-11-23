@@ -25,7 +25,7 @@
 - **퀘스트 문구 수정은 새 버전으로 공개한다.** 콘텐츠 파일과 출구 목록의 `versionId`를 바꾸고 `pnpm db:publish:content --apply`(Preview는 `--preview` 추가)를 실행한다. 서울풍물시장·낙산·남산·윤동주 시인의 언덕 4개가 Preview 공개를 기다린다. 절차는 [앱에 올리는 순서](../research/desk/quest-drafts/PUBLISHING.md).
 - **퀘스트 화면.** `/quests/courses`에 노선 코스 6개(퀘스트 사이는 1km 안이면 걷기, 아니면 출구 역 사이 지하철), 퀘스트 상세에 단계 미리 보기·보여 줄 한국어 문장·공식 안내 확인일·역 이름 이야기, 코스·역 결과·상세에 매주 쉬는 요일(오늘이 그 요일이면 공식 안내 확인 권유)을 더했다. 홈에서 역 퀘스트로 바로 간다.
 - **퀘스트까지 가는 길.** 지하철 안내는 `?quest=<slug>`나 `?to=<역 코드>`로 도착역을 미리 채워 연다. 환승역은 출발역에 맞춰 갈아타기가 가장 적은 승강장을 고르고, 출발역이 비어 있으면 현재 위치로 가까운 역을 고를 수 있다. 저장된 이동 정보는 출발역을 고른 뒤에만 덮어쓴다.
-- **오프라인 퀘스트.** 퀘스트 상세의 저장 버튼을 누르면 공개 문구(출구·단계·한국어 카드·주소·정기 휴무)만 이 기기 `localStorage`에 남는다. 전파가 없을 때 그 상세 경로를 열면 service worker가 `/quest-offline.html`을 돌려주고 저장한 내용을 보여 준다. 퀘스트 HTML은 여전히 cache storage에 넣지 않는다.
+- **오프라인 퀘스트.** 퀘스트 상세의 저장 버튼을 누르면 공개 문구(출구·단계·한국어 카드·주소·정기 휴무)만 이 기기 `localStorage`에 남는다. 전파가 없을 때 그 상세 경로를 열면 service worker가 `/quest-offline.html`을 돌려주고 저장한 내용을 보여 준다. 퀘스트 HTML은 여전히 cache storage에 넣지 않는다. 저장한 퀘스트는 `/quests` 위의 "保存したクエスト / 저장한 퀘스트" 칸에 모이고(오늘이 정기 휴무면 강조, 칸에서 지우기), 퀘스트 목록·역 결과·코스에는 "オフライン保存済み / 오프라인 저장됨" 표시가 붙는다.
 - **팀 idea 저장소 복사본.** 공개 저장소 `DigiMan-Hackathon-2026/idea`의 `idea/sangmu/kokoseoul`은 이 저장소의 커밋을 git 기록 없이 복사한 것이다. `pnpm idea:sync`는 `origin/main`을 복사했을 때 바뀌는 파일 수만 보여 주고, `pnpm idea:sync --push`가 커밋·푸시한다. 비밀값·로컬 경로·`.env` 파일·실제 이메일 주소가 있거나 폴더 밖이 바뀌면 멈추며, 커밋 작성자는 GitHub noreply 주소다.
 - **퀘스트 콘텐츠 검사.** `quest-content-rules.test.ts`가 DB 공개 규칙(단계 3~5개, 한·일 필수 문구, 길이, 소요 시간, 지역·목적, UUID, https 출처, 남은 `TODO`)을, `quest-exit-mentions.test.ts`가 문구 속 출구 번호를 확인한다. 초안을 JSON 뼈대로 바꾸는 `scripts/draft_to_visit_guide.py`가 있다.
 

@@ -8,6 +8,7 @@ import { pickLocale, type Locale } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/locale.server";
 import type { CourseLeg } from "@/modules/content/quest-access";
 import { getCatalogQuestPath } from "@/modules/content/quest-catalog";
+import { SavedQuestMark } from "@/components/saved-quests";
 import { getClosedWeekdays } from "@/modules/content/quest-closures";
 import { questCourses, resolveCourse } from "@/modules/content/quest-courses";
 
@@ -85,6 +86,7 @@ export default async function QuestCoursesPage() {
                         {access.exit.stations.map(({ line, code }) => <QuestLineBadge key={code} line={line} locale={locale} />)}
                         <span>{pickLocale(locale, access.exit.nameJa, access.exit.nameKo)}</span>
                         {access.quest.durationMinutes ? <span>· {access.quest.durationMinutes}{pickLocale(locale, "分", "분")}</span> : null}
+                        <SavedQuestMark path={getCatalogQuestPath(access.quest)} />
                       </p>
                       <h3 className="mt-1 break-words text-base font-black">
                         <Link href={getCatalogQuestPath(access.quest)} className="inline-flex min-h-11 items-center text-[var(--primary)] underline">
