@@ -8,6 +8,8 @@ B2C 반응형 웹과 설치 가능한 PWA를 먼저 구현하고, 사용자와 �
 
 - [현재 구현 준비도](docs/READINESS_STATUS.md)
 - [열린 결정과 우선순위](docs/DECISION_QUEUE.md)
+- [여기서울 제품 요구사항 PRD](docs/PRD_v0.1.md)
+- [여기서울 기술 요구사항 TRD](docs/TRD_v0.1.md)
 - [B2C 설계 스펙 v0.1](docs/B2C_SPEC_v0.1.md)
 - [도메인 용어·명명 계약 v0.1](docs/DOMAIN_GLOSSARY_v0.1.md)
 - [B2C API 요청과 응답 예시 v0.1](docs/API_EXAMPLES_B2C_v0.1.md)
