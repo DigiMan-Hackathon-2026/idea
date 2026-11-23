@@ -1,0 +1,1484 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>オミヤゲ・ソウル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Maru+Gothic:wght@400;500;700&family=Gowun+Dodum&family=Gowun+Batang:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F4F3F0; --paper:#FFFFFF; --peach:#DCCCAC; --peach-soft:#EFE7D6;
+  --coral:#AE1932; --coral-deep:#8E1428; --sky:#BCD0EC; --sky-deep:#558BCF;
+  --butter:#F6B65A; --mint:#CFE0D9; --lilac:#E0DFDE;
+  --ink:#2F2D29; --ink-2:#504E48; --ink-3:#8F8C84; --line:#E4E2DD;
+  --r-lg:28px; --r-md:20px; --r-sm:14px;
+  --shadow:0 8px 24px rgba(60,55,50,.08), 0 1px 2px rgba(60,55,50,.06);
+  --serif:"Shippori Mincho", serif;
+  --sans:"Zen Maru Gothic", "Hiragino Maru Gothic ProN", system-ui, sans-serif;
+  --ko:"Gowun Dodum", "Apple SD Gothic Neo", sans-serif;
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+html[lang="ko"]{ --serif:"Gowun Batang", serif; --sans:"Gowun Dodum","Apple SD Gothic Neo",sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:#E9E8E5;
+  background-image:radial-gradient(circle at 15% 20%,#F2DCDF 0,transparent 40%),radial-gradient(circle at 85% 80%,#D6E2F2 0,transparent 40%);
+  font-family:var(--sans);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;gap:56px;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit;color:inherit}
+
+/* ---------- desktop side caption ---------- */
+.side{max-width:280px}
+.side h1{font-family:var(--serif);font-size:40px;line-height:1.15;margin-bottom:14px}
+.side p{color:var(--ink-2);font-size:14px;line-height:1.8}
+.side .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.side .chips span{font-size:12px;background:var(--paper);border:1px solid var(--line);padding:6px 10px;border-radius:99px}
+.swatches{margin-top:26px;display:grid;gap:8px}
+.swatches p{font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;margin-bottom:2px}
+.sw{display:flex;align-items:center;gap:10px;font-size:12px}
+.sw i{width:28px;height:28px;border-radius:9px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.sw small{color:var(--ink-3);font-family:ui-monospace,monospace;margin-left:auto}
+@media (max-width:860px){.side{display:none}}
+.phrase{background:#345F53 !important}
+
+/* ---------- phone ---------- */
+.phone{
+  width:390px;height:min(844px, calc(100dvh - 32px));min-height:560px;flex:none;background:var(--cream);border-radius:52px;
+  border:10px solid #1E1A18;box-shadow:0 40px 80px rgba(30,28,25,.25);
+  position:relative;overflow:hidden;display:flex;flex-direction:column;
+}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:32px;background:#1E1A18;border-radius:20px;z-index:40}
+@media (max-width:500px){
+  body{display:block;background:var(--cream)}
+  .phone{width:100%;height:100dvh;border:0;border-radius:0;box-shadow:none}
+  .notch{display:none}
+}
+.statusbar{height:52px;flex:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px;font-size:13px;font-weight:700}
+.screens{flex:1;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:auto;padding:4px 20px 150px;display:none;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:block}
+.screen.go-fwd{animation:slideL .42s cubic-bezier(.2,.8,.2,1)}
+.screen.go-back{animation:slideR .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes slideL{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes slideR{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+
+/* stagger entrance */
+.stagger > *{animation:rise .55s var(--spring) both;animation-delay:calc(var(--i,0) * 70ms)}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.pop-in{animation:popIn .45s var(--spring) both}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.leaving{animation:leave .28s ease forwards}
+@keyframes leave{to{opacity:0;transform:translateX(60px) scale(.9);height:0;margin:0;padding:0}}
+.bump{animation:bump .3s var(--spring)}
+@keyframes bump{50%{transform:scale(1.25)}}
+.swap{animation:swap .4s var(--spring)}
+@keyframes swap{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.flip{animation:flip .5s ease}
+@keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+.fade-lang{animation:fadeLang .35s ease}
+@keyframes fadeLang{from{opacity:.2;filter:blur(2px)}to{opacity:1;filter:none}}
+
+/* ---------- common ---------- */
+.appbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0 14px;min-height:60px}
+.brand{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px}
+.brand .logo svg{width:24px;height:24px;display:block}
+.back{width:38px;height:38px;border-radius:50%;background:var(--paper);box-shadow:var(--shadow);display:grid;place-items:center;font-size:20px;transition:transform .2s var(--spring)}
+.back:active{transform:scale(.88)}
+.step{font-size:12px;color:var(--ink-3);font-weight:700;letter-spacing:.08em}
+.h-serif{font-family:var(--serif);font-weight:800;font-size:34px;line-height:1.2;letter-spacing:-.01em}
+.h2{font-family:var(--serif);font-weight:800;font-size:26px;line-height:1.3}
+.sub{color:var(--ink-2);font-size:13px;margin-top:6px}
+.label{font-size:13px;font-weight:700;color:var(--ink-2);margin:22px 0 10px}
+.card{background:var(--paper);border-radius:var(--r-md);box-shadow:var(--shadow);padding:16px}
+.tabs{display:flex;gap:18px;font-size:13px;font-weight:700;margin-bottom:18px;border-bottom:1px solid var(--line);position:relative}
+.tabs button{padding:10px 0;color:var(--ink-3);font-weight:700;display:flex;align-items:center;transition:color .2s}
+.tabs button.on{color:var(--ink)}
+.tabs .ink{position:absolute;bottom:-1px;height:2px;background:var(--ink);transition:left .3s var(--spring),width .3s var(--spring)}
+.tabs .dot{display:inline-grid;place-items:center;min-width:16px;height:16px;border-radius:99px;background:var(--coral);color:#fff;font-size:10px;margin-left:4px;padding:0 4px}
+.tabs .dot:empty,.tabs .dot[data-n="0"]{display:none}
+
+.btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:99px;background:var(--ink);color:#fff;font-weight:700;font-size:16px;transition:transform .2s var(--spring), background .2s;box-shadow:0 10px 24px rgba(47,45,41,.25)}
+.btn:active{transform:scale(.96)}
+.btn.coral{background:var(--coral);box-shadow:0 10px 24px rgba(174,25,50,.4)}
+.btn .arrow{transition:transform .2s}
+.btn:hover .arrow{transform:translateX(4px)}
+.cta-wrap{position:absolute;left:0;right:0;bottom:86px;padding:0 20px;z-index:8;transition:transform .35s var(--spring),opacity .25s;pointer-events:none}
+.cta-wrap .btn{pointer-events:auto}
+.cta-wrap.hide{transform:translateY(30px);opacity:0}
+.cta-wrap.hide .btn{pointer-events:none}
+
+.chip{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:99px;background:var(--paper);border:1.5px solid var(--line);font-size:13px;font-weight:500;transition:background .2s,color .2s,border-color .2s,transform .2s var(--spring);white-space:nowrap}
+.chip:active{transform:scale(.92)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.seg{position:relative;display:flex;background:#E9E7E2;border-radius:99px;padding:4px}
+.seg button{position:relative;z-index:1;flex:1;height:38px;border-radius:99px;font-size:13px;font-weight:700;color:var(--ink-2);transition:color .2s}
+.seg button.on{color:var(--ink)}
+.seg .knob{position:absolute;top:4px;bottom:4px;border-radius:99px;background:var(--paper);box-shadow:0 2px 6px rgba(0,0,0,.08);transition:left .35s var(--spring),width .35s var(--spring)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:ripple .55s ease-out forwards;pointer-events:none}
+.chip:not(.on) .ripple{background:rgba(174,25,50,.25)}
+@keyframes ripple{to{transform:scale(1);opacity:0}}
+
+/* ---------- language pill ---------- */
+.lang{position:absolute;top:66px;right:20px;z-index:12;display:flex;background:var(--paper);border-radius:99px;padding:3px;box-shadow:var(--shadow)}
+.lang button{position:relative;z-index:1;font-size:11px;font-weight:700;padding:6px 9px;border-radius:99px;color:var(--ink-3);transition:color .2s}
+.lang button.on{color:#fff}
+.lang .knob{position:absolute;top:3px;bottom:3px;border-radius:99px;background:var(--ink);transition:left .35s var(--spring),width .35s var(--spring)}
+
+/* ---------- nav ---------- */
+.nav{position:absolute;left:12px;right:12px;bottom:14px;height:64px;background:var(--paper);border-radius:24px;box-shadow:0 10px 30px rgba(50,45,40,.12);display:flex;justify-content:space-around;align-items:center;z-index:9}
+.nav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--ink-3);flex:1;min-width:0;transition:color .2s}
+.nav .ai-tab .ic{width:50px;height:50px;margin-top:-30px;padding:6px 7px 4px;background:var(--paper);border-radius:50%;box-shadow:0 6px 18px rgba(50,45,40,.18);filter:none;opacity:1;transform:none}
+.nav .ai-tab.on .ic{box-shadow:0 0 0 3px var(--coral),0 6px 18px rgba(50,45,40,.18);transform:translateY(-3px)}
+.nav .ai-tab.on::after{display:none}
+.nav button .ic{font-size:20px;line-height:1;filter:grayscale(1);opacity:.55;transition:transform .3s var(--spring),filter .2s,opacity .2s}
+.nav button.on{color:var(--ink)}
+.nav button.on .ic{filter:none;opacity:1;transform:translateY(-3px) scale(1.15)}
+.nav button.on::after{content:"";position:absolute;bottom:-8px;width:5px;height:5px;border-radius:50%;background:var(--coral)}
+
+/* ---------- mascot ---------- */
+.mascot svg{display:block;width:100%;height:auto;overflow:visible}
+.mascot .bob{animation:bob 2.6s ease-in-out infinite;transform-origin:60px 110px}
+.mascot .eye{animation:blink 4s infinite;transform-box:fill-box;transform-origin:center}
+.mascot .bow{animation:wiggle 3s ease-in-out infinite;transform-origin:60px 36px}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.mascot.jump .bob{animation:jump .7s var(--spring) infinite}
+@keyframes jump{0%,100%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-18px) scale(.95,1.05)}60%{transform:translateY(0) scale(1.08,.92)}}
+
+/* ---------- home ---------- */
+.date{font-size:13px;color:var(--ink-2);margin:6px 0 18px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border-radius:var(--r-md);padding:14px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;text-align:center;transition:transform .25s var(--spring);cursor:pointer}
+.tile:hover{transform:translateY(-3px) rotate(-1deg)}
+.tile:nth-child(2):hover{transform:translateY(-3px) rotate(1deg)}
+.tile .t{font-size:12px;font-weight:700;opacity:.75}
+.tile .v{font-family:var(--serif);font-size:32px;font-weight:800}
+.tile .u{font-size:12px;font-weight:500}
+.tile.sky{background:var(--sky)}
+.tile.butter{background:var(--butter)}
+.hero{position:relative;margin-top:14px;background:var(--peach-soft);border-radius:var(--r-lg);padding:20px 18px 20px 130px;min-height:150px;overflow:hidden;cursor:pointer}
+.hero .mascot{position:absolute;left:8px;bottom:-4px;width:118px}
+.hero q{font-family:var(--serif);font-size:17px;font-weight:600;line-height:1.55;quotes:"「" "」";display:block}
+html[lang="ko"] .hero q{quotes:"“" "”"}
+.hero small{display:block;font-size:12px;color:var(--ink-2);margin-top:8px}
+.recent{display:flex;align-items:center;gap:12px;margin-top:10px;cursor:pointer;transition:transform .2s}
+.recent:active{transform:scale(.98)}
+.recent .ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none}
+.recent b{font-size:14px}
+.recent p{font-size:12px;color:var(--ink-3)}
+.recent .arrow{margin-left:auto;color:var(--ink-3)}
+.fav-item{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.fav-item .pic{width:52px;height:52px;border-radius:16px;background:#EEEDE9;display:grid;place-items:center;font-size:26px;flex:none}
+.fav-item b{font-size:14px;display:block}
+.fav-item p{font-size:12px;color:var(--ink-3)}
+
+/* ---------- groups ---------- */
+.group{position:relative;margin-bottom:12px}
+.group .top{display:flex;align-items:center;gap:12px}
+.group .emoji{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:24px;flex:none}
+.group .name{font-weight:700;font-size:15px}
+.group .meta{font-size:12px;color:var(--ink-3)}
+.group .del{margin-left:auto;color:var(--ink-3);font-size:18px;width:32px;height:32px;border-radius:50%;transition:.2s}
+.group .del:hover{background:#EEEDE9;color:var(--coral-deep);transform:rotate(90deg)}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.row > span{font-size:13px;color:var(--ink-2);font-weight:500}
+.stepper{display:flex;align-items:center;gap:4px;background:#EEEDE9;border-radius:99px;padding:4px}
+.stepper button{width:30px;height:30px;border-radius:50%;background:var(--paper);font-size:16px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:transform .15s var(--spring)}
+.stepper button:active{transform:scale(.8)}
+.stepper output{min-width:70px;text-align:center;font-weight:700;font-size:14px;display:inline-block}
+.add{width:100%;border:2px dashed #D6D3CC;border-radius:var(--r-md);padding:16px;color:var(--ink-2);font-weight:700;font-size:14px;transition:.2s}
+.add:hover{border-color:var(--coral);color:var(--coral)}
+.sumbar{margin-top:16px;display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;border-radius:var(--r-md);padding:14px 18px}
+.sumbar small{opacity:.7;font-size:11px;display:block}
+.sumbar b{font-size:18px}
+
+/* ---------- conditions ---------- */
+.datefield{display:flex;align-items:center;justify-content:space-between;background:var(--paper);border-radius:var(--r-sm);padding:12px 14px;box-shadow:var(--shadow)}
+.datefield input{border:0;background:none;font-weight:700;outline:none}
+.hint{font-size:12px;color:var(--ink-3);margin-top:8px}
+
+/* ---------- results ---------- */
+.loader{display:none;flex-direction:column;align-items:center;text-align:center;padding-top:40px}
+.loader.show{display:flex}
+.loader .mascot{width:140px}
+.loader .lt{font-family:var(--serif);font-size:20px;font-weight:700;margin:18px 0 20px}
+.loader ul{list-style:none;width:100%;max-width:280px}
+.loader li{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--paper);border-radius:var(--r-sm);margin-bottom:8px;font-size:13px;color:var(--ink-3);box-shadow:var(--shadow);transition:color .3s;text-align:left}
+.loader li .s{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--coral);flex:none}
+.loader li.run{color:var(--ink)}
+.loader li.run .s{animation:spin .7s linear infinite}
+.loader li.done{color:var(--ink)}
+.loader li.done .s{border:0;background:var(--mint);display:grid;place-items:center;animation:popIn .35s var(--spring)}
+.loader li.done .s::after{content:"✓";font-size:11px;font-weight:700}
+@keyframes spin{to{transform:rotate(360deg)}}
+.verify{display:flex;align-items:center;gap:8px;background:var(--mint);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;font-weight:500;margin:14px 0}
+.rec{margin-bottom:14px;overflow:hidden;padding:0;position:relative}
+.rec .head{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700}
+.rec .body{padding:14px 16px 16px;display:flex;gap:14px}
+.rec .pic{width:72px;height:72px;border-radius:18px;display:grid;place-items:center;font-size:36px;flex:none;background:#EEEDE9;transition:transform .3s var(--spring)}
+.rec:hover .pic{transform:rotate(-6deg) scale(1.05)}
+.rec .pname{font-weight:700;font-size:15px;line-height:1.35;padding-right:30px}
+.rec .alt-name{font-size:12px;color:var(--ink-3)}
+.rec .tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.rec .tags span{font-size:10px;padding:3px 8px;border-radius:99px;background:#EEEDE9;color:var(--ink-2);font-weight:700}
+.rec .calc{display:flex;justify-content:space-between;align-items:flex-end;padding:0 16px 14px;font-size:13px;color:var(--ink-2)}
+.rec .calc b{font-size:18px;color:var(--ink)}
+.rec .why{margin:0 16px 16px;background:var(--cream);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;line-height:1.7;color:var(--ink-2)}
+.rec .why b{color:var(--ink)}
+.rec .alt{display:flex;gap:6px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none}
+.rec .alt button{font-size:11px;padding:6px 10px;border-radius:99px;border:1px solid var(--line);white-space:nowrap;color:var(--ink-2);transition:.2s}
+.rec .alt button:hover{border-color:var(--coral);color:var(--coral)}
+.heart{position:absolute;right:12px;top:52px;width:34px;height:34px;border-radius:50%;background:var(--paper);box-shadow:var(--shadow);font-size:16px;color:#CFCCC4;transition:color .2s}
+.heart.on{color:var(--coral)}
+.heart.pop{animation:heartPop .45s var(--spring)}
+@keyframes heartPop{40%{transform:scale(1.45)}}
+.total{background:var(--paper);border-radius:var(--r-md);padding:16px;box-shadow:var(--shadow)}
+.total .line{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2);margin:4px 0}
+.total .big{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.total .big b{font-family:var(--serif);font-size:28px}
+.bar{height:10px;background:#E9E7E2;border-radius:99px;margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--coral);border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.empty{text-align:center;padding:30px 10px;color:var(--ink-2);font-size:13px;line-height:1.7}
+.sample{font-size:10px;color:var(--ink-3);text-align:center;margin-top:14px}
+
+/* ---------- map ---------- */
+.map{position:relative;height:210px;border-radius:var(--r-lg);overflow:hidden;background:#EEEFEA;box-shadow:var(--shadow)}
+.map svg{width:100%;height:100%;display:block}
+.pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;transition:transform .3s var(--spring);z-index:1}
+.pin.drop{animation:drop .6s var(--spring) both;animation-delay:calc(var(--i) * 120ms)}
+@keyframes drop{from{opacity:0;transform:translate(-50%,-180%)}to{opacity:1;transform:translate(-50%,-100%)}}
+.pin span{background:var(--paper);border-radius:99px;padding:4px 8px;font-size:10px;font-weight:700;box-shadow:var(--shadow);white-space:nowrap}
+.pin i{width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);margin-top:4px;border:3px solid #fff;box-shadow:var(--shadow)}
+.pin.hl{z-index:3;transform:translate(-50%,-110%) scale(1.25)}
+.pin.hl span{background:var(--ink);color:#fff}
+.me{position:absolute;left:48%;top:56%;width:16px;height:16px;border-radius:50%;background:var(--sky-deep);border:3px solid #fff}
+.me::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:rgba(85,139,207,.35);animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{to{transform:scale(3.2);opacity:0}}
+.store{display:flex;align-items:center;gap:12px;padding:12px 6px;margin:0 -6px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:12px;transition:background .2s}
+.store:last-child{border-bottom:0}
+.store:hover,.store.on{background:#F1F0EC}
+.store .ico{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:20px;flex:none}
+.store b{font-size:14px}
+.store p{font-size:11px;color:var(--ink-3)}
+.store .dist{margin-left:auto;font-size:12px;font-weight:700;color:var(--ink-2);white-space:nowrap}
+.phrase-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;scrollbar-width:none;padding:2px}
+.phrase{background:var(--ink);color:#fff;border-radius:var(--r-lg);padding:22px 20px;margin-top:6px;position:relative;overflow:hidden}
+.phrase .say{font-size:11px;opacity:.6;font-weight:700;letter-spacing:.04em}
+.phrase .kr{font-family:var(--ko);font-size:30px;line-height:1.35;margin:10px 0 8px;word-break:keep-all}
+.phrase .yomi{font-size:13px;color:var(--butter);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.phrase .yomi button{color:#fff;background:rgba(255,255,255,.14);padding:4px 10px;border-radius:99px;font-size:12px}
+.phrase .ja{font-size:12px;opacity:.7;margin-top:6px}
+.phrase .deco{position:absolute;right:-20px;top:-20px;width:110px;height:110px;border-radius:50%;background:rgba(246,182,90,.15);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.2)}}
+.mini{background:var(--paper);border-radius:var(--r-sm);padding:12px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.mini .kr2{font-family:var(--ko);font-size:16px}
+.mini p{font-size:11px;color:var(--ink-3)}
+.speak{width:36px;height:36px;border-radius:50%;background:var(--peach-soft);display:grid;place-items:center;flex:none;transition:transform .2s var(--spring)}
+.speak:active,.speak.talk{transform:scale(1.2);background:var(--peach)}
+
+/* ---------- message ---------- */
+.msg-wrap{perspective:800px}
+.msg{position:relative;background:var(--paper);border-radius:var(--r-lg);padding:24px 20px 18px;box-shadow:var(--shadow);margin-top:18px}
+.msg .note{font-family:"Shippori Mincho",serif;font-size:20px;line-height:1.7;font-weight:600}
+.msg .mean{font-family:var(--ko);font-size:13px;color:var(--ink-2);margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:none}
+html[lang="ko"] .msg .mean{display:block}
+.msg .from{font-size:12px;color:var(--ink-3);margin-top:10px}
+.msg .tool{display:flex;gap:8px;margin-top:14px}
+.msg .tool button{flex:1;height:40px;border-radius:99px;background:#EEEDE9;font-size:12px;font-weight:700;transition:transform .2s var(--spring)}
+.msg .tool button:active{transform:scale(.93)}
+.msg .tape{position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-2deg);width:84px;height:22px;background:rgba(220,204,172,.8);border-radius:4px}
+.tip{display:flex;gap:10px;align-items:flex-start;background:var(--lilac);border-radius:var(--r-md);padding:14px;margin-top:14px;font-size:12px;line-height:1.7}
+
+/* ---------- checklist ---------- */
+.ring{display:flex;align-items:center;gap:18px}
+.ring svg{width:96px;height:96px;flex:none}
+.ring circle{transition:stroke-dasharray .8s cubic-bezier(.2,.8,.2,1)}
+.ring b{font-family:var(--serif);font-size:26px;display:block}
+.ring small{color:var(--ink-3);font-size:12px;display:block}
+.check{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check:last-child{border:0}
+.box{width:26px;height:26px;border-radius:9px;border:2px solid #C9C6BE;display:grid;place-items:center;flex:none;transition:background .2s,border-color .2s;color:transparent;font-size:14px;font-weight:700}
+.check.done .box{background:var(--coral);border-color:var(--coral);color:#fff}
+.check .t{font-size:14px;font-weight:700;transition:color .3s}
+.check.done .t{text-decoration:line-through;color:var(--ink-3)}
+.check p{font-size:11px;color:var(--ink-3)}
+.check .amt{margin-left:auto;font-size:13px;font-weight:700;white-space:nowrap}
+.done-card{display:none;margin-top:14px;text-align:center;background:var(--butter);border-radius:var(--r-md);padding:18px}
+.done-card.show{display:block;animation:popIn .5s var(--spring)}
+.done-card .mascot{width:90px;margin:0 auto 6px}
+.done-card b{font-family:var(--serif);font-size:18px}
+
+/* ---------- sheet ---------- */
+.backdrop{position:absolute;inset:0;background:rgba(47,45,41,.35);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+.backdrop.show{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--cream);border-radius:28px 28px 0 0;padding:12px 20px 34px;transform:translateY(105%);transition:transform .45s var(--spring);z-index:21}
+.sheet.show{transform:none}
+.sheet .grab{width:40px;height:5px;border-radius:99px;background:#C9C6BE;margin:0 auto 16px}
+.sheet h3{font-family:var(--serif);font-size:20px;margin-bottom:14px}
+.preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.preset-grid button{background:var(--paper);border-radius:var(--r-md);padding:14px 6px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:700;transition:transform .2s var(--spring)}
+.preset-grid button:hover{transform:translateY(-3px)}
+.preset-grid button:active{transform:scale(.92)}
+.preset-grid .e{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px}
+
+.toast{position:absolute;left:50%;bottom:160px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:99px;font-size:12px;opacity:0;transition:.3s var(--spring);z-index:30;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.confetti{position:absolute;top:-10px;width:8px;height:12px;border-radius:2px;z-index:35;pointer-events:none;animation:fall 1.6s cubic-bezier(.3,.6,.5,1) forwards}
+@keyframes fall{to{transform:translate(var(--dx),900px) rotate(var(--r));opacity:.3}}
+
+/* ---------- AI (mock) ---------- */
+.ai-hero{position:relative;margin-top:14px;background:var(--peach-soft);border-radius:var(--r-lg);padding:16px;overflow:hidden}
+.ai-badge{position:absolute;top:12px;right:12px;font-size:9px;font-weight:700;letter-spacing:.08em;background:var(--ink);color:#fff;padding:3px 7px;border-radius:99px}
+.ai-top{display:flex;gap:8px;align-items:flex-end}
+.ai-top .mascot{width:84px;flex:none;margin-bottom:-4px}
+.bubble{background:var(--paper);border-radius:18px 18px 18px 4px;padding:10px 12px;font-size:12px;line-height:1.55;box-shadow:var(--shadow);color:var(--ink-2);animation:popIn .5s var(--spring) both .25s;margin-bottom:14px}
+.bubble b{display:block;font-family:var(--serif);font-size:15px;color:var(--ink);margin-bottom:2px}
+.ai-input{margin-top:12px;width:100%;display:flex;align-items:center;gap:8px;background:var(--paper);border-radius:99px;padding:6px 6px 6px 16px;font-size:13px;color:var(--ink-3);box-shadow:var(--shadow);text-align:left;transition:transform .2s var(--spring)}
+.ai-input:active{transform:scale(.97)}
+.ai-input #aiPh{flex:1;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.send{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:16px;flex:none;transition:transform .2s var(--spring)}
+.send:active{transform:scale(.85)}
+.ai-sugs,.chat-sugs{display:flex;gap:6px;overflow-x:auto;margin-top:10px;scrollbar-width:none;padding-bottom:2px}
+.ai-sugs::-webkit-scrollbar,.chat-sugs::-webkit-scrollbar{display:none}
+.ai-sugs button,.chat-sugs button{font-size:11px;padding:7px 11px;border-radius:99px;background:rgba(255,255,255,.65);white-space:nowrap;border:1px solid rgba(0,0,0,.05);transition:transform .2s var(--spring)}
+.ai-sugs button:active,.chat-sugs button:active{transform:scale(.92)}
+.chat-sugs{margin-left:38px;flex-wrap:wrap;overflow:visible;animation:rise .45s var(--spring) both}
+.chat-sugs button{background:var(--paper);box-shadow:var(--shadow);border:0}
+
+.chat-head{display:flex;align-items:center;gap:8px}
+.chat-head .mascot{width:36px}
+.chat-head b{font-size:14px;display:block}
+.chat-head small{font-size:11px;color:var(--ink-3);display:flex;align-items:center;gap:4px}
+.live{width:7px;height:7px;border-radius:50%;background:#3BB273;display:inline-block}
+.chat-log{display:flex;flex-direction:column;gap:10px;padding-top:6px}
+.row-bot{display:flex;gap:8px;align-items:flex-end;animation:rise .4s var(--spring) both}
+.row-bot .av{width:30px;flex:none}
+.bb{max-width:80%;background:var(--paper);border-radius:18px 18px 18px 4px;padding:10px 13px;font-size:14px;line-height:1.65;box-shadow:var(--shadow);white-space:pre-wrap;word-break:break-word}
+.row-me{align-self:flex-end;max-width:78%;background:var(--ink);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 13px;font-size:14px;line-height:1.6;animation:rise .35s var(--spring) both;white-space:pre-wrap}
+.typing{display:flex;gap:4px;padding:14px 16px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--ink-3);animation:dot 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:none;opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.caret::after{content:"▍";color:var(--coral);animation:blinkc .7s steps(1) infinite}
+@keyframes blinkc{50%{opacity:0}}
+.plan{margin-left:38px;background:var(--paper);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow);animation:popIn .45s var(--spring) both}
+.plan h4{font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.plan .g{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.plan .g .e{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;flex:none}
+.plan .g b{margin-left:auto;font-size:12px;white-space:nowrap}
+.guar{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0 2px}
+.guar span{font-size:10px;font-weight:700;padding:4px 8px;border-radius:99px;background:var(--mint)}
+.plan .btn{height:46px;font-size:14px;margin-top:10px}
+.json-t{font-size:11px;color:var(--ink-3);text-decoration:underline;margin-top:10px;display:block}
+.plan pre{display:none;background:var(--ink);color:#EDE8E0;font-size:10px;padding:10px 12px;border-radius:12px;overflow-x:auto;margin-top:8px;line-height:1.55;font-family:ui-monospace,Menlo,monospace}
+.plan pre.show{display:block;animation:swap .3s ease}
+.plan .note{font-size:10px;color:var(--ink-3);margin-top:6px;line-height:1.5}
+.chatbar{position:absolute;left:12px;right:12px;bottom:86px;display:flex;align-items:center;gap:8px;background:var(--paper);border-radius:99px;padding:6px 6px 6px 16px;box-shadow:0 10px 30px rgba(50,45,40,.14);z-index:8;transform:translateY(30px);opacity:0;pointer-events:none;transition:transform .35s var(--spring),opacity .25s}
+.chatbar.show{transform:none;opacity:1;pointer-events:auto}
+.chatbar input{flex:1;min-width:0;border:0;outline:none;background:none;font-size:14px}
+.chatbar{padding-left:8px}
+.cb-av{width:34px;flex:none}
+.chatbar:focus-within{box-shadow:0 0 0 2px var(--coral),0 10px 30px rgba(50,45,40,.14)}
+.ai-form{display:block;margin:12px auto 0;font-size:12px;font-weight:700;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+#chatInput.swap{animation:swap .4s var(--spring)}
+
+/* ---------- 土産話 QR (mock) ---------- */
+.mcard{position:relative;display:flex;gap:14px;align-items:center;background:var(--paper);border-radius:16px;padding:16px;box-shadow:var(--shadow);aspect-ratio:91/55;border:1px solid var(--line)}
+.mcard .tape{position:absolute;top:-9px;right:28px;width:70px;height:20px;background:rgba(220,204,172,.8);border-radius:4px;transform:rotate(3deg)}
+.qr{width:96px;flex:none}.qr svg{display:block;width:100%}
+.mc-body small{font-size:10px;color:var(--ink-3);letter-spacing:.08em;display:block}
+.mc-body b{font-family:"Shippori Mincho",serif;font-size:17px;display:block;margin:6px 0;line-height:1.35}
+.mc-body span{font-size:12px;color:var(--ink-2);display:block}
+.mc-body em{font-style:normal;font-size:11px;color:var(--coral);font-weight:700;display:block;margin-top:10px}
+.photo-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ph{aspect-ratio:1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6px;gap:2px;color:#fff;border:3px solid transparent;transition:transform .2s var(--spring);background-size:cover;background-position:center}
+.ph.up{justify-content:center;padding-bottom:0}
+.ph span{font-size:24px}.ph small{font-size:10px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.ph.on{border-color:var(--ink);transform:scale(1.04)}
+.ph.up{background:#EEE6DC;color:var(--ink-2)}.ph.up small{text-shadow:none}
+.field{background:var(--paper);box-shadow:var(--shadow);border-radius:var(--r-sm);padding:12px 14px;font-size:14px;line-height:1.6}
+.hint-inline{font-weight:500;color:var(--ink-3);font-size:11px}
+.two-btn{display:flex;gap:8px;margin-top:18px}.two-btn .btn{height:46px;font-size:13px}
+.btn.ghost{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+.react{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.react:last-child{border:0}
+.av2{width:34px;height:34px;border-radius:50%;background:var(--peach-soft);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.react b{font-size:13px}.react p{font-size:12px;color:var(--ink-2)}.react small{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.recv-note{font-size:11px;color:var(--ink-3);text-align:center;margin-bottom:10px}
+.browser{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 12px 30px rgba(50,45,40,.14);border:1px solid var(--line)}
+.browser .url{font-size:11px;color:var(--ink-3);text-align:center;padding:8px;background:#F4F1EC;border-bottom:1px solid var(--line)}
+.rp-top{position:relative}
+.rp-hero{height:180px;background:#ddd center/cover no-repeat;position:relative}
+.rp-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(255,255,255,.35) 100%)}
+.rp-miya{position:absolute;right:10px;top:104px;width:124px;z-index:2;filter:drop-shadow(0 8px 12px rgba(50,45,40,.18))}
+.rp-bubble{position:absolute;right:132px;top:120px;z-index:2;background:#fff;border-radius:16px 16px 4px 16px;padding:9px 13px;font-size:12px;font-weight:700;box-shadow:0 6px 16px rgba(50,45,40,.15);animation:popIn .5s var(--spring) both .3s;white-space:nowrap}
+.rp-body{padding:18px 16px 16px}
+.rp-kicker{font-size:11px;color:var(--ink-3);font-weight:700;letter-spacing:.06em}
+.rp-title{font-family:"Shippori Mincho",serif;font-weight:800;font-size:20px;line-height:1.4;margin:4px 120px 14px 0}
+html[lang="ko"] .rp-title{font-family:var(--serif)}
+.rp-name{display:flex;gap:12px;align-items:center}
+.rp-thumb{width:64px;height:64px;border-radius:16px;background:url(assets/yakgwa.jpg) center/cover;flex:none}
+.rp-name b{font-size:16px;display:block}.rp-name small{font-size:11px;color:var(--ink-3)}
+.rp-desc{font-size:13px;line-height:1.8;color:var(--ink-2);margin:12px 0}
+.rp-info{border-top:1px solid var(--line);margin:0}
+.rp-info div{display:flex;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:12px}
+.rp-info dt{width:72px;flex:none;color:var(--ink-3);font-weight:700}.rp-info dd{margin:0;color:var(--ink)}
+.rp-msg{margin-top:16px;background:var(--cream);border-radius:16px;padding:14px 16px;position:relative}
+.rp-msg small{font-size:11px;color:var(--ink-3);font-weight:700}.rp-msg p{font-family:"Shippori Mincho",serif;font-size:15px;line-height:1.75;margin-top:4px}
+html[lang="ko"] .rp-msg p{font-family:var(--serif)}
+.rp-ask{text-align:center;font-size:12px;color:var(--ink-2);font-weight:700;margin-top:18px}
+.rp-react{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.rf2{width:46px;display:block}
+.rf{width:34px;flex:none}
+.mc-miya{position:absolute;right:8px;bottom:-10px;width:54px}
+.rp-react button{background:var(--cream);border-radius:16px;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;transition:transform .2s var(--spring),border-color .2s}
+.rp-react button span{font-size:10px;font-weight:700;color:var(--ink-2);line-height:1.3;text-align:center}
+.rp-react button:active{transform:scale(.9)}
+.rp-react button.on{border-color:var(--coral);background:var(--paper);animation:bump .4s var(--spring)}
+.rp-foot{text-align:center;font-size:10px;color:var(--ink-3);margin-top:14px}
+.push{position:absolute;top:10px;left:10px;right:10px;z-index:45;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:22px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 12px 30px rgba(0,0,0,.18);transform:translateY(-150%);transition:transform .55s var(--spring);cursor:pointer}
+.push.show{transform:none}
+.push .pi{width:38px;flex:none;background:var(--peach-soft);border-radius:10px;padding:3px}
+.push small{font-size:10px;color:var(--ink-3);display:block}.push b{font-size:13px;line-height:1.4;display:block}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <h1 data-i="brandBr"></h1>
+  <p data-i="sideDesc"></p>
+  <div class="chips" id="sideChips"></div>
+  <div class="swatches">
+    <p>SEOUL COLORS · 서울대표색</p>
+    <div class="sw"><i style="background:#AE1932"></i>단청빨간색<small>#AE1932</small></div>
+    <div class="sw"><i style="background:#558BCF"></i>서울하늘색<small>#558BCF</small></div>
+    <div class="sw"><i style="background:#F6B65A"></i>은행노란색<small>#F6B65A</small></div>
+    <div class="sw"><i style="background:#345F53"></i>남산초록색<small>#345F53</small></div>
+    <div class="sw"><i style="background:#DCCCAC"></i>삼베연미색<small>#DCCCAC</small></div>
+    <div class="sw"><i style="background:#E0DFDE"></i>한강은백색<small>#E0DFDE</small></div>
+    <div class="sw"><i style="background:#504E48"></i>기와진회색<small>#504E48</small></div>
+  </div>
+</aside>
+
+<div class="phone" id="phone">
+  <div class="notch"></div>
+  <div class="statusbar"><span>9:41</span><span>●●● ◔</span></div>
+
+  <div class="lang" id="lang"><i class="knob"></i><button data-lang="ja">日本語</button><button data-lang="ko">한국어</button></div>
+
+  <div class="screens">
+  <!-- ============ HOME ============ -->
+  <section class="screen" id="home">
+    <div class="appbar"><div class="brand"><span class="logo" data-mascot="mini"></span><span data-i="brand"></span></div></div>
+    <div class="tabs" id="homeTabs">
+      <button class="on" data-hometab="prep"><span data-i="tabPrep"></span></button>
+      <button data-hometab="fav"><span data-i="tabFav"></span><span class="dot" id="favDot"></span></button>
+      <i class="ink"></i>
+    </div>
+    <div id="homePrep">
+      <h1 class="h-serif" data-i="homeTitle"></h1>
+      <p class="date" id="today"></p>
+      <div class="duo">
+        <div class="tile sky" data-go="people"><span class="t" data-i="people"></span><span class="v" id="homePeople">0</span><span class="u" id="homePeopleU"></span></div>
+        <div class="tile butter" data-go="people"><span class="t" data-i="budget"></span><span class="v" id="homeBudget">₩0</span><span class="u" id="homeYen"></span></div>
+      </div>
+      <div class="hero" id="hero">
+        <div class="mascot" data-mascot></div>
+        <q id="heroQ"></q>
+        <small data-i="heroSmall"></small>
+      </div>
+      <p class="label" data-i="recent"></p>
+      <div class="card recent" id="recentCard">
+        <div class="ico" style="background:var(--peach-soft)">🎁</div>
+        <div><b data-i="recentTitle"></b><p data-i="recentMeta"></p></div><span class="arrow">›</span>
+      </div>
+    </div>
+    <div id="homeFav" style="display:none"></div>
+  </section>
+
+  <!-- ============ PEOPLE ============ -->
+  <section class="screen" id="people">
+    <div class="appbar"><button class="back" data-go="home">‹</button><span class="step">STEP 1 / 2</span><span style="width:96px"></span></div>
+    <h2 class="h2" data-i="peopleTitle"></h2>
+    <p class="sub" data-i="peopleSub"></p>
+    <div id="groupList" style="margin-top:18px"></div>
+    <button class="add" id="addGroup" data-i="addGroup"></button>
+    <div class="sumbar"><div><small data-i="total"></small><b id="peopleSum"></b></div><div style="text-align:right"><small data-i="budgetGuide"></small><b id="budgetSum"></b></div></div>
+  </section>
+
+  <!-- ============ CONDITIONS ============ -->
+  <section class="screen" id="cond">
+    <div class="appbar"><button class="back" data-go="people">‹</button><span class="step">STEP 2 / 2</span><span style="width:96px"></span></div>
+    <div id="condBody">
+      <h2 class="h2" data-i="condTitle"></h2>
+      <p class="sub" data-i="condSub"></p>
+      <div><p class="label" data-i="storage"></p>
+        <div class="seg" data-key="storage"><i class="knob"></i><button data-v="room" data-i="room"></button><button data-v="any" data-i="fridgeOk"></button></div></div>
+      <div><p class="label" data-i="returnDate"></p>
+        <label class="datefield"><span>✈️ <span data-i="returnDate"></span></span><input type="date" id="returnDate"></label>
+        <p class="hint" id="shelfHint"></p></div>
+      <div><p class="label" data-i="luggage"></p>
+        <div class="seg" data-key="luggage"><i class="knob"></i><button data-v="light" data-i="lugLight"></button><button data-v="normal" data-i="lugNormal"></button><button data-v="any" data-i="lugAny"></button></div></div>
+      <div><p class="label" data-i="allergyTitle"></p><div class="chips" data-multi="allergy" id="allergyChips"></div></div>
+      <div><p class="label" data-i="placeTitle"></p><div class="chips" data-multi="store" id="storeChips"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section class="screen" id="result">
+    <div class="appbar"><button class="back" data-go="cond">‹</button><span class="step" data-i="stepResult"></span><span style="width:96px"></span></div>
+    <div class="loader" id="loader">
+      <div class="mascot jump" data-mascot></div>
+      <p class="lt" data-i="loading"></p>
+      <ul id="loadSteps"></ul>
+    </div>
+    <div id="resultBody">
+      <h2 class="h2" data-i="resultTitle"></h2>
+      <div class="verify">✅ <span data-i="verify"></span></div>
+      <div id="recList"></div>
+      <div class="total" id="totalBox"></div>
+      <p class="sample" data-i="sample"></p>
+    </div>
+  </section>
+
+  <!-- ============ MAP ============ -->
+  <section class="screen" id="map">
+    <div class="appbar"><button class="back" data-go="result">‹</button><span class="step" data-i="stepMap"></span><span style="width:96px"></span></div>
+    <h2 class="h2" data-i="mapTitle"></h2>
+    <p class="sub" style="margin-bottom:14px" data-i="mapLoc"></p>
+    <div class="map">
+      <svg viewBox="0 0 350 210" preserveAspectRatio="xMidYMid slice">
+        <rect width="350" height="210" fill="#EEEFEA"/>
+        <path d="M0 140 C80 120 120 160 200 135 S320 110 350 125 L350 210 L0 210Z" fill="#C9DAF0"/>
+        <rect x="20" y="20" width="70" height="50" rx="10" fill="#D6E3DD"/><rect x="240" y="30" width="80" height="60" rx="10" fill="#D6E3DD"/>
+        <g stroke="#fff" stroke-width="12" stroke-linecap="round" fill="none"><path d="M-10 95 H360"/><path d="M160 -10 V220"/><path d="M60 -10 L110 220"/></g>
+        <g stroke="#F3D9AE" stroke-width="5" stroke-linecap="round" fill="none"><path d="M-10 95 H360"/></g>
+      </svg>
+      <div class="me"></div>
+      <div id="pins"></div>
+    </div>
+    <div class="card" style="margin-top:14px;padding:4px 16px" id="storeList"></div>
+
+    <p class="label" data-i="showStaff"></p>
+    <div class="phrase-tabs" id="phraseTabs"></div>
+    <div class="phrase" id="phraseCard"><div class="deco"></div>
+      <div class="say" data-i="sayToStaff"></div>
+      <div class="kr" id="phraseKr"></div>
+      <div class="yomi" id="phraseYomi"></div>
+      <div class="ja" id="phraseJa"></div>
+    </div>
+    <div id="miniPhrases"></div>
+  </section>
+
+  <!-- ============ MESSAGE ============ -->
+  <section class="screen" id="message">
+    <div class="appbar"><button class="back" data-go="map">‹</button><span class="step" data-i="stepMsg"></span><span style="width:96px"></span></div>
+    <h2 class="h2" data-i="msgTitle"></h2>
+    <div class="chips" id="msgTabs" style="margin-top:16px"></div>
+    <div class="msg-wrap"><div class="msg" id="msgCard"><div class="tape"></div>
+      <p class="note" id="msgText"></p><p class="mean" id="msgMean"></p><p class="from" id="msgFrom"></p>
+      <div class="tool"><button id="sayMsg">🔊 <span data-i="listen"></span></button><button id="copyMsg">📋 <span data-i="copy"></span></button><button id="nextMsg">🔄 <span data-i="another"></span></button></div>
+    </div></div>
+    <div class="tip"><span style="font-size:22px">🐾</span><div><b data-i="memoTitle"></b><br><span data-i="memoBody"></span><br><span style="color:var(--ink-2)" data-i="memoNote"></span></div></div>
+  </section>
+
+  <!-- ============ CHECKLIST ============ -->
+  <section class="screen" id="list">
+    <div class="appbar"><button class="back" data-go="message">‹</button><span class="step" data-i="stepList"></span><span style="width:96px"></span></div>
+    <h2 class="h2" data-i="listTitle"></h2>
+    <div class="card ring" style="margin-top:16px">
+      <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#E9E7E2" stroke-width="5"/><circle id="ringArc" cx="18" cy="18" r="15" fill="none" stroke="var(--coral)" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 100" transform="rotate(-90 18 18)" pathLength="100"/></svg>
+      <div><small data-i="remaining"></small><b id="remain">₩0</b><small id="remainSub"></small></div>
+    </div>
+    <div class="card" style="margin-top:14px;padding:4px 16px" id="checkList"></div>
+    <div class="done-card" id="doneCard"><div class="mascot" data-mascot></div><b data-i="allDone"></b><p class="sub" data-i="allDoneSub"></p></div>
+  </section>
+
+  <!-- ============ 土産話 QR CARD (mock) ============ -->
+  <section class="screen" id="story">
+    <div class="appbar"><button class="back" data-go="list">‹</button><span class="step" data-i="stepStory"></span><span style="width:96px"></span></div>
+    <div id="storyBody">
+      <div><h2 class="h2" data-i="storyTitle"></h2><p class="sub" data-i="storySub"></p></div>
+      <div><p class="label" data-i="previewLabel"></p>
+        <div class="mcard"><div class="tape"></div><div class="qr" id="qrBox"></div>
+          <div class="mc-body"><small data-i="cardKicker"></small><b data-i="prodName"></b><span data-i="fromSato"></span><em data-i="scanMe"></em></div>
+          <div class="mc-miya" data-mascot="love"></div></div></div>
+      <div><p class="label" data-i="photoLabel"></p>
+        <div class="photo-pick" id="photoPick">
+          <button class="ph on" data-photo="myeongdong" style="background-image:url(assets/myeongdong.jpg)"><small data-i="phMd"></small></button>
+          <button class="ph" data-photo="market" style="background-image:url(assets/market.jpg)"><small data-i="phMk"></small></button>
+          <button class="ph" data-photo="hangang" style="background-image:url(assets/hangang.jpg)"><small data-i="phHg"></small></button>
+          <button class="ph up"><span>＋</span><small data-i="photoUpload"></small></button>
+        </div></div>
+      <div><p class="label"><span data-i="commentLabel"></span> <small class="hint-inline" data-i="commentHint"></small></p>
+        <div class="field" data-i="commentText"></div></div>
+      <div class="two-btn"><button class="btn ghost" data-toast="printToast" data-i="print"></button><button class="btn ghost" data-toast="linkToast" data-i="copyLink"></button></div>
+      <div><p class="label" data-i="reactTitle"></p>
+        <div class="card" style="padding:4px 16px" id="reactFeed">
+          <div class="react"><span class="rf" data-mascot="love"></span><div><b data-i="nSuzuki"></b><p data-i="rThanks"></p></div><small data-i="ago5"></small></div>
+          <div class="react"><span class="rf" data-mascot="wow"></span><div><b data-i="nTakahashi"></b><p data-i="rWow"></p></div><small data-i="ago12"></small></div>
+          <div class="react"><span class="rf" data-mascot="yum"></span><div><b data-i="nIto"></b><p data-i="rYum"></p></div><small data-i="ago30"></small></div>
+        </div></div>
+    </div>
+  </section>
+
+  <!-- ============ RECIPIENT PAGE (mock) ============ -->
+  <section class="screen" id="recv">
+    <div class="appbar"><button class="back" data-go="story">‹</button><span class="step" data-i="stepRecv"></span><span style="width:96px"></span></div>
+    <p class="recv-note" data-i="recvNote"></p>
+    <div class="browser" id="recvPage">
+      <div class="url">omiyage.seoul/s/8f2k1x</div>
+      <div class="rp-top">
+        <div class="rp-hero" id="rpHero"></div>
+        <div class="rp-bubble" data-i="miyaSays"></div>
+        <div class="rp-miya" data-mascot="smile"></div>
+      </div>
+      <div class="rp-body">
+        <p class="rp-kicker" data-i="recvKicker"></p>
+        <h3 class="rp-title" data-i="recvTitle"></h3>
+        <div class="rp-name"><div class="rp-thumb"></div><div><b data-i="prodName"></b><small data-i="prodSub"></small></div></div>
+        <p class="rp-desc" data-i="prodDesc"></p>
+        <dl class="rp-info">
+          <div><dt data-i="iWhere"></dt><dd data-i="iWhereV"></dd></div>
+          <div><dt data-i="iTip"></dt><dd data-i="iTipV"></dd></div>
+          <div><dt data-i="iAlg"></dt><dd data-i="iAlgV"></dd></div>
+          <div><dt data-i="iShelf"></dt><dd data-i="iShelfV"></dd></div>
+        </dl>
+        <div class="rp-msg"><small data-i="fromSato2"></small><p data-i="commentText"></p></div>
+        <p class="rp-ask" data-i="reactAsk"></p>
+        <div class="rp-react">
+          <button data-react="rYum"><span class="rf2" data-mascot="yum"></span><span data-i="rYum"></span></button>
+          <button data-react="rThanks"><span class="rf2" data-mascot="love"></span><span data-i="rThanks"></span></button>
+          <button data-react="rWow"><span class="rf2" data-mascot="wow"></span><span data-i="rWow"></span></button>
+        </div>
+        <p class="rp-foot"><span data-i="recvFoot"></span><br>Photos: Sgroey (CC BY-SA 4.0), Bgag (CC0), Wvdp (CC0), Korea.net (CC BY-SA 2.0) / Wikimedia Commons</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AI CHAT (mock) ============ -->
+  <section class="screen" id="chat">
+    <div class="appbar"><button class="back" data-go="home">‹</button>
+      <div class="chat-head"><div id="chatAv" data-mascot></div><div><b data-i="chatName"></b><small><i class="live"></i><span id="chatStatus" data-i="chatOnline"></span></small></div></div>
+      <span style="width:96px"></span></div>
+    <div class="chat-log" id="chatLog"></div>
+  </section>
+  </div>
+
+  <div class="cta-wrap hide" id="cta"><button class="btn" id="ctaBtn"></button></div>
+  <form class="chatbar" id="chatbar" autocomplete="off"><span class="cb-av" data-mascot></span><input id="chatInput" maxlength="120"><button class="send" type="submit">↑</button></form>
+
+  <nav class="nav">
+    <button data-tab="home"><span class="ic">🏠</span><span data-i="navHome"></span></button>
+    <button data-tab="people"><span class="ic">🎁</span><span data-i="navFind"></span></button>
+    <button data-tab="chat" class="ai-tab"><span class="ic" data-mascot></span><span data-i="navAI"></span></button>
+    <button data-tab="map"><span class="ic">🗺️</span><span data-i="navMap"></span></button>
+    <button data-tab="list"><span class="ic">✅</span><span data-i="navList"></span></button>
+  </nav>
+
+  <div class="backdrop" id="backdrop"></div>
+  <div class="sheet" id="sheet"><div class="grab"></div><h3 data-i="addGroupTitle"></h3><div class="preset-grid" id="presetGrid"></div></div>
+  <div class="push" id="push"><div class="mascot pi" data-mascot></div><div><small id="pushApp"></small><b id="pushText"></b></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ================= i18n ================= */
+const I = {
+  ja:{
+    brand:'オミヤゲ・ソウル', brandBr:'オミヤゲ・<br>ソウル',
+    sideDesc:'人数・予算・賞味期限を入れるだけ。配るお土産選びから、買う場所、韓国語での買い方、渡すときのひと言まで。',
+    sideChips:['① 渡す人','② 条件','③ おすすめ','④ 買う場所','⑤ ひと言','⑥ リスト'],
+    tabPrep:'✦ きょうの準備', tabFav:'♡ お気に入り', homeTitle:'今日のおみやげ', daySuffix:' · ソウル 3日目',
+    people:'渡す人', budget:'予算', peopleUnit:(n,g)=>`人 · ${g}グループ`,
+    heroQ:(name,n)=>`${name}に${n}人分…<br>何を買えばいいかな？`, heroSmall:'ミヤちゃんが一緒に選びます', heroTap:'タップしてはじめよう！',
+    recent:'さいきんのリスト', recentTitle:'春の釜山旅行', recentMeta:'12人分 · 完了', recentToast:'デモ：過去のリストは準備中です',
+    favEmpty:'まだお気に入りがありません。<br>おすすめ画面の ♥ で追加できます。',
+    peopleTitle:'誰に渡しますか？', peopleSub:'グループごとに人数と1人あたりの予算を決めましょう',
+    count:'人数', perPerson:'1人あたり', formal:['カジュアル','ふつう','きちんと'], person:n=>`${n}人`,
+    subtotalGuide:'小計の目安', addGroup:'＋ グループを追加', addGroupTitle:'どんなグループ？', total:'合計', budgetGuide:'予算の目安',
+    needOne:'1グループ以上必要です', added:n=>`${n}を追加しました`,
+    condTitle:'条件を教えてください', condSub:'持ち帰りやすさとアレルギーをチェックします',
+    storage:'保存方法', room:'常温のみ', fridgeOk:'冷蔵もOK', returnDate:'帰国日',
+    shelfHint:d=>`帰国まで${d}日 → 帰国後1か月以上もつ商品だけを選びます`,
+    luggage:'荷物の重さ', lugLight:'軽くしたい', lugNormal:'ふつう', lugAny:'気にしない',
+    allergyTitle:'アレルギー・避けたい食材', placeTitle:'買い物しやすい場所',
+    stepResult:'おすすめ', loading:'ミヤちゃんが選んでいます…',
+    loadSteps:['条件で候補をしぼり込み中','ぴったりの組み合わせを選択中','個数と合計を計算中'],
+    resultTitle:'この組み合わせは<br>いかがですか？', verify:'登録済みの商品だけから選び、個数と合計はコードで再計算しています',
+    upTo:w=>`1人 ${w}まで`, packs:'パック', pcs:n=>`${n}個入り`, spare:n=>` · ${n}個あまり`, why:'💡 おすすめ理由',
+    swapTo:'に変える', swapped:'入れ替えました', noMatch:'条件に合う商品がありません。<br>予算かアレルギー条件を見直してください。',
+    sum:'合計', budgetLine:w=>`予算 ${w}`, over:w=>`予算オーバー ${w}`, left:w=>`のこり ${w}`,
+    sample:'※ 価格・賞味期限はサンプルです（デモ前にチームで確認）', favAdd:'お気に入りに追加', favDel:'お気に入りから削除',
+    stepMap:'買う場所', mapTitle:'近くで買えます', mapLoc:'📍 明洞駅周辺 · カカオローカルAPI（デモ）', noStore:'近くに対応するお店がありません',
+    routeToast:n=>`${n}への道案内（デモ）`,
+    showStaff:'お店の人に見せる', sayToStaff:'この画面を店員さんに見せてください', listen:'読み上げ', reading:'よみ', meaning:'意味',
+    stepMsg:'渡すときのひと言', msgTitle:'渡すときに<br>ひと言そえて', copy:'コピー', another:'別の言い方', copied:'コピーしました', copyFail:'コピーできませんでした',
+    to:n=>`— ${n}へ`, memoTitle:'ミヤちゃんのメモ', memoBody:'職場では休み明けの朝に、上司 → 同僚の順で配るとスムーズです。', memoNote:'（日本人インタビューで確認予定）',
+    stepList:'買い物リスト', listTitle:'お買い物チェック', remaining:'のこりの予算',
+    bought:(a,b,w)=>`${a} / ${b} 購入済み · 使った額 ${w}`, listEmpty:'まだリストがありません',
+    allDone:'ぜんぶ買えました！', allDoneSub:'いい旅のおみやげになりますように 🎁', noVoice:'音声に対応していません',
+    navAI:'ミヤちゃん',
+    stepStory:'土産話カード', storyTitle:'お土産に<br>土産話をそえて', storySub:'QRカードを貼って渡すと、相手のスマホで旅の話が読めます',
+    previewLabel:'カードのプレビュー（名刺サイズ）', photoLabel:'写真', photoUpload:'写真を選ぶ', commentLabel:'ひと言', commentHint:'受け取った人に表示されます',
+    print:'🖨 15枚印刷する', copyLink:'🔗 リンクをコピー', printToast:'印刷用PDFを作成しました（デモ）', linkToast:'リンクをコピーしました（デモ）',
+    reactTitle:'みんなの反応 3 / 15', ago5:'5分前', ago12:'12分前', ago30:'30分前',
+    stepRecv:'受け取った人の画面', recvNote:'田中さんのスマホ（QRを読み取ったところ）',
+    sentTo:'佐藤さんに届きました', pushApp:'オミヤゲ・ソウル · たった今', pushText:w=>`田中さんが「${w}」と言っています`,
+    cardKicker:'ソウル土産のおはなし', prodName:'ミニ薬菓（ヤックァ）', prodSub:'韓国語：미니 약과', fromSato:'from 佐藤さん', scanMe:'スマホで読み取ってね',
+    phMd:'明洞', phMk:'市場', phHg:'漢江',
+    commentText:'街中どこでも売ってて、韓国の人も大好きなお菓子でした！温かいお茶と一緒にどうぞ。',
+    nSuzuki:'鈴木さん', nTakahashi:'高橋さん', nIto:'伊藤さん',
+    rYum:'おいしかった', rThanks:'ありがとう', rWow:'韓国に行きたくなった',
+    miyaSays:'ソウルからのお土産だよ！', recvKicker:'SEOUL OMIYAGE STORY', recvTitle:'佐藤さんからの<br>ソウル土産',
+    prodDesc:'はちみつと油で作る韓国の伝統菓子。昔からお祝いの席で食べられてきました。',
+    iWhere:'買った場所', iWhereV:'明洞のコンビニ', iTip:'おすすめ', iTipV:'温かいお茶と一緒に', iAlg:'アレルゲン', iAlgV:'小麦・大豆', iShelf:'賞味期限', iShelfV:'購入から約3か月',
+    fromSato2:'佐藤さんより', reactAsk:'佐藤さんにひと言とどけよう', recvFoot:'アプリなしで見られます · オミヤゲ・ソウル', photoToast:'写真の選択（デモ）',
+    cta:{home:'🎁 おみやげを探す',people:'次へ：条件を入れる',cond:'✨ おすすめを見る',result:'🗺️ 買う場所を見る',map:'💬 渡すときのひと言',message:'✅ 買い物リストへ',list:'📮 土産話カードを作る',story:'👀 受け取った人の画面を見る'},
+    navHome:'ホーム', navFind:'さがす', navMap:'マップ', navList:'リスト',
+    aiHello:'ミヤちゃんAIに相談', aiHelloSub:'誰に・何人・いくらくらい？<br>ふつうに話しかけてね', ex:'例：',
+    chatName:'ミヤちゃんAI', chatOnline:'オンライン · デモ', chatThinking:'考え中…', chatPh:'メッセージを入力…',
+    sugs:['職場の同僚15人、1人2000ウォンくらい','家族2人と友だち1人に、ちょっと高級なもの','同僚10人、小麦アレルギーの人がいる','お土産を渡すときのマナーは？'],
+    chatHello:'こんにちは、ミヤちゃんです🎁\n誰に、何人分のお土産を探してる？\n予算やアレルギーも教えてくれたら、条件に合うものだけ選ぶよ。',
+    planTitle:'🧠 AIが整理した条件', planBtn:'✨ この条件でおすすめを見る', jsonShow:'{ } LLMの出力(JSON)を見る',
+    jsonNote:'AIは会話から条件を整理するだけ。商品・個数・金額はコードが計算して保証します。',
+    guar:['✓ 人数','✓ 予算','✓ 日持ち','✓ アレルギー'],
+    replyPlan:s=>`了解！${s}ですね。\n人数・予算・日持ち・アレルギーの4つをチェックして選ぶよ。`,
+    replyManner:'今は「つまらないものですが」より「よかったらどうぞ」が自然かも。\n職場なら休み明けの朝、上司から順に配るとスムーズだよ。\n（インタビューで確認予定）',
+    replyThanks:'どういたしまして！いいお土産が見つかりますように🎁',
+    replyAsk:'もう少し教えて！\n「誰に」「何人」「1人いくらくらい」がわかると選べるよ。',
+    sumPerson:(n,c)=>`${n}${c}人`, sumJoin:'、', sumBudget:w=>`（1人${w}）`, sumAllergy:a=>`、${a}なし`,
+  },
+  ko:{
+    brand:'오미야게 서울', brandBr:'오미야게<br>서울',
+    sideDesc:'인원·예산·유통기한만 입력하면 나눠 줄 선물 고르기부터 살 곳, 한국어로 사는 법, 건넬 때 한마디까지.',
+    sideChips:['① 받을 사람','② 조건','③ 추천','④ 살 곳','⑤ 한마디','⑥ 리스트'],
+    tabPrep:'✦ 오늘의 준비', tabFav:'♡ 즐겨찾기', homeTitle:'오늘의 선물', daySuffix:' · 서울 3일째',
+    people:'받을 사람', budget:'예산', peopleUnit:(n,g)=>`명 · ${g}개 그룹`,
+    heroQ:(name,n)=>`${name} ${n}명 몫…<br>뭘 사면 좋을까?`, heroSmall:'미야짱이 같이 골라 줄게요', heroTap:'눌러서 시작해요!',
+    recent:'최근 리스트', recentTitle:'봄 부산 여행', recentMeta:'12명 · 완료', recentToast:'데모: 지난 리스트는 준비 중이에요',
+    favEmpty:'아직 즐겨찾기가 없어요.<br>추천 화면의 ♥ 로 추가할 수 있어요.',
+    peopleTitle:'누구에게 줄까요?', peopleSub:'그룹마다 인원과 1인당 예산을 정해 주세요',
+    count:'인원', perPerson:'1인당', formal:['캐주얼','보통','격식'], person:n=>`${n}명`,
+    subtotalGuide:'소계 목표', addGroup:'＋ 그룹 추가', addGroupTitle:'어떤 그룹인가요?', total:'합계', budgetGuide:'예산 목표',
+    needOne:'그룹이 하나 이상 필요해요', added:n=>`${n} 그룹을 추가했어요`,
+    condTitle:'조건을 알려 주세요', condSub:'들고 가기 편한지, 알레르기는 없는지 확인해요',
+    storage:'보관 방식', room:'상온만', fridgeOk:'냉장도 OK', returnDate:'귀국일',
+    shelfHint:d=>`귀국까지 ${d}일 → 귀국 후 한 달 이상 보관되는 상품만 골라요`,
+    luggage:'짐 무게', lugLight:'가볍게', lugNormal:'보통', lugAny:'상관없음',
+    allergyTitle:'알레르기 · 피하고 싶은 재료', placeTitle:'쇼핑하기 편한 곳',
+    stepResult:'추천', loading:'미야짱이 고르는 중…',
+    loadSteps:['조건으로 후보를 거르는 중','딱 맞는 조합을 고르는 중','개수와 합계를 계산하는 중'],
+    resultTitle:'이 조합은<br>어떠세요?', verify:'등록된 상품 안에서만 고르고, 개수와 합계는 코드로 다시 계산했어요',
+    upTo:w=>`1인 ${w}까지`, packs:'팩', pcs:n=>`${n}개입`, spare:n=>` · ${n}개 남음`, why:'💡 추천 이유',
+    swapTo:'(으)로 변경', swapped:'바꿨어요', noMatch:'조건에 맞는 상품이 없어요.<br>예산이나 알레르기 조건을 바꿔 보세요.',
+    sum:'합계', budgetLine:w=>`예산 ${w}`, over:w=>`예산 초과 ${w}`, left:w=>`남은 금액 ${w}`,
+    sample:'※ 가격·유통기한은 샘플이에요 (데모 전에 팀이 확인)', favAdd:'즐겨찾기에 추가했어요', favDel:'즐겨찾기에서 뺐어요',
+    stepMap:'살 곳', mapTitle:'근처에서 살 수 있어요', mapLoc:'📍 명동역 주변 · 카카오 로컬 API (데모)', noStore:'근처에 맞는 매장이 없어요',
+    routeToast:n=>`${n} 길찾기 (데모)`,
+    showStaff:'점원에게 보여 주기', sayToStaff:'이 화면을 점원에게 보여 주세요', listen:'듣기', reading:'발음', meaning:'뜻',
+    stepMsg:'건넬 때 한마디', msgTitle:'건넬 때<br>한마디 곁들이기', copy:'복사', another:'다른 표현', copied:'복사했어요', copyFail:'복사하지 못했어요',
+    to:n=>`— ${n}에게`, memoTitle:'미야짱 메모', memoBody:'회사에서는 휴가 다음 날 아침, 상사 → 동료 순으로 나눠 주면 자연스러워요.', memoNote:'(일본인 인터뷰로 확인 예정)',
+    stepList:'쇼핑 리스트', listTitle:'쇼핑 체크', remaining:'남은 예산',
+    bought:(a,b,w)=>`${a} / ${b} 구매 완료 · 쓴 금액 ${w}`, listEmpty:'아직 리스트가 없어요',
+    allDone:'전부 샀어요!', allDoneSub:'좋은 여행 선물이 되길 바라요 🎁', noVoice:'음성을 지원하지 않아요',
+    navAI:'미야짱',
+    stepStory:'土産話 카드', storyTitle:'선물에<br>여행 이야기를 더해요', storySub:'QR 카드를 붙여 건네면, 받는 사람 휴대폰에서 여행 이야기를 읽을 수 있어요',
+    previewLabel:'카드 미리보기 (명함 크기)', photoLabel:'사진', photoUpload:'사진 선택', commentLabel:'한마디', commentHint:'받는 사람에게 보여요',
+    print:'🖨 15장 인쇄하기', copyLink:'🔗 링크 복사', printToast:'인쇄용 PDF를 만들었어요 (데모)', linkToast:'링크를 복사했어요 (데모)',
+    reactTitle:'모두의 반응 3 / 15', ago5:'5분 전', ago12:'12분 전', ago30:'30분 전',
+    stepRecv:'받는 사람 화면', recvNote:'다나카 씨의 휴대폰 (QR을 찍은 화면) · 실제 받는 사람에게는 일본어로 보여요',
+    sentTo:'사토 씨에게 전달됐어요', pushApp:'오미야게 서울 · 방금', pushText:w=>`다나카 씨가 「${w}」라고 했어요`,
+    cardKicker:'서울 선물 이야기', prodName:'미니 약과', prodSub:'日本語：ミニ薬菓（ヤックァ）', fromSato:'from 사토 씨', scanMe:'휴대폰으로 찍어 주세요',
+    phMd:'명동', phMk:'시장', phHg:'한강',
+    commentText:'거리 어디서나 팔고, 한국 사람들도 정말 좋아하는 과자였어요! 따뜻한 차와 함께 드세요.',
+    nSuzuki:'스즈키 씨', nTakahashi:'다카하시 씨', nIto:'이토 씨',
+    rYum:'맛있었어요', rThanks:'고마워요', rWow:'한국에 가 보고 싶어졌어요',
+    miyaSays:'서울에서 온 선물이야!', recvKicker:'SEOUL OMIYAGE STORY', recvTitle:'사토 씨가 보낸<br>서울 선물',
+    prodDesc:'꿀과 기름으로 만든 한국 전통 과자. 예로부터 잔칫상에 올라온 과자예요.',
+    iWhere:'산 곳', iWhereV:'명동 편의점', iTip:'추천', iTipV:'따뜻한 차와 함께', iAlg:'알레르기', iAlgV:'밀·대두', iShelf:'유통기한', iShelfV:'구매 후 약 3개월',
+    fromSato2:'사토 씨가', reactAsk:'사토 씨에게 한마디 보내기', recvFoot:'앱 없이 볼 수 있어요 · 오미야게 서울', photoToast:'사진 선택 (데모)',
+    cta:{home:'🎁 선물 찾기',people:'다음: 조건 입력',cond:'✨ 추천 보기',result:'🗺️ 살 곳 보기',map:'💬 건넬 때 한마디',message:'✅ 쇼핑 리스트로',list:'📮 土産話 카드 만들기',story:'👀 받는 사람 화면 보기'},
+    navHome:'홈', navFind:'찾기', navMap:'지도', navList:'리스트',
+    aiHello:'미야짱 AI에게 물어보기', aiHelloSub:'누구에게·몇 명·얼마 정도?<br>편하게 말해 줘', ex:'예: ',
+    chatName:'미야짱 AI', chatOnline:'온라인 · 데모', chatThinking:'생각 중…', chatPh:'메시지를 입력하세요…',
+    sugs:['직장 동료 15명, 1인당 2000원 정도','가족 2명이랑 친구 1명, 좀 고급스러운 걸로','동료 10명, 밀 알레르기 있는 사람이 있어','선물 건넬 때 매너는?'],
+    chatHello:'안녕, 미야짱이야🎁\n누구에게 몇 명분 선물을 찾고 있어?\n예산이나 알레르기도 알려 주면 조건에 맞는 것만 골라 줄게.',
+    planTitle:'🧠 AI가 정리한 조건', planBtn:'✨ 이 조건으로 추천 보기', jsonShow:'{ } LLM 출력(JSON) 보기',
+    jsonNote:'AI는 대화에서 조건만 정리해요. 상품·개수·금액은 코드가 계산하고 보장해요.',
+    guar:['✓ 인원','✓ 예산','✓ 보관','✓ 알레르기'],
+    replyPlan:s=>`알겠어! ${s} 맞지?\n인원·예산·보관·알레르기 4가지를 확인해서 골라 줄게.`,
+    replyManner:'건넬 때는 「よかったらどうぞ(괜찮으면 드세요)」가 자연스러워.\n회사라면 휴가 다음 날 아침, 상사부터 순서대로 나눠 주면 좋아.\n(인터뷰로 확인 예정)',
+    replyThanks:'천만에! 좋은 선물 찾길 바라🎁',
+    replyAsk:'조금만 더 알려 줘!\n「누구에게」「몇 명」「1인당 얼마」를 알면 고를 수 있어.',
+    sumPerson:(n,c)=>`${n} ${c}명`, sumJoin:', ', sumBudget:w=>` (1인 ${w})`, sumAllergy:a=>`, ${a} 제외`,
+  }
+};
+let L = 'ja';
+try { L = localStorage.getItem('omiyage-lang') || 'ja'; } catch(e){}
+const t = (k, ...a) => { const v = I[L][k]; return typeof v === 'function' ? v(...a) : v; };
+const tx = o => o[L];
+
+/* ================= data ================= */
+const TAG = {
+  share:{ja:'配りやすい',ko:'나눠 주기 좋음'}, light:{ja:'軽い',ko:'가벼움'}, popular:{ja:'人気',ko:'인기'},
+  healthy:{ja:'ヘルシー',ko:'건강함'}, korean:{ja:'韓国らしい',ko:'한국다움'}, classic:{ja:'定番',ko:'스테디셀러'},
+  women:{ja:'女性に人気',ko:'여성에게 인기'}, fresh:{ja:'できたて',ko:'갓 만든'}, snack:{ja:'おつまみ',ko:'안주'},
+  premium:{ja:'高級感',ko:'고급스러움'}, health:{ja:'健康',ko:'건강'}, wrap:{ja:'個包装',ko:'개별 포장'}
+};
+const ALLERGEN = { wheat:{ja:'小麦',ko:'밀'}, milk:{ja:'乳',ko:'우유'}, egg:{ja:'卵',ko:'달걀'}, nuts:{ja:'ナッツ',ko:'견과류'}, soy:{ja:'大豆',ko:'대두'}, shrimp:{ja:'えび',ko:'새우'} };
+const STORE_META = {
+  convenience:{ja:'コンビニ',ko:'편의점',e:'🏪',c:'var(--sky)'}, mart:{ja:'スーパー',ko:'마트',e:'🛒',c:'var(--butter)'},
+  drugstore:{ja:'ドラッグストア',ko:'드럭스토어',e:'💊',c:'var(--mint)'}, department:{ja:'デパート',ko:'백화점',e:'🏬',c:'var(--peach)'}
+};
+// Sample DB — prices / shelf life are placeholders
+const DB = [
+  {id:'p001',ko:'조미김 도시락 (12봉)',ja:'味付け海苔 お弁当サイズ',e:'🟩',price:5000,pack:12,wrap:true,shelf:[180,365],storage:'room',allergens:['soy'],stores:['convenience','mart'],tags:['share','light'],formal:1},
+  {id:'p002',ko:'허니버터 아몬드 미니 (10봉)',ja:'ハニーバターアーモンド ミニ',e:'🥜',price:9000,pack:10,wrap:true,shelf:[180,300],storage:'room',allergens:['nuts','milk'],stores:['convenience','mart','drugstore'],tags:['share','popular'],formal:1},
+  {id:'p003',ko:'유자차 스틱 (20개)',ja:'ゆず茶 スティック',e:'🍋',price:9000,pack:20,wrap:true,shelf:[365,540],storage:'room',allergens:[],stores:['mart','department'],tags:['share','light','healthy'],formal:2},
+  {id:'p004',ko:'미니 약과 (10개)',ja:'ミニ薬菓（ヤックァ）',e:'🍪',price:7000,pack:10,wrap:true,shelf:[90,180],storage:'room',allergens:['wheat','soy'],stores:['convenience','mart'],tags:['korean','share'],formal:2},
+  {id:'p005',ko:'초코파이 (12개)',ja:'チョコパイ',e:'🍫',price:6000,pack:12,wrap:true,shelf:[180,270],storage:'room',allergens:['wheat','milk','egg','soy'],stores:['convenience','mart'],tags:['share','classic'],formal:1},
+  {id:'p006',ko:'시트 마스크팩 (10매)',ja:'シートマスク',e:'🧖',price:10000,pack:10,wrap:true,shelf:[730,1095],storage:'room',allergens:[],stores:['drugstore'],tags:['light','women'],formal:2},
+  {id:'p007',ko:'인삼 캔디 (약 30개)',ja:'高麗人参キャンディ',e:'🍬',price:6000,pack:30,wrap:true,shelf:[365,730],storage:'room',allergens:[],stores:['mart','convenience'],tags:['share','light','korean'],formal:1},
+  {id:'p008',ko:'호두과자 (20개)',ja:'くるみ饅頭（ホドゥグァジャ）',e:'🌰',price:12000,pack:20,wrap:true,shelf:[5,10],storage:'fridge',allergens:['wheat','egg','milk','nuts'],stores:['department'],tags:['fresh'],formal:2},
+  {id:'p009',ko:'김부각 스낵 (6봉)',ja:'海苔チップス（キムブガク）',e:'🍘',price:9000,pack:6,wrap:true,shelf:[120,180],storage:'room',allergens:['wheat','soy'],stores:['mart','department'],tags:['korean','snack'],formal:2},
+  {id:'p010',ko:'홍삼 젤리 스틱 (30포)',ja:'紅参ゼリースティック',e:'🧧',price:25000,pack:30,wrap:true,shelf:[540,730],storage:'room',allergens:[],stores:['department','drugstore'],tags:['premium','health'],formal:3},
+  {id:'p011',ko:'핸드크림 (3개 세트)',ja:'ハンドクリーム 3本セット',e:'🧴',price:12000,pack:3,wrap:true,shelf:[730,1095],storage:'room',allergens:[],stores:['drugstore','department'],tags:['premium','women'],formal:3},
+  {id:'p012',ko:'전통 다과 선물세트',ja:'伝統菓子 ギフトセット',e:'🎎',price:30000,pack:1,wrap:false,shelf:[60,120],storage:'room',allergens:['wheat','soy'],stores:['department'],tags:['premium','korean'],formal:3},
+];
+const KRW_PER_JPY = 9.3;
+const PRESETS = [
+  {name:{ja:'上司',ko:'상사'},e:'👔',color:'var(--lilac)',formal:3},
+  {name:{ja:'取引先',ko:'거래처'},e:'🤝',color:'var(--sky)',formal:3},
+  {name:{ja:'ご近所',ko:'이웃'},e:'🌿',color:'var(--mint)',formal:2},
+  {name:{ja:'サークル',ko:'동아리'},e:'🎾',color:'var(--peach)',formal:1},
+  {name:{ja:'親戚',ko:'친척'},e:'👵',color:'var(--butter)',formal:2},
+  {name:{ja:'先生',ko:'선생님'},e:'📚',color:'var(--lilac)',formal:3},
+];
+const STORES = [
+  {t:'convenience',name:{ja:'コンビニ 明洞駅前店',ko:'편의점 명동역점'},dist:'120m',x:62,y:40},
+  {t:'drugstore',name:{ja:'ドラッグストア 明洞2号店',ko:'드럭스토어 명동2호점'},dist:'240m',x:30,y:30},
+  {t:'mart',name:{ja:'スーパー 会賢店',ko:'마트 회현점'},dist:'450m',x:78,y:72},
+  {t:'department',name:{ja:'デパート 本店',ko:'백화점 본점'},dist:'600m',x:20,y:78},
+];
+const MSGS = {
+  1:[{ja:'韓国のお土産です。<br>よかったらどうぞ。',ko:'한국 선물이에요. 괜찮으시면 드세요.'},
+     {ja:'お休みをいただきありがとうございました。<br>ささやかですが、韓国のお土産です。',ko:'휴가 주셔서 감사했습니다. 작지만 한국 선물이에요.'},
+     {ja:'ソウルに行ってきました！<br>皆さんでどうぞ。',ko:'서울 다녀왔어요! 다 같이 드세요.'}],
+  2:[{ja:'ソウルで見つけたよ。<br>みんなで食べてね。',ko:'서울에서 찾았어. 다 같이 먹어.'},
+     {ja:'韓国のお土産です。<br>お口に合うといいな。',ko:'한국 선물이야. 입에 맞으면 좋겠다.'}],
+  3:[{ja:'いつもお世話になっております。<br>心ばかりですが、ソウルのお土産です。',ko:'항상 신세 지고 있습니다. 작은 정성이지만 서울 선물입니다.'},
+     {ja:'先日ソウルへ行ってまいりました。<br>ほんの気持ちですが、お納めください。',ko:'얼마 전 서울에 다녀왔습니다. 작은 마음이지만 받아 주세요.'}],
+};
+const MINI = [
+  {kr:'개별 포장인가요?', yomi:'ケビョル ポジャンインガヨ？', mean:{ja:'個包装ですか？',ko:'개별 포장인지 묻기'}},
+  {kr:'유통기한이 언제까지예요?', yomi:'ユトンギハニ オンジェッカジエヨ？', mean:{ja:'賞味期限はいつまで？',ko:'유통기한 묻기'}},
+  {kr:'봉투 주세요.', yomi:'ポントゥ チュセヨ', mean:{ja:'袋をください',ko:'봉투 요청'}},
+];
+const NATIVE = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열','열한','열두','열세','열네','열다섯','열여섯','열일곱','열여덟','열아홉','스무'];
+const YOMI = ['','ハン','トゥ','セ','ネ','タソッ','ヨソッ','イルゴプ','ヨドル','アホプ','ヨル','ヨラン','ヨルトゥ','ヨルセ','ヨルレ','ヨルタソッ','ヨルリョソッ','ヨリルゴプ','ヨルリョドル','ヨラホプ','スム'];
+
+/* ================= state ================= */
+const S = {
+  cur:null,
+  groups:[
+    {id:1,name:{ja:'職場の同僚',ko:'직장 동료'},e:'💼',color:'var(--sky)',count:15,budget:2000,formal:1},
+    {id:2,name:{ja:'家族',ko:'가족'},e:'🏠',color:'var(--peach)',count:2,budget:8000,formal:2},
+    {id:3,name:{ja:'友だち',ko:'친구'},e:'💛',color:'var(--butter)',count:1,budget:12000,formal:3},
+  ],
+  storage:'room', luggage:'light', allergy:[], store:['convenience','mart'],
+  returnDate:null, picks:{}, checked:{}, fav:new Set(), msgIdx:0, msgGroup:0, phraseIdx:0,
+  homeTab:'prep', dirty:true, recs:null, loading:false
+};
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const won = n => '₩' + Math.round(n).toLocaleString();
+const yen = n => '¥' + Math.round(n / KRW_PER_JPY).toLocaleString();
+const pname = p => L==='ja' ? p.ja : p.ko;
+const paltname = p => L==='ja' ? p.ko : p.ja;
+function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),1700); }
+function countUp(el, to, fmt, dur=700){
+  const from = +(el.dataset.val || 0); el.dataset.val = to;
+  if (from === to){ el.textContent = fmt(to); return; }
+  const t0 = performance.now();
+  const step = now => { const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,3);
+    el.textContent = fmt(from + (to-from)*e); if (k<1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function stagger(container, on){
+  container.classList.toggle('stagger', !!on);
+  [...container.children].forEach((c,i)=>c.style.setProperty('--i', i));
+}
+function moveKnob(wrap, sel='button.on'){
+  const k = wrap.querySelector('.knob'), b = wrap.querySelector(sel); if (!k || !b) return;
+  k.style.left = b.offsetLeft+'px'; k.style.width = b.offsetWidth+'px';
+}
+function speak(text, lang='ko-KR', btn){
+  if (!('speechSynthesis' in window)) return toast(t('noVoice'));
+  const u = new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=.9;
+  if (btn){ btn.classList.add('talk'); u.onend = ()=>btn.classList.remove('talk'); setTimeout(()=>btn.classList.remove('talk'),3000); }
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+function confetti(){
+  const colors=['#AE1932','#F6B65A','#BCD0EC','#CFE0D9','#E0DFDE','#DCCCAC'], ph=$('#phone');
+  for (let i=0;i<46;i++){
+    const c=document.createElement('span'); c.className='confetti';
+    c.style.left=Math.random()*100+'%'; c.style.background=colors[i%colors.length];
+    c.style.setProperty('--dx',(Math.random()*160-80)+'px'); c.style.setProperty('--r',(Math.random()*720-360)+'deg');
+    c.style.animationDelay=Math.random()*.3+'s'; c.style.animationDuration=1.3+Math.random()*.8+'s';
+    ph.appendChild(c); setTimeout(()=>c.remove(),2600);
+  }
+}
+
+/* ripple on buttons & chips */
+document.addEventListener('pointerdown', e=>{
+  const b = e.target.closest('.btn, .chip'); if (!b) return;
+  const r = b.getBoundingClientRect(), d = Math.max(r.width,r.height)*2, s=document.createElement('span');
+  s.className='ripple'; s.style.width=s.style.height=d+'px';
+  s.style.left=(e.clientX-r.left-d/2)+'px'; s.style.top=(e.clientY-r.top-d/2)+'px';
+  b.appendChild(s); setTimeout(()=>s.remove(),600);
+});
+
+/* ================= mascot ================= */
+const EYE = x => `<g class="eye"><circle cx="${x}" cy="76" r="4.5" fill="#2F2D29"/><circle cx="${x+1.5}" cy="74.5" r="1.4" fill="#fff"/></g>`;
+const BIGEYE = x => `<g class="eye"><circle cx="${x}" cy="76" r="5.8" fill="#2F2D29"/><circle cx="${x+2}" cy="73.8" r="2.1" fill="#fff"/><circle cx="${x-1.6}" cy="78.2" r="1" fill="#fff"/></g>`;
+const HAPPY = x => `<path d="M${x-5.5} 78 Q${x} 70.5 ${x+5.5} 78" stroke="#2F2D29" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+const HEART = x => `<path d="M${x} 82 C${x-10} 75 ${x-6.5} 67 ${x} 72 C${x+6.5} 67 ${x+10} 75 ${x} 82Z" fill="#AE1932"/>`;
+const CHEEK = `<ellipse cx="34" cy="86" rx="6" ry="3.5" fill="#E7897F" opacity=".7"/><ellipse cx="86" cy="86" rx="6" ry="3.5" fill="#E7897F" opacity=".7"/>`;
+const SMILE = `<path d="M54 86 Q60 92 66 86" stroke="#2F2D29" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+const FACES = {
+  smile: EYE(42) + EYE(78) + CHEEK + SMILE,
+  yum:   HAPPY(42) + HAPPY(78) + CHEEK + `<path d="M53 85 Q60 92 67 85" stroke="#2F2D29" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M57.5 88.6 Q60.5 96 63.5 88.9Z" fill="#AE1932"/>`,
+  love:  HEART(42) + HEART(78) + CHEEK + `<path d="M53 86 Q60 94 67 86" stroke="#2F2D29" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
+  wow:   BIGEYE(42) + BIGEYE(78) + CHEEK + `<ellipse cx="60" cy="89" rx="4.2" ry="5" fill="#2F2D29"/>`,
+};
+const miya = (x='smile') => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="113" rx="36" ry="5" fill="rgba(0,0,0,.07)"/>
+  <g class="bob">
+  <rect x="20" y="46" width="80" height="62" rx="16" fill="#F6B65A"/>
+  <rect x="14" y="36" width="92" height="22" rx="10" fill="#E9A03C"/>
+  <rect x="53" y="36" width="14" height="72" fill="#AE1932"/>
+  <g class="bow"><path d="M60 36 C44 14 26 22 34 34 C38 40 52 38 60 36Z" fill="#AE1932"/>
+  <path d="M60 36 C76 14 94 22 86 34 C82 40 68 38 60 36Z" fill="#AE1932"/></g>
+  ${FACES[x] || FACES.smile}
+  </g></svg>`;
+const MASCOT = miya();
+$$('[data-mascot]').forEach(el => { el.classList.add('mascot'); el.innerHTML = miya(el.dataset.mascot); });
+
+/* ================= i18n apply ================= */
+function applyI18n(){
+  document.documentElement.lang = L;
+  document.title = t('brand');
+  $$('[data-i]').forEach(el => { const v = I[L][el.dataset.i]; if (typeof v === 'string') el.innerHTML = v; });
+  $('#sideChips').innerHTML = t('sideChips').map(c=>`<span>${c}</span>`).join('');
+  $('#allergyChips').innerHTML = Object.entries(ALLERGEN).map(([k,v])=>`<button class="chip ${S.allergy.includes(k)?'on':''}" data-v="${k}">${tx(v)}</button>`).join('');
+  $('#storeChips').innerHTML = Object.entries(STORE_META).map(([k,v])=>`<button class="chip ${S.store.includes(k)?'on':''}" data-v="${k}">${v.e} ${tx(v)}</button>`).join('');
+  $('#miniPhrases').innerHTML = MINI.map(m=>`<div class="mini"><div><div class="kr2">${m.kr}</div><p>${m.yomi} — ${tx(m.mean)}</p></div><button class="speak" data-say="${m.kr}">🔊</button></div>`).join('');
+  setChatPh();
+  $$('#lang button').forEach(b=>b.classList.toggle('on', b.dataset.lang===L));
+  requestAnimationFrame(()=>{ moveKnob($('#lang')); $$('.seg').forEach(s=>moveKnob(s)); moveTabInk(); });
+}
+$('#lang').addEventListener('click', e=>{
+  const b = e.target.closest('[data-lang]'); if (!b || b.dataset.lang===L) return;
+  L = b.dataset.lang; try { localStorage.setItem('omiyage-lang', L); } catch(err){}
+  applyI18n(); updateCta(S.cur);
+  if (!S.loading) render[S.cur] && render[S.cur]({anim:false});
+  const sc = $('#'+S.cur); sc.classList.remove('fade-lang'); void sc.offsetWidth; sc.classList.add('fade-lang');
+});
+
+/* ================= routing ================= */
+const ORDER = ['home','people','cond','result','map','message','list','story','recv','chat'];
+const NEXT = {home:'people',people:'cond',cond:'result',result:'map',map:'message',message:'list',list:'story',story:'recv'};
+function updateCta(id){
+  const label = I[L].cta[id];
+  $('#cta').classList.toggle('hide', !label || S.loading);
+  if (label){ $('#ctaBtn').innerHTML = `${label} <span class="arrow">→</span>`; $('#ctaBtn').className = 'btn' + (id==='cond'?' coral':''); }
+}
+$('#ctaBtn').onclick = () => NEXT[S.cur] && go(NEXT[S.cur]);
+function go(id){
+  const prev = S.cur; if (prev === id) return;
+  S.cur = id;
+  if (S.loading){ S.loading=false; S.loadToken++; $('#loader').classList.remove('show'); $('#resultBody').style.display=''; }
+  const dir = !prev || ORDER.indexOf(id) >= ORDER.indexOf(prev) ? 'go-fwd' : 'go-back';
+  $$('.screen').forEach(s=>{ s.classList.remove('active','go-fwd','go-back','fade-lang'); });
+  const el = $('#'+id); void el.offsetWidth; el.classList.add('active', dir); el.scrollTop = 0;
+  const tab = {home:'home',chat:'chat',people:'people',cond:'people',result:'people',map:'map',message:'map',list:'list',story:'list',recv:'list'}[id];
+  $('#chatbar').classList.toggle('show', id==='chat');
+  $$('.nav button').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
+  render[id] && render[id]({anim:true, from:prev});
+  updateCta(id);
+}document.addEventListener('click', e=>{
+  const g = e.target.closest('[data-go]'); if (g) return go(g.dataset.go);
+  const tb = e.target.closest('[data-tab]'); if (tb) return go(tb.dataset.tab);
+  const sp = e.target.closest('[data-say]'); if (sp) return speak(sp.dataset.say, 'ko-KR', sp);
+});
+
+/* ================= recommendation =================
+   mock of: rule filter (code) → constrained pick (LLM in real app) → verification (code) */
+function daysUntilReturn(){
+  if (!S.returnDate) return 3;
+  return Math.max(0, Math.ceil((new Date(S.returnDate) - new Date()) / 864e5));
+}
+function candidates(g){
+  const minShelf = daysUntilReturn() + 30;
+  return DB.filter(p =>
+    (S.storage==='any' || p.storage==='room') &&
+    !p.allergens.some(a => S.allergy.includes(a)) &&
+    p.shelf[0] >= minShelf &&
+    p.stores.some(s => S.store.includes(s)) &&
+    p.price / p.pack <= g.budget * 1.15 &&
+    (g.count <= 3 || p.wrap)
+  );
+}
+function score(p, g){
+  let s = -Math.abs(p.formal - g.formal) * 3;
+  if (g.count >= 5 && p.tags.includes('share')) s += 3;
+  if (S.luggage==='light' && p.tags.includes('light')) s += 2;
+  if (p.tags.includes('korean')) s += 1;
+  s -= Math.abs(p.price/p.pack - g.budget) / g.budget;
+  return s;
+}
+function reasonFor(p, g){
+  const ja = L==='ja', b = [], m = Math.round(p.shelf[0]/30);
+  if (p.wrap && g.count>=5) b.push(ja?`個包装なので${g.count}人に配りやすい`:`개별 포장이라 ${g.count}명에게 나눠 주기 좋아요`);
+  if (p.storage==='room') b.push(ja?`常温で${m}か月以上もちます`:`상온에서 ${m}개월 이상 보관돼요`);
+  if (p.tags.includes('light')) b.push(ja?'軽くてスーツケースの負担が少ない':'가벼워서 캐리어 부담이 적어요');
+  if (p.tags.includes('korean')) b.push(ja?'韓国らしさが伝わる':'한국다운 느낌이 전해져요');
+  if (p.tags.includes('premium')) b.push(ja?'きちんとした印象を与えられます':'격식 있는 인상을 줘요');
+  if (!p.allergens.length) b.push(ja?'主要アレルゲンを含みません':'주요 알레르기 성분이 없어요');
+  return b.slice(0,3).join(ja?'。':'. ') + (ja?'。':'.');
+}
+function recommend(){
+  S.recs = S.groups.map(g=>{
+    const c = candidates(g).sort((a,b)=>score(b,g)-score(a,g));
+    const chosen = c.find(p=>p.id===S.picks[g.id]) || c[0];
+    const valid = chosen && DB.some(p=>p.id===chosen.id);            // verify ID exists
+    if (!valid) return {g, p:null, alts:[], qty:0, sub:0, spare:0};
+    const qty = Math.ceil(g.count / chosen.pack);                    // recompute in code
+    return {g, p:chosen, alts:c.slice(0,4), qty, sub:qty*chosen.price, spare:qty*chosen.pack-g.count};
+  });
+  S.dirty = false;
+}
+const budgetTotal = () => S.groups.reduce((a,g)=>a+g.count*g.budget,0);
+const peopleTotal = () => S.groups.reduce((a,g)=>a+g.count,0);
+const markDirty = () => { S.dirty = true; };
+
+/* ================= renderers ================= */
+const render = {};
+
+render.home = ({anim}={})=>{
+  $('#homePrep').style.display = S.homeTab==='prep' ? '' : 'none';
+  $('#homeFav').style.display = S.homeTab==='fav' ? '' : 'none';
+  $$('#homeTabs [data-hometab]').forEach(b=>b.classList.toggle('on', b.dataset.hometab===S.homeTab));
+  const dot = $('#favDot'); dot.textContent = S.fav.size; dot.dataset.n = S.fav.size;
+  moveTabInk();
+  if (S.homeTab==='fav'){
+    const items = DB.filter(p=>S.fav.has(p.id));
+    $('#homeFav').innerHTML = items.length ? items.map(p=>`
+      <div class="card fav-item"><div class="pic">${p.e}</div><div style="flex:1"><b>${pname(p)}</b><p>${paltname(p)} · ${won(p.price)}</p></div>
+      <button class="heart on" style="position:static" data-fav="${p.id}">♥</button></div>`).join('')
+      : `<div class="empty"><div class="mascot" style="width:100px;margin:0 auto 10px">${MASCOT}</div>${t('favEmpty')}</div>`;
+    stagger($('#homeFav'), anim); return;
+  }
+  const n = peopleTotal(), b = budgetTotal();
+  countUp($('#homePeople'), n, v=>Math.round(v));
+  $('#homePeopleU').textContent = t('peopleUnit', n, S.groups.length);
+  countUp($('#homeBudget'), b, v=>'₩'+Math.round(v/1000)+'k');
+  $('#homeYen').textContent = '≈ ' + yen(b);
+  const big = [...S.groups].sort((a,b)=>b.count-a.count)[0];
+  $('#heroQ').innerHTML = t('heroQ', tx(big.name), big.count);
+  $('#today').textContent = new Date().toLocaleDateString(L==='ja'?'ja-JP':'ko-KR',{month:'long',day:'numeric',weekday:'long'}) + t('daySuffix');
+  stagger($('#homePrep'), anim);
+};
+function moveTabInk(){
+  const on = $('#homeTabs button.on'), ink = $('#homeTabs .ink'); if (!on) return;
+  ink.style.left = on.offsetLeft+'px'; ink.style.width = on.offsetWidth+'px';
+}
+$('#homeTabs').addEventListener('click', e=>{
+  const b = e.target.closest('[data-hometab]'); if (!b) return;
+  S.homeTab = b.dataset.hometab; render.home({anim:true});
+});
+/* ================= Miya-chan AI (mock) =================
+   Real app: LLM turns free text into the structured JSON below (function calling / JSON schema).
+   Here a small rule-based parser stands in for the LLM. */
+function setChatPh(){ $('#chatInput').placeholder = t('chatPh'); }
+$('#hero').onclick = ()=>go('people');
+
+const ROLES = [
+  {re:/上司|部長|課長|상사|부장|과장|팀장/, name:{ja:'上司',ko:'상사'},e:'👔',color:'var(--lilac)',formal:3,def:1},
+  {re:/取引先|거래처/, name:{ja:'取引先',ko:'거래처'},e:'🤝',color:'var(--sky)',formal:3,def:3},
+  {re:/同僚|職場|会社|동료|직장|회사|팀원/, name:{ja:'職場の同僚',ko:'직장 동료'},e:'💼',color:'var(--sky)',formal:1,def:10},
+  {re:/家族|両親|親|가족|부모|엄마|아빠/, name:{ja:'家族',ko:'가족'},e:'🏠',color:'var(--peach)',formal:2,def:2},
+  {re:/友|친구/, name:{ja:'友だち',ko:'친구'},e:'💛',color:'var(--butter)',formal:2,def:1},
+];
+const ALLERGY_RE = {wheat:/小麦|밀/, milk:/乳製品|牛乳|乳|우유|유제품/, egg:/卵|달걀|계란/, nuts:/ナッツ|견과/, soy:/大豆|대두|콩/, shrimp:/えび|エビ|새우/};
+function parseRequest(text){
+  let s = text.replace(/[０-９]/g, c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
+  let per = /인당|あたり|ずつ|につき/.test(s);
+  s = s.replace(/1\s*(?:人|인|名)\s*(?:あたり|당|につき|ずつ)|1\s*(?:人|名)(?=\s*[₩¥]?\s*\d)/g, ()=>{ per=true; return ' '; });
+  let amount = 0;
+  s = s.replace(/([₩¥])?\s*(\d[\d,.]*)\s*(万|만|千|천)?\s*(ウォン|원|won|円|엔)?/gi, (m,sym,num,mul,unit)=>{
+    if (!sym && !unit && !mul) return m;
+    let v = parseFloat(num.replace(/,/g,'')) * ({'万':1e4,'만':1e4,'千':1e3,'천':1e3}[mul]||1);
+    if (sym==='¥' || /円|엔/.test(unit||'')) v *= KRW_PER_JPY;
+    amount = v; return ' ';
+  });
+  const groups = []; let orphan = 0;
+  s.split(/[、,，。\n]|と|や|그리고|이랑|랑|하고|및/).forEach(seg=>{
+    const role = ROLES.find(r=>r.re.test(seg)), num = seg.match(/(\d+)\s*(?:人|명|名)/);
+    if (role && !groups.some(g=>g.name.ja===role.name.ja)) groups.push({...role, count: num ? +num[1] : role.def});
+    else if (!role && num) orphan = +num[1];
+  });
+  if (!groups.length && orphan) groups.push({...ROLES[2], count: orphan});
+  if (/高級|きちんと|ちゃんと|고급|격식/.test(text)) groups.forEach(g=>g.formal=3);
+  if (/気軽|カジュアル|安い|가볍게|저렴/.test(text)) groups.forEach(g=>g.formal=1);
+  const people = groups.reduce((a,g)=>a+g.count,0);
+  const perBudget = amount ? Math.max(500, Math.round((per ? amount : amount/Math.max(1,people))/500)*500) : 0;
+  groups.forEach(g=>{ g.budget = perBudget || {1:2000,2:5000,3:12000}[g.formal]; delete g.re; delete g.def; });
+  const allergy = Object.keys(ALLERGY_RE).filter(k=>ALLERGY_RE[k].test(text));
+  return {groups, allergy, budgetGiven: !!amount};
+}
+function summarize(p){
+  let s = p.groups.map(g=>t('sumPerson', tx(g.name), g.count)).join(t('sumJoin'));
+  if (p.budgetGiven) s += t('sumBudget', won(p.groups[0].budget));
+  if (p.allergy.length) s += t('sumAllergy', p.allergy.map(a=>tx(ALLERGEN[a])).join('・'));
+  return s;
+}
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+const scrollChat = () => { const c=$('#chat'); c.scrollTo({top:c.scrollHeight, behavior:'smooth'}); };
+function setThinking(on){
+  $('#chatAv').classList.toggle('jump', on);
+  $('#chatStatus').textContent = on ? t('chatThinking') : t('chatOnline');
+}
+function addMe(text){
+  const d=document.createElement('div'); d.className='row-me'; d.textContent=text; $('#chatLog').appendChild(d); scrollChat();
+}
+function botRow(inner){
+  const r=document.createElement('div'); r.className='row-bot';
+  r.innerHTML=`<div class="mascot av">${MASCOT}</div><div class="bb">${inner||''}</div>`;
+  $('#chatLog').appendChild(r); scrollChat(); return r;
+}
+async function streamBot(text, fast){
+  const bb = botRow().querySelector('.bb'); bb.classList.add('caret');
+  for (let i=1;i<=text.length;i++){ bb.textContent = text.slice(0,i); if (!fast) await sleep(22); if (i%8===0) scrollChat(); }
+  bb.classList.remove('caret'); scrollChat();
+}
+function addSugs(){
+  const d=document.createElement('div'); d.className='chat-sugs';
+  d.innerHTML = t('sugs').map(s=>`<button data-sug>${s}</button>`).join('');
+  $('#chatLog').appendChild(d); scrollChat();
+}
+S.plans = {};
+function addPlan(p){
+  const id = 'pl'+Date.now(); S.plans[id] = p;
+  const json = JSON.stringify({
+    intent:'plan_gifts',
+    groups:p.groups.map(g=>({name:g.name.ja, count:g.count, budget_per_person_krw:g.budget, formality:['casual','normal','formal'][g.formal-1]})),
+    avoid_allergens:p.allergy, storage:'room'
+  }, null, 2);
+  const d=document.createElement('div'); d.className='plan';
+  d.innerHTML = `<h4>${t('planTitle')}</h4>
+    ${p.groups.map(g=>`<div class="g"><span class="e" style="background:${g.color}">${g.e}</span>${tx(g.name)} · ${t('person',g.count)}<b>${t('upTo',won(g.budget))}</b></div>`).join('')}
+    ${p.allergy.length?`<div class="g"><span class="e" style="background:var(--peach-soft)">🚫</span>${p.allergy.map(a=>tx(ALLERGEN[a])).join('・')}</div>`:''}
+    <div class="guar">${t('guar').map(x=>`<span>${x}</span>`).join('')}</div>
+    <button class="btn coral" data-apply="${id}">${t('planBtn')}</button>
+    <button class="json-t" data-json="${id}">${t('jsonShow')}</button>
+    <pre id="${id}-json"></pre><p class="note">${t('jsonNote')}</p>`;
+  d.querySelector('pre').textContent = json;
+  $('#chatLog').appendChild(d); scrollChat();
+}
+async function chatSend(text){
+  if (S.chatBusy) return; S.chatBusy = true;
+  $$('#chatLog .chat-sugs').forEach(x=>x.remove());
+  addMe(text); setThinking(true);
+  const typing = botRow('<div class="typing"><span></span><span></span><span></span></div>');
+  typing.querySelector('.bb').style.padding='0';
+  await sleep(900 + Math.random()*600); typing.remove();
+  const p = parseRequest(text);
+  if (p.groups.length){ await streamBot(t('replyPlan', summarize(p))); addPlan(p); }
+  else if (/渡|マナー|건네|매너|예절/.test(text)) await streamBot(t('replyManner'));
+  else if (/ありがと|고마|감사/.test(text)) await streamBot(t('replyThanks'));
+  else { await streamBot(t('replyAsk')); addSugs(); }
+  setThinking(false); S.chatBusy = false;
+}
+render.chat = async ()=>{
+  const pending = S.chatPending; S.chatPending = null;
+  if (!S.chatInit){ S.chatInit = true; await streamBot(t('chatHello'), !!pending); if (!pending) addSugs(); }
+  if (pending) chatSend(pending);
+  else setTimeout(()=>$('#chatInput').focus({preventScroll:true}), 400);
+};
+$('#chatbar').addEventListener('submit', e=>{
+  e.preventDefault(); const v=$('#chatInput').value.trim(); if(!v || S.chatBusy) return;
+  $('#chatInput').value=''; chatSend(v);
+});
+$('#chatLog').addEventListener('click', e=>{
+  const sg = e.target.closest('[data-sug]'); if (sg) return chatSend(sg.textContent);
+  const js = e.target.closest('[data-json]'); if (js) return $(`#${js.dataset.json}-json`).classList.toggle('show');
+  const ap = e.target.closest('[data-apply]'); if (!ap) return;
+  const p = S.plans[ap.dataset.apply];
+  S.groups = p.groups.map((g,i)=>({id:Date.now()+i, name:g.name, e:g.e, color:g.color, count:g.count, budget:g.budget, formal:g.formal}));
+  S.allergy = [...p.allergy]; S.picks = {}; S.checked = {}; S.msgGroup = 0; S.phraseIdx = 0;
+  markDirty(); applyI18n(); go('result');
+});
+$('#recentCard').onclick = ()=>toast(t('recentToast'));
+$('#homeFav').addEventListener('click', e=>{ const h=e.target.closest('[data-fav]'); if(h){ toggleFav(h.dataset.fav, h); render.home({anim:false}); } });
+
+render.people = ({anim}={}, bumpKey)=>{
+  $('#groupList').innerHTML = S.groups.map(g=>`
+    <div class="card group" data-gid="${g.id}">
+      <div class="top"><div class="emoji" style="background:${g.color}">${g.e}</div>
+        <div><div class="name">${tx(g.name)}</div><div class="meta">${t('subtotalGuide')} ${won(g.count*g.budget)}</div></div>
+        <button class="del" data-del="${g.id}" aria-label="delete">×</button></div>
+      <div class="row"><span>${t('count')}</span><div class="stepper"><button data-inc="${g.id}|count|-1">−</button><output data-out="${g.id}|count">${t('person',g.count)}</output><button data-inc="${g.id}|count|1">＋</button></div></div>
+      <div class="row"><span>${t('perPerson')}</span><div class="stepper"><button data-inc="${g.id}|budget|-500">−</button><output data-out="${g.id}|budget">${won(g.budget)}</output><button data-inc="${g.id}|budget|500">＋</button></div></div>
+      <div class="seg" data-formal="${g.id}"><i class="knob"></i>${t('formal').map((f,i)=>`<button class="${g.formal===i+1?'on':''}" data-fv="${i+1}">${f}</button>`).join('')}</div>
+    </div>`).join('');
+  stagger($('#groupList'), anim);
+  requestAnimationFrame(()=>$$('#groupList .seg').forEach(s=>moveKnob(s)));
+  if (bumpKey){ const o = $(`[data-out="${bumpKey}"]`); o && o.classList.add('bump'); }
+  countUp($('#peopleSum'), peopleTotal(), v=>t('person', Math.round(v)), 400);
+  countUp($('#budgetSum'), budgetTotal(), won, 400);
+};
+$('#groupList').addEventListener('click', e=>{
+  const inc = e.target.closest('[data-inc]'), fb = e.target.closest('[data-fv]'), del = e.target.closest('[data-del]');
+  if (inc){
+    const [id,k,d]=inc.dataset.inc.split('|'); const g=S.groups.find(x=>x.id==id);
+    g[k] = Math.min(k==='count'?99:100000, Math.max(k==='count'?1:500, g[k] + +d));
+    markDirty(); render.people({anim:false}, `${id}|${k}`);
+  }
+  if (fb){
+    const seg = fb.closest('.seg'), g = S.groups.find(x=>x.id==seg.dataset.formal);
+    g.formal = +fb.dataset.fv; markDirty();
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b===fb)); moveKnob(seg);
+  }
+  if (del){
+    if (S.groups.length===1) return toast(t('needOne'));
+    const card = del.closest('.group'); card.classList.add('leaving');
+    setTimeout(()=>{ S.groups = S.groups.filter(x=>x.id!=del.dataset.del); markDirty(); render.people({anim:false}); }, 260);
+  }
+});
+
+/* add-group sheet */
+function openSheet(){
+  $('#presetGrid').innerHTML = PRESETS.map((p,i)=>`<button data-preset="${i}"><span class="e" style="background:${p.color}">${p.e}</span>${tx(p.name)}</button>`).join('');
+  $('#backdrop').classList.add('show'); $('#sheet').classList.add('show');
+}
+function closeSheet(){ $('#backdrop').classList.remove('show'); $('#sheet').classList.remove('show'); }
+$('#addGroup').onclick = openSheet;
+$('#backdrop').onclick = closeSheet;
+$('#presetGrid').addEventListener('click', e=>{
+  const b = e.target.closest('[data-preset]'); if (!b) return;
+  const p = PRESETS[b.dataset.preset], id = Date.now();
+  S.groups.push({id, name:p.name, e:p.e, color:p.color, count:3, budget:3000, formal:p.formal});
+  markDirty(); closeSheet(); render.people({anim:false});
+  const card = $(`[data-gid="${id}"]`); card.classList.add('pop-in'); card.scrollIntoView({behavior:'smooth',block:'center'});
+  toast(t('added', tx(p.name)));
+});
+
+render.cond = ({anim}={})=>{
+  $('#shelfHint').textContent = t('shelfHint', daysUntilReturn());
+  $$('.seg[data-key]').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.v===S[seg.dataset.key]));
+    requestAnimationFrame(()=>moveKnob(seg));
+  });
+  stagger($('#condBody'), anim);
+};
+$$('.seg[data-key]').forEach(seg=>seg.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); moveKnob(seg);
+  S[seg.dataset.key]=b.dataset.v; markDirty();
+}));
+$$('[data-multi]').forEach(box=>box.addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b) return; b.classList.toggle('on');
+  S[box.dataset.multi] = [...box.querySelectorAll('.chip.on')].map(x=>x.dataset.v); markDirty();
+}));
+const rd = new Date(Date.now()+3*864e5); $('#returnDate').value = rd.toISOString().slice(0,10); S.returnDate = $('#returnDate').value;
+$('#returnDate').onchange = e=>{ S.returnDate=e.target.value; markDirty(); render.cond(); };
+
+render.result = ({anim, from}={})=>{
+  if (anim && (S.dirty || from==='cond' || !S.recs)) return runLoader();
+  if (S.dirty || !S.recs) recommend();
+  drawResults(anim);
+};
+function runLoader(){
+  const token = S.loadToken = (S.loadToken||0)+1;
+  S.loading = true; updateCta('result');
+  $('#resultBody').style.display='none'; $('#loader').classList.add('show');
+  $('#loadSteps').innerHTML = t('loadSteps').map(s=>`<li><span class="s"></span>${s}</li>`).join('');
+  const lis = $$('#loadSteps li');
+  lis.forEach((li,i)=>{
+    setTimeout(()=>{ li.classList.add('run'); }, i*520);
+    setTimeout(()=>{ li.classList.remove('run'); li.classList.add('done'); }, i*520+480);
+  });
+  setTimeout(()=>{
+    if (token!==S.loadToken || S.cur!=='result') return;
+    recommend(); S.loading = false;
+    $('#loader').classList.remove('show'); $('#resultBody').style.display='';
+    drawResults(true); updateCta('result');
+  }, lis.length*520+250);
+}
+function drawResults(anim){
+  $('#recList').innerHTML = S.recs.map(r=>{
+    const head = `<div class="head" style="background:${r.g.color}"><span>${r.g.e} ${tx(r.g.name)} · ${t('person',r.g.count)}</span><span>${t('upTo',won(r.g.budget))}</span></div>`;
+    if (!r.p) return `<div class="card rec">${head}<div class="empty">${t('noMatch')}</div></div>`;
+    return `<div class="card rec">${head}
+      <button class="heart ${S.fav.has(r.p.id)?'on':''}" data-fav="${r.p.id}">♥</button>
+      <div class="body"><div class="pic">${r.p.e}</div>
+        <div><div class="pname">${pname(r.p)}</div><div class="alt-name">${paltname(r.p)}</div>
+        <div class="tags">${r.p.tags.map(k=>`<span>${tx(TAG[k])}</span>`).join('')}${r.p.wrap?`<span>${tx(TAG.wrap)}</span>`:''}</div></div></div>
+      <div class="calc"><span>${won(r.p.price)} × ${r.qty}${t('packs')}<br><small>${t('pcs', r.qty*r.p.pack)}${r.spare?t('spare',r.spare):''}</small></span><b>${won(r.sub)}</b></div>
+      <div class="why"><b>${t('why')}</b>　${reasonFor(r.p,r.g)}</div>
+      ${r.alts.length>1?`<div class="alt">${r.alts.filter(a=>a.id!==r.p.id).slice(0,3).map(a=>`<button data-pick="${r.g.id}|${a.id}">${a.e} ${pname(a)}${t('swapTo')}</button>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+  stagger($('#recList'), anim);
+  const total = S.recs.reduce((a,r)=>a+r.sub,0), b = budgetTotal(), pct = Math.min(100, total/b*100), over = total>b;
+  $('#totalBox').innerHTML = S.recs.filter(r=>r.p).map(r=>`<div class="line"><span>${r.g.e} ${tx(r.g.name)}</span><span>${won(r.sub)}</span></div>`).join('') +
+    `<div class="big"><span>${t('sum')} <small style="color:var(--ink-3)">≈ ${yen(total)}</small></span><b id="totalNum" data-val="${anim?0:total}">${won(total)}</b></div>
+     <div class="bar"><i id="totalBar" style="background:${over?'var(--coral-deep)':'var(--coral)'};width:${anim?0:pct}%"></i></div>
+     <div class="line" style="margin-top:8px"><span>${t('budgetLine',won(b))}</span><span style="color:${over?'var(--coral-deep)':'inherit'}">${over?t('over',won(total-b)):t('left',won(b-total))}</span></div>`;
+  if (anim){ countUp($('#totalNum'), total, won, 900); setTimeout(()=>$('#totalBar').style.width = pct+'%', 50); }
+}
+$('#recList').addEventListener('click',e=>{
+  const h=e.target.closest('[data-fav]'); if (h) return toggleFav(h.dataset.fav, h);
+  const p=e.target.closest('[data-pick]'); if(!p) return;
+  const [gid,pid]=p.dataset.pick.split('|'); S.picks[gid]=pid; recommend(); drawResults(false);
+  const idx = S.groups.findIndex(g=>g.id==gid); const nc = $$('#recList .rec')[idx]; nc && nc.classList.add('swap');
+  toast(t('swapped'));
+});
+function toggleFav(id, btn){
+  const on = !S.fav.has(id); on ? S.fav.add(id) : S.fav.delete(id);
+  btn.classList.toggle('on', on); btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+  toast(on ? t('favAdd') : t('favDel'));
+}
+
+render.map = ({anim}={})=>{
+  if (S.dirty || !S.recs) recommend();
+  const need = new Set(S.recs.filter(r=>r.p).flatMap(r=>r.p.stores.filter(s=>S.store.includes(s))));
+  const list = STORES.filter(s=>need.has(s.t));
+  $('#pins').innerHTML = list.map((s,i)=>`<div class="pin ${anim?'drop':''}" data-pin="${s.t}" style="left:${s.x}%;top:${s.y}%;--i:${i}"><span>${STORE_META[s.t].e} ${s.dist}</span><i style="background:${STORE_META[s.t].c}"></i></div>`).join('');
+  $('#storeList').innerHTML = list.map(s=>{
+    const items = S.recs.filter(r=>r.p&&r.p.stores.includes(s.t)).map(r=>pname(r.p)).join('・');
+    return `<div class="store" data-store="${s.t}"><div class="ico" style="background:${STORE_META[s.t].c}">${STORE_META[s.t].e}</div><div><b>${tx(s.name)}</b><p>${items}</p></div><span class="dist">${s.dist} ›</span></div>`;
+  }).join('') || `<div class="empty">${t('noStore')}</div>`;
+  stagger($('#storeList'), anim);
+  drawPhrase(false);
+};
+function drawPhrase(animate){
+  const recs = S.recs.filter(r=>r.p);
+  if (S.phraseIdx >= recs.length) S.phraseIdx = 0;
+  $('#phraseTabs').innerHTML = recs.map((r,i)=>`<button class="chip ${i===S.phraseIdx?'on':''}" data-ph="${i}">${r.p.e} ${tx(r.g.name)}</button>`).join('');
+  const r = recs[S.phraseIdx]; if (!r) return;
+  const name = r.p.ko.replace(/\s*\(.*\)/,''), n = r.qty;
+  const cnt = n<=20 ? `${NATIVE[n]} 개` : `${n}개`, y = n<=20 ? `${YOMI[n]} ゲ` : `${n} ゲ`;
+  $('#phraseKr').textContent = `${name} ${cnt} 주세요.`;
+  $('#phraseYomi').innerHTML = `<span>${t('reading')}: …${y} チュセヨ</span><button data-say="${name} ${cnt} 주세요">🔊 ${t('listen')}</button>`;
+  $('#phraseJa').textContent = L==='ja' ? `${t('meaning')}：「${r.p.ja}を${n}つください」` : `${t('meaning')}: ${r.p.ko.replace(/\s*\(.*\)/,'')} ${n}개 주세요 (日本語:「${r.p.ja}を${n}つください」)`;
+  if (animate){ const c=$('#phraseCard'); c.classList.remove('swap'); void c.offsetWidth; c.classList.add('swap'); }
+}
+$('#phraseTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-ph]'); if(b){ S.phraseIdx=+b.dataset.ph; drawPhrase(true); }});
+$('#storeList').addEventListener('click',e=>{
+  const s=e.target.closest('[data-store]'); if(!s) return;
+  $$('.store').forEach(x=>x.classList.toggle('on', x===s));
+  $$('.pin').forEach(p=>p.classList.toggle('hl', p.dataset.pin===s.dataset.store));
+  const st = STORES.find(x=>x.t===s.dataset.store); toast(t('routeToast', tx(st.name)));
+  const idx = S.recs.filter(r=>r.p).findIndex(r=>r.p.stores.includes(st.t));
+  if (idx>=0 && idx!==S.phraseIdx){ S.phraseIdx=idx; drawPhrase(true); }
+});
+
+render.message = ({anim}={})=>{
+  if (S.msgGroup >= S.groups.length) S.msgGroup = 0;
+  $('#msgTabs').innerHTML = S.groups.map((g,i)=>`<button class="chip ${i===S.msgGroup?'on':''}" data-mg="${i}">${g.e} ${tx(g.name)}</button>`).join('');
+  const g = S.groups[S.msgGroup], arr = MSGS[g.formal], m = arr[S.msgIdx % arr.length];
+  $('#msgText').innerHTML = m.ja; $('#msgMean').textContent = `${t('meaning')}: ${m.ko}`;
+  $('#msgFrom').textContent = `${t('to', tx(g.name))} · ${t('formal')[g.formal-1]}`;
+  if (anim) stagger($('#msgTabs'), true);
+};
+function flipMsg(){ const c=$('#msgCard'); c.classList.remove('flip'); void c.offsetWidth; c.classList.add('flip'); setTimeout(()=>render.message({anim:false}), 250); }
+$('#msgTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-mg]'); if(b){ S.msgGroup=+b.dataset.mg; S.msgIdx=0; $$('#msgTabs .chip').forEach(c=>c.classList.toggle('on',c===b)); flipMsg(); }});
+$('#nextMsg').onclick = ()=>{ S.msgIdx++; flipMsg(); };
+$('#sayMsg').onclick = e=>speak($('#msgText').innerText, 'ja-JP', e.currentTarget);
+$('#copyMsg').onclick = ()=>{
+  const txt=$('#msgText').innerText;
+  if (!navigator.clipboard) return toast(t('copyFail'));
+  navigator.clipboard.writeText(txt).then(()=>toast(t('copied')),()=>toast(t('copyFail')));
+};
+
+render.list = ({anim}={}, justChecked)=>{
+  if (S.dirty || !S.recs) recommend();
+  const recs = S.recs.filter(r=>r.p);
+  $('#checkList').innerHTML = recs.map(r=>{
+    const st = r.p.stores.find(s=>S.store.includes(s)) || r.p.stores[0];
+    return `<div class="check ${S.checked[r.g.id]?'done':''}" data-ck="${r.g.id}">
+      <div class="box">✓</div><div><div class="t">${r.p.e} ${pname(r.p)} × ${r.qty}</div><p>${tx(r.g.name)} · ${tx(STORE_META[st])}</p></div>
+      <span class="amt">${won(r.sub)}</span></div>`;
+  }).join('') || `<div class="empty">${t('listEmpty')}</div>`;
+  if (anim) stagger($('#checkList'), true);
+  const b = budgetTotal(), doneRecs = recs.filter(r=>S.checked[r.g.id]), spent = doneRecs.reduce((a,r)=>a+r.sub,0);
+  countUp($('#remain'), b-spent, won, 600);
+  $('#remainSub').textContent = t('bought', doneRecs.length, recs.length, won(spent));
+  $('#ringArc').setAttribute('stroke-dasharray', `${Math.min(100,spent/b*100)} 100`);
+  const all = recs.length && doneRecs.length===recs.length;
+  $('#doneCard').classList.toggle('show', !!all);
+  return all;
+};
+$('#checkList').addEventListener('click',e=>{
+  const c=e.target.closest('[data-ck]'); if(!c) return;
+  S.checked[c.dataset.ck]=!S.checked[c.dataset.ck];
+  const all = render.list({anim:false}, true);
+  const nb = $(`[data-ck="${c.dataset.ck}"] .box`); nb && nb.classList.add('bump');
+  if (all && S.checked[c.dataset.ck]) confetti();
+});
+
+/* ================= 土産話 QR (mock only) ================= */
+(function drawQR(){ // decorative fake QR
+  let h = 2166136261; for (const c of 'omiyage-8f2k1x') h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
+  const bit = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return h & 1; };
+  const N = 25, inF = (x,y) => (x<8&&y<8) || (x>N-9&&y<8) || (x<8&&y>N-9);
+  const F = (x,y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#2F2D29"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="#2F2D29"/>`;
+  let m = ''; for (let y=0;y<N;y++) for (let x=0;x<N;x++) if (!inF(x,y) && bit()) m += `<rect x="${x}" y="${y}" width="1" height="1" fill="#2F2D29"/>`;
+  $('#qrBox').innerHTML = `<svg viewBox="-1 -1 ${N+2} ${N+2}" shape-rendering="crispEdges"><rect x="-1" y="-1" width="${N+2}" height="${N+2}" fill="#fff"/>${m}${F(0,0)}${F(N-7,0)}${F(0,N-7)}</svg>`;
+})();
+render.story = ({anim}={}) => stagger($('#storyBody'), anim);
+render.recv = ({anim}={}) => {
+  $('#rpHero').style.backgroundImage = `url(assets/${S.photo || 'myeongdong'}.jpg)`;
+  stagger($('#recvPage'), anim);
+};
+$('#photoPick').addEventListener('click', e=>{
+  const b = e.target.closest('.ph'); if (!b) return;
+  if (!b.dataset.photo) return toast(t('photoToast'));
+  S.photo = b.dataset.photo;
+  $$('#photoPick .ph').forEach(x=>x.classList.toggle('on', x===b));
+});
+document.addEventListener('click', e=>{ const b = e.target.closest('[data-toast]'); if (b) toast(t(b.dataset.toast)); });
+$('#recvPage').addEventListener('click', e=>{
+  const b = e.target.closest('[data-react]'); if (!b) return;
+  $$('#recvPage [data-react]').forEach(x=>x.classList.toggle('on', x===b));
+  toast(t('sentTo'));
+  setTimeout(()=>{
+    $('#pushApp').textContent = t('pushApp'); $('#pushText').textContent = t('pushText', t(b.dataset.react));
+    $('#push').classList.add('show'); clearTimeout(S.pushT); S.pushT = setTimeout(()=>$('#push').classList.remove('show'), 4500);
+  }, 1200);
+});
+$('#push').onclick = ()=>{ $('#push').classList.remove('show'); go('story'); };
+
+/* ================= boot ================= */
+applyI18n();
+go('home');
+window.addEventListener('resize', ()=>{ moveKnob($('#lang')); $$('.seg').forEach(s=>moveKnob(s)); moveTabInk(); });
+</script>
+</body>
+</html>
