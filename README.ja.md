@@ -14,6 +14,7 @@ idea/
 │   └── omiyage-seoul/   2. オミヤゲ・ソウル
 ├── sion/       한시온（ハン・シオン）
 ├── sangmu/     이상무（イ・サンム）
+│   └── kokoseoul/       1. 地下鉄案内サービス（ココソウル：案内・クエスト・スタンプ）
 ├── jonghoon/   임종훈（イム・ジョンフン）
 ├── minyoung/   허민영（ホ・ミニョン）
 └── yeeun/      유예은（ユ・イェウン）
@@ -41,7 +42,7 @@ idea/
 - **提案:** 최도일, 한시온, 이상무
 - **内容:** ホームの案内板を撮ると「この電車に乗っていいか」を日本語で判定する。3Dマップで電車を追いかけ、駅に着いたらスタンプとクエストを集める。APIをつないで、実際の運行状況に合わせて案内する。
 - **根拠:** 7号線の終着駅表記の事例（長岩／石南 方面）
-- **コード:** [`idea/doil/subway`](idea/doil/subway)
+- **コード:** [`idea/doil/subway`](idea/doil/subway)、[`idea/sangmu/kokoseoul`](idea/sangmu/kokoseoul)（ココソウルのウェブ／モバイル、クエストのウェブ・モバイルデモのコード）
 - **デモ:**
   - 地下鉄アプリ: https://subway-seven-drab.vercel.app
   - 3D: https://subway-seven-drab.vercel.app/#ride

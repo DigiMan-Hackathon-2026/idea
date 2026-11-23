@@ -1,0 +1,66 @@
+[
+  {
+    "id": "16e737bb-f397-47a5-bf02-37e484128b65",
+    "versionId": "9198038c-74fe-480a-87e7-5fa978737dd6",
+    "slug": "seochon-tosokchon-samgyetang",
+    "areaCode": "jongno",
+    "purpose": "food",
+    "titleKo": "서촌 토속촌에서 삼계탕 한 그릇 주문하기",
+    "titleJa": "西村の土俗村でサムゲタンを一つ注文する",
+    "summaryKo": "한옥 식당에서 한 명 자리를 물어보고 기본 삼계탕을 골라요.",
+    "summaryJa": "韓屋の食堂で1人で座れるか聞き、定番のサムゲタンを選びます。",
+    "bodyKo": "서울관광재단 안내 기준 일본어 메뉴판이 있어요. 한 명 자리와 대기 시간, 오늘 메뉴 가격은 매장에서 확인해요.",
+    "bodyJa": "ソウル観光財団によると、日本語のメニューがあります。1人で座れるか、待ち時間や当日の値段は店頭で確認しましょう。",
+    "detailKo": "일본어 메뉴판 · 가격은 매장 확인",
+    "detailJa": "日本語メニューあり · 値段は店頭で確認",
+    "durationMinutes": 60,
+    "place": {
+      "id": "7a8cb7dd-d921-4ccf-b409-f8bbfd41ca30",
+      "nameKo": "토속촌삼계탕",
+      "nameJa": "土俗村サムゲタン",
+      "addressKo": "서울 종로구 자하문로5길 5",
+      "guideUrlKo": "https://korean.visitseoul.net/area/TosokchonSamgyetang/KOPywjsmm",
+      "guideUrlJa": "https://korean.visitseoul.net/area/TosokchonSamgyetang/KOPywjsmm",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "4cdce88d-06ac-441f-8b08-697872e9a6a4",
+        "titleKo": "토속촌 입구 찾기",
+        "titleJa": "土俗村の入口を探す",
+        "bodyKo": "자하문로5길 5의 ‘토속촌’ 간판을 찾아요. 줄이 있다면 어디에서 기다리는지 직원에게 물어봐요.",
+        "bodyJa": "「자하문로5길 5」の「토속촌」の看板を探します。列があれば、どこに並ぶかスタッフに聞きましょう。",
+        "completionLabelKo": "입구를 찾았어요",
+        "completionLabelJa": "入口を見つけました",
+        "showsPlace": true
+      },
+      {
+        "id": "aba52350-9647-4a0c-ab05-5c1a270af08e",
+        "titleKo": "한 명 자리와 대기 시간 묻기",
+        "titleJa": "1人席と待ち時間を聞く",
+        "bodyKo": "한 명이 앉을 수 있는지와 예상 대기 시간을 물어봐요. 오래 걸리면 덜 붐비는 시간을 물어보고 나중에 이어가요.",
+        "bodyJa": "1人で座れるかと待ち時間の目安を聞きます。時間がかかるときは空いている時間帯を聞いて、後で続けましょう。",
+        "completionLabelKo": "자리나 대기 방법을 확인했어요",
+        "completionLabelJa": "席か待ち方を確認しました",
+        "phraseKo": "한 명이에요. 지금 앉을 수 있나요? 얼마나 기다려야 하나요?",
+        "phraseJa": "1人です。今、席は空いていますか？ どのくらい待ちますか？"
+      },
+      {
+        "id": "45088615-f04c-4f56-8e35-bd6fb07ca442",
+        "titleKo": "기본 삼계탕 한 그릇 주문하기",
+        "titleJa": "定番のサムゲタンを一つ注文する",
+        "bodyKo": "일본어 메뉴판에서 기본 삼계탕과 가격을 확인해요. 궁금한 재료가 있으면 주문 전에 물어봐요.",
+        "bodyJa": "日本語のメニューで定番のサムゲタンと値段を確かめます。気になる食材があれば注文前に聞きましょう。",
+        "completionLabelKo": "삼계탕 한 그릇을 주문했어요",
+        "completionLabelJa": "サムゲタンを一つ注文しました",
+        "phraseKo": "일본어 메뉴판을 보여 주실 수 있나요? 기본 삼계탕 하나 주세요.",
+        "phraseJa": "日本語のメニューを見せていただけますか？ 定番のサムゲタンを一つお願いします。"
+      }
+    ],
+    "seed": {
+      "supplierId": "7c48091c-4293-492a-ad14-0b1544055ffe",
+      "editorId": "6a29fa68-0834-43e0-9bf9-7f6b8cd544ac",
+      "requestId": "03fe6ebe-052d-4ebb-9398-19e88501df53"
+    }
+  }
+]

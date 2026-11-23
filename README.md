@@ -14,6 +14,7 @@ idea/
 │   └── omiyage-seoul/   2. 오미야게 서울
 ├── sion/       한시온
 ├── sangmu/     이상무
+│   └── kokoseoul/       1. 지하철 안내 서비스 (여기서울: 안내·퀘스트·스탬프)
 ├── jonghoon/   임종훈
 ├── minyoung/   허민영
 └── yeeun/      유예은
@@ -41,7 +42,7 @@ idea/
 - **제안:** 최도일, 한시온, 이상무
 - **내용:** 승강장 표지를 찍으면 "이 열차를 타도 되는지"를 일본어로 판정하고, 3D 지도에서 열차를 따라가며 역 도착 시 스탬프와 퀘스트를 모은다. API를 연결해 실제 상황 기준으로 안내한다.
 - **근거:** 7호선 종착역 표기 사례(장암/석남 방면)
-- **코드:** [`idea/doil/subway`](idea/doil/subway)
+- **코드:** [`idea/doil/subway`](idea/doil/subway), [`idea/sangmu/kokoseoul`](idea/sangmu/kokoseoul) (여기서울 웹/모바일, 퀘스트 웹·모바일 데모의 코드)
 - **데모:**
   - 지하철 앱: https://subway-seven-drab.vercel.app
   - 3D: https://subway-seven-drab.vercel.app/#ride

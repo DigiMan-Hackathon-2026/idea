@@ -1,0 +1,100 @@
+name: 사용자 조사 작업
+description: 개인정보 없이 조사 질문·사례·반대 증거·결정 기준을 정의합니다.
+title: "[Research] "
+labels:
+  - research
+body:
+  - type: markdown
+    attributes:
+      value: |
+        참여자 이름·연락처·계정·정확한 일정·녹음·원본 화면을 issue에 넣지 않습니다. 익명 참여자 코드와 비식별 사건만 사용합니다.
+  - type: dropdown
+    id: decision
+    attributes:
+      label: 연결할 결정
+      options:
+        - 첫 타깃
+        - 해결할 사용자 문제
+        - 첫 지역
+        - 첫 퀘스트
+        - 안내 정보 우선순위
+        - 일본어 문구 이해
+        - 모바일 사용성·접근성
+        - 기타 조사 결정
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: 조사 질문
+      description: 이번 조사로 무엇을 유지·수정·폐기할지 한 문장으로 적습니다.
+      placeholder: 최근 서울 혼자 이동에서 안내 부족 때문에 새 장소를 포기한 실제 사건이 반복되는가?
+    validations:
+      required: true
+  - type: textarea
+    id: current_evidence
+    attributes:
+      label: 현재 근거와 반대 증거
+      description: 확인된 사건, 아직 가설인 부분과 반대 사례를 구분합니다.
+    validations:
+      required: true
+  - type: textarea
+    id: participants
+    attributes:
+      label: 참여 기준과 비교 범위
+      description: 대상 조건·목표 수·관광객/거주자 구분을 적고 통계적 대표성처럼 표현하지 않습니다.
+    validations:
+      required: true
+  - type: dropdown
+    id: method
+    attributes:
+      label: 방법
+      options:
+        - 최근 사건 인터뷰
+        - 저충실도 안내 이해 관찰
+        - 실제 모바일 사용성 관찰
+        - 현장·콘텐츠 사실 확인
+        - 조사 합성
+    validations:
+      required: true
+  - type: textarea
+    id: materials
+    attributes:
+      label: 질문·자극물·version
+      description: 사용할 문서 경로와 version을 적습니다. 제품 설명을 먼저 보여 줄지 여부도 명시합니다.
+    validations:
+      required: true
+  - type: textarea
+    id: privacy
+    attributes:
+      label: 동의·개인정보·보관
+      description: 메모·녹음 동의, 저장 위치, 삭제일, Git에 남기지 않을 항목을 적습니다.
+    validations:
+      required: true
+  - type: textarea
+    id: decision_rule
+    attributes:
+      label: 판단 기준
+      description: 어떤 관찰이면 가설을 유지·수정·보류할지 조사 전에 적습니다.
+    validations:
+      required: true
+  - type: textarea
+    id: outputs
+    attributes:
+      label: 익명 산출물과 완료 조건
+      description: 인터뷰 기록·합성·후보·스펙 변경 경로와 필요한 반대 사례를 적습니다.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 실행 전 확인
+      options:
+        - label: 모집·동의·질문 문구의 일본어 검수 상태를 확인했다.
+          required: true
+        - label: 연락처·녹음·원본 사진·화면은 저장소 밖에서 관리한다.
+          required: true
+        - label: 가상 안내 예시의 선호를 실제 지역·퀘스트 수요로 세지 않는다.
+          required: true
+        - label: 참여자가 언제든 건너뛰거나 중단할 수 있게 안내한다.
+          required: true

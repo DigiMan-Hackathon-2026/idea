@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>オフライン地下鉄ガイド · 오프라인 지하철 안내</title>
+  <script defer src="/subway-offline.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; min-height: 100vh; background: radial-gradient(at 20% 0%, #eed7ee, transparent 55%), linear-gradient(145deg, #f7f6fc, #e0e7fd); color: #282439; font: 1rem/1.6 system-ui, sans-serif; }
+    main { max-width: 38rem; margin: 0 auto; }
+    h1 { margin: 0; padding: 1rem 1.2rem; border-radius: 1.2rem; background: linear-gradient(125deg,#222d57,#4a508d); color: white; line-height: 1.25; }
+    h1 span { display: block; margin-top: 8px; font-size: 1.25rem; }
+    .card { margin-top: 16px; border: 1px solid #ded9eb; border-radius: 16px; background: white; padding: 20px; }
+    dl { margin: 0; }
+    dt { color: #455f54; font-weight: 750; }
+    dd { margin: 0 0 12px; font-size: 1.125rem; font-weight: 750; overflow-wrap: anywhere; }
+    dd:last-child { margin-bottom: 0; }
+    p { margin: 8px 0; }
+    a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; color: #941e34; font-weight: 750; }
+    .notice { border-left: 4px solid #e5b560; padding-left: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>オフライン地下鉄ガイド<span lang="ko">오프라인 지하철 안내</span></h1>
+    <div id="empty" class="card" role="status">
+      <p>この端末に保存した移動情報が見つかりません。駅名と駅番号を確かめ、迷ったら駅員にこの画面を見せてください。</p>
+      <p lang="ko">이 기기에 저장된 이동 정보를 찾지 못했어요. 역 이름과 번호를 확인하고, 길이 헷갈리면 이 화면을 역무원에게 보여 주세요.</p>
+      <p lang="ko"><strong>지금 어느 역인지 알려 주실 수 있나요?</strong></p>
+      <p>今どの駅にいるか教えていただけますか？</p>
+    </div>
+    <section id="saved" class="card" hidden aria-label="保存した移動 · 저장된 이동 정보">
+      <p id="express" class="notice" hidden>9号線の急行 · <span lang="ko">9호선 급행</span></p>
+      <dl>
+        <dt>最後に選んだ駅 · <span lang="ko">마지막으로 고른 역</span></dt>
+        <dd id="origin"></dd>
+        <dt>降りたい駅 · <span lang="ko">내릴 역</span></dt>
+        <dd id="destination"></dd>
+        <dt id="next-label">次に照合する駅 · <span lang="ko">다음에 대조할 역</span></dt>
+        <dd id="next"></dd>
+        <dt id="local-change-label" hidden>各駅停車に乗り換える駅 · <span lang="ko">일반열차로 갈아탈 역</span></dt>
+        <dd id="local-change" hidden></dd>
+        <dt id="transfer-to-label" hidden>乗り換え先の駅番号 · <span lang="ko">갈아탈 호선의 역번호</span></dt>
+        <dd id="transfer-to" hidden></dd>
+      </dl>
+      <p id="transfer" class="notice" hidden>
+        保存した案内では、最後に選んだ駅で乗り換えます。<br>
+        <span lang="ko">저장한 안내에서는 마지막으로 고른 역에서 갈아타요.</span>
+      </p>
+      <p id="change-to-local" class="notice" hidden>
+        ここで各駅停車に乗り換えます。<br>
+        <span lang="ko">이 역에서 일반열차로 갈아타요.</span>
+      </p>
+      <p>保存した案内です。今いる駅と運行状況は現地で確かめてください。</p>
+      <p lang="ko">저장해 둔 안내예요. 지금 있는 역과 운행 상황은 현장에서 다시 확인해 주세요.</p>
+      <p lang="ko"><strong id="phrase"></strong></p>
+      <p id="phrase-ja"></p>
+    </section>
+    <a href="/subway">地下鉄ガイドを読み直す · <span lang="ko">지하철 안내 다시 불러오기</span></a>
+  </main>
+</body>
+</html>
