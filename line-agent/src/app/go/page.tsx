@@ -40,13 +40,19 @@ async function GoPageContent({ searchParams }: { searchParams: SearchParams }) {
         </p>
       )}
       <div className="space-y-2">
+        {/* Lead with the way the trip is actually made: walking → map, otherwise → subway guide. */}
+        {naverApp && walk && (
+          <a href={naverApp} className="block rounded-lg bg-[#455f54] p-3 text-center font-bold text-white">
+            {ja ? "NAVER地図アプリで歩いて行く" : "네이버 지도 앱으로 걸어가기"}
+          </a>
+        )}
         {station && (
-          <Link href={`/subway?to=${station}`} className="block rounded-lg bg-[#455f54] p-3 text-center font-bold text-white">
+          <Link href={`/subway?to=${station}`} className={`block rounded-lg p-3 text-center font-bold ${walk ? "border border-[#455f54] text-[#455f54]" : "bg-[#455f54] text-white"}`}>
             {ja ? "地下鉄の案内を開く" : "지하철 안내 열기"}
           </Link>
         )}
-        {naverApp && (
-          <a href={naverApp} className={`block rounded-lg p-3 text-center font-bold ${station ? "border border-[#455f54] text-[#455f54]" : "bg-[#455f54] text-white"}`}>
+        {naverApp && !walk && (
+          <a href={naverApp} className="block rounded-lg border border-[#455f54] p-3 text-center font-bold text-[#455f54]">
             {ja ? "NAVER地図アプリで道順を見る" : "네이버 지도 앱으로 길 찾기"}
           </a>
         )}
