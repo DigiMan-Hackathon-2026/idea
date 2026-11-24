@@ -148,10 +148,14 @@ export const menuNames: Record<MenuKey, { ja: string; ko: string }> = {
 };
 
 export function findMenu(text: string): { key: MenuKey; label: string } | null {
+  // Longest alias wins, so タッカルビ is not read as カルビ (焼肉).
+  let best: { key: MenuKey; label: string } | null = null;
   for (const [key, aliases] of Object.entries(menuAliases) as [MenuKey, string[]][]) {
-    const hit = aliases.find((alias) => text.includes(alias));
-    if (hit) return { key, label: hit };
+    for (const alias of aliases) {
+      if (text.includes(alias) && (!best || alias.length > best.label.length)) best = { key, label: alias };
+    }
   }
+  if (best) return best;
   const any = anyMenuAliases.find((alias) => text.includes(alias));
   return any ? { key: "any", label: any } : null;
 }
