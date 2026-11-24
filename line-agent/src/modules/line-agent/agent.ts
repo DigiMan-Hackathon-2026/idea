@@ -15,7 +15,7 @@ import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, 
 import { decodePostback, type Postback } from "./postback";
 import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
-import { addMinutes, ceilToMinutes, seoulDate, seoulInstant } from "./time";
+import { addMinutes, ceilToMinutes, laterOf, seoulDate, seoulInstant } from "./time";
 import type { TravelProvider } from "./travel";
 import type { CallApproval, CallAttempt, CandidateState, DiningRequest, MenuKey } from "./types";
 import { readWait } from "./wait";
@@ -40,6 +40,7 @@ const REQUEST_TTL_MINUTES = 6 * 60;
 const APPROVAL_TTL_MINUTES = 10;
 const MAX_CALL_CANDIDATES = 2;
 const MAX_CARDS = 3;
+const CALL_WINDOW_MINUTES = 75;
 const MEAL_MINUTES = 45;
 const BUFFER_MINUTES = 10;
 const REQUESTER_ONLY = new Set(["call_request", "approve", "cancel_call", "new_search", "party", "area", "menu", "decision_retry"]);
@@ -599,8 +600,11 @@ export class DiningAgent {
     }
     const starts = plans.map((plan) => plan.arriveRestaurantAt ?? addMinutes(now, 15));
     const ends = plans.map((plan) => plan.seatDeadline).filter((value): value is string => value !== null);
-    const windowStart = ceilToMinutes(starts.reduce((a, b) => (Date.parse(a) >= Date.parse(b) ? a : b)), 5);
-    const minEnd = ends.length ? ends.reduce((a, b) => (Date.parse(a) <= Date.parse(b) ? a : b)) : addMinutes(windowStart, 60);
+    const latestArrival = starts.reduce((a, b) => (Date.parse(a) >= Date.parse(b) ? a : b));
+    const earliestEnd = ends.length ? ends.reduce((a, b) => (Date.parse(a) <= Date.parse(b) ? a : b)) : null;
+    // Ask for a table close to the deadline, not hours early (e.g. asked in the morning for dinner).
+    const windowStart = ceilToMinutes(earliestEnd ? laterOf(latestArrival, addMinutes(earliestEnd, -CALL_WINDOW_MINUTES)) : latestArrival, 5);
+    const minEnd = earliestEnd ?? addMinutes(windowStart, 60);
     const windowEnd = Date.parse(minEnd) > Date.parse(windowStart) ? minEnd : addMinutes(windowStart, 30);
     next.proposal = {
       candidateIds: plans.map((plan) => plan.candidateId),
