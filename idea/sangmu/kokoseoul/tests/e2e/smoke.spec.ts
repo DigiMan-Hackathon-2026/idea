@@ -886,6 +886,20 @@ test("completes the ordered demo flow and saves feedback", async ({ page }) => {
   await expect(page.getByText("フィードバックを保存しました")).toBeVisible();
 });
 
+test("carries the album return path through starting and completing a quest", async ({ page }) => {
+  await installServerRunMock(page);
+  await page.goto(`/quests/${demoQuestId}?fromLine=2&fromBook=experiences&fromMission=ddp-curves`);
+  await page.getByRole("button", { name: "このデモクエストを始める" }).click();
+  await page.getByRole("button", { name: "記録を作成して始める" }).click();
+  await expect(page.getByRole("link", { name: "冒険ノートの項目に戻る" })).toBeVisible();
+  await page.getByRole("button", { name: "案内を確認しました" }).click();
+  await page.getByRole("button", { name: "韓国語カードを使いました" }).click();
+  await page.getByRole("button", { name: "クエストを完了する" }).click();
+  await expect(page.getByRole("heading", { name: "クエスト完了" })).toBeVisible();
+  await page.getByRole("link", { name: "冒険ノートの項目に戻る" }).click();
+  await expect(page.getByRole("heading", { name: "DDPで曲線の建築を見つける", exact: true })).toBeVisible();
+});
+
 test("resumes and deletes the browser-only demo record", async ({ page }) => {
   await installServerRunMock(page);
   await page.goto("/my");

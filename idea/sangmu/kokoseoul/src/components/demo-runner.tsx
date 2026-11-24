@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ReportButton } from "@/components/report-button";
 import { useLocale } from "@/components/locale-provider";
 import { pickLocale } from "@/lib/locale";
+import { readAdventureOrigin, withAdventureOrigin } from "@/lib/adventure-origin";
 import { buildNaverPlaceUrl } from "@/lib/naver-map";
 import {
   DIGIMAN_HACKATHON_ENDED_JA,
@@ -22,6 +23,8 @@ type CopyStatus = "idle" | "copied" | "failed";
 export function DemoRunner({ runId }: { runId: string }) {
   const { locale } = useLocale();
   const router = useRouter();
+  const params = useSearchParams();
+  const adventureOrigin = params && readAdventureOrigin(params);
   const [run, setRun] = useState<QuestRunDto | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
@@ -88,7 +91,7 @@ export function DemoRunner({ runId }: { runId: string }) {
     return (
       <section className="mx-auto mt-10 max-w-2xl rounded-xl bg-white p-7 text-center shadow-sm">
         <p className="text-sm font-black text-[#455f54]">{pickLocale(locale, "このクエストは完了済みです", "이 퀘스트는 이미 완료됐어요")}</p>
-        <Link href={`/runs/${run.id}/completion`} className="mt-5 inline-flex min-h-12 items-center rounded-full bg-[#504e49] px-6 text-sm font-black text-white">
+        <Link href={withAdventureOrigin(`/runs/${run.id}/completion`, adventureOrigin)} className="mt-5 inline-flex min-h-12 items-center rounded-full bg-[#504e49] px-6 text-sm font-black text-white">
           {pickLocale(locale, "完了した記録を見る", "완료 기록 보기")}
         </Link>
       </section>
@@ -113,7 +116,7 @@ export function DemoRunner({ runId }: { runId: string }) {
       const updated = await completeQuestRunStep(run.id, currentStep!.id);
       setCopyStatus("idle");
       if (updated.completionPath) {
-        router.push(updated.completionPath);
+        router.push(withAdventureOrigin(updated.completionPath, adventureOrigin));
         return;
       }
       await loadRun();

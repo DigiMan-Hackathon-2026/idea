@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { AdventureReturnLink } from "@/components/adventure-return-link";
 import { DemoCompletion } from "@/components/demo-completion";
 import { buildQuestNextSteps } from "@/components/quest-station-links";
 import { SiteHeader } from "@/components/site-header";
@@ -10,9 +11,11 @@ import { getRequestLocale } from "@/lib/locale.server";
 async function DemoCompletionContent({ params }: { params: Promise<{ runId: string }> }) {
   const { runId } = await params;
   if (!isUuid(runId)) notFound();
+  const locale = await getRequestLocale();
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 pt-5 sm:px-8">
+      <AdventureReturnLink locale={locale} className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--primary)] underline" />
       <DemoCompletion runId={runId} nextSteps={buildQuestNextSteps()} />
     </div>
   );

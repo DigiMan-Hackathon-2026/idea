@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { AdventureReturnLink } from "@/components/adventure-return-link";
 import { DemoRunner } from "@/components/demo-runner";
 import { SiteHeader } from "@/components/site-header";
 import { isUuid } from "@/server/http-validation";
@@ -16,9 +17,11 @@ async function DemoRunContent({ params }: { params: Promise<{ runId: string }> }
   return (
     <div className="seoul-page">
       <ScenicHero theme="dusk" title={pickLocale(locale, "次の体験へ進みましょう", "다음 체험으로 진행해요")}>
-        <Link href="/quests" className="mt-3 inline-flex min-h-11 items-center rounded-full border border-white/45 px-4 text-sm font-bold">
-          {pickLocale(locale, "クエスト一覧へ", "퀘스트 목록으로")}
-        </Link>
+        <AdventureReturnLink locale={locale} className="mt-3 inline-flex min-h-11 items-center rounded-full border border-white/45 px-4 text-sm font-bold" fallback={
+          <Link href="/quests" className="mt-3 inline-flex min-h-11 items-center rounded-full border border-white/45 px-4 text-sm font-bold">
+            {pickLocale(locale, "クエスト一覧へ", "퀘스트 목록으로")}
+          </Link>
+        } />
       </ScenicHero>
       <div className="scenic-content"><DemoRunner runId={runId} /></div>
     </div>
