@@ -18,6 +18,7 @@
     "test:e2e": "playwright test",
     "voice:bridge": "node --env-file-if-exists=.env.local services/voice-bridge/bridge.mjs",
     "voice:selftest": "node services/voice-bridge/selftest.mjs",
+    "line:richmenu": "node --env-file-if-exists=.env.local scripts/line/setup-rich-menu.mjs",
     "idea:sync": "python3 scripts/sync_idea_repo.py",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

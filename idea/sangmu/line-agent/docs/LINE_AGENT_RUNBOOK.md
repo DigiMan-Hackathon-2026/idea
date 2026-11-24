@@ -47,6 +47,8 @@ open http://localhost:3000/dev/line-agent
 
 그룹에서는 「ココソウル」을 붙여 부르거나 비서를 멘션해야 반응한다.
 
+대화창 아래 고정 메뉴(使い方 · ごはんを探す · やめる)는 `pnpm line:richmenu`로 한 번 만든다. 이미지만 미리 보려면 `node scripts/line/setup-rich-menu.mjs --dry-run menu.png`.
+
 ## 3. 실제 전화 켜기
 
 필요한 것: OpenAI API 키(GPT-Live), Twilio 유료 계정과 번호, 시험 전화를 받기로 동의한 팀원 번호.
