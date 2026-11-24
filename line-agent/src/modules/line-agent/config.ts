@@ -18,6 +18,7 @@ export type LineAgentConfig = {
   simulatorEnabled: boolean;
   demoNow: string | null;
   simulatedCallDelayMs: number;
+  store: "memory" | "postgres";
 };
 
 const E164 = /^\+[1-9]\d{7,14}$/;
@@ -74,5 +75,6 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     simulatorEnabled: !production && (appEnv === "local" || appEnv === "test" || value("LINE_AGENT_SIMULATOR") === "1"),
     demoNow: demoNow && !Number.isNaN(Date.parse(demoNow)) ? new Date(demoNow).toISOString() : null,
     simulatedCallDelayMs: Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
+    store: value("LINE_AGENT_STORE") === "postgres" ? "postgres" : "memory",
   };
 }

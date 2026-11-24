@@ -64,6 +64,13 @@
       "when": 1795354988961,
       "tag": "0008_quest_nearby_search",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795554868016,
+      "tag": "0009_line_agent",
+      "breakpoints": true
     }
   ]
 }
