@@ -51,3 +51,10 @@ export function ceilToMinutes(iso: string, step: number): string {
   const stepMs = step * MINUTE_MS;
   return new Date(Math.ceil(ms / stepMs) * stepMs).toISOString();
 }
+
+/** Round down to the previous multiple of `step` minutes. */
+export function floorToMinutes(iso: string, step: number): string {
+  const ms = Date.parse(iso);
+  const stepMs = step * MINUTE_MS;
+  return new Date(Math.floor(ms / stepMs) * stepMs).toISOString();
+}

@@ -9,15 +9,15 @@ import type { LineGateway } from "./line/client";
 import type { LineEvent, LineMessage, LineSource } from "./line/types";
 import { conversationTarget } from "./line/webhook";
 import * as m from "./messages";
-import { classifyCall } from "./outcome";
+import { classifyCall, type TranscriptTurn } from "./outcome";
 import { computePlan, rankPlans, type CandidatePlan } from "./plan";
 import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, menuNames, stationAdventurePath } from "./places";
 import { decodePostback, type Postback } from "./postback";
 import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
-import { addMinutes, ceilToMinutes, laterOf, seoulDate, seoulInstant } from "./time";
+import { addMinutes, ceilToMinutes, floorToMinutes, laterOf, seoulDate, seoulInstant } from "./time";
 import type { TravelProvider } from "./travel";
-import type { CallApproval, CallAttempt, CandidateState, DiningRequest, MenuKey, Restaurant } from "./types";
+import type { CallApproval, CallAttempt, CallOutcome, CandidateState, DiningRequest, MenuKey, Restaurant } from "./types";
 import { readWait } from "./wait";
 
 export type AgentDeps = {
@@ -35,6 +35,8 @@ export type AgentDeps = {
   phoneAllowed: (phoneRef: string) => boolean;
   /** Reads the text in an image the user sent (OCR). null = cannot read images here. */
   readImage?: ((messageId: string) => Promise<string | null>) | null;
+  /** Called with each finished call's transcript (the simulator shows it; nothing is stored by default). */
+  onCallTranscript?: (info: { replyTarget: string; attemptId: string; restaurantId: string; transcript: TranscriptTurn[]; outcome: CallOutcome["kind"]; at: string }) => void;
   log?: (event: string, data: Record<string, string | number | boolean | null>) => void;
 };
 
@@ -133,6 +135,7 @@ export class DiningAgent {
 
       const outcome = classifyCall(result.transcript, { partySize: approval.partySize, windowStart: approval.windowStart, windowEnd: approval.windowEnd });
       const quote = lastShopWords(result.transcript);
+      this.deps.onCallTranscript?.({ replyTarget: request.replyTarget, attemptId: call.id, restaurantId: restaurant.id, transcript: result.transcript, outcome: outcome.kind, at: now });
       nextCall.status = "finished";
       nextCall.outcome = outcome;
       this.log("call.outcome", { kind: outcome.kind, attempt: call.ordinal });
@@ -713,7 +716,8 @@ export class DiningAgent {
     const earliestEnd = ends.length ? ends.reduce((a, b) => (Date.parse(a) <= Date.parse(b) ? a : b)) : null;
     // Ask for a table close to the deadline, not hours early (e.g. asked in the morning for dinner).
     const windowStart = ceilToMinutes(earliestEnd ? laterOf(latestArrival, addMinutes(earliestEnd, -CALL_WINDOW_MINUTES)) : latestArrival, 5);
-    const minEnd = earliestEnd ?? addMinutes(windowStart, 60);
+    // Spoken on the call, so keep both ends on 5-minute marks ("6시 40분", not "6시 44분").
+    const minEnd = earliestEnd ? floorToMinutes(earliestEnd, 5) : addMinutes(windowStart, 60);
     const windowEnd = Date.parse(minEnd) > Date.parse(windowStart) ? minEnd : addMinutes(windowStart, 30);
     next.proposal = {
       candidateIds: plans.map((plan) => plan.candidateId),

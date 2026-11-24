@@ -14,6 +14,8 @@ import { RoutedTravelProvider } from "./travel";
 
 export const SIMULATOR_PREFIX = "sim-";
 
+export type SimulatorCall = { replyTarget: string; attemptId: string; restaurantId: string; transcript: { speaker: "ai" | "shop"; text: string }[]; outcome: string; at: string };
+
 export type LineAgentRuntime = {
   config: LineAgentConfig;
   store: AgentStore;
@@ -24,6 +26,8 @@ export type LineAgentRuntime = {
   simulatorLine: RecordingLineGateway;
   /** Images uploaded in the simulator, read once by id and then dropped. */
   simulatorImages: Map<string, Buffer>;
+  /** Finished simulator calls with transcripts, newest last (memory only). */
+  simulatorCalls: SimulatorCall[];
   /** Routes a call result to the agent that owns the conversation. */
   finishCall(result: CallFinished): Promise<void>;
   attemptToken(attemptId: string): string;
@@ -80,8 +84,14 @@ function createRuntime(): LineAgentRuntime {
     return null;
   };
 
-  const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null) =>
-    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, log });
+  const simulatorCalls: SimulatorCall[] = [];
+  const keepSimulatorCall = (call: SimulatorCall) => {
+    if (!call.replyTarget.startsWith(SIMULATOR_PREFIX)) return;
+    simulatorCalls.push(call);
+    if (simulatorCalls.length > 200) simulatorCalls.splice(0, simulatorCalls.length - 200);
+  };
+  const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null, onCallTranscript?: (call: SimulatorCall) => void) =>
+    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, onCallTranscript, log });
 
   const simulatorLine = new RecordingLineGateway(clock);
   const simulatorImages = new Map<string, Buffer>();
@@ -98,7 +108,7 @@ function createRuntime(): LineAgentRuntime {
       }
     : null;
   const realLine: LineGateway = accessToken ? new LineMessagingClient(accessToken) : new RecordingLineGateway(clock);
-  const runtime: LineAgentRuntime = { config, store, agent: make(realLine, readLineImage), simulator: make(simulatorLine, readSimulatorImage), simulatorLine, simulatorImages, finishCall, attemptToken };
+  const runtime: LineAgentRuntime = { config, store, agent: make(realLine, readLineImage), simulator: make(simulatorLine, readSimulatorImage, keepSimulatorCall), simulatorLine, simulatorImages, simulatorCalls, finishCall, attemptToken };
   self.runtime = runtime;
   log("line_agent.started", { calls: config.calls, line: config.accessToken !== null, simulator: config.simulatorEnabled, store: config.store });
   return runtime;
