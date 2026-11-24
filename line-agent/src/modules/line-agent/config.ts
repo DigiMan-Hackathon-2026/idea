@@ -19,6 +19,8 @@ export type LineAgentConfig = {
   demoNow: string | null;
   simulatedCallDelayMs: number;
   store: "memory" | "postgres";
+  /** Lets the simulator be used through a public URL (e.g. a tunnel) when given as ?token=. */
+  simulatorToken: string | null;
 };
 
 const E164 = /^\+[1-9]\d{7,14}$/;
@@ -76,5 +78,6 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     demoNow: demoNow && !Number.isNaN(Date.parse(demoNow)) ? new Date(demoNow).toISOString() : null,
     simulatedCallDelayMs: Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
     store: value("LINE_AGENT_STORE") === "postgres" ? "postgres" : "memory",
+    simulatorToken: (value("LINE_AGENT_SIMULATOR_TOKEN")?.length ?? 0) >= 16 ? value("LINE_AGENT_SIMULATOR_TOKEN") : null,
   };
 }
