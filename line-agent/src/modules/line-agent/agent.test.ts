@@ -231,6 +231,15 @@ describe("DiningAgent rules", () => {
     });
   });
 
+  it("understands the rich menu buttons", async () => {
+    await agent.handleEvent(text(ALICE, "使い方"));
+    expect(lastTexts(ALICE, 1)).toContain("食べたいもの、人数");
+    await agent.handleEvent(text(ALICE, "ごはんを探したい"));
+    expect(lastTexts(ALICE, 1)).toBe("今回、お食事は何名ですか？");
+    await agent.handleEvent(text(ALICE, "キャンセル"));
+    expect(lastTexts(ALICE, 1)).toContain("終了しました");
+  });
+
   it("answers in Korean to a Korean request", async () => {
     await agent.handleEvent(text(ALICE, "신촌에서 두 명이 삼겹살 먹고 싶어요. 8시까지 홍대 공연장에 가야 해요."));
     expect(lastTexts(ALICE, 2)).toContain("후보예요");
