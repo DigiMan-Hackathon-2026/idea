@@ -18,7 +18,9 @@ const liveUrl = process.env.OPENAI_LIVE_URL ?? "wss://api.openai.com/v1/live/ses
 const liveModel = process.env.OPENAI_LIVE_MODEL ?? "gpt-live-1";
 const liveVoice = process.env.OPENAI_LIVE_VOICE ?? "marin";
 const apiKey = process.env.OPENAI_API_KEY;
-const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 4000);
+const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 5000);
+// The AI's turn must *end* with a closing line; "감사합니다. 몇 시에 가능할까요?" is not one.
+const closingLine = /(감사합니다|다시 연락드리겠습니다)[.!。\s]*$/;
 const silenceLimit = Number(process.env.VOICE_BRIDGE_SILENCE_LIMIT_MS ?? 25000);
 const maxQueued = 250; // ~5 s of 20 ms chunks while GPT-Live starts
 
@@ -143,8 +145,11 @@ function bridgeCall(twilio) {
         call.lastActivity = now;
         add("ai", event.delta);
         // After a closing line, hang up once the audio has played and the shop is quiet.
-        if (/감사합니다|다시 연락드리겠습니다/.test(call.transcript.at(-1)?.text ?? "")) {
-          if (call.closingTimer) clearTimeout(call.closingTimer);
+        if (call.closingTimer) {
+          clearTimeout(call.closingTimer);
+          call.closingTimer = null;
+        }
+        if (closingLine.test(call.transcript.at(-1)?.text ?? "")) {
           call.closingTimer = setTimeout(() => finish("closing"), Math.max(0, call.playbackEndsAt - Date.now()) + closingPause);
         }
         return;
