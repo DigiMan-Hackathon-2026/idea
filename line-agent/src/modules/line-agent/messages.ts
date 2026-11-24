@@ -319,13 +319,17 @@ export function needsDecision(request: DiningRequest, restaurant: Restaurant, re
     reason === "deposit"
       ? tr(lang, `${restaurant.nameJa}から予約金の支払いを求められたので、確定していません。`, `${restaurant.nameKo}에서 예약금을 요구해서 확정하지 않았어요.`)
       : tr(lang, `${restaurant.nameJa}から${offeredTime ? formatSeoulTime(offeredTime) : "別の時間"}の提案がありました。承認された時間の外なので、確定していません。`, `${restaurant.nameKo}에서 ${offeredTime ? formatSeoulTime(offeredTime) : "다른 시간"}을 제안했어요. 승인한 시간 밖이라 확정하지 않았어요.`);
+  const actions: LineAction[] = [];
+  if (reason === "out_of_range" && offeredTime) {
+    const label = tr(lang, `${formatSeoulTime(offeredTime)}でお願いする`, `${formatSeoulTime(offeredTime)}로 부탁하기`);
+    actions.push(postback(request, "decision_accept", label, { candidateId: restaurant.id, displayText: label }));
+  }
+  actions.push(postback(request, "call_request", tr(lang, "ほかのお店に電話", "다른 가게에 전화"), { displayText: tr(lang, "ほかのお店に電話", "다른 가게에 전화") }));
+  actions.push(postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }));
   return {
     type: "text",
-    text: `${what}${tr(lang, "条件を変えてもう一度頼むか、ほかのお店を探せます。", " 조건을 바꿔 다시 부탁하거나 다른 가게를 찾을 수 있어요.")}`,
-    quickReply: quickReply([
-      postback(request, "call_request", tr(lang, "条件を変えて頼む", "조건 바꿔 부탁하기"), { displayText: tr(lang, "条件を変えて頼む", "조건 바꿔 부탁하기") }),
-      postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }),
-    ]),
+    text: `${what}${tr(lang, "その時間でもう一度頼むか、ほかのお店を探せます。", " 그 시간으로 다시 부탁하거나 다른 가게를 찾을 수 있어요.")}`,
+    quickReply: quickReply(actions),
   };
 }
 
