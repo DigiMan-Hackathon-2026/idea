@@ -40,6 +40,7 @@ let line: RecordingLineGateway;
 let calls: ManualCalls;
 let agent: DiningAgent;
 let eventCount = 0;
+let imageText: string | null = null;
 
 const GROUP = "Cgroup0001";
 const ALICE = "Ualice0001";
@@ -56,6 +57,12 @@ function text(user: string, value: string, group = false, mention = false): Line
     type: "message", webhookEventId: `ev-${eventCount}`, timestamp: 0, replyToken, source: source(user, group),
     message: { type: "text", id: `m${eventCount}`, text: value, mention: mention ? { mentionees: [{ isSelf: true }] } : undefined },
   };
+}
+
+function image(user: string): LineEvent {
+  const replyToken = `rt-${++eventCount}`;
+  line.registerReplyToken(replyToken, user);
+  return { type: "message", webhookEventId: `ev-${eventCount}`, timestamp: 0, replyToken, source: source(user, false), message: { type: "image", id: `img${eventCount}` } };
 }
 
 function tap(user: string, data: string, group = false): LineEvent {
@@ -92,6 +99,7 @@ beforeEach(() => {
     store, line, travel: new FixedTravel(), calls,
     clock: () => clock, newId: () => `id-${String(++ids).padStart(6, "0")}`, keyOf: (raw) => `k:${raw}`,
     origin: "https://example.test", linkSecret: "test-secret", phoneAllowed: () => true,
+    readImage: async () => imageText,
   });
 });
 
@@ -187,6 +195,40 @@ describe("DiningAgent rules", () => {
     expect(lastTexts(ALICE, 1)).toContain("明洞のお店はまだ準備中です");
     await agent.handleEvent(text(ALICE, "新村"));
     expect(lastTexts(ALICE, 2)).toContain("2名の候補です");
+  });
+
+  describe("wait screens shared as images (WAIT-01)", () => {
+    async function askWaitFor(shop: string) {
+      await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル。20時までに弘大のライブ会場に着きたい"));
+      const carousel = line.messagesFor(ALICE).at(-1)!.message;
+      const bubbles = carousel.type === "flex" && carousel.contents.type === "carousel" ? carousel.contents.contents : [];
+      const bubble = bubbles.find((b) => JSON.stringify(b).includes(shop))!;
+      await agent.handleEvent(tap(ALICE, buttons(bubble as unknown as LineMessage)["待ち状況を送る"]));
+    }
+
+    it("reads minutes and teams from the image text", async () => {
+      await askWaitFor("テスト店B");
+      imageText = "테스트 매장 B 현재 대기 8팀 예상 대기시간 40분";
+      await agent.handleEvent(image(ALICE));
+      expect(lastTexts(ALICE, 1)).toContain("「40分」は");
+      const basis = line.messagesFor(ALICE).at(-1)!.message;
+      await agent.handleEvent(tap(ALICE, buttons(basis)["着いてから並ぶ"]));
+      expect(JSON.stringify(line.messagesFor(ALICE).at(-1)!.message)).toContain("待ち40分（着いてから・画像");
+    });
+
+    it("does not record another shop's screen", async () => {
+      await askWaitFor("テスト店B");
+      imageText = "테스트 매장 C 현재 대기 3팀 예상 대기시간 15분";
+      await agent.handleEvent(image(ALICE));
+      expect(lastTexts(ALICE, 1)).toContain("テスト店C（焼肉）の画面のようです");
+    });
+
+    it("asks for text when the image cannot be read", async () => {
+      await askWaitFor("テスト店B");
+      imageText = null;
+      await agent.handleEvent(image(ALICE));
+      expect(lastTexts(ALICE, 1)).toContain("読み取れませんでした");
+    });
   });
 
   it("answers in Korean to a Korean request", async () => {

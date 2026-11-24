@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Server-side OCR for wait screens shared with the LINE agent.
+  serverExternalPackages: ["tesseract.js"],
   async redirects() {
     if (process.env.APP_ENV !== "local" || !process.env.APP_ORIGIN) return [];
 

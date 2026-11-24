@@ -51,3 +51,6 @@ research/**/*.mp3
 research/**/*.wav
 research/**/*.mp4
 research/**/*.mov
+
+# OCR language data downloaded at runtime
+*.traineddata

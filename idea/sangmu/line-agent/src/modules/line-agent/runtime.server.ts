@@ -7,6 +7,7 @@ import { readLineAgentConfig, type LineAgentConfig } from "./config";
 import { LineMessagingClient, RecordingLineGateway, type LineGateway } from "./line/client";
 import { getRuntimeDatabasePool } from "../../db/runtime.server";
 import { PostgresAgentStore } from "./postgres-store";
+import { fetchLineImage, readImageText } from "./ocr.server";
 import { MemoryAgentStore, type AgentStore } from "./store";
 import { SimulatedCallPlacer, TwilioCallPlacer, type CallFinished, type CallPlacer } from "./telephony";
 import { RoutedTravelProvider } from "./travel";
@@ -21,6 +22,8 @@ export type LineAgentRuntime = {
   /** Agent for the local chat simulator; never sends to LINE. */
   simulator: DiningAgent;
   simulatorLine: RecordingLineGateway;
+  /** Images uploaded in the simulator, read once by id and then dropped. */
+  simulatorImages: Map<string, Buffer>;
   /** Routes a call result to the agent that owns the conversation. */
   finishCall(result: CallFinished): Promise<void>;
   attemptToken(attemptId: string): string;
@@ -77,12 +80,25 @@ function createRuntime(): LineAgentRuntime {
     return null;
   };
 
-  const make = (line: LineGateway) =>
-    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, log });
+  const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null) =>
+    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, log });
 
   const simulatorLine = new RecordingLineGateway(clock);
-  const realLine: LineGateway = config.accessToken ? new LineMessagingClient(config.accessToken) : new RecordingLineGateway(clock);
-  const runtime: LineAgentRuntime = { config, store, agent: make(realLine), simulator: make(simulatorLine), simulatorLine, finishCall, attemptToken };
+  const simulatorImages = new Map<string, Buffer>();
+  const readSimulatorImage = async (id: string) => {
+    const image = simulatorImages.get(id);
+    simulatorImages.delete(id);
+    return image ? readImageText(image) : null;
+  };
+  const accessToken = config.accessToken;
+  const readLineImage = accessToken
+    ? async (messageId: string) => {
+        const image = await fetchLineImage(messageId, accessToken);
+        return image ? readImageText(image) : null;
+      }
+    : null;
+  const realLine: LineGateway = accessToken ? new LineMessagingClient(accessToken) : new RecordingLineGateway(clock);
+  const runtime: LineAgentRuntime = { config, store, agent: make(realLine, readLineImage), simulator: make(simulatorLine, readSimulatorImage), simulatorLine, simulatorImages, finishCall, attemptToken };
   self.runtime = runtime;
   log("line_agent.started", { calls: config.calls, line: config.accessToken !== null, simulator: config.simulatorEnabled, store: config.store });
   return runtime;

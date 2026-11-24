@@ -58,7 +58,17 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
     bottom.current?.scrollIntoView({ block: "end" });
   }, [entries.length, mine.length]);
 
-  async function send(payload: { text?: string; data?: string }, shown: string) {
+  async function sendImage(file: File) {
+    if (file.size > 5 * 1024 * 1024) return;
+    const image = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsDataURL(file);
+    });
+    await send({ image }, `［画像 · 이미지］${file.name}`);
+  }
+
+  async function send(payload: { text?: string; data?: string; image?: string }, shown: string) {
     setBusy(true);
     setMine((list) => [...list, { at: new Date().toISOString(), text: shown, user }]);
     const text = payload.text && group && !/ココソウル|코코서울/.test(payload.text) ? `ココソウル ${payload.text}` : payload.text;
@@ -130,6 +140,10 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
       <form onSubmit={submit} className="sticky bottom-0 flex gap-2 bg-white p-2">
         <label className="sr-only" htmlFor="draft">メッセージ</label>
         <input id="draft" value={draft} onChange={(event) => setDraft(event.target.value)} className="min-w-0 flex-1 rounded border border-[#a4a199] px-2 py-2 text-sm" />
+        <label className="flex cursor-pointer items-center rounded border border-[#a4a199] px-2 text-xs">
+          画像
+          <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void sendImage(file); event.target.value = ""; }} />
+        </label>
         <button type="submit" disabled={busy} className="rounded bg-[#455f54] px-3 text-sm text-white">送信</button>
       </form>
     </main>

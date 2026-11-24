@@ -117,7 +117,21 @@ export function waitNotUnderstood(lang: Lang): LineMessage {
 export function imageNotSupported(lang: Lang): LineMessage {
   return {
     type: "text",
-    text: tr(lang, "画像の読み取りはまだできません。待ち時間を「40分」のように文字で送ってください。", "이미지는 아직 읽지 못해요. 대기 시간을 \"40분\"처럼 글자로 보내 주세요."),
+    text: tr(lang, "画像から待ち時間を読み取れませんでした。「40分」や「前に8組」のように文字で送ってください。", "이미지에서 대기 시간을 읽지 못했어요. \"40분\"이나 \"앞에 8팀\"처럼 글자로 보내 주세요."),
+  };
+}
+
+export function imageOtherShop(lang: Lang, expected: Restaurant, other: Restaurant): LineMessage {
+  return {
+    type: "text",
+    text: tr(lang, `この画像は${other.nameJa}の画面のようです。${expected.nameJa}の待ち状況なら、その画面か「40分」のような文字を送ってください。`, `이 이미지는 ${other.nameKo} 화면 같아요. ${expected.nameKo}의 대기 상황이라면 그 화면이나 "40분" 같은 글자를 보내 주세요.`),
+  };
+}
+
+export function askWaitFirst(lang: Lang): LineMessage {
+  return {
+    type: "text",
+    text: tr(lang, "待ち状況の画像は、お店のカードの「待ち状況を送る」を押してから送ってください。", "대기 화면 이미지는 가게 카드의 \"대기 상황 보내기\"를 누른 뒤 보내 주세요."),
   };
 }
 
@@ -125,7 +139,7 @@ export function imageNotSupported(lang: Lang): LineMessage {
 
 function waitLine(lang: Lang, wait: WaitObservation | null): string {
   if (!wait) return tr(lang, "待ち状況：未確認", "대기 상황: 확인 안 됨");
-  const when = formatSeoulTime(wait.reportedAt);
+  const when = wait.source === "user_image" ? tr(lang, `画像・${formatSeoulTime(wait.reportedAt)}`, `이미지 · ${formatSeoulTime(wait.reportedAt)}`) : formatSeoulTime(wait.reportedAt);
   if (wait.readyAt) return tr(lang, `${formatSeoulTime(wait.readyAt)}に入店できる（${when} 共有）`, `${formatSeoulTime(wait.readyAt)} 입장 가능 (${when} 공유)`);
   if (wait.minutes === null) return tr(lang, `前に${wait.teams}組・待ち時間は表示なし（${when} 共有）`, `앞에 ${wait.teams}팀 · 예상 시간 표시 없음 (${when} 공유)`);
   if (wait.minutes === 0) return tr(lang, `待ちなし（${when} 共有）`, `대기 없음 (${when} 공유)`);
