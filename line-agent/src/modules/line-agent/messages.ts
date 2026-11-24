@@ -205,12 +205,16 @@ export function candidateBubble(request: DiningRequest, restaurant: Restaurant, 
   body.push(partyLine(lang, restaurant, request.partySize ?? 2));
   const header: FlexComponent[] = [text(name(lang, restaurant), { size: "md", weight: "bold" }), text(lang === "ja" ? restaurant.nameKo : restaurant.nameJa, { size: "xs", color: color.muted })];
   if (restaurant.test) header.push(text(tr(lang, "テスト用の店舗です", "테스트용 매장이에요"), { size: "xs", color: color.warning }));
+  if (restaurant.searchOnly) header.push(text(tr(lang, `検索候補・未確認（NAVER ${restaurant.source.checkedAt}）`, `검색 후보 · 확인 안 됨 (네이버 ${restaurant.source.checkedAt})`), { size: "xs", color: color.info }));
   const footer: FlexComponent[] = [
     { type: "button", style: "primary", color: color.primary, height: "sm", action: postback(request, "select", tr(lang, "ここに行く", "여기로 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) }) },
     { type: "button", style: "secondary", height: "sm", action: postback(request, "wait", tr(lang, "待ち状況を送る", "대기 상황 보내기"), { candidateId: restaurant.id }) },
   ];
   const link = restaurant.bookingLinks[0];
-  if (link) footer.push({ type: "button", style: "link", height: "sm", action: { type: "uri", label: tr(lang, "予約・順番待ちを確認", "예약·웨이팅 확인"), uri: link.url } });
+  if (link) {
+    const label = link.provider === "naver" ? tr(lang, "NAVERで見る", "네이버에서 보기") : tr(lang, "予約・順番待ちを確認", "예약·웨이팅 확인");
+    footer.push({ type: "button", style: "link", height: "sm", action: { type: "uri", label, uri: link.url } });
+  }
   return { type: "bubble", size: "kilo", header: vbox(header, { spacing: "xs" }), body: vbox(body), footer: vbox(footer) };
 }
 

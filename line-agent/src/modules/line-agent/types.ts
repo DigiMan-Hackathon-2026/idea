@@ -53,6 +53,8 @@ export type Restaurant = {
   source: { label: string; url: string | null; checkedAt: string };
   /** Test entries are labelled as such on every card and result. */
   test: boolean;
+  /** Found by NAVER local search, not curated: shown as unverified and never called. */
+  searchOnly?: boolean;
 };
 
 export type TravelLeg = {
@@ -64,6 +66,8 @@ export type TravelLeg = {
 
 export type CandidateState = {
   restaurantId: string;
+  /** Saved copy of a search candidate (curated shops are looked up by id). */
+  snapshot?: Restaurant;
   rank: number;
   toRestaurant: TravelLeg | null;
   toNext: TravelLeg | null;

@@ -7,6 +7,7 @@ import { readLineAgentConfig, type LineAgentConfig } from "./config";
 import { LineMessagingClient, RecordingLineGateway, type LineGateway } from "./line/client";
 import { getRuntimeDatabasePool } from "../../db/runtime.server";
 import { PostgresAgentStore } from "./postgres-store";
+import { naverPlaceSearch } from "./naver-search";
 import { fetchLineImage, readImageText } from "./ocr.server";
 import { MemoryAgentStore, type AgentStore } from "./store";
 import { SimulatedCallPlacer, TwilioCallPlacer, type CallFinished, type CallPlacer } from "./telephony";
@@ -84,6 +85,7 @@ function createRuntime(): LineAgentRuntime {
     return null;
   };
 
+  const searchPlaces = config.naverSearch ? naverPlaceSearch(config.naverSearch) : null;
   const simulatorCalls: SimulatorCall[] = [];
   const keepSimulatorCall = (call: SimulatorCall) => {
     if (!call.replyTarget.startsWith(SIMULATOR_PREFIX)) return;
@@ -91,7 +93,7 @@ function createRuntime(): LineAgentRuntime {
     if (simulatorCalls.length > 200) simulatorCalls.splice(0, simulatorCalls.length - 200);
   };
   const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null, onCallTranscript?: (call: SimulatorCall) => void) =>
-    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, onCallTranscript, log });
+    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log });
 
   const simulatorLine = new RecordingLineGateway(clock);
   const simulatorImages = new Map<string, Buffer>();

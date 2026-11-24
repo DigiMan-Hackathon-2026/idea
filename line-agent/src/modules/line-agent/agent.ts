@@ -11,7 +11,8 @@ import { conversationTarget } from "./line/webhook";
 import * as m from "./messages";
 import { classifyCall, type TranscriptTurn } from "./outcome";
 import { computePlan, rankPlans, type CandidatePlan } from "./plan";
-import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, menuNames, stationAdventurePath } from "./places";
+import { searchCandidate, type PlaceSearch } from "./naver-search";
+import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, menuNames, registerSearchRestaurant, stationAdventurePath } from "./places";
 import { decodePostback, type Postback } from "./postback";
 import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
@@ -35,6 +36,8 @@ export type AgentDeps = {
   phoneAllowed: (phoneRef: string) => boolean;
   /** Reads the text in an image the user sent (OCR). null = cannot read images here. */
   readImage?: ((messageId: string) => Promise<string | null>) | null;
+  /** NAVER local search to fill up when fewer than three curated shops match (spec §2). */
+  searchPlaces?: PlaceSearch | null;
   /** Called with each finished call's transcript (the simulator shows it; nothing is stored by default). */
   onCallTranscript?: (info: { replyTarget: string; attemptId: string; restaurantId: string; transcript: TranscriptTurn[]; outcome: CallOutcome["kind"]; at: string }) => void;
   log?: (event: string, data: Record<string, string | number | boolean | null>) => void;
@@ -105,7 +108,7 @@ export class DiningAgent {
 
   async handleCallFinished(result: CallFinished): Promise<void> {
     for (let attempt = 0; attempt < 3; attempt++) {
-      const request = await this.deps.store.findByAttempt(result.attemptId);
+      const request = this.hydrate(await this.deps.store.findByAttempt(result.attemptId));
       if (!request) return;
       const call = request.attempts.find((a) => a.id === result.attemptId)!;
       if (call.status === "finished" || call.status === "failed_to_place") return; // duplicate callback
@@ -202,7 +205,7 @@ export class DiningAgent {
     const isGroup = ctx.kind !== "user";
     const addressed = !isGroup || mentioned || mentionsBot(rawText);
     const text = stripBotName(rawText);
-    const active = await this.deps.store.getActiveRequest(ctx.convKey, now);
+    const active = this.hydrate(await this.deps.store.getActiveRequest(ctx.convKey, now));
     const fromRequester = active !== null && ctx.requesterKey !== null && active.requesterKey === ctx.requesterKey;
 
     // The requester answers a group request's name question in 1:1.
@@ -257,7 +260,7 @@ export class DiningAgent {
   }
 
   private async onImage(ctx: Context, messageId: string): Promise<void> {
-    const active = await this.deps.store.getActiveRequest(ctx.convKey, this.now());
+    const active = this.hydrate(await this.deps.store.getActiveRequest(ctx.convKey, this.now()));
     if (!active) return;
     // Only images sent as an answer to "send the wait" are read (spec §9: no group-wide reading).
     const candidateId = active.pendingQuestion === "wait" ? active.pendingWaitCandidateId : ctx.kind === "user" ? active.selectedCandidateId : null;
@@ -377,9 +380,23 @@ export class DiningAgent {
     const area = findArea(request.areaId!)!;
     // Shops whose confirmed capacity is below the party are left out (spec §2 인원).
     const found = listRestaurants(area.id, request.menuKey ?? "any").filter((restaurant) => restaurant.maxParty === null || restaurant.maxParty >= (request.partySize ?? 1));
+    if (found.length < MAX_CARDS && this.deps.searchPlaces) {
+      const menu = request.menuKey ?? "any";
+      const query = `${area.nameKo} ${menu === "any" ? "맛집" : menuNames[menu].ko}`;
+      const hits = await this.deps.searchPlaces(query).catch(() => []);
+      for (const hit of hits) {
+        if (found.length >= MAX_CARDS * 2) break;
+        const candidate = searchCandidate(hit, area.id, menu, seoulDate(now));
+        if (!found.some((r) => r.id === candidate.id || r.nameKo === candidate.nameKo)) {
+          registerSearchRestaurant(candidate);
+          found.push(candidate);
+        }
+      }
+    }
     const states = await Promise.all(
       found.map(async (restaurant): Promise<CandidateState> => ({
         restaurantId: restaurant.id,
+        ...(restaurant.searchOnly ? { snapshot: restaurant } : {}),
         rank: 0,
         toRestaurant: await this.deps.travel.leg(area.point, restaurant.point, now),
         toNext: request.nextPlace ? await this.deps.travel.leg(restaurant.point, request.nextPlace.point, now) : null,
@@ -510,7 +527,7 @@ export class DiningAgent {
     const postback = decodePostback(data);
     if (!postback) return;
     const now = this.now();
-    const request = await this.deps.store.getRequest(postback.requestId);
+    const request = this.hydrate(await this.deps.store.getRequest(postback.requestId));
     if (!request || request.conversationKey !== ctx.convKey) return;
     const lang = request.lang;
     if (!isActive(request, now)) {
@@ -807,6 +824,12 @@ export class DiningAgent {
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
+
+  /** Makes saved search candidates findable again (e.g. after a restart with the DB store). */
+  private hydrate<T extends DiningRequest | null>(request: T): T {
+    for (const candidate of request?.candidates ?? []) if (candidate.snapshot) registerSearchRestaurant(candidate.snapshot);
+    return request;
+  }
 
   private bump(request: DiningRequest, now: string): DiningRequest {
     const next = structuredClone(request);
