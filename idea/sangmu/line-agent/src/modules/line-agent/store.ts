@@ -8,6 +8,8 @@ export interface AgentStore {
   getActiveRequest(conversationKey: string, now: string): Promise<DiningRequest | null>;
   /** Active request started by this person in any conversation (for 1:1 questions). */
   getActiveByRequester(requesterKey: string, now: string): Promise<DiningRequest | null>;
+  /** Active request of this person that is waiting for their booking name (asked in 1:1). */
+  findAwaitingAlias(requesterKey: string, now: string): Promise<DiningRequest | null>;
   findByAttempt(attemptId: string): Promise<DiningRequest | null>;
   /** Saves when the stored revision equals `expectedRevision` (null = new). */
   save(request: DiningRequest, expectedRevision: number | null): Promise<boolean>;
@@ -49,6 +51,10 @@ export class MemoryAgentStore implements AgentStore {
 
   async getActiveByRequester(requesterKey: string, now: string): Promise<DiningRequest | null> {
     return this.latest((request) => request.requesterKey === requesterKey && isActive(request, now));
+  }
+
+  async findAwaitingAlias(requesterKey: string, now: string): Promise<DiningRequest | null> {
+    return this.latest((request) => request.requesterKey === requesterKey && request.pendingQuestion === "alias" && isActive(request, now));
   }
 
   async findByAttempt(attemptId: string): Promise<DiningRequest | null> {

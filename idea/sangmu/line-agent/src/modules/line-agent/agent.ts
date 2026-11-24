@@ -207,8 +207,8 @@ export class DiningAgent {
 
     // The requester answers a group request's name question in 1:1.
     if (!isGroup && ctx.requesterKey && (!active || active.pendingQuestion !== "alias")) {
-      const elsewhere = await this.deps.store.getActiveByRequester(ctx.requesterKey, now);
-      if (elsewhere && elsewhere.id !== active?.id && elsewhere.pendingQuestion === "alias") {
+      const elsewhere = await this.deps.store.findAwaitingAlias(ctx.requesterKey, now);
+      if (elsewhere && elsewhere.id !== active?.id) {
         await this.answerAlias(elsewhere, text, ctx);
         return;
       }

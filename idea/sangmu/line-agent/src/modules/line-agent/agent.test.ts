@@ -388,6 +388,15 @@ describe("DiningAgent rules", () => {
     expect(await store.getAlias("k:" + ALICE)).toBeNull();
   });
 
+  it("takes the booking name in 1:1 even when a 1:1 request is also open", async () => {
+    await agent.handleEvent(text(ALICE, "新村で3人、焼肉"));
+    await agent.handleEvent(text(ALICE, "ココソウル 新村で2人、サムギョプサル", true));
+    const view = line.messagesFor(GROUP).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(view)["電話で聞いてもらう"], true));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    expect(line.messagesFor(GROUP).at(-1)!.message.type === "flex" && JSON.stringify(line.messagesFor(GROUP).at(-1)!.message)).toContain("予約名：サトウ");
+  });
+
   it("stays quiet in a group unless called", async () => {
     await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル", true));
     expect(line.sent).toHaveLength(0);

@@ -44,6 +44,13 @@ export class PostgresAgentStore implements AgentStore {
     );
   }
 
+  async findAwaitingAlias(requesterKey: string, now: string): Promise<DiningRequest | null> {
+    return this.one(
+      "select body from line_agent_requests where requester_key = $1 and status <> 'closed' and expires_at > $2 and body->>'pendingQuestion' = 'alias' order by created_at desc limit 1",
+      [requesterKey, now],
+    );
+  }
+
   async findByAttempt(attemptId: string): Promise<DiningRequest | null> {
     return this.one(
       "select r.body from line_agent_call_attempts a join line_agent_requests r on r.id = a.request_id where a.id = $1",
