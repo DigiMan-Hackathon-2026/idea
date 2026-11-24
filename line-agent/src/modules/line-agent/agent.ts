@@ -203,7 +203,8 @@ export class DiningAgent {
     }
 
     if (active?.pendingQuestion && (fromRequester || (active.pendingQuestion === "wait" && addressed)) && !interpret(text).cancel) {
-      if (await this.answerPending(active, text, ctx)) return;
+      // In a group, chat not addressed to the bot only counts if it reads as an answer.
+      if (await this.answerPending(active, text, ctx, isGroup && !addressed)) return;
     }
     if (!addressed) return;
 
@@ -370,14 +371,14 @@ export class DiningAgent {
     return m.candidatesMessages(request, plans, findRestaurant, { callingEnabled: this.deps.calls !== null, intro });
   }
 
-  private async answerPending(request: DiningRequest, text: string, ctx: Context): Promise<boolean> {
+  private async answerPending(request: DiningRequest, text: string, ctx: Context, quietIfUnclear = false): Promise<boolean> {
     const now = this.now();
     switch (request.pendingQuestion) {
       case "party": {
         const reading = interpret(text);
         const size = parsePartySize(text);
         if (size === null || size < 1 || size > 30) {
-          if (reading.wantsFood && filledFields(reading) >= 2) return false;
+          if (quietIfUnclear || (reading.wantsFood && filledFields(reading) >= 2)) return false;
           await this.reply(ctx, [m.askPartySize(request)]);
           return true;
         }
@@ -391,6 +392,7 @@ export class DiningAgent {
         const mentions = findAreaMentions(normalizeText(text));
         const mention = mentions.find((hit) => hit.area.diningArea);
         if (!mention) {
+          if (quietIfUnclear && mentions.length === 0) return false;
           await this.reply(ctx, [m.askArea(request, mentions[0]?.area)]);
           return true;
         }
@@ -402,6 +404,7 @@ export class DiningAgent {
       case "menu": {
         const menu = findMenu(normalizeText(text));
         if (!menu) {
+          if (quietIfUnclear) return false;
           await this.reply(ctx, [m.askMenu(request)]);
           return true;
         }
@@ -417,6 +420,7 @@ export class DiningAgent {
       case "wait":
         if (!request.pendingWaitCandidateId) return false;
         if (!readWait(text)) {
+          if (quietIfUnclear) return false;
           await this.reply(ctx, [m.waitNotUnderstood(request.lang)]);
           return true;
         }
