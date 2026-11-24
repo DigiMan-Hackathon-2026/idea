@@ -1,3 +1,4 @@
+import candidateData from "./candidates.json";
 import type { MenuKey, Place, Restaurant } from "./types";
 
 // Areas the agent understands, with the spellings travellers use. Points are
@@ -148,93 +149,33 @@ export function findMenu(text: string): { key: MenuKey; label: string } | null {
   return any ? { key: "any", label: any } : null;
 }
 
-// Curated candidates. The demo entries are test shops: their phone refs map to
-// teammates who agreed to take test calls, and every card says テスト / 테스트.
-// Replace them with verified shops (source + checked date) before real use.
-const checked = "2026-11-25";
+// Curated candidates live in candidates.json so the team can replace the test
+// shops with verified ones without touching code. validateCandidates() keeps
+// the file honest (checked dates, HTTPS links, no phone numbers).
+export function validateCandidates(value: unknown): Restaurant[] {
+  const list = (value as { restaurants?: unknown }).restaurants;
+  if (!Array.isArray(list)) throw new Error("candidates.json: restaurants must be an array");
+  const ids = new Set<string>();
+  for (const item of list as Restaurant[]) {
+    const where = `candidates.json: ${item?.id ?? "?"}`;
+    if (!/^[a-z0-9-]{1,64}$/.test(item.id) || ids.has(item.id)) throw new Error(`${where}: id must be unique lowercase-kebab`);
+    ids.add(item.id);
+    if (!findArea(item.areaId)?.diningArea) throw new Error(`${where}: unknown dining area ${item.areaId}`);
+    if (!item.nameJa?.trim() || !item.nameKo?.trim() || !item.addressKo?.trim()) throw new Error(`${where}: names and address are required`);
+    if (!(item.point?.lat > 37.4 && item.point.lat < 37.72 && item.point.lng > 126.7 && item.point.lng < 127.3)) throw new Error(`${where}: point must be in Seoul`);
+    if (!Array.isArray(item.menus) || item.menus.length === 0 || item.menus.some((menu) => !(menu in menuNames) || menu === "any")) throw new Error(`${where}: menus must be known menu keys`);
+    if (item.phoneRef !== null && !/^[a-z0-9-]{1,40}$/.test(item.phoneRef)) throw new Error(`${where}: phoneRef must be a key, not a number`);
+    if (JSON.stringify(item).match(/\+?\d{2,3}[-\s]?\d{3,4}[-\s]?\d{4}/)) throw new Error(`${where}: looks like a phone number; use phoneRef`);
+    for (const link of item.bookingLinks ?? []) {
+      if (!link.url.startsWith("https://") || !/^\d{4}-\d{2}-\d{2}$/.test(link.checkedAt)) throw new Error(`${where}: booking links need https and checkedAt`);
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(item.source?.checkedAt ?? "")) throw new Error(`${where}: source.checkedAt is required`);
+    if (!item.test && !item.source.url?.startsWith("https://")) throw new Error(`${where}: a verified shop needs a source URL`);
+  }
+  return list as Restaurant[];
+}
 
-export const restaurants: Restaurant[] = [
-  {
-    id: "test-shinchon-a",
-    areaId: "shinchon",
-    nameJa: "テスト店A（サムギョプサル）",
-    nameKo: "테스트 매장 A (삼겹살)",
-    point: { lat: 37.5569, lng: 126.9372 },
-    addressKo: "서울 서대문구 신촌역 북쪽 (테스트)",
-    menus: ["samgyeopsal", "korean_bbq"],
-    maxParty: 6,
-    soloEntry: false,
-    singlePortion: false,
-    bookingLinks: [],
-    phoneRef: "demo-shop-a",
-    source: { label: "テストデータ / 테스트 데이터", url: null, checkedAt: checked },
-    test: true,
-  },
-  {
-    id: "test-shinchon-b",
-    areaId: "shinchon",
-    nameJa: "テスト店B（サムギョプサル）",
-    nameKo: "테스트 매장 B (삼겹살)",
-    point: { lat: 37.5547, lng: 126.9332 },
-    addressKo: "서울 마포구 신촌역 서쪽 (테스트)",
-    menus: ["samgyeopsal"],
-    maxParty: 4,
-    soloEntry: true,
-    singlePortion: true,
-    bookingLinks: [],
-    phoneRef: "demo-shop-b",
-    source: { label: "テストデータ / 테스트 데이터", url: null, checkedAt: checked },
-    test: true,
-  },
-  {
-    id: "test-shinchon-c",
-    areaId: "shinchon",
-    nameJa: "テスト店C（焼肉）",
-    nameKo: "테스트 매장 C (고기구이)",
-    point: { lat: 37.5584, lng: 126.9385 },
-    addressKo: "서울 서대문구 연세로 근처 (테스트)",
-    menus: ["korean_bbq", "samgyeopsal"],
-    maxParty: 10,
-    soloEntry: null,
-    singlePortion: null,
-    bookingLinks: [],
-    phoneRef: "demo-shop-c",
-    source: { label: "テストデータ / 테스트 데이터", url: null, checkedAt: checked },
-    test: true,
-  },
-  {
-    id: "test-shinchon-d",
-    areaId: "shinchon",
-    nameJa: "テスト店D（タッカルビ）",
-    nameKo: "테스트 매장 D (닭갈비)",
-    point: { lat: 37.5559, lng: 126.9390 },
-    addressKo: "서울 서대문구 신촌역 동쪽 (테스트)",
-    menus: ["dakgalbi"],
-    maxParty: 8,
-    soloEntry: false,
-    singlePortion: false,
-    bookingLinks: [],
-    phoneRef: "demo-shop-d",
-    source: { label: "テストデータ / 테스트 데이터", url: null, checkedAt: checked },
-    test: true,
-  },
-  {
-    id: "test-seongsu-a",
-    areaId: "seongsu",
-    nameJa: "テスト店E（サムギョプサル）",
-    nameKo: "테스트 매장 E (삼겹살)",
-    point: { lat: 37.5452, lng: 127.0571 },
-    addressKo: "서울 성동구 성수역 근처 (테스트)",
-    menus: ["samgyeopsal", "korean_bbq"],
-    maxParty: 6,
-    soloEntry: true,
-    singlePortion: false,
-    bookingLinks: [],
-    phoneRef: "demo-shop-e",
-    source: { label: "テストデータ / 테스트 데이터", url: null, checkedAt: checked },
-    test: true,
-  },
-];
+export const restaurants: Restaurant[] = validateCandidates(candidateData);
 
 export function findRestaurant(id: string): Restaurant | undefined {
   return restaurants.find((restaurant) => restaurant.id === id);
