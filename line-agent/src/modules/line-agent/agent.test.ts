@@ -240,6 +240,17 @@ describe("DiningAgent rules", () => {
     expect(lastTexts(ALICE, 1)).toContain("終了しました");
   });
 
+  it("suggests a nearby mission while a remote wait leaves time", async () => {
+    await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル。20時までに弘大のライブ会場に着きたい"));
+    const carousel = line.messagesFor(ALICE).at(-1)!.message;
+    const first = carousel.type === "flex" && carousel.contents.type === "carousel" ? carousel.contents.contents[0] : null;
+    await agent.handleEvent(tap(ALICE, buttons(first as unknown as LineMessage)["待ち状況を送る"]));
+    await agent.handleEvent(text(ALICE, "順番待ち登録済み、あと40分"));
+    const idea = line.messagesFor(ALICE).at(-1)!.message;
+    expect(idea.type === "text" && idea.text).toContain("駅のまわりの小さなミッション");
+    expect(JSON.stringify(idea)).toContain("/quests/adventure?line=2&station=240");
+  });
+
   it("answers in Korean to a Korean request", async () => {
     await agent.handleEvent(text(ALICE, "신촌에서 두 명이 삼겹살 먹고 싶어요. 8시까지 홍대 공연장에 가야 해요."));
     expect(lastTexts(ALICE, 2)).toContain("후보예요");
