@@ -29,6 +29,12 @@ describe("interpret", () => {
     expect(result.nextPlace?.nameKo).toBe("홍대 공연장");
   });
 
+  it("reads a return to a hotel and the longest menu name", () => {
+    const result = interpret("19時半までに明洞のホテルに戻りたい。新村で2人、タッカルビ");
+    expect(result).toMatchObject({ partySize: 2, menu: { key: "dakgalbi" }, currentAreaId: "shinchon", arriveBy: { hour: 19, minute: 30 } });
+    expect(result.nextPlace?.nameJa).toBe("明洞のホテル");
+  });
+
   it("leaves missing fields empty", () => {
     const result = interpret("お腹すいた、何か食べたい");
     expect(result).toMatchObject({ partySize: null, currentAreaId: null, nextPlace: null, arriveBy: null, wantsFood: true });
