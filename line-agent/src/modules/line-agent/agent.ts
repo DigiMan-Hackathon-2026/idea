@@ -82,6 +82,11 @@ export class DiningAgent {
       replyToken: "replyToken" in event ? event.replyToken : "",
     };
     this.log("line.event", { type: event.type, conversation: ctx.kind });
+    if (event.type === "unfollow") {
+      // The user blocked the account: forget the booking name they gave.
+      if (ctx.requesterKey) await this.deps.store.deleteAlias(ctx.requesterKey);
+      return;
+    }
     if (event.type === "follow" || event.type === "join") {
       await this.reply(ctx, [m.greeting("ja", ctx.kind === "user" ? "user" : "group")]);
     } else if (event.type === "message") {
@@ -255,6 +260,7 @@ export class DiningAgent {
       if (ctx.kind === "user") await this.reply(ctx, [m.askWaitFirst(active.lang)]);
       return;
     }
+    if (ctx.kind === "user") await this.deps.line.showLoading?.(ctx.target, 10);
     const text = this.deps.readImage ? await this.deps.readImage(messageId).catch(() => null) : null;
     if (!text || !readWait(text)) {
       await this.reply(ctx, [m.imageNotSupported(active.lang)]);
@@ -355,6 +361,7 @@ export class DiningAgent {
       return this.reply(ctx, [...notices, question]);
     }
     next.pendingQuestion = null;
+    if (ctx.kind === "user") await this.deps.line.showLoading?.(ctx.target, 10);
     next.candidates = await this.searchCandidates(next, now);
     next.status = "comparing";
     if (!(await this.deps.store.save(next, expectedRevision))) return this.reply(ctx, [m.staleCard(next.lang)]);

@@ -340,6 +340,12 @@ describe("DiningAgent rules", () => {
     expect(lastTexts(GROUP, 1)).toContain("どのあたり");
   });
 
+  it("forgets the booking name when the user blocks the account", async () => {
+    await store.setAlias("k:" + ALICE, "サトウ");
+    await agent.handleEvent({ type: "unfollow", webhookEventId: "ev-unfollow", timestamp: 0, source: { type: "user", userId: ALICE } });
+    expect(await store.getAlias("k:" + ALICE)).toBeNull();
+  });
+
   it("stays quiet in a group unless called", async () => {
     await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル", true));
     expect(line.sent).toHaveLength(0);
