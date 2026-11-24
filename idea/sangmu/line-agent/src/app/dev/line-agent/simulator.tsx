@@ -7,6 +7,7 @@ type Node = { type: string; text?: string; action?: Action; contents?: Node[] | 
 type Message = { type: "text"; text: string; quickReply?: { items: { action: Action }[] } } | { type: "flex"; altText: string; contents: Node; quickReply?: { items: { action: Action }[] } };
 type Entry = { at: string; to: string; via: "reply" | "push"; message: Message };
 type Mine = { at: string; text: string; user: string };
+type CallLog = { attemptId: string; shopJa: string; shopKo: string; transcript: { speaker: "ai" | "shop"; text: string }[]; outcome: string; at: string };
 
 const users = { alice: "Alice（依頼する人）", bob: "Bob（同じグループの人）" } as const;
 type User = keyof typeof users;
@@ -35,6 +36,7 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
   const [user, setUser] = useState<User>("alice");
   const [group, setGroup] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [callLog, setCallLog] = useState<CallLog[]>([]);
   const [mine, setMine] = useState<Mine[]>([]);
   const [draft, setDraft] = useState("新村で2人、サムギョプサルが食べたいです。20時までに弘大のライブ会場に着きたいです。");
   const [busy, setBusy] = useState(false);
@@ -43,7 +45,11 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
   const refresh = useCallback(async () => {
     if (!session) return;
     const response = await fetch(`/api/v1/dev/line-agent?session=${session}&user=${user}&group=${group ? 1 : 0}`, { cache: "no-store", headers: token ? { "x-simulator-token": token } : {} });
-    if (response.ok) setEntries((await response.json()).messages);
+    if (response.ok) {
+      const body = await response.json();
+      setEntries(body.messages);
+      setCallLog(body.callLog ?? []);
+    }
   }, [session, user, group, token]);
 
   useEffect(() => {
@@ -117,6 +123,7 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
           ))}
         </div>
       </header>
+      {callLog.length > 0 && <CallLogPanel calls={callLog} />}
       <section className="flex-1 space-y-3 p-3" aria-live="polite">
         {timeline.map((item, index) =>
           item.kind === "me" ? (
@@ -183,4 +190,50 @@ function FlexNode({ node, onAction }: { node: Node; onAction: (action: Action) =
   if (node.type === "separator") return <hr className="border-[#dfdfdd]" />;
   const children = Array.isArray(node.contents) ? node.contents : [];
   return <div className="space-y-1">{children.map((child, index) => <FlexNode key={index} node={child} onAction={onAction} />)}</div>;
+}
+
+const outcomeLabels: Record<string, string> = {
+  confirmed: "予約成立 · 예약 성립",
+  alternate_offered: "別の時間を提案 · 다른 시간 제안",
+  declined: "断られた · 거절",
+  no_answer: "応答なし · 응답 없음",
+  unknown: "不明 · 불명확",
+};
+
+/** Transcripts of simulated calls, with playback in the browser's Korean voice (demo fallback). */
+function CallLogPanel({ calls }: { calls: CallLog[] }) {
+  function play(call: CallLog) {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const voices = window.speechSynthesis.getVoices().filter((voice) => voice.lang.startsWith("ko"));
+    for (const turn of call.transcript) {
+      const utterance = new SpeechSynthesisUtterance(turn.text);
+      utterance.lang = "ko-KR";
+      utterance.voice = voices.at(turn.speaker === "ai" ? 0 : -1) ?? null;
+      utterance.pitch = turn.speaker === "ai" ? 1.1 : 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+  return (
+    <details className="mx-3 mt-3 rounded-xl bg-white p-3 text-xs text-[#504e49]">
+      <summary className="cursor-pointer font-bold">通話ログ · 통화 기록（{calls.length}）</summary>
+      <ol className="mt-2 space-y-3">
+        {calls.map((call) => (
+          <li key={call.attemptId} className="space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-bold">{call.shopJa} — {outcomeLabels[call.outcome] ?? call.outcome}</span>
+              <button type="button" onClick={() => play(call)} className="rounded border border-[#455f54] px-2 py-0.5 text-[#455f54]">再生 · 재생</button>
+            </div>
+            <ul lang="ko" className="space-y-0.5">
+              {call.transcript.map((turn, index) => (
+                <li key={index}>
+                  <span className="font-bold">{turn.speaker === "ai" ? "AI" : "가게"}:</span> {turn.text}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </details>
+  );
 }

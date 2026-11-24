@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import type { LineEvent } from "../../../../../modules/line-agent/line/types";
 import { getLineAgentRuntime, SIMULATOR_PREFIX } from "../../../../../modules/line-agent/runtime.server";
+import { findRestaurant } from "../../../../../modules/line-agent/places";
 import { requestOrigin, simulatorAllowed } from "../../../../../modules/line-agent/simulator-access";
 
 // Local chat simulator for the LINE agent: lets the team rehearse the whole
@@ -34,8 +35,11 @@ export async function GET(request: NextRequest) {
   const session = request.nextUrl.searchParams.get("session") ?? "";
   if (!USERS.has(user) || !SESSION.test(session)) return new Response(null, { status: 400 });
   const to = target(session, user, group);
+  const callLog = runtime.simulatorCalls
+    .filter((call) => call.replyTarget === to)
+    .map((call) => ({ ...call, shopJa: findRestaurant(call.restaurantId)?.nameJa ?? call.restaurantId, shopKo: findRestaurant(call.restaurantId)?.nameKo ?? call.restaurantId }));
   return Response.json(
-    { messages: runtime.simulatorLine.messagesFor(to), calls: runtime.config.calls, line: runtime.config.accessToken !== null },
+    { messages: runtime.simulatorLine.messagesFor(to), callLog, calls: runtime.config.calls, line: runtime.config.accessToken !== null },
     { headers: { "cache-control": "no-store" } },
   );
 }
