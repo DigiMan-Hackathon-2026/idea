@@ -248,6 +248,12 @@ export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[
 
 // ── Calls ────────────────────────────────────────────────────────────────────
 
+/** The shop's own words from the call, quoted in Korean (no translation is claimed). */
+function shopQuote(lang: Lang, quote: string | null): string {
+  if (!quote) return "";
+  return tr(lang, `\nお店の返事（韓国語）：「${quote}」`, `\n가게 답변: "${quote}"`);
+}
+
 export function approvalCard(request: DiningRequest, approval: CallProposal, lookup: (id: string) => Restaurant | undefined): LineMessage {
   const lang = request.lang;
   const shops = approval.candidateIds.map((id, i) => `${i + 1}. ${name(lang, lookup(id) ?? { nameJa: id, nameKo: id })}`);
@@ -291,7 +297,7 @@ export function calling(lang: Lang, restaurant: Restaurant, index: number, total
   return { type: "text", text: tr(lang, `${restaurant.nameJa}に電話しています（${index}/${total}）。結果はこのトークに送ります。`, `${restaurant.nameKo}에 전화하고 있어요 (${index}/${total}). 결과는 이 대화방으로 보낼게요.`) };
 }
 
-export function callMovedOn(lang: Lang, restaurant: Restaurant, reason: "declined" | "no_answer" | "late_offer" | "failed", offeredTime: string | null, request: DiningRequest): LineMessage {
+export function callMovedOn(lang: Lang, restaurant: Restaurant, reason: "declined" | "no_answer" | "late_offer" | "failed", offeredTime: string | null, request: DiningRequest, quote: string | null = null): LineMessage {
   const arrive = request.arriveBy && request.nextPlace ? tr(lang, `${formatSeoulTime(request.arriveBy)}までの到着に間に合いません。`, `${formatSeoulTime(request.arriveBy)}까지 도착하기 어려워요.`) : "";
   const why =
     reason === "late_offer" && offeredTime
@@ -301,7 +307,7 @@ export function callMovedOn(lang: Lang, restaurant: Restaurant, reason: "decline
         : reason === "no_answer"
           ? tr(lang, `${restaurant.nameJa}は電話に出ませんでした。`, `${restaurant.nameKo}는 전화를 받지 않았어요.`)
           : tr(lang, `${restaurant.nameJa}に電話をかけられませんでした。`, `${restaurant.nameKo}에 전화를 걸지 못했어요.`);
-  return { type: "text", text: `${why}${tr(lang, "人数と時間はそのままで、次のお店に電話します。", " 인원과 시간은 그대로 두고 다음 가게에 전화할게요.")}` };
+  return { type: "text", text: `${why}${tr(lang, "人数と時間はそのままで、次のお店に電話します。", " 인원과 시간은 그대로 두고 다음 가게에 전화할게요.")}${shopQuote(lang, quote)}` };
 }
 
 export function callsExhausted(request: DiningRequest): LineMessage {
@@ -313,7 +319,7 @@ export function callsExhausted(request: DiningRequest): LineMessage {
   };
 }
 
-export function needsDecision(request: DiningRequest, restaurant: Restaurant, reason: "out_of_range" | "deposit", offeredTime: string | null): LineMessage {
+export function needsDecision(request: DiningRequest, restaurant: Restaurant, reason: "out_of_range" | "deposit", offeredTime: string | null, quote: string | null = null): LineMessage {
   const lang = request.lang;
   const what =
     reason === "deposit"
@@ -328,7 +334,7 @@ export function needsDecision(request: DiningRequest, restaurant: Restaurant, re
   actions.push(postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }));
   return {
     type: "text",
-    text: `${what}${tr(lang, "その時間でもう一度頼むか、ほかのお店を探せます。", " 그 시간으로 다시 부탁하거나 다른 가게를 찾을 수 있어요.")}`,
+    text: `${what}${tr(lang, "その時間でもう一度頼むか、ほかのお店を探せます。", " 그 시간으로 다시 부탁하거나 다른 가게를 찾을 수 있어요.")}${shopQuote(lang, quote)}`,
     quickReply: quickReply(actions),
   };
 }
@@ -357,7 +363,7 @@ export function verifiedNone(request: DiningRequest): LineMessage {
   };
 }
 
-export function confirmedCard(request: DiningRequest, reservation: Reservation, restaurant: Restaurant, links: { origin: string; cardToken: string | null }): LineMessage {
+export function confirmedCard(request: DiningRequest, reservation: Reservation, restaurant: Restaurant, links: { origin: string; cardToken: string | null }, quote: string | null = null): LineMessage {
   const lang = request.lang;
   const title = reservation.test ? tr(lang, "予約が取れました（テスト）", "예약했어요 (테스트)") : tr(lang, "予約が取れました", "예약했어요");
   const footer: FlexComponent[] = [
@@ -383,6 +389,7 @@ export function confirmedCard(request: DiningRequest, reservation: Reservation, 
             : tr(lang, `根拠：お店に確認したと依頼者が共有（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 가게에 확인했다고 요청자가 공유 (${formatSeoulTime(reservation.acceptedAt)})`),
           { size: "xs", color: color.muted },
         ),
+        ...(quote ? [text(tr(lang, `お店の返事（韓国語）：「${quote}」`, `가게 답변: "${quote}"`), { size: "xs", color: color.muted })] : []),
       ]),
       footer: vbox(footer),
     },
