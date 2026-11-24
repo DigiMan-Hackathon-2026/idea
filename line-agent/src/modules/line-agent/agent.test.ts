@@ -182,6 +182,13 @@ describe("DiningAgent rules", () => {
     expect(view).toContain("テスト店C"); // max 10
   });
 
+  it("says when an area has no shops yet", async () => {
+    await agent.handleEvent(text(ALICE, "明洞で2人、サムギョプサル"));
+    expect(lastTexts(ALICE, 1)).toContain("明洞のお店はまだ準備中です");
+    await agent.handleEvent(text(ALICE, "新村"));
+    expect(lastTexts(ALICE, 2)).toContain("2名の候補です");
+  });
+
   it("answers in Korean to a Korean request", async () => {
     await agent.handleEvent(text(ALICE, "신촌에서 두 명이 삼겹살 먹고 싶어요. 8시까지 홍대 공연장에 가야 해요."));
     expect(lastTexts(ALICE, 2)).toContain("후보예요");

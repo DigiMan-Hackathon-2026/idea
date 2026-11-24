@@ -283,7 +283,8 @@ export class DiningAgent {
     };
     const notices = this.merge(request, reading, now);
     this.log("request.started", { lang: request.lang, kind: ctx.kind });
-    await this.advance(request, null, ctx, notices);
+    const unsupported = reading.currentAreaId && !findArea(reading.currentAreaId)?.diningArea ? findArea(reading.currentAreaId) : undefined;
+    await this.advance(request, null, ctx, notices, unsupported);
   }
 
   /** Copies what the text states into fields that are still empty. */
@@ -312,7 +313,7 @@ export class DiningAgent {
   }
 
   /** Asks the next missing question, or searches once everything is known. */
-  private async advance(request: DiningRequest, expectedRevision: number | null, ctx: Context, notices: LineMessage[] = []): Promise<void> {
+  private async advance(request: DiningRequest, expectedRevision: number | null, ctx: Context, notices: LineMessage[] = [], unsupportedArea?: { nameJa: string; nameKo: string }): Promise<void> {
     const now = this.now();
     const next = expectedRevision === null ? request : this.bump(request, now);
     if (expectedRevision === null) next.revision = 1;
@@ -322,7 +323,7 @@ export class DiningAgent {
       question = m.askPartySize(next);
     } else if (next.areaId === null) {
       next.pendingQuestion = "area";
-      question = m.askArea(next);
+      question = m.askArea(next, unsupportedArea);
     } else if (next.menuKey === null) {
       next.pendingQuestion = "menu";
       question = m.askMenu(next);
@@ -387,9 +388,10 @@ export class DiningAgent {
         return true;
       }
       case "area": {
-        const mention = findAreaMentions(normalizeText(text)).find((hit) => hit.area.diningArea);
+        const mentions = findAreaMentions(normalizeText(text));
+        const mention = mentions.find((hit) => hit.area.diningArea);
         if (!mention) {
-          await this.reply(ctx, [m.askArea(request)]);
+          await this.reply(ctx, [m.askArea(request, mentions[0]?.area)]);
           return true;
         }
         const next = structuredClone(request);

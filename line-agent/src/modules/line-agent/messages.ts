@@ -53,12 +53,15 @@ export function askPartySize(request: DiningRequest): LineMessage {
   };
 }
 
-export function askArea(request: DiningRequest): LineMessage {
+export function askArea(request: DiningRequest, unsupported?: { nameJa: string; nameKo: string }): LineMessage {
   const lang = request.lang;
   const options = ["shinchon", "seongsu"].map((id) => findArea(id)!);
+  const note = unsupported
+    ? tr(lang, `${unsupported.nameJa}のお店はまだ準備中です。新村か聖水なら探せます。`, `${unsupported.nameKo} 가게는 아직 준비 중이에요. 신촌이나 성수라면 찾을 수 있어요.`)
+    : tr(lang, "どのあたりで食べますか？いまいる駅や地域を送ってください。", "어디쯤에서 드실 건가요? 지금 계신 역이나 동네를 보내 주세요.");
   return {
     type: "text",
-    text: tr(lang, "どのあたりで食べますか？いまいる駅や地域を送ってください。", "어디쯤에서 드실 건가요? 지금 계신 역이나 동네를 보내 주세요."),
+    text: note,
     quickReply: quickReply(options.map((area) => postback(request, "area", name(lang, area), { value: area.id, displayText: name(lang, area) }))),
   };
 }
