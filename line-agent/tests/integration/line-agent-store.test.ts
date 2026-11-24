@@ -44,6 +44,9 @@ describe("PostgreSQL LINE agent store", () => {
     expect((await store.getActiveRequest("conv-a", now))?.revision).toBe(2);
     expect(await store.getActiveRequest("conv-a", "2026-11-29T15:00:00.000Z")).toBeNull();
     expect((await store.getActiveByRequester("req-alice", now))?.id).toBe("req00000001");
+    expect(await store.findAwaitingAlias("req-alice", now)).toBeNull();
+    await store.save(request({ revision: 3, pendingQuestion: "alias" }), 2);
+    expect((await store.findAwaitingAlias("req-alice", now))?.revision).toBe(3);
   });
 
   it("finds a request by attempt and rejects a second attempt for the same slot", async () => {
