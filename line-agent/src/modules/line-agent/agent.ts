@@ -17,7 +17,7 @@ import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
 import { addMinutes, ceilToMinutes, laterOf, seoulDate, seoulInstant } from "./time";
 import type { TravelProvider } from "./travel";
-import type { CallApproval, CallAttempt, CandidateState, DiningRequest, MenuKey } from "./types";
+import type { CallApproval, CallAttempt, CandidateState, DiningRequest, MenuKey, Restaurant } from "./types";
 import { readWait } from "./wait";
 
 export type AgentDeps = {
@@ -33,6 +33,8 @@ export type AgentDeps = {
   origin: string;
   linkSecret: string | null;
   phoneAllowed: (phoneRef: string) => boolean;
+  /** Reads the text in an image the user sent (OCR). null = cannot read images here. */
+  readImage?: ((messageId: string) => Promise<string | null>) | null;
   log?: (event: string, data: Record<string, string | number | boolean | null>) => void;
 };
 
@@ -87,7 +89,7 @@ export class DiningAgent {
         const mentioned = event.message.mention?.mentionees.some((mentionee) => mentionee.isSelf) ?? false;
         await this.onText(ctx, event.message.text, mentioned);
       } else if (event.message.type === "image") {
-        await this.onImage(ctx);
+        await this.onImage(ctx, event.message.id);
       }
     } else if (event.type === "postback") {
       await this.onPostback(ctx, event.postback.data);
@@ -244,9 +246,27 @@ export class DiningAgent {
     await this.reply(ctx, [m.didNotUnderstand(reading.lang)]);
   }
 
-  private async onImage(ctx: Context): Promise<void> {
+  private async onImage(ctx: Context, messageId: string): Promise<void> {
     const active = await this.deps.store.getActiveRequest(ctx.convKey, this.now());
-    if (active && (active.pendingQuestion === "wait" || ctx.kind === "user")) await this.reply(ctx, [m.imageNotSupported(active.lang)]);
+    if (!active) return;
+    // Only images sent as an answer to "send the wait" are read (spec §9: no group-wide reading).
+    const candidateId = active.pendingQuestion === "wait" ? active.pendingWaitCandidateId : ctx.kind === "user" ? active.selectedCandidateId : null;
+    if (!candidateId) {
+      if (ctx.kind === "user") await this.reply(ctx, [m.askWaitFirst(active.lang)]);
+      return;
+    }
+    const text = this.deps.readImage ? await this.deps.readImage(messageId).catch(() => null) : null;
+    if (!text || !readWait(text)) {
+      await this.reply(ctx, [m.imageNotSupported(active.lang)]);
+      return;
+    }
+    const other = otherCandidateNamed(active, candidateId, text);
+    if (other) {
+      await this.reply(ctx, [m.imageOtherShop(active.lang, findRestaurant(candidateId)!, other)]);
+      return;
+    }
+    const fresh = await this.deps.store.getRequest(active.id);
+    if (fresh) await this.recordWait(fresh, candidateId, text, ctx, "user_image");
   }
 
   private async startRequest(ctx: Context, reading: Interpretation, now: string): Promise<void> {
@@ -444,14 +464,14 @@ export class DiningAgent {
     await this.propose(next, request.revision, ctx, alias);
   }
 
-  private async recordWait(request: DiningRequest, candidateId: string, text: string, ctx: Context): Promise<void> {
+  private async recordWait(request: DiningRequest, candidateId: string, text: string, ctx: Context, source: "user_text" | "user_image" = "user_text"): Promise<void> {
     const now = this.now();
     const reading = readWait(text)!;
     const restaurant = findRestaurant(candidateId);
     if (!restaurant) return;
     const next = this.bump(request, now);
     const readyAt = reading.readyAt ? seoulInstant(seoulDate(now), reading.readyAt.hour, reading.readyAt.minute) : null;
-    next.waits.push({ candidateId, minutes: reading.minutes, teams: reading.teams, readyAt, basis: reading.basis, observedAt: now, reportedAt: now, reportedBy: ctx.requesterKey ?? "unknown", source: "user_text" });
+    next.waits.push({ candidateId, minutes: reading.minutes, teams: reading.teams, readyAt, basis: reading.basis, observedAt: now, reportedAt: now, reportedBy: ctx.requesterKey ?? "unknown", source });
     next.pendingQuestion = null;
     next.pendingWaitCandidateId = null;
     if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(next.lang)]);
@@ -767,6 +787,22 @@ export class DiningAgent {
   private async push(request: DiningRequest, messages: LineMessage[]): Promise<void> {
     await this.deps.line.push(request.replyTarget, messages).catch(() => this.log("line.push_failed", {}));
   }
+}
+
+/** A shop other than the expected one whose name appears in the image text (spec WAIT-01). */
+function otherCandidateNamed(request: DiningRequest, candidateId: string, text: string): Restaurant | null {
+  const core = (name: string) => name.replace(/[（(].*$/, "").replace(/\s+/g, "");
+  const flat = text.replace(/\s+/g, "");
+  for (const candidate of request.candidates) {
+    if (candidate.restaurantId === candidateId) continue;
+    const restaurant = findRestaurant(candidate.restaurantId);
+    if (restaurant && [restaurant.nameJa, restaurant.nameKo].some((name) => core(name).length >= 2 && flat.includes(core(name)))) {
+      const expected = findRestaurant(candidateId);
+      if (expected && [expected.nameJa, expected.nameKo].some((name) => flat.includes(core(name)))) return null;
+      return restaurant;
+    }
+  }
+  return null;
 }
 
 function rankOf(request: DiningRequest, candidateId: string): number {

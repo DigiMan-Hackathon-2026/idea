@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const runtime = enabled();
   if (!runtime) return new Response(null, { status: 404 });
-  let body: { session?: unknown; user?: unknown; group?: unknown; text?: unknown; data?: unknown; mention?: unknown };
+  let body: { session?: unknown; user?: unknown; group?: unknown; text?: unknown; data?: unknown; mention?: unknown; image?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -58,6 +58,13 @@ export async function POST(request: NextRequest) {
   let event: LineEvent;
   if (typeof body.text === "string" && body.text.trim()) {
     event = { ...common, type: "message", message: { type: "text", id: `m${counter}`, text: body.text.slice(0, 1000), mention: body.mention === true ? { mentionees: [{ isSelf: true }] } : undefined } };
+  } else if (typeof body.image === "string") {
+    const match = body.image.match(/^data:image\/(?:png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/);
+    const image = match ? Buffer.from(match[1], "base64") : null;
+    if (!image || image.length > 5 * 1024 * 1024) return new Response(null, { status: 413 });
+    const id = `${SIMULATOR_PREFIX}img-${Date.now()}-${counter}`;
+    runtime.simulatorImages.set(id, image);
+    event = { ...common, type: "message", message: { type: "image", id } };
   } else if (typeof body.data === "string") {
     event = { ...common, type: "postback", postback: { data: body.data.slice(0, 300) } };
   } else {

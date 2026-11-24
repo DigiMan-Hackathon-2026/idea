@@ -81,7 +81,7 @@ export type WaitObservation = {
   observedAt: string | null;
   reportedAt: string;
   reportedBy: string;
-  source: "user_text";
+  source: "user_text" | "user_image";
 };
 
 export type CallApproval = {
