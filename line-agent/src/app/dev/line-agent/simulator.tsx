@@ -11,7 +11,20 @@ type Mine = { at: string; text: string; user: string };
 const users = { alice: "Alice（依頼する人）", bob: "Bob（同じグループの人）" } as const;
 type User = keyof typeof users;
 
+function newSession(): string {
+  return Math.random().toString(36).slice(2, 10);
+}
+
 export function LineAgentSimulator({ calls }: { calls: string }) {
+  // One conversation per tab; ?s=… in the URL keeps it across reloads.
+  const [session] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const fromUrl = new URLSearchParams(window.location.search).get("s");
+    if (fromUrl && /^[a-z0-9]{1,16}$/.test(fromUrl)) return fromUrl;
+    const created = newSession();
+    window.history.replaceState(null, "", `?s=${created}`);
+    return created;
+  });
   const [user, setUser] = useState<User>("alice");
   const [group, setGroup] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -21,9 +34,10 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
   const bottom = useRef<HTMLDivElement | null>(null);
 
   const refresh = useCallback(async () => {
-    const response = await fetch(`/api/v1/dev/line-agent?user=${user}&group=${group ? 1 : 0}`, { cache: "no-store" });
+    if (!session) return;
+    const response = await fetch(`/api/v1/dev/line-agent?session=${session}&user=${user}&group=${group ? 1 : 0}`, { cache: "no-store" });
     if (response.ok) setEntries((await response.json()).messages);
-  }, [user, group]);
+  }, [session, user, group]);
 
   useEffect(() => {
     // Fetch once per view change, then poll for pushed messages (call results).
@@ -43,7 +57,7 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
     setBusy(true);
     setMine((list) => [...list, { at: new Date().toISOString(), text: shown, user }]);
     const text = payload.text && group && !/ココソウル|코코서울/.test(payload.text) ? `ココソウル ${payload.text}` : payload.text;
-    await fetch("/api/v1/dev/line-agent", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ user, group, ...payload, text }) });
+    await fetch("/api/v1/dev/line-agent", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session, user, group, ...payload, text }) });
     await refresh();
     setBusy(false);
   }
@@ -71,6 +85,9 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
     <main className="mx-auto flex min-h-screen max-w-md flex-col bg-[#8cabd9]/30">
       <header className="sticky top-0 z-10 space-y-2 bg-[#455f54] p-3 text-white">
         <h1 className="text-base font-bold">LINE 秘書シミュレーター · LINE 비서 시뮬레이터</h1>
+        <p className="text-xs opacity-90">
+          <a href="/dev/line-agent" className="underline">新しい会話 · 새 대화</a>
+        </p>
         <p className="text-xs opacity-90">電話: {calls === "simulator" ? "台本どおりのテスト店（実際には電話しません）" : calls === "twilio" ? "実際に発信（許可された番号のみ）" : "オフ"}</p>
         <div className="flex flex-wrap gap-2 text-xs">
           <label className="flex items-center gap-1">
