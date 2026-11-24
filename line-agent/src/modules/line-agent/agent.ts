@@ -132,6 +132,7 @@ export class DiningAgent {
       }
 
       const outcome = classifyCall(result.transcript, { partySize: approval.partySize, windowStart: approval.windowStart, windowEnd: approval.windowEnd });
+      const quote = lastShopWords(result.transcript);
       nextCall.status = "finished";
       nextCall.outcome = outcome;
       this.log("call.outcome", { kind: outcome.kind, attempt: call.ordinal });
@@ -153,22 +154,22 @@ export class DiningAgent {
         const token = this.deps.linkSecret
           ? makeCardToken({ restaurantId: restaurant.id, partySize: approval.partySize, time: outcome.confirmedTime, alias: approval.alias, test: restaurant.test, expiresAt: addMinutes(outcome.confirmedTime, 6 * 60) }, this.deps.linkSecret)
           : null;
-        messages.push(m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token }));
+        messages.push(m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token }, quote));
       } else if (outcome.kind === "alternate_offered" && outcome.depositRequired) {
         next.status = "needs_decision";
         next.decision = { reason: "deposit", candidateId: restaurant.id, offeredTime: outcome.offeredTime };
-        messages.push(m.needsDecision(next, restaurant, "deposit", outcome.offeredTime));
+        messages.push(m.needsDecision(next, restaurant, "deposit", outcome.offeredTime, quote));
       } else if (outcome.kind === "alternate_offered" && outcome.offeredTime) {
         const plan = this.planFor(next, restaurant.id, now);
         // Too late for the next appointment → try the next shop. Without an appointment,
         // or for an earlier time, the requester decides.
         if (plan?.seatDeadline && Date.parse(outcome.offeredTime) > Date.parse(plan.seatDeadline)) {
-          messages.push(m.callMovedOn(next.lang, restaurant, "late_offer", outcome.offeredTime, next));
+          messages.push(m.callMovedOn(next.lang, restaurant, "late_offer", outcome.offeredTime, next, quote));
           continueCalling = true;
         } else {
           next.status = "needs_decision";
           next.decision = { reason: "out_of_range", candidateId: restaurant.id, offeredTime: outcome.offeredTime };
-          messages.push(m.needsDecision(next, restaurant, "out_of_range", outcome.offeredTime));
+          messages.push(m.needsDecision(next, restaurant, "out_of_range", outcome.offeredTime, quote));
         }
       } else if (outcome.kind === "unknown" && outcome.bookingRequested) {
         // A booking may exist: never call the next shop until it is checked (spec CALL-03).
@@ -176,7 +177,7 @@ export class DiningAgent {
         next.decision = { reason: "out_of_range", candidateId: restaurant.id, offeredTime: outcome.offeredTime };
         messages.push(m.needsVerification(next, restaurant));
       } else {
-        messages.push(m.callMovedOn(next.lang, restaurant, outcome.kind === "no_answer" ? "no_answer" : "declined", null, next));
+        messages.push(m.callMovedOn(next.lang, restaurant, outcome.kind === "no_answer" ? "no_answer" : "declined", null, next, quote));
         continueCalling = true;
       }
 
@@ -844,6 +845,14 @@ function otherCandidateNamed(request: DiningRequest, candidateId: string, text: 
     }
   }
   return null;
+}
+
+/** The shop's most telling line: the last one that says something about the booking. */
+function lastShopWords(transcript: readonly { speaker: "ai" | "shop"; text: string }[]): string | null {
+  const lines = transcript.filter((turn) => turn.speaker === "shop").map((turn) => turn.text.trim()).filter((text) => text.length > 1);
+  const telling = [...lines].reverse().find((text) => /시|돼|되|안|어렵|만석|가능|예약|맞/.test(text) && !/^네[.,!]?$/.test(text)) ?? lines.at(-1);
+  if (!telling) return null;
+  return telling.length > 80 ? `${telling.slice(0, 79)}…` : telling;
 }
 
 function rankOf(request: DiningRequest, candidateId: string): number {

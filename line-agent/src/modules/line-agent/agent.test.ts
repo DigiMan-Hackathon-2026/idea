@@ -144,6 +144,7 @@ describe("DiningAgent demo flow (spec 3분 시연, CALL-01)", () => {
     clock = seoulInstant("2026-11-29", 17, 33);
     await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("only_later", calls.jobs[0].brief) });
     expect(lastTexts(GROUP, 2)).toContain("19:00");
+    expect(lastTexts(GROUP, 2)).toContain("お店の返事（韓国語）：「그 시간은 꽉 찼고요, 일곱 시는 돼요.」");
     expect(calls.jobs).toHaveLength(2);
     expect(calls.jobs[1].phoneRef).toBe("demo-shop-a");
 
