@@ -42,7 +42,8 @@ export function classifyCall(turns: readonly TranscriptTurn[], context: OutcomeC
       }
     }
     if (!reply) {
-      return { ...base, kind: "unknown", bookingRequested: true, summaryKo: "복창 후 답을 듣지 못했습니다." };
+      const asked = recapTime ? toInstant(recapTime) : null;
+      return { ...base, kind: "unknown", bookingRequested: true, offeredTime: asked, summaryKo: "복창 후 답을 듣지 못했습니다." };
     }
   }
 

@@ -21,10 +21,15 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
     if (typeof window === "undefined") return "";
     const fromUrl = new URLSearchParams(window.location.search).get("s");
     if (fromUrl && /^[a-z0-9]{1,16}$/.test(fromUrl)) return fromUrl;
-    const created = newSession();
-    window.history.replaceState(null, "", `?s=${created}`);
-    return created;
+    return newSession();
   });
+
+  useEffect(() => {
+    // Keep the conversation across reloads (no state change, so no re-render).
+    if (session && new URLSearchParams(window.location.search).get("s") !== session) {
+      window.history.replaceState(window.history.state, "", `?s=${session}`);
+    }
+  }, [session]);
   const [user, setUser] = useState<User>("alice");
   const [group, setGroup] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
