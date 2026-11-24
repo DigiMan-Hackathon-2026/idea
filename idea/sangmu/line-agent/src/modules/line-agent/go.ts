@@ -1,6 +1,6 @@
 // Resolves the public place ids used in /go links (spec §7: URLs carry only
 // verified public place ids).
-import { areaAsPlace, findArea, findRestaurant } from "./places";
+import { areaAsPlace, findArea, findRestaurant, stationAlbumPath } from "./places";
 import { estimateLeg } from "./travel";
 import type { Point, TravelLeg } from "./types";
 
@@ -13,6 +13,8 @@ export type GoPlace = {
   stationCode: string | null;
   test: boolean;
   approximate: boolean;
+  /** Link to the station's stamp page in the 여기서울 album. */
+  albumPath: string | null;
 };
 
 export function resolveGoPlace(ref: string | null | undefined): GoPlace | null {
@@ -23,7 +25,7 @@ export function resolveGoPlace(ref: string | null | undefined): GoPlace | null {
     const restaurant = findRestaurant(id);
     if (!restaurant) return null;
     const area = findArea(restaurant.areaId);
-    return { ref, nameJa: restaurant.nameJa, nameKo: restaurant.nameKo, point: restaurant.point, addressKo: restaurant.addressKo, stationCode: area?.stationCode ?? null, test: restaurant.test, approximate: false };
+    return { ref, nameJa: restaurant.nameJa, nameKo: restaurant.nameKo, point: restaurant.point, addressKo: restaurant.addressKo, stationCode: area?.stationCode ?? null, test: restaurant.test, approximate: false, albumPath: stationAlbumPath(restaurant.areaId) };
   }
   const area = findArea(id);
   if (!area || (kind !== "a" && kind !== "v")) return null;
@@ -38,6 +40,7 @@ export function resolveGoPlace(ref: string | null | undefined): GoPlace | null {
     stationCode: place.stationCode,
     test: false,
     approximate: true,
+    albumPath: stationAlbumPath(area.id),
   };
 }
 

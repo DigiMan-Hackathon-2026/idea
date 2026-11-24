@@ -128,7 +128,8 @@ export type Reservation = {
   partySize: number;
   time: string;
   alias: string;
-  evidence: "call_accept";
+  /** call_accept: the shop said yes on the call; user_confirmed: the requester checked with the shop. */
+  evidence: "call_accept" | "user_confirmed";
   acceptedAt: string;
   test: boolean;
 };

@@ -6,7 +6,11 @@ import { formatKoreanSpokenTime } from "./time";
 
 export type CallJob = { attemptId: string; phoneRef: string; brief: CallBrief };
 
-export type CallFinished = { attemptId: string; transcript: TranscriptTurn[] } | { attemptId: string; failed: true };
+export type CallFinished =
+  | { attemptId: string; transcript: TranscriptTurn[] }
+  | { attemptId: string; failed: true }
+  /** The call ended but no transcript arrived: a booking may exist, so it must be checked. */
+  | { attemptId: string; lost: true };
 
 export interface CallPlacer {
   readonly kind: "simulator" | "twilio";
@@ -96,6 +100,8 @@ export class TwilioCallPlacer implements CallPlacer {
     private readonly config: { accountSid: string; authToken: string; from: string; bridgeHost: string },
     private readonly phoneFor: (phoneRef: string) => string | null,
     private readonly tokenFor: (attemptId: string) => string,
+    /** Where Twilio reports the final call status (no-answer, busy, completed…). */
+    private readonly statusUrlFor: ((attemptId: string) => string) | null = null,
   ) {}
 
   async place(job: CallJob): Promise<string> {
@@ -113,7 +119,14 @@ export class TwilioCallPlacer implements CallPlacer {
         Authorization: "Basic " + Buffer.from(`${this.config.accountSid}:${this.config.authToken}`).toString("base64"),
         "content-type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({ To: to, From: this.config.from, Twiml: twiml, TimeLimit: "300" }),
+      body: new URLSearchParams({
+        To: to,
+        From: this.config.from,
+        Twiml: twiml,
+        TimeLimit: "300",
+        Timeout: "25",
+        ...(this.statusUrlFor ? { StatusCallback: this.statusUrlFor(job.attemptId), StatusCallbackMethod: "POST" } : {}),
+      }),
       signal: AbortSignal.timeout(10_000),
     });
     const body = (await response.json().catch(() => ({}))) as { sid?: string };

@@ -2,11 +2,12 @@ import type { MenuKey, Place, Restaurant } from "./types";
 
 // Areas the agent understands, with the spellings travellers use. Points are
 // the station coordinates from the 여기서울 subway data (station-coordinates.json).
-type Area = Place & { aliases: string[]; diningArea: boolean };
+type Area = Place & { aliases: string[]; diningArea: boolean; stationKo: string };
 
 export const areas: Area[] = [
   {
     id: "shinchon",
+    stationKo: "신촌",
     nameJa: "新村",
     nameKo: "신촌",
     point: { lat: 37.555131, lng: 126.936926 },
@@ -17,6 +18,7 @@ export const areas: Area[] = [
   },
   {
     id: "hongdae",
+    stationKo: "홍대입구",
     nameJa: "弘大",
     nameKo: "홍대",
     point: { lat: 37.55679, lng: 126.923708 },
@@ -27,6 +29,7 @@ export const areas: Area[] = [
   },
   {
     id: "ewha",
+    stationKo: "이대",
     nameJa: "梨大",
     nameKo: "이대",
     point: { lat: 37.556733, lng: 126.946013 },
@@ -37,6 +40,7 @@ export const areas: Area[] = [
   },
   {
     id: "hapjeong",
+    stationKo: "합정",
     nameJa: "合井",
     nameKo: "합정",
     point: { lat: 37.549457, lng: 126.913808 },
@@ -47,6 +51,7 @@ export const areas: Area[] = [
   },
   {
     id: "seongsu",
+    stationKo: "성수",
     nameJa: "聖水",
     nameKo: "성수",
     point: { lat: 37.544581, lng: 127.055961 },
@@ -57,6 +62,7 @@ export const areas: Area[] = [
   },
   {
     id: "myeongdong",
+    stationKo: "명동",
     nameJa: "明洞",
     nameKo: "명동",
     point: { lat: 37.560989, lng: 126.986325 },
@@ -91,6 +97,14 @@ export function findAreaMentions(text: string): { area: Area; index: number; len
   return mentions.filter(
     (mention, i) => !mentions.some((other, j) => j !== i && other.index <= mention.index && other.index + other.length >= mention.index + mention.length && other.length > mention.length),
   );
+}
+
+/** 여기서울 station album link (stamps) for an area's station. */
+export function stationAlbumPath(areaId: string): string | null {
+  const area = findArea(areaId);
+  if (!area?.stationCode || !/^\d{3}$/.test(area.stationCode)) return null;
+  const line = area.stationCode[0];
+  return `/station-album?line=${line}&station=${encodeURIComponent(area.stationKo)}#station-story`;
 }
 
 export function areaAsPlace(area: Area): Place {

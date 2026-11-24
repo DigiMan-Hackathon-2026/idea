@@ -54,6 +54,11 @@ async function GoPageContent({ searchParams }: { searchParams: SearchParams }) {
           {ja ? "アプリがない場合：NAVER地図（Web）" : "앱이 없으면: 네이버 지도 (웹)"}
         </a>
       </div>
+      {to.albumPath && (
+        <Link href={to.albumPath} className="block text-sm text-[#6789ca] underline">
+          {ja ? "着いたら駅のスタンプを集める（駅図鑑）" : "도착하면 역 스탬프 모으기 (역 도감)"}
+        </Link>
+      )}
       {to.addressKo && !to.test && (
         <p className="text-sm">
           {ja ? "住所（韓国語）" : "주소"}: <span lang="ko" className="select-all">{to.addressKo}</span>

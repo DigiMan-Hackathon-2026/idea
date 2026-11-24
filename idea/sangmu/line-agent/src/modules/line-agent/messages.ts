@@ -134,7 +134,8 @@ function verdictLine(lang: Lang, plan: CandidatePlan): FlexComponent | null {
   if (plan.unknown.includes("no_deadline")) return null;
   if (plan.verdict === "fits") {
     const spare = -(plan.marginMinutes ?? 0);
-    return text(tr(lang, `間に合う見込み（余裕${spare}分）`, `시간 안에 들어갈 수 있어요 (여유 ${spare}분)`), { color: color.primary, weight: "bold" });
+    const room = spare > 120 ? tr(lang, "時間に余裕あり", "시간 여유 있음") : tr(lang, `余裕${spare}分`, `여유 ${spare}분`);
+    return text(tr(lang, `間に合う見込み（${room}）`, `시간 안에 들어갈 수 있어요 (${room})`), { color: color.primary, weight: "bold" });
   }
   if (plan.verdict === "late") {
     const over = plan.marginMinutes ?? 0;
@@ -145,7 +146,9 @@ function verdictLine(lang: Lang, plan: CandidatePlan): FlexComponent | null {
   if (plan.unknown.includes("wait_basis_unknown")) return text(tr(lang, "待ちの基準を確認中", "대기 기준 확인 중"), { color: color.info });
   if (plan.unknown.includes("wait_teams_only")) return text(tr(lang, "組数だけでは間に合うか判断できません", "팀 수만으로는 판단할 수 없어요"), { color: color.info });
   if (plan.unknown.includes("wait_unknown") && plan.marginMinutes !== null) {
-    return text(tr(lang, `移動だけなら間に合います（余裕${-plan.marginMinutes}分）・待ちは未確認`, `이동만 보면 시간 안이에요 (여유 ${-plan.marginMinutes}분) · 대기는 확인 안 됨`), { color: color.info });
+    const spare = -plan.marginMinutes;
+    const room = spare > 120 ? tr(lang, "時間に余裕あり", "시간 여유 있음") : tr(lang, `余裕${spare}分`, `여유 ${spare}분`);
+    return text(tr(lang, `移動だけなら間に合います（${room}）・待ちは未確認`, `이동만 보면 시간 안이에요 (${room}) · 대기는 확인 안 됨`), { color: color.info });
   }
   return text(tr(lang, "間に合うか確認できませんでした", "시간 안에 들어갈 수 있는지 확인하지 못했어요"), { color: color.info });
 }
@@ -309,10 +312,27 @@ export function needsDecision(request: DiningRequest, restaurant: Restaurant, re
   };
 }
 
-export function needsVerification(lang: Lang, restaurant: Restaurant): LineMessage {
+export function needsVerification(request: DiningRequest, restaurant: Restaurant): LineMessage {
+  const lang = request.lang;
   return {
     type: "text",
     text: tr(lang, `${restaurant.nameJa}で予約が取れたか確認できませんでした。お店に確認してください。確認できるまで、ほかのお店には電話しません。`, `${restaurant.nameKo}에서 예약이 됐는지 확인하지 못했어요. 가게에 확인해 주세요. 확인될 때까지 다른 가게에는 전화하지 않아요.`),
+    quickReply: quickReply([
+      postback(request, "verify_yes", tr(lang, "予約できていた", "예약돼 있었어요"), { candidateId: restaurant.id, displayText: tr(lang, "予約できていた", "예약돼 있었어요") }),
+      postback(request, "verify_no", tr(lang, "予約できていなかった", "예약 안 돼 있었어요"), { candidateId: restaurant.id, displayText: tr(lang, "予約できていなかった", "예약 안 돼 있었어요") }),
+    ]),
+  };
+}
+
+export function verifiedNone(request: DiningRequest): LineMessage {
+  const lang = request.lang;
+  return {
+    type: "text",
+    text: tr(lang, "予約はないことを記録しました。ほかのお店に電話で聞くこともできます。", "예약이 없다고 기록했어요. 다른 가게에 전화로 물어볼 수도 있어요."),
+    quickReply: quickReply([
+      postback(request, "call_request", tr(lang, "電話で聞いてもらう", "전화로 물어봐 주세요"), { displayText: tr(lang, "電話で聞いてもらう", "전화로 물어봐 주세요") }),
+      postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }),
+    ]),
   };
 }
 
@@ -336,7 +356,12 @@ export function confirmedCard(request: DiningRequest, reservation: Reservation, 
         text(tr(lang, `時間：${formatSeoulTime(reservation.time)}`, `시간: ${formatSeoulTime(reservation.time)}`), { color: color.time, weight: "bold" }),
         text(tr(lang, `人数：${reservation.partySize}名`, `인원: ${reservation.partySize}명`)),
         text(tr(lang, `予約名：${reservation.alias}`, `예약자 이름: ${reservation.alias}`)),
-        text(tr(lang, `根拠：電話でお店が承諾（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 전화로 가게가 수락 (${formatSeoulTime(reservation.acceptedAt)})`), { size: "xs", color: color.muted }),
+        text(
+          reservation.evidence === "call_accept"
+            ? tr(lang, `根拠：電話でお店が承諾（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 전화로 가게가 수락 (${formatSeoulTime(reservation.acceptedAt)})`)
+            : tr(lang, `根拠：お店に確認したと依頼者が共有（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 가게에 확인했다고 요청자가 공유 (${formatSeoulTime(reservation.acceptedAt)})`),
+          { size: "xs", color: color.muted },
+        ),
       ]),
       footer: vbox(footer),
     },

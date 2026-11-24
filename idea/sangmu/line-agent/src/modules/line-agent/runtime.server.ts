@@ -71,7 +71,8 @@ function createRuntime(): LineAgentRuntime {
   const placer = (): CallPlacer | null => {
     if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs);
     if (config.calls === "twilio" && config.twilio && config.bridge) {
-      return new TwilioCallPlacer({ ...config.twilio, bridgeHost: config.bridge.host }, (ref) => config.phoneAllowlist[ref] ?? null, attemptToken);
+      const statusUrl = (attemptId: string) => `${config.origin}/api/v1/integrations/voice/attempts/${attemptId}/status?t=${attemptToken(attemptId)}`;
+      return new TwilioCallPlacer({ ...config.twilio, bridgeHost: config.bridge.host }, (ref) => config.phoneAllowlist[ref] ?? null, attemptToken, statusUrl);
     }
     return null;
   };

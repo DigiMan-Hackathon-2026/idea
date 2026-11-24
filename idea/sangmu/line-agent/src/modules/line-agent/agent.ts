@@ -43,7 +43,7 @@ const MAX_CARDS = 3;
 const CALL_WINDOW_MINUTES = 75;
 const MEAL_MINUTES = 45;
 const BUFFER_MINUTES = 10;
-const REQUESTER_ONLY = new Set(["call_request", "approve", "cancel_call", "new_search", "party", "area", "menu", "decision_retry"]);
+const REQUESTER_ONLY = new Set(["call_request", "approve", "cancel_call", "new_search", "party", "area", "menu", "decision_retry", "verify_yes", "verify_no"]);
 
 type Context = {
   target: string;
@@ -107,6 +107,15 @@ export class DiningAgent {
       const nextCall = next.attempts.find((a) => a.id === call.id)!;
       nextCall.finishedAt = now;
 
+      if ("lost" in result) {
+        nextCall.status = "finished";
+        nextCall.outcome = { kind: "unknown", offeredTime: null, confirmedTime: null, partySize: null, depositRequired: false, bookingRequested: true, summaryKo: "통화 결과를 받지 못했습니다." };
+        next.status = "needs_verification";
+        next.decision = { reason: "out_of_range", candidateId: restaurant.id, offeredTime: null };
+        if (!(await this.deps.store.save(next, request.revision))) continue;
+        await this.push(next, [m.needsVerification(next, restaurant)]);
+        return;
+      }
       if ("failed" in result) {
         nextCall.status = "failed_to_place";
         if (!(await this.deps.store.save(next, request.revision))) continue;
@@ -156,7 +165,8 @@ export class DiningAgent {
       } else if (outcome.kind === "unknown" && outcome.bookingRequested) {
         // A booking may exist: never call the next shop until it is checked (spec CALL-03).
         next.status = "needs_verification";
-        messages.push(m.needsVerification(next.lang, restaurant));
+        next.decision = { reason: "out_of_range", candidateId: restaurant.id, offeredTime: outcome.offeredTime };
+        messages.push(m.needsVerification(next, restaurant));
       } else {
         messages.push(m.callMovedOn(next.lang, restaurant, outcome.kind === "no_answer" ? "no_answer" : "declined", null, next));
         continueCalling = true;
@@ -331,7 +341,8 @@ export class DiningAgent {
 
   private async searchCandidates(request: DiningRequest, now: string): Promise<CandidateState[]> {
     const area = findArea(request.areaId!)!;
-    const found = listRestaurants(area.id, request.menuKey ?? "any");
+    // Shops whose confirmed capacity is below the party are left out (spec §2 인원).
+    const found = listRestaurants(area.id, request.menuKey ?? "any").filter((restaurant) => restaurant.maxParty === null || restaurant.maxParty >= (request.partySize ?? 1));
     const states = await Promise.all(
       found.map(async (restaurant): Promise<CandidateState> => ({
         restaurantId: restaurant.id,
@@ -568,6 +579,36 @@ export class DiningAgent {
         if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
         await this.reply(ctx, [{ type: "text", text: lang === "ja" ? "電話はやめました。" : "전화는 그만뒀어요." }]);
         return;
+      }
+      case "verify_yes":
+      case "verify_no": {
+        const restaurant = postback.candidateId ? findRestaurant(postback.candidateId) : undefined;
+        if (request.status !== "needs_verification" || !restaurant) return this.reply(ctx, [m.staleCard(lang)]);
+        const attempt = [...request.attempts].reverse().find((a) => a.candidateId === restaurant.id);
+        const approval = request.approvals.find((a) => a.id === attempt?.approvalId);
+        const next = this.bump(request, now);
+        next.decision = null;
+        if (postback.action === "verify_no" || !approval) {
+          next.status = "comparing";
+          if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
+          return this.reply(ctx, [m.verifiedNone(next)]);
+        }
+        next.status = "confirmed";
+        next.selectedCandidateId = restaurant.id;
+        next.reservation = {
+          candidateId: restaurant.id,
+          partySize: approval.partySize,
+          time: attempt?.outcome?.offeredTime ?? request.decision?.offeredTime ?? approval.windowStart,
+          alias: approval.alias,
+          evidence: "user_confirmed",
+          acceptedAt: now,
+          test: restaurant.test,
+        };
+        if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
+        const token = this.deps.linkSecret
+          ? makeCardToken({ restaurantId: restaurant.id, partySize: approval.partySize, time: next.reservation.time, alias: approval.alias, test: restaurant.test, expiresAt: addMinutes(next.reservation.time, 6 * 60) }, this.deps.linkSecret)
+          : null;
+        return this.reply(ctx, [m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token })]);
       }
       case "new_search": {
         const next = structuredClone(request);

@@ -175,6 +175,13 @@ describe("DiningAgent rules", () => {
     expect(JSON.stringify(view[1].message)).toContain("団体席と事前予約を先に確認");
   });
 
+  it("leaves out shops too small for the party (LINE-01, 8名)", async () => {
+    await agent.handleEvent(text(ALICE, "新村で8人、サムギョプサル"));
+    const view = JSON.stringify(line.messagesFor(ALICE).at(-1)!.message);
+    expect(view).not.toContain("テスト店B"); // max 4
+    expect(view).toContain("テスト店C"); // max 10
+  });
+
   it("answers in Korean to a Korean request", async () => {
     await agent.handleEvent(text(ALICE, "신촌에서 두 명이 삼겹살 먹고 싶어요. 8시까지 홍대 공연장에 가야 해요."));
     expect(lastTexts(ALICE, 2)).toContain("후보예요");
@@ -214,6 +221,29 @@ describe("DiningAgent rules", () => {
     expect(lastTexts(ALICE, 1)).toContain("確認できませんでした");
     expect(calls.jobs).toHaveLength(1);
     expect((await store.getRequest(decodePostback(buttons(card)["この条件で電話を頼む"])!.requestId))?.status).toBe("needs_verification");
+  });
+
+  it("lets the requester settle an unclear booking", async () => {
+    const card = await toApproval();
+    await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
+    const cut = simulateTranscript("accept", calls.jobs[0].brief).slice(0, -2);
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: cut });
+    const question = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(question)["予約できていた"]));
+    const result = line.messagesFor(ALICE).at(-1)!.message;
+    expect(result.type === "flex" && result.altText).toContain("予約が取れました");
+    expect(JSON.stringify(result)).toContain("お店に確認したと依頼者が共有");
+  });
+
+  it("stops for a check when the call ended without a transcript (CALL-02 lost result)", async () => {
+    const card = await toApproval();
+    await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, lost: true });
+    expect(lastTexts(ALICE, 1)).toContain("確認できませんでした");
+    expect(calls.jobs).toHaveLength(1);
+    // A late transcript for the same attempt is ignored.
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("accept", calls.jobs[0].brief) });
+    expect(lastTexts(ALICE, 1)).toContain("確認できませんでした");
   });
 
   it("asks before accepting a deposit (CALL-02)", async () => {
