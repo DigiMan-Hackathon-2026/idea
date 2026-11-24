@@ -4,6 +4,8 @@ import type { LineMessage } from "./types";
 export interface LineGateway {
   reply(replyToken: string, messages: LineMessage[]): Promise<void>;
   push(to: string, messages: LineMessage[]): Promise<void>;
+  /** Typing indicator in a 1:1 chat while the agent works (best effort). */
+  showLoading?(userId: string, seconds: number): Promise<void>;
 }
 
 const API = "https://api.line.me/v2/bot/message";
@@ -35,6 +37,15 @@ export class LineMessagingClient implements LineGateway {
         await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
       }
     }
+  }
+
+  async showLoading(userId: string, seconds: number): Promise<void> {
+    await fetch("https://api.line.me/v2/bot/chat/loading/start", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${this.accessToken}`, "content-type": "application/json" },
+      body: JSON.stringify({ chatId: userId, loadingSeconds: Math.min(60, Math.max(5, Math.ceil(seconds / 5) * 5)) }),
+      signal: AbortSignal.timeout(3_000),
+    }).catch(() => undefined);
   }
 
   private async send(url: string, body: unknown, retryKey?: string): Promise<number> {

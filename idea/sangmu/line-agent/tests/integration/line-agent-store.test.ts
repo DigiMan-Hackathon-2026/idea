@@ -59,5 +59,7 @@ describe("PostgreSQL LINE agent store", () => {
     await store.setAlias("req-alice", "サトウ");
     await store.setAlias("req-alice", "タナカ");
     expect(await store.getAlias("req-alice")).toBe("タナカ");
+    await store.deleteAlias("req-alice");
+    expect(await store.getAlias("req-alice")).toBeNull();
   });
 });

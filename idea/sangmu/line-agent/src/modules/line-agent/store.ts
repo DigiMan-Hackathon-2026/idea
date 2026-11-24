@@ -13,6 +13,7 @@ export interface AgentStore {
   save(request: DiningRequest, expectedRevision: number | null): Promise<boolean>;
   getAlias(requesterKey: string): Promise<string | null>;
   setAlias(requesterKey: string, alias: string): Promise<void>;
+  deleteAlias(requesterKey: string): Promise<void>;
 }
 
 const ACTIVE_EXCLUDED = new Set(["closed"]);
@@ -63,6 +64,10 @@ export class MemoryAgentStore implements AgentStore {
 
   async setAlias(requesterKey: string, alias: string): Promise<void> {
     this.aliases.set(requesterKey, alias);
+  }
+
+  async deleteAlias(requesterKey: string): Promise<void> {
+    this.aliases.delete(requesterKey);
   }
 
   private latest(test: (request: DiningRequest) => boolean): DiningRequest | null {

@@ -100,6 +100,10 @@ export class PostgresAgentStore implements AgentStore {
     );
   }
 
+  async deleteAlias(requesterKey: string): Promise<void> {
+    await this.db.query("delete from line_agent_aliases where requester_key = $1", [requesterKey]);
+  }
+
   /** Deletes requests past expiry plus a day, old events and stale aliases (spec §9 보존). */
   async purgeExpired(now: string): Promise<void> {
     await this.db.query("delete from line_agent_requests where expires_at < $1::timestamptz - interval '24 hours'", [now]);
