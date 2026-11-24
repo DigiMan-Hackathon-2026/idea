@@ -252,6 +252,25 @@ describe("DiningAgent rules", () => {
     expect(JSON.stringify(idea)).toContain("/quests/adventure?line=2&station=240");
   });
 
+  it("fills up with NAVER search candidates that are never called", async () => {
+    agent = new DiningAgent({
+      store, line, travel: new FixedTravel(), calls,
+      clock: () => clock, newId: () => `id-${String(++ids).padStart(6, "0")}`, keyOf: (raw) => `k:${raw}`,
+      origin: "https://example.test", linkSecret: null, phoneAllowed: () => true,
+      searchPlaces: async () => [{ title: "성수 고기집", addressKo: "서울 성동구 성수이로 2", lat: 37.5451, lng: 127.0569, link: "https://example.com/a", category: "한식" }],
+    });
+    await agent.handleEvent(text(ALICE, "聖水で2人、サムギョプサル"));
+    const view = JSON.stringify(line.messagesFor(ALICE).at(-1)!.message);
+    expect(view).toContain("성수 고기집");
+    expect(view).toContain("検索候補・未確認");
+    expect(view).toContain("NAVERで見る");
+    await agent.handleEvent(tap(ALICE, buttons(line.messagesFor(ALICE).at(-1)!.message)["電話で聞いてもらう"]));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    const card = JSON.stringify(line.messagesFor(ALICE).at(-1)!.message);
+    expect(card).toContain("テスト店E");
+    expect(card).not.toContain("성수 고기집");
+  });
+
   it("answers in Korean to a Korean request", async () => {
     await agent.handleEvent(text(ALICE, "신촌에서 두 명이 삼겹살 먹고 싶어요. 8시까지 홍대 공연장에 가야 해요."));
     expect(lastTexts(ALICE, 2)).toContain("후보예요");

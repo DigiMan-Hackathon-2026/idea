@@ -188,8 +188,15 @@ export function validateCandidates(value: unknown): Restaurant[] {
 
 export const restaurants: Restaurant[] = validateCandidates(candidateData);
 
+// Search candidates seen in this process (their copies also live in each request).
+const searchRegistry = new Map<string, Restaurant>();
+
+export function registerSearchRestaurant(restaurant: Restaurant): void {
+  if (restaurant.searchOnly && restaurant.id.startsWith("nv-")) searchRegistry.set(restaurant.id, restaurant);
+}
+
 export function findRestaurant(id: string): Restaurant | undefined {
-  return restaurants.find((restaurant) => restaurant.id === id);
+  return restaurants.find((restaurant) => restaurant.id === id) ?? searchRegistry.get(id);
 }
 
 export function listRestaurants(areaId: string, menu: MenuKey): Restaurant[] {

@@ -21,6 +21,7 @@ export type LineAgentConfig = {
   store: "memory" | "postgres";
   /** Lets the simulator be used through a public URL (e.g. a tunnel) when given as ?token=. */
   simulatorToken: string | null;
+  naverSearch: { clientId: string; clientSecret: string } | null;
 };
 
 const E164 = /^\+[1-9]\d{7,14}$/;
@@ -79,5 +80,6 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     simulatedCallDelayMs: Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
     store: value("LINE_AGENT_STORE") === "postgres" ? "postgres" : "memory",
     simulatorToken: (value("LINE_AGENT_SIMULATOR_TOKEN")?.length ?? 0) >= 16 ? value("LINE_AGENT_SIMULATOR_TOKEN") : null,
+    naverSearch: value("NAVER_SEARCH_CLIENT_ID") && value("NAVER_SEARCH_CLIENT_SECRET") ? { clientId: value("NAVER_SEARCH_CLIENT_ID")!, clientSecret: value("NAVER_SEARCH_CLIENT_SECRET")! } : null,
   };
 }
