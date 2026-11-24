@@ -1,0 +1,115 @@
+# 여기서울 구현 준비도
+
+최종 갱신: 2026-11-22 · 기준 branch: `main`
+
+이 문서는 계획된 것과 실제 완료된 것을 구분하는 현재 상태판이다. 상세 계약의 원본은 각 링크 문서이며, 상태가 바뀌면 근거 commit·실행 결과와 함께 이 표를 갱신한다.
+
+외부 답변·사용자 근거·기술 선택의 의존 순서와 미확정 기본 행동은 [결정 큐](DECISION_QUEUE.md)에서 관리한다.
+
+## 상태 의미
+
+| 상태 | 의미 |
+| --- | --- |
+| 완료 | 산출물과 검증 증거가 저장소에 있음 |
+| 준비됨 | 실행 방법·양식은 있으나 실제 실행 전 |
+| 진행 가능 | 외부 결정 없이 다음 작업을 수행할 수 있음 |
+| 대기 | 사용자·팀·주최 측 또는 외부 계정 결정 필요 |
+| 보류 | 규칙 또는 선행 조건 때문에 시작하지 않음 |
+
+## 현재 준비도
+
+| 영역 | 상태 | 근거 | 다음 완료 조건 |
+| --- | --- | --- | --- |
+| B2C 제품 범위 | 완료 | [B2C 스펙](B2C_SPEC_v0.1.md) | 사용자 조사 결과에 따른 변경 반영 |
+| 도메인 용어·명명 | 준비됨 | [용어 계약](DOMAIN_GLOSSARY_v0.1.md) | schema·API type·일본어 검수에 실제 적용 |
+| 기술 작업 기준 | 완료 | [기술 결정](TECH_DECISIONS_v0.1.md), [F0 착수 계획](F0_BOOTSTRAP_PLAN_v0.1.md), `package.json`·`pnpm-lock.yaml` | 팀 동의와 F1 PostgreSQL 연결 |
+| module·import 경계 | 준비됨 | [module 경계 계약](MODULE_BOUNDARIES_v0.1.md) | F0/F1 lint·build canary·integration에 적용 |
+| 환경 설정·secret | 진행 중 | [환경·secret 계약](CONFIGURATION_SECRETS_v0.1.md), local/test runtime URL role guard와 server-only pool | D09·D10 뒤 provider 설정과 rotation 훈련 |
+| 구현 순서 | 완료 | [구현 계획](IMPLEMENTATION_PLAN_v0.1.md) | F1 공통 기반과 명시적 demo 세로 흐름 착수 |
+| 미결정 관리 | 준비됨 | [결정 큐](DECISION_QUEUE.md) | D01~D13 근거가 생길 때 결정·보류 기록 |
+| B2C API 예시 | 완료 | [B2C API](API_EXAMPLES_B2C_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
+| 운영 API 예시 | 완료 | [운영 API](API_EXAMPLES_ADMIN_v0.1.md), [계약 인덱스](API_CONTRACT_INDEX_v0.1.md), JSON parser 통과 | 구현 계약 테스트와 연결 |
+| API 오류·request ID | 진행 중 | 공통 오류 factory·request ID·6개 route의 405/Allow와 dependency 503·invariant 500 분리, [오류 catalog](API_ERROR_CATALOG_v0.1.md) | 구조화 server log·전체 endpoint 통합 검수 |
+| 목록 pagination·cursor | 준비됨 | [pagination·cursor 계약](PAGINATION_CURSOR_v0.1.md) | 실제 index·key rotation·동시 변경 통합 검수 |
+| DB 정합성 설계 | local·CI 완료 | 전체 domain 14 tables migration, capability roles, 동시성·rollback, visitor repositories, HMAC session core와 HTTP 세로 흐름, PostgreSQL 17.12 통합 테스트 46개, [F1 검수 계획](F1_DATABASE_PLAN_v0.1.md) | provider login mapping·나머지 visitor/admin adapter 연결 |
+| migration·backfill 배포 | 준비됨 | [DB 배포 계약](DATABASE_MIGRATION_RELEASE_v0.1.md) | provider·row 규모 기반 rehearsal과 timeout 확정 |
+| 화면 상태·문구 | 진행 중 | [여기서울 UX 원칙](UX_PRINCIPLES_v0.1.md), [화면 계약](SCREEN_STATES_v0.1.md), demo 정상·빈 결과·404·오류 복구 UI, 한국어·일본어 전환과 E2E | 일본어 모어 화자 검수와 실제 장애 주입 |
+| 웹 접근성 구현 | 진행 중 | skip link, focus-visible, reduced-motion, modal 초기 초점·focus trap·Escape와 Chromium E2E | screen reader·실제 기기 수동 검수 |
+| locale·표시 형식 | 진행 중 | 한국어·일본어 UI, locale cookie, 날짜·금액 formatter와 [locale 계약](LOCALIZATION_FORMATTING_v0.1.md) | 일본어 모어 화자·font·screen reader 검수 |
+| client 오류 복구 | 준비됨 | [요청·복구 계약](CLIENT_RECOVERY_v0.1.md) | fault injection과 browser state 검수 |
+| 보안·개인정보 | 진행 중 | 사용자 HTML `no-store`, 기본 `no-referrer`·`nosniff`·frame deny·camera/microphone 차단, same-origin geolocation과 좌표 비저장·비전송 Chromium 검수, [위협 모델](SECURITY_PRIVACY_v0.1.md), [보존·삭제·복구 계약](DATA_RETENTION_ERASURE_v0.1.md) | provider의 `private` 직렬화·CSP·HSTS·cookie 삭제·출시 전 gate 실행 |
+| 테스트 계획 | 진행 중 | [테스트 계획](TEST_PLAN_v0.1.md), 114개 unit·46개 PostgreSQL integration·20개 Chromium E2E | admin 경합·실기기에서 AC01~AC20 전체 증거 |
+| test fixture·seed | 준비됨 | [fixture 계약](TEST_FIXTURES_v0.1.md) | F1 typed builder와 profile별 count 구현 |
+| 성능·부하 검수 | 준비됨 | [성능·부하 계약](PERFORMANCE_LOAD_TEST_v0.1.md) | 배포 후보에서 L0~L5 실행과 기준 확정 |
+| 배포·복구 | 진행 중 | [운영 런북](OPERATIONS_RUNBOOK_v0.1.md), demo 기본 `noindex`, Web App Manifest·설치 아이콘·service worker·이중 언어 offline fallback | HTTPS 배포 후보의 Android·iOS 설치와 worker update 실기기 검수 |
+| 장애 대응 | 준비됨 | [장애 대응 런북](INCIDENT_RESPONSE_v0.1.md) | 역할·연락 경로 확정과 P0·P1 tabletop 훈련 |
+| 로그·관측성 | 준비됨 | [관측 계약](OBSERVABILITY_CONTRACT_v0.1.md) | provider 설정과 canary·alert 검수 |
+| 운영 감사 로그 | 준비됨 | [audit 계약](AUDIT_LOG_CONTRACT_v0.1.md) | schema·원자성·append-only 권한 구현 |
+| 제품 시연 | 준비됨 | [2분 시연 런북](DEMO_RUNBOOK_v0.1.md) | 구현 뒤 실제 기기 100초 리허설과 기록 |
+| 출시 판정 | 준비됨 | [출시 준비 gate](RELEASE_READINESS_v0.1.md) | 고정 commit·환경에서 모든 필수 증거와 승인 기록 |
+| 문서·조사 자동 검증 | 완료 | `python3 scripts/verify_all.py`, 68개 회귀 테스트와 scope·research gate | CI 연결은 행사 규칙 확인 후 결정 |
+| 행사 사전 개발 범위 | 대기 | [규칙 확인서](EVENT_RULES_CHECKLIST.md), code scope `UNRESTRICTED` | 제출·공개 전 주최 측 공식 답변 기록 |
+| 사용자 인터뷰 | 준비됨 | [조사 계획](USER_RESEARCH_v0.1.md), [작업공간](../research/README.md) | D02 일본어 검수 뒤 모집·일정, 익명 기록 3~5개와 합성 |
+| 첫 타깃 | 대기 | 재방문 일본인 혼행객은 가설 | 인터뷰 사례로 유지·수정·폐기 결정 |
+| 첫 지역 | 대기 | 후보 미선정 | 사례·현장 검증 기준을 통과한 지역 1곳 |
+| 첫 퀘스트 | 대기 | 후보 미작성 | 검수 가능한 후보 1개와 예비 2개 |
+| 일본어 검수자 | 대기 | 미배정 | 화면·콘텐츠 검수자 코드와 일정 |
+| 콘텐츠 사실·권리 검수 | 준비됨 | [콘텐츠 검수 계약](CONTENT_VERIFICATION_v0.1.md) | 첫 후보의 출처·권리 register 작성 |
+| 콘텐츠 편집·공개 | 준비됨 | [authoring 계약](CONTENT_AUTHORING_v0.1.md) | F7 UI·transaction·revision conflict 구현 |
+| 정보 오류 신고 운영 | 준비됨 | [신고 처리 런북](REPORT_TRIAGE_v0.1.md) | 운영 UI 구현과 pause·부분 실패 훈련 |
+| Neon·Vercel | 준비됨 | [외부 서비스 평가](EXTERNAL_SERVICES_EVALUATION_v0.1.md) | 계정·plan 승인, Singapore 배치와 지연 측정 |
+| Google OIDC | 대기 | 구현 기준만 결정 | 환경별 client·callback·허용 principal 준비 |
+| 운영자 인증·인가 | 준비됨 | [운영 인증 계약](ADMIN_AUTHORIZATION_v0.1.md) | D10 결정과 검수 tenant에서 AC13~AC15 실행 |
+| 익명 visitor session | 진행 중 | HMAC token repository, `POST /api/v1/visitor-sessions` 생성과 visitor 인증을 거친 퀘스트 시작 API의 Origin·JSON·cookie·no-store 계약, [session 수명주기 계약](VISITOR_SESSION_LIFECYCLE_v0.1.md) | rate limit·실DB HTTP/browser·삭제 경합 통합 검수 |
+| 보존·cleanup job | 준비됨 | [background job 계약](BACKGROUND_JOBS_v0.1.md) | D09 scheduler·identity 뒤 overlap·24h SLO 검수 |
+| 지도·이동 안내 | 진행 중 | `/quests` 목록·Naver 지도 전환, 사용자 선택 뒤 browser에만 표시하는 파란 현재 위치 점·정확도 범위·위치 복귀, TMAP 보행자 경로, NAVER 앱 길찾기, 성수역 공식 3F·2F·1F 층 관계, 직전 역·계단/승강기 선택에 따른 빠른 하차 문, 승강기 상태 코드·1/4번 지상 연결 경계, 오승강장·오개찰구·오출구 복구와 한국어 도움 카드, [지도 계약](MAP_ADDRESS_HANDOFF_v0.1.md), [현장 안내 가설](SUBWAY_FIELD_GUIDE_v0.1.md) | 실제 일본인 비교 검증, 역별 정확한 동선과 촬영일·방향·권리가 확인된 사진, 배포 domain과 iOS·Android 앱 fallback 검수 |
+| 제품 코드 F0~F8 | 진행 중 | 가상 demo seed, 익명 session, 실제 UUID run 시작·조회·순서형 단계 완료·완료 카드·피드백·내 기록·전체 삭제·공개 상세·정보 신고의 DB/API/UI/E2E 연결 | 운영 화면 구현 |
+| AC01~AC20 실행 | 보류 | 테스트 계획만 존재 | 제품 구현과 검수 환경 필요 |
+
+## 현재 사실
+
+- F0 품질 gate와 명시적 가상 demo의 일본어 기본 화면, 한국어 전환, 목적→시간→지역 3단계 시작 흐름, 선택 조건 조정, 상세·3단계 진행·완료·기록 이어하기·전체 삭제·피드백·정보 신고 화면이 있다. 설치 가능한 PWA shell과 이중 언어 offline fallback이 있으며 개인화 HTML·API는 service worker에 저장하지 않는다. 진행·완료·피드백·내 기록·삭제는 이 브라우저의 익명 session과 PostgreSQL을 최종 기준으로 사용하고, 정보 신고도 실제 API로 접수하고 재전송은 같은 `clientRequestId`로 한 건에 수렴한다. 서울 방문 경험은 완료 뒤 선택적으로 묻고 feedback에 저장한다. 시작 화면에서 지역 판정에 쓰는 현재 위치와 NAVER 앱 대중교통 길찾기의 현재 위치 모두 서비스 URL·저장소·서버에 좌표를 남기지 않는다.
+- 현재 사전 코드 게이트는 `UNRESTRICTED`다. 코드 파일 생성·검증에 제한이나 경고를 적용하지 않는다.
+- 현재 조사 실행 게이트는 `DRAFT_ONLY`다. D02 일본어 검수 근거 전에는 공개 모집·실제 인터뷰 기록을 보류한다.
+- 외부 서비스 계정과 secret은 저장소에 없다.
+- 전체 Markdown의 JSON block 46개는 JSON parser를 통과한다.
+- B2C 스펙과 테스트 계획에 AC01~AC20이 모두 존재한다.
+- 위 항목은 구현·테스트 통과를 뜻하지 않는다.
+- `main`은 기능 단위 문서·검증 변경을 원격 저장소와 동기화한다.
+
+## 바로 실행할 수 있는 작업
+
+### 사용자·팀이 필요한 작업
+
+1. [행사 규칙 질문](EVENT_RULES_CHECKLIST.md)을 주최 측에 보낸다.
+2. 모집·동의·P0 자극물 문구를 검수할 일본어 모어 화자와 일정을 정한다.
+3. D02 검수 뒤 일본어 사용자 3~5명을 모집해 인터뷰 일정을 잡는다.
+4. 팀의 Next.js·TypeScript·PostgreSQL 경험과 역할을 확인한다.
+
+### 저장소에서 계속 가능한 작업
+
+1. 제공받은 공식 규칙 답변을 근거와 함께 반영한다.
+2. 익명화한 인터뷰 기록을 `research/interviews`에 추가한다.
+3. 조사 합성으로 타깃·지역·퀘스트 결정을 갱신한다.
+4. 외부 서비스의 비용·지역·복구 조건을 공식 문서로 비교한다.
+5. F1 공통 기반과 명시적 demo 탐색 세로 흐름을 기능 단위로 구현한다.
+
+## 첫 구현 착수 조건
+
+다음 조건을 모두 충족하기 전에는 제품 코드가 준비됐다고 표시하지 않는다.
+
+- [ ] 행사 제출·공개 전에는 사전 코드 허용 범위의 공식 근거와 조건을 다시 확인한다.
+- [x] Node·pnpm과 package version을 lockfile로 고정했다.
+- [ ] 개발 PostgreSQL과 production 분리 방법을 확인한다.
+- [ ] 팀이 기술 작업 기준과 기능 분담에 동의한다.
+- [ ] 첫 퀘스트가 실제 또는 명시적인 demo로 구분돼 있다.
+
+사용자 인터뷰 완료는 F0 환경 구성의 기술적 필수 조건은 아니지만, F2 이후 실제 콘텐츠와 화면 우선순위의 선행 조건이다.
+
+## 상태 갱신 규칙
+
+- 계획 문서 작성만으로 실행 항목을 완료로 바꾸지 않는다.
+- 테스트는 commit, 환경, 결과와 증거가 있어야 pass로 기록한다.
+- 외부 서비스는 후보 조사와 실제 계정·설정을 구분한다.
+- 사용자 사례는 참여자 수와 반대 사례를 함께 기록한다.
+- 차단이 풀리면 관련 문서와 이 상태판을 같은 기능 커밋에서 갱신한다.

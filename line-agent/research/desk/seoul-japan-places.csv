@@ -1,0 +1,31 @@
+id,kind,name_ko,name_ja,category,gu,nearest_station,why_ko,japanese_evidence,source_status,sources,verify_before_use
+P01,popular,명동,明洞（ミョンドン）,쇼핑·길거리 음식,중구,명동역(4호선),외래관광객조사 방문지 1위(전체 외국인). 서울AI재단 분석에서 쇼핑 명소의 일본·중국 관광객 비중이 크다고 언급,indirect,sourced,https://m.megaeconomy.co.kr/news/amp.html?ncode=1065574052389583 | https://www.newsis.com/view/NISX20260721_0003717515,일본인만의 비율 수치는 없음
+P02,popular,남대문시장,南大門市場,전통시장,중구,회현역(4호선),서울AI재단 분석에서 일본·중국 관광객 비중이 큰 쇼핑 명소로 언급,indirect,sourced,https://www.newsis.com/view/NISX20260721_0003717515,외국인 방문 감소 보도도 있음(르포)
+P03,popular,광장시장,広蔵市場（クァンジャン市場）,전통시장·먹거리,종로구,종로5가역(1호선),서울AI재단 분석에서 일본·중국 비중이 큰 곳으로 언급. 일본 여행 매체가 육회·빈대떡 먹거리 골목으로 반복 소개,direct,sourced,https://www.newsis.com/view/NISX20260721_0003717515 | https://www.funliday.com/posts/seoul-shopping-eating/ | https://newt.net/mag/158575315492,가격·바가지 논란 보도 이력 확인 필요
+P04,popular,경복궁,景福宮（キョンボックン）,고궁,종로구,경복궁역(3호선),"일본 여행 매체 추천 목록 반복 등장, 일본어 해설 안내 언급. 외래관광객조사 상위 방문지",direct,sourced,https://www.asoview.com/note/4668/ | https://article.his-j.com/kaigai/asia/korea/seoul/post-4345/ | https://m.megaeconomy.co.kr/news/amp.html?ncode=1065574052389583,일본어 해설 시간표 확인
+P05,popular,광화문광장,光化門広場,광장·도심,종로구,광화문역(5호선),일본 여행 매체 추천 목록 등장,direct,sourced,https://www.asoview.com/note/4668/,
+P06,popular,창덕궁,昌徳宮（チャンドックン）,고궁·세계유산,종로구,안국역(3호선),"일본 여행 매체 추천 목록 등장, 일본어 가이드 언급",direct,sourced,https://www.asoview.com/note/4668/,후원 관람 예약 방식 확인
+P07,popular,종묘,宗廟（チョンミョ）,세계유산,종로구,종로3가역(1·3·5호선),일본 여행 매체 추천 목록 등장,direct,sourced,https://www.asoview.com/note/4668/,관람 방식(시간제 해설) 확인
+P08,popular,N서울타워(남산),Nソウルタワー（南山）,전망·야경,용산구,명동역(4호선) 후 남산 케이블카 또는 버스,일본 여행 매체 추천 목록 반복 등장(야경 전망대),direct,sourced,https://www.asoview.com/note/4668/ | https://article.his-j.com/kaigai/asia/korea/seoul/post-4345/,접근 경로·운영 시간 확인
+P09,popular,동대문디자인플라자(DDP),東大門デザインプラザ（DDP）,건축·쇼핑,중구,동대문역사문화공원역(2·4·5호선),일본 여행 매체 추천 목록 등장. 서울AI재단 분석에서 외국인 비중 상위,direct,sourced,https://www.asoview.com/note/4668/ | https://www.newsis.com/view/NISX20260721_0003717515,
+P10,popular,홍대,弘大（ホンデ）,거리·쇼핑·카페,마포구,홍대입구역(2호선·공항철도),일본 여행 매체가 카페·쇼핑 지역으로 소개. 외래관광객조사 상위 방문지,direct,sourced,https://www.funliday.com/posts/seoul-shopping-eating/ | https://m.megaeconomy.co.kr/news/amp.html?ncode=1065574052389583,
+P11,popular,연남동,延南洞（ヨンナムドン）,카페·골목,마포구,홍대입구역(2호선·공항철도),일본 여행 매체가 카페 지역으로 소개,direct,sourced,https://www.funliday.com/posts/seoul-shopping-eating/,
+P12,popular,한남동,漢南洞（ハンナムドン）,카페·쇼핑,용산구,한강진역(6호선),일본 여행 매체가 카페·쇼핑 지역으로 소개,direct,sourced,https://www.funliday.com/posts/seoul-shopping-eating/,
+P13,popular,성수동,聖水（ソンス）,카페·팝업·쇼핑,성동구,성수역(2호선),일본 여행 매체가 혼자 여행 2박3일 코스로 소개. 외국인 방문 급증 보도,direct,sourced,https://rurubu.jp/andmore/article/25163 | https://v.daum.net/v/1oiYRpcnTO | https://v.daum.net/v/20251007060152951,현재 데모 퀘스트 지역
+P14,popular,광야@서울(KWANGYA@SEOUL),KWANGYA@SEOUL,K팝 굿즈·팬 방문,성동구,성수역(2호선) 도보권(출처 기준),SM엔터테인먼트 플래그십 스토어로 K팝 성지 안내에 등장,none,sourced,https://blog.namanecard.com/seongsu-dong-guide-2026-cafes-kpop-popups-ko/ | https://migaku.com/blog/language-fun/k-pop-tourism-in-seoul-visiting-hybe-sm-town-and-jyp,일본인 특정 근거 없음. 위치·운영 여부 확인
+P15,popular,망원시장,望遠市場（マンウォン市場）,전통시장·먹거리,마포구,망원역(6호선),일본 여행 매체가 시장 고로케 먹거리로 소개,direct,sourced,https://newt.net/mag/158575315492,
+P16,popular,북촌한옥마을,北村韓屋村,한옥 주거지,종로구,안국역(3호선),"일본 여행 매체 소개. 북촌로11길 일대 특별관리지역, 관광객 출입 10~17시",direct,sourced,https://www.veltra.com/jp/guide/international/spot-international/20270/,주민 거주지. 출입 시간 규정 재확인
+P17,popular,서촌,西村（ソチョン）,골목·카페,종로구,경복궁역(3호선),외국인 '인스타 핫플' 쏠림 보도,none,sourced,https://v.daum.net/v/20251007060152951,일본인 특정 근거 없음
+P18,popular,아티스트 베이커리(안국),ARTIST BAKERY（安国）,베이커리,종로구,안국역(3호선),"일본 여행 매체가 소금빵 인기점으로 소개, 사전 예약 권장",direct,sourced,https://newt.net/mag/158575315492,개별 업소. 영업·예약 방식 변동 가능
+P19,popular,도산분식,島山粉食（ドサンブンシク）,분식,강남구,압구정로데오역(수인분당선),일본 여행 매체가 돈가스 샌드·떡볶이 인기점으로 소개,direct,sourced,https://newt.net/mag/158575315492,개별 업소. 위치·영업 확인
+P20,popular,익선동,益善洞（イクソンドン）,한옥 골목·카페,종로구,종로3가역(1·3·5호선),데스크 후보. 이번 검색에서 근거를 찾지 못함,none,unsourced,,출처 확보 전 사용 금지
+J01,japan_related,동부이촌동(리틀도쿄),東部二村洞（リトル東京）,일본인 거주지·일본 음식점,용산구,이촌역(4호선·경의중앙선),"1960년대 중반부터 일본인 마을 형성. 서울 거주 일본인 집중 지역으로 보도, 일식당·일본 식재료점",direct,sourced,https://mediahub.seoul.go.kr/archives/1009750 | https://www.koreajoongangdaily.com/business/little-tokyo-caters-to-japanese-living-in-seoul/11825918,최근 위상 약화 평가 있음. 현재 현황 확인
+J02,japan_related,후암동 문화주택 일대,厚岩洞の文化住宅,일제강점기 일본인 주거지,용산구,숙대입구역(4호선),일제강점기 대표 일본인 거주지. 1920년대 일본인 별장(지월장)이 게스트하우스로 남음,direct,sourced,https://m.seoul.co.kr/news/2018/12/06/20181206018017,민가·영업 공간 포함. 촬영·출입 예절 확인
+J03,japan_related,문화역서울284(구 서울역사),文化駅ソウル284（旧ソウル駅舎）,근대건축·전시,중구,서울역(1·4호선),"1925년 개관 구 경성역사. 일본인 건축가 설계, 현재 전시 공간",direct,sourced,https://metropolisjapan.com/seoul-revisited/,전시 일정 확인
+J04,japan_related,한국은행 화폐박물관(구 조선은행 본점),韓国銀行貨幣博物館（旧朝鮮銀行本店）,근대건축·박물관,중구,회현역(4호선),1912년 신고전주의 건물. 다쓰노 긴고 설계로 소개,direct,sourced,https://metropolisjapan.com/seoul-revisited/,개관 요일 확인
+J05,japan_related,서울도서관(구 경성부청),ソウル図書館（旧京城府庁）,근대건축·도서관,중구,시청역(1·2호선),일제강점기 경성부청 건물이 서울도서관으로 사용됨,direct,sourced,https://mediahub.seoul.go.kr/archives/2013906 | https://mediahub.seoul.go.kr/archives/2000851,건립 연도 원자료(국가유산청) 확인
+J06,japan_related,신세계백화점 본점 본관(구 미쓰코시 경성점),新世界百貨店本店本館（旧三越京城店）,근대건축·백화점,중구,회현역(4호선),식민지 시기 미쓰코시백화점 건물이 신세계 본관으로 남음,direct,sourced,https://mediahub.seoul.go.kr/archives/2000851,
+J07,japan_related,용산역사박물관(구 용산철도병원),龍山歴史博物館（旧龍山鉄道病院）,근대건축·박물관,용산구,신용산역(4호선)·용산역,1928년 용산철도병원을 리모델링해 2022년 개관. 일본인 신시가지의 의료시설이었음,direct,sourced,https://mediahub.seoul.go.kr/archives/2004132,가까운 역·출구 확인
+J08,japan_related,일본국제교류기금 서울일본문화센터,国際交流基金ソウル日本文化センター,일본 문화 기관,용산구,서울역 12번 출구 도보 약 2분(출처 기준),트윈시티남산 2층으로 안내됨,direct,sourced,https://world.nol.com/en/content/pois/1fa441f9-9cf7-4441-acd5-b812f1fcde04 | https://moneypin.biz/bizno/detail/1018402655/,공공데이터 기반 주소라 공식 사이트로 재확인
+J09,japan_related,주한일본대사관 공보문화원,在大韓民国日本国大使館公報文化院,일본 문화 기관,미확인,미확인,JETRO 기관 목록에 존재. 현재 주소는 확인하지 못함,direct,partial,https://www.jetro.go.jp/korea/co/jp.html,주소·공개 여부 공식 확인 전 사용 금지
+J10,japan_related,서대문형무소역사관,西大門刑務所歴史館,일제강점기 역사,서대문구,독립문역(3호선),데스크 후보. 이번 검색에서 근거를 찾지 못함,none,unsourced,,출처 확보 전 사용 금지. 일본인 대상 안내 시 문구 민감도 검토

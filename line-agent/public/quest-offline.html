@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>保存したクエスト · 저장한 퀘스트</title>
+  <script defer src="/quest-offline.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; min-height: 100vh; background: radial-gradient(at 20% 0%, #eed7ee, transparent 55%), linear-gradient(145deg, #f7f6fc, #e0e7fd); color: #282439; font: 1rem/1.6 system-ui, sans-serif; }
+    main { max-width: 38rem; margin: 0 auto; }
+    h1 { margin: 0; padding: 1rem 1.2rem; border-radius: 1.2rem; background: linear-gradient(125deg,#222d57,#4a508d); color: white; line-height: 1.25; font-size: 1.5rem; }
+    h1 span { display: block; margin-top: 8px; font-size: 1.125rem; }
+    h2 { margin: 0; font-size: 1.25rem; line-height: 1.35; }
+    h2 span, .ko-sub { display: block; font-size: 1rem; color: #594743; }
+    .card { margin-top: 16px; border: 1px solid #ded9eb; border-radius: 16px; background: white; padding: 20px; }
+    p { margin: 8px 0; }
+    .muted { color: #594743; font-size: .9375rem; }
+    .exit { font-weight: 750; font-size: 1.0625rem; }
+    .line { display: inline-block; margin-right: 6px; padding: 0 6px; border-left: 4px solid #504e49; border-radius: 4px; background: #f3f1f8; font-size: .875rem; }
+    .notice { border-left: 4px solid #e5b560; padding-left: 12px; font-weight: 700; }
+    .notice.today { border-color: #941e34; color: #941e34; }
+    ol { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    li { border-radius: 10px; background: #f4f2f9; padding: 12px 14px; }
+    li strong { display: block; }
+    .phrase { margin-top: 10px; border: 2px solid #504e49; border-radius: 12px; background: white; padding: 12px; text-align: center; }
+    .phrase [lang="ko"] { font-size: 1.25rem; font-weight: 800; line-height: 1.4; color: #504e49; }
+    .address { font-weight: 750; user-select: all; overflow-wrap: anywhere; }
+    a, button { display: inline-block; min-height: 44px; margin-top: 12px; padding: 10px 0; color: #941e34; font: inherit; font-weight: 750; line-height: 1.5; }
+    button { margin-right: 12px; border: 1px solid #ded9eb; border-radius: 12px; background: white; padding: 10px 14px; color: #504e49; cursor: pointer; text-align: left; }
+    li a { margin-top: 0; padding: 4px 0; }
+    ul { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>保存したクエスト<span lang="ko">저장한 퀘스트</span></h1>
+    <div id="intro" class="card" role="status">
+      <p>今はインターネットにつながっていません。この端末に保存したクエストを表示します。</p>
+      <p lang="ko">지금은 인터넷에 연결되지 않았어요. 이 기기에 저장한 퀘스트를 보여 드려요.</p>
+    </div>
+    <div id="empty" class="card" hidden>
+      <p>この端末に保存したクエストはありません。次はクエストの画面で「オフライン用に保存する」を押してから出発してください。</p>
+      <p lang="ko">이 기기에 저장한 퀘스트가 없어요. 다음에는 퀘스트 화면에서 ‘오프라인용으로 저장하기’를 누르고 출발해 주세요.</p>
+    </div>
+    <div id="quest"></div>
+    <section id="others" class="card" hidden aria-labelledby="others-title">
+      <h2 id="others-title">ほかに保存したクエスト<span lang="ko">저장한 다른 퀘스트</span></h2>
+      <ul id="other-list"></ul>
+    </section>
+    <a href="/subway-offline.html">保存した地下鉄の案内を見る · <span lang="ko">저장한 지하철 안내 보기</span></a><br>
+    <a id="reload" href="/quests">接続したら読み直す · <span lang="ko">연결되면 다시 불러오기</span></a>
+  </main>
+</body>
+</html>
