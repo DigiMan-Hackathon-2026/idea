@@ -12,7 +12,7 @@ describe("candidates.json", () => {
   });
 
   it.each([
-    ["a phone number instead of a ref", { phoneRef: "+821012345678" }],
+    ["a phone number instead of a ref", { phoneRef: "+821000000002" }],
     ["a phone number in the address", { addressKo: "서울 010-1234-5678" }],
     ["a point outside Seoul", { point: { lat: 35.1, lng: 129.0 } }],
     ["an unknown menu", { menus: ["sushi"] }],

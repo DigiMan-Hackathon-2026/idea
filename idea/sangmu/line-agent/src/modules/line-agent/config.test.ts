@@ -31,7 +31,7 @@ describe("readLineAgentConfig", () => {
 
 describe("parsePhoneAllowlist", () => {
   it("keeps only E.164 numbers under simple refs", () => {
-    expect(parsePhoneAllowlist('{"demo-shop-a":"+821012345678","bad ref":"+821000000000","demo-shop-b":"010-1234"}')).toEqual({ "demo-shop-a": "+821012345678" });
+    expect(parsePhoneAllowlist('{"demo-shop-a":"+821000000002","bad ref":"+821000000000","demo-shop-b":"010-1234"}')).toEqual({ "demo-shop-a": "+821000000002" });
     expect(parsePhoneAllowlist("not json")).toEqual({});
   });
 });
