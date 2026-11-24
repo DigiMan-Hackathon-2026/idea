@@ -1,0 +1,53 @@
+# Local secrets and tool settings
+.env
+.env.*
+!.env.example
+!.env.*.example
+.aws/
+.codex/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies and generated output
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.venv/
+__pycache__/
+dist/
+build/
+.next/
+out/
+coverage/
+test-results/
+playwright-report/
+*.log
+.pnpm-debug.log*
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# User research material that must stay local
+research/private/
+research/recordings/
+research/raw-media/
+research/**/contacts.*
+research/**/*.m4a
+research/**/*.mp3
+research/**/*.wav
+research/**/*.mp4
+research/**/*.mov

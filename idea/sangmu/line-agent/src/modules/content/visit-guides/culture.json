@@ -1,0 +1,129 @@
+[
+  {
+    "id": "8d3e210f-7766-419d-8dd1-59a9714fd9e4",
+    "versionId": "6ec5b7e8-20e9-412d-aae0-0d0294aecc41",
+    "slug": "anguk-folk-museum-seollal",
+    "areaCode": "jongno",
+    "purpose": "culture",
+    "titleKo": "국립민속박물관에서 한국의 설 풍습 찾아보기",
+    "titleJa": "国立民俗博物館で韓国の旧正月の風習を探す",
+    "summaryKo": "떡국이나 세배를 보고 내가 아는 새해 풍습과 비교해요.",
+    "summaryJa": "トッククや新年のあいさつを見て、自分が知っている正月の風習と比べます。",
+    "bodyKo": "본관 상설전시관 2 ‘한국인의 일 년’은 무료예요. 전시실을 이용하기 어렵다면 온라인 해설에서 설 풍습을 볼 수 있어요.",
+    "bodyJa": "本館の常設展示室2「韓国人の一年」は無料です。展示室に入れない日は、公式のオンライン解説で旧正月の風習を見られます。",
+    "detailKo": "상설전시관 2 · 무료",
+    "detailJa": "常設展示室2 · 無料",
+    "durationMinutes": 30,
+    "costMin": 0,
+    "place": {
+      "id": "ccfb4127-01d8-4ddb-a8bc-c5b09b16fc64",
+      "nameKo": "국립민속박물관 본관",
+      "nameJa": "国立民俗博物館 本館",
+      "addressKo": "서울 종로구 삼청로 37",
+      "guideUrlKo": "https://www.nfm.go.kr/home/subIndex/11.do",
+      "guideUrlJa": "https://www.nfm.go.kr/home/subIndex/11.do",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "d38809b2-03c1-4e72-a985-ce62bdc5d40b",
+        "titleKo": "상설전시관 2 찾기",
+        "titleJa": "常設展示室2を探す",
+        "bodyKo": "본관에서 ‘한국인의 일 년’ 표지를 따라가요. 전시실을 이용하기 어렵다면 공식 안내에서 온라인 해설을 열어요.",
+        "bodyJa": "本館で「한국인의 일 년」の表示を探します。展示室に入れない場合は公式のオンライン解説を開きましょう。",
+        "completionLabelKo": "전시실이나 온라인 해설을 열었어요",
+        "completionLabelJa": "展示室かオンライン解説を見つけました",
+        "showsPlace": true,
+        "guideUrl": "https://www.nfm.go.kr/home/1428/userVideoChannelDetail.do?no=739"
+      },
+      {
+        "id": "5bdc1e42-d6dc-40df-9779-06f5a76cea1e",
+        "titleKo": "설 풍습 하나 고르기",
+        "titleJa": "旧正月の風習を一つ選ぶ",
+        "bodyKo": "정월 전시에서 떡국이나 세배처럼 궁금한 풍습 하나를 골라요.",
+        "bodyJa": "正月の展示から、トッククやセベなど気になる風習を一つ選びます。",
+        "completionLabelKo": "설 풍습 하나를 골랐어요",
+        "completionLabelJa": "旧正月の風習を一つ選びました",
+        "phraseKo": "설 풍습을 보고 싶어요. 일본어 안내가 있나요?",
+        "phraseJa": "旧正月の風習を見たいです。日本語の案内はありますか？"
+      },
+      {
+        "id": "48929a97-0fe2-4d9e-b137-80e3496ba3e0",
+        "titleKo": "익숙한 새해와 비교하기",
+        "titleJa": "自分が知っているお正月と比べる",
+        "bodyKo": "새해 음식이나 인사법에서 비슷하거나 다른 점을 하나 떠올려요.",
+        "bodyJa": "正月の料理やあいさつで、似ている点か違う点を一つ考えましょう。",
+        "completionLabelKo": "비슷하거나 다른 점을 찾았어요",
+        "completionLabelJa": "似ている点か違う点を見つけました"
+      }
+    ],
+    "seed": {
+      "supplierId": "6acdbdf6-1da1-492f-9c3d-a97e5a7c8c34",
+      "editorId": "49b63a71-fee9-424f-8f7d-739f45965998",
+      "requestId": "977e3b7c-b7d3-4a80-a7ab-252aa4439748"
+    }
+  },
+  {
+    "id": "22d9ae82-3527-4df0-b3ca-60a489ec8db4",
+    "versionId": "b1d0afd1-c524-494c-a9b8-7fca63674ce1",
+    "slug": "seongsu-lumiere-perfume-class",
+    "areaCode": "seongsu",
+    "purpose": "culture",
+    "titleKo": "성수 뤼미에르 퍼퓸에서 향수 만들기",
+    "titleJa": "聖水のルミエール・パルファムで香水を作る",
+    "summaryKo": "향을 맡아 보고 마음에 드는 조합으로 향수를 만들어요.",
+    "summaryJa": "香りを試し、気に入った組み合わせで香水を作ります。",
+    "bodyKo": "공식 예약에서 성수점을 골라요. 클래스 요금·환불 조건과 진행 언어를 결제 전에 확인해요.",
+    "bodyJa": "公式予約で聖水店を選び、料金・キャンセル条件・使用言語を支払い前に確認しましょう。",
+    "detailKo": "사전 예약 · 요금과 진행 언어 확인",
+    "detailJa": "要予約 · 料金と使用言語を確認",
+    "durationMinutes": 60,
+    "place": {
+      "id": "e325356e-8675-42ff-bcb4-e9cf2802612a",
+      "nameKo": "뤼미에르 퍼퓸 성수점",
+      "nameJa": "ルミエール・パルファム 聖水店",
+      "addressKo": "서울 성동구 연무장길 49",
+      "guideUrlKo": "https://litt.ly/lumiereparfum",
+      "guideUrlJa": "https://litt.ly/lumiereparfum",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "0814aa2e-3f17-47fe-8375-7233e7c1936d",
+        "titleKo": "성수점 시간 예약하기",
+        "titleJa": "聖水店の時間を予約する",
+        "bodyKo": "공식 예약 링크에서 성수점을 선택해요. 원하는 시간과 진행 언어를 확인하고 예약 확정 안내를 받아요. 마감이면 다른 날짜를 살펴봐요.",
+        "bodyJa": "公式予約リンクで聖水店を選びます。希望時間と使用言語を確かめ、予約確定の連絡を受け取ります。満席なら別の日を探しましょう。",
+        "completionLabelKo": "예약 확정을 확인했어요",
+        "completionLabelJa": "予約が確定しました",
+        "showsPlace": true
+      },
+      {
+        "id": "2de44cbb-0819-487c-b148-38178f4072f6",
+        "titleKo": "향 두 가지 비교하기",
+        "titleJa": "香りを二つ比べる",
+        "bodyKo": "확정 안내에 적힌 호수로 가요. 향을 맡고 마음에 드는 방향을 강사에게 전해요.",
+        "bodyJa": "予約案内に記載された部屋へ。香りを試し、好みを講師に伝えましょう。",
+        "completionLabelKo": "써보고 싶은 향을 골랐어요",
+        "completionLabelJa": "使ってみたい香りを選びました",
+        "showsPlace": true,
+        "phraseKo": "이 두 향을 비교해 보고 싶어요. 어떤 차이가 있나요?",
+        "phraseJa": "この二つの香りを比べたいです。どんな違いがありますか？"
+      },
+      {
+        "id": "88df26ee-ecc4-488f-8273-8d8e087addd7",
+        "titleKo": "강사 안내에 따라 향수 만들기",
+        "titleJa": "講師の案内に沿って香水を作る",
+        "bodyKo": "강사와 향의 조합을 정한 다음 안내에 따라 만들어요. 완성품을 언제 받을 수 있는지 확인해요.",
+        "bodyJa": "講師と香りの組み合わせを決め、案内に沿って作ります。完成品をいつ受け取れるか確認しましょう。",
+        "completionLabelKo": "향수를 만들고 수령 방법을 확인했어요",
+        "completionLabelJa": "香水を作り、受け取り方を確かめました"
+      }
+    ],
+    "seed": {
+      "supplierId": "fffbcb77-ba99-408b-b81e-ef1bb52aac5c",
+      "editorId": "6535469a-aa95-456f-9484-1da40b97e0fd",
+      "requestId": "0b530cbf-3277-4933-968a-5bf19979edfb"
+    }
+  }
+]
