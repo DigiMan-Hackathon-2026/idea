@@ -288,6 +288,16 @@ describe("DiningAgent rules", () => {
     expect(buttons(view)["電話で聞いてもらう"]).toBeUndefined();
   });
 
+  it("does not nag the group when the requester chats about something else", async () => {
+    await agent.handleEvent(text(ALICE, "ココソウル サムギョプサル食べたい", true));
+    expect(lastTexts(GROUP, 1)).toBe("今回、お食事は何名ですか？");
+    const count = line.sent.length;
+    await agent.handleEvent(text(ALICE, "今日の公演たのしみ！", true));
+    expect(line.sent.length).toBe(count);
+    await agent.handleEvent(text(ALICE, "3人", true));
+    expect(lastTexts(GROUP, 1)).toContain("どのあたり");
+  });
+
   it("stays quiet in a group unless called", async () => {
     await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル", true));
     expect(line.sent).toHaveLength(0);
