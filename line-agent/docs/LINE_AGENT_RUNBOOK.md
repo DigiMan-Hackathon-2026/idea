@@ -58,9 +58,11 @@ open http://localhost:3000/dev/line-agent
    - `LINE_AGENT_CALLS=twilio`
    - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`
    - `LINE_AGENT_PHONE_ALLOWLIST={"demo-shop-a":"+8210…","demo-shop-b":"+8210…","demo-shop-c":"+8210…"}` (동의한 번호만)
-   - `VOICE_BRIDGE_SECRET`(16자 이상), `OPENAI_API_KEY`
+   - `VOICE_BRIDGE_SECRET`(16자 이상), `OPENAI_API_KEY`, `VOICE_BRIDGE_APP_URL=http://localhost:3000`
 3. 음성 중계를 켠다: `pnpm voice:bridge` (포트 8787).
 4. 중계용 공개 주소를 하나 더 연다: `cloudflared tunnel --url http://localhost:8787`. 주소에서 `https://`를 뺀 호스트를 `VOICE_BRIDGE_PUBLIC_HOST`에 넣고 앱 서버를 다시 켠다.
+
+`APP_ORIGIN`은 앱의 공개 주소여야 한다. Twilio가 통화 결과 상태(안 받음·통화 중·종료)를 이 주소로 알려 준다. 음성 중계는 같은 컴퓨터의 앱에 `VOICE_BRIDGE_APP_URL=http://localhost:3000`으로 붙는다.
 
 시뮬레이터에서도 `twilio` 모드면 실제로 전화가 간다. LINE 채널 없이 전화부터 시험할 수 있다. 수신 화면에 '국제전화'가 뜨는지 꼭 확인한다.
 
