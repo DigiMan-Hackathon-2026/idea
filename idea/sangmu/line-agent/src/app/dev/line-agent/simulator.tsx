@@ -15,7 +15,7 @@ function newSession(): string {
   return Math.random().toString(36).slice(2, 10);
 }
 
-export function LineAgentSimulator({ calls }: { calls: string }) {
+export function LineAgentSimulator({ calls, token }: { calls: string; token: string | null }) {
   // One conversation per tab; ?s=… in the URL keeps it across reloads.
   const [session] = useState(() => {
     if (typeof window === "undefined") return "";
@@ -27,7 +27,9 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
   useEffect(() => {
     // Keep the conversation across reloads (no state change, so no re-render).
     if (session && new URLSearchParams(window.location.search).get("s") !== session) {
-      window.history.replaceState(window.history.state, "", `?s=${session}`);
+      const query = new URLSearchParams(window.location.search);
+      query.set("s", session);
+      window.history.replaceState(window.history.state, "", `?${query.toString()}`);
     }
   }, [session]);
   const [user, setUser] = useState<User>("alice");
@@ -40,9 +42,9 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
 
   const refresh = useCallback(async () => {
     if (!session) return;
-    const response = await fetch(`/api/v1/dev/line-agent?session=${session}&user=${user}&group=${group ? 1 : 0}`, { cache: "no-store" });
+    const response = await fetch(`/api/v1/dev/line-agent?session=${session}&user=${user}&group=${group ? 1 : 0}`, { cache: "no-store", headers: token ? { "x-simulator-token": token } : {} });
     if (response.ok) setEntries((await response.json()).messages);
-  }, [session, user, group]);
+  }, [session, user, group, token]);
 
   useEffect(() => {
     // Fetch once per view change, then poll for pushed messages (call results).
@@ -72,7 +74,7 @@ export function LineAgentSimulator({ calls }: { calls: string }) {
     setBusy(true);
     setMine((list) => [...list, { at: new Date().toISOString(), text: shown, user }]);
     const text = payload.text && group && !/ココソウル|코코서울/.test(payload.text) ? `ココソウル ${payload.text}` : payload.text;
-    await fetch("/api/v1/dev/line-agent", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session, user, group, ...payload, text }) });
+    await fetch("/api/v1/dev/line-agent", { method: "POST", headers: { "content-type": "application/json", ...(token ? { "x-simulator-token": token } : {}) }, body: JSON.stringify({ session, user, group, ...payload, text }) });
     await refresh();
     setBusy(false);
   }

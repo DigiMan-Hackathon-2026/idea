@@ -31,6 +31,10 @@ export class MemoryAgentStore implements AgentStore {
   async claimEvent(eventId: string, now: string): Promise<boolean> {
     if (this.events.has(eventId)) return false;
     this.events.set(eventId, now);
+    // Keep memory bounded on a long-running demo server.
+    if (this.events.size > 10_000) {
+      for (const key of [...this.events.keys()].slice(0, 5_000)) this.events.delete(key);
+    }
     return true;
   }
 

@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import type { LineEvent } from "../../../../../modules/line-agent/line/types";
 import { getLineAgentRuntime, SIMULATOR_PREFIX } from "../../../../../modules/line-agent/runtime.server";
+import { requestOrigin, simulatorAllowed } from "../../../../../modules/line-agent/simulator-access";
 
 // Local chat simulator for the LINE agent: lets the team rehearse the whole
 // flow without a LINE channel. Disabled in production.
@@ -8,9 +9,11 @@ const USERS = new Set(["alice", "bob"]);
 const SESSION = /^[a-z0-9]{1,16}$/;
 let counter = 0;
 
-function enabled() {
+function enabled(request: NextRequest) {
   const runtime = getLineAgentRuntime();
-  return runtime.config.simulatorEnabled ? runtime : null;
+  if (!runtime.config.simulatorEnabled) return null;
+  const token = request.headers.get("x-simulator-token") ?? request.nextUrl.searchParams.get("token");
+  return simulatorAllowed(requestOrigin((name) => request.headers.get(name)), token, runtime.config.simulatorToken) ? runtime : null;
 }
 
 // Each simulator tab has its own session so rehearsals and tests do not mix.
@@ -24,7 +27,7 @@ function target(session: string, user: string, group: boolean): string {
 }
 
 export async function GET(request: NextRequest) {
-  const runtime = enabled();
+  const runtime = enabled(request);
   if (!runtime) return new Response(null, { status: 404 });
   const user = request.nextUrl.searchParams.get("user") ?? "alice";
   const group = request.nextUrl.searchParams.get("group") === "1";
@@ -38,7 +41,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const runtime = enabled();
+  const runtime = enabled(request);
   if (!runtime) return new Response(null, { status: 404 });
   let body: { session?: unknown; user?: unknown; group?: unknown; text?: unknown; data?: unknown; mention?: unknown; image?: unknown };
   try {
