@@ -45,7 +45,7 @@ const MAX_CARDS = 3;
 const CALL_WINDOW_MINUTES = 75;
 const MEAL_MINUTES = 45;
 const BUFFER_MINUTES = 10;
-const REQUESTER_ONLY = new Set(["call_request", "approve", "cancel_call", "new_search", "party", "area", "menu", "decision_retry", "verify_yes", "verify_no"]);
+const REQUESTER_ONLY = new Set(["call_request", "approve", "cancel_call", "new_search", "party", "area", "menu", "decision_retry", "decision_accept", "verify_yes", "verify_no"]);
 
 type Context = {
   target: string;
@@ -160,8 +160,9 @@ export class DiningAgent {
         messages.push(m.needsDecision(next, restaurant, "deposit", outcome.offeredTime));
       } else if (outcome.kind === "alternate_offered" && outcome.offeredTime) {
         const plan = this.planFor(next, restaurant.id, now);
-        const limit = plan?.seatDeadline ?? approval.windowEnd;
-        if (Date.parse(outcome.offeredTime) > Date.parse(limit)) {
+        // Too late for the next appointment → try the next shop. Without an appointment,
+        // or for an earlier time, the requester decides.
+        if (plan?.seatDeadline && Date.parse(outcome.offeredTime) > Date.parse(plan.seatDeadline)) {
           messages.push(m.callMovedOn(next.lang, restaurant, "late_offer", outcome.offeredTime, next));
           continueCalling = true;
         } else {
@@ -613,6 +614,30 @@ export class DiningAgent {
         await this.reply(ctx, [{ type: "text", text: lang === "ja" ? "電話はやめました。" : "전화는 그만뒀어요." }]);
         return;
       }
+      case "decision_accept": {
+        // The requester accepts the time the shop offered: a new approval for that shop only,
+        // and the call starts by checking the table again (spec §5).
+        const decision = request.decision;
+        const restaurant = decision ? findRestaurant(decision.candidateId) : undefined;
+        if (request.status !== "needs_decision" || !decision?.offeredTime || !restaurant || postback.candidateId !== restaurant.id || !this.deps.calls) {
+          return this.reply(ctx, [m.staleCard(lang)]);
+        }
+        const alias = (await this.deps.store.getAlias(request.requesterKey)) ?? request.approvals.at(-1)?.alias;
+        if (!alias) return this.reply(ctx, [m.staleCard(lang)]);
+        const next = this.bump(request, now);
+        next.proposal = {
+          candidateIds: [restaurant.id],
+          partySize: next.partySize!,
+          windowStart: decision.offeredTime,
+          windowEnd: addMinutes(decision.offeredTime, 15),
+          alias,
+          expiresAt: addMinutes(now, APPROVAL_TTL_MINUTES),
+        };
+        next.decision = null;
+        next.status = "awaiting_approval";
+        if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
+        return this.reply(ctx, [m.approvalCard(next, next.proposal, findRestaurant)]);
+      }
       case "verify_yes":
       case "verify_no": {
         const restaurant = postback.candidateId ? findRestaurant(postback.candidateId) : undefined;
@@ -714,7 +739,7 @@ export class DiningAgent {
         return;
       }
       const restaurant = findRestaurant(candidateId)!;
-      const attempt: CallAttempt = { id: this.deps.newId(), approvalId, candidateId, ordinal: 1, status: "placing", providerCallId: null, outcome: null, startedAt: now, finishedAt: null };
+      const attempt: CallAttempt = { id: this.deps.newId(), approvalId, candidateId, ordinal: request.attempts.filter((a) => a.candidateId === candidateId).length + 1, status: "placing", providerCallId: null, outcome: null, startedAt: now, finishedAt: null };
       const next = this.bump(request, now);
       next.attempts.push(attempt);
       if (!(await this.deps.store.save(next, request.revision))) continue;

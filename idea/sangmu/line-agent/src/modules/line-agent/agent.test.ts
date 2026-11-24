@@ -304,6 +304,27 @@ describe("DiningAgent rules", () => {
     expect(lastTexts(ALICE, 1)).toContain("確認できませんでした");
   });
 
+  it("re-asks the same shop when the requester accepts its offered time", async () => {
+    // No deadline: the 19:00 offer is outside the approved window but not "late", so it needs a decision.
+    await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル"));
+    const view = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(view)["電話で聞いてもらう"]));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    const card = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("only_later", calls.jobs[0].brief) });
+    const decision = line.messagesFor(ALICE).at(-1)!.message;
+    expect(lastTexts(ALICE, 1)).toContain("19:00の提案");
+    await agent.handleEvent(tap(ALICE, buttons(decision)["19:00でお願いする"]));
+    const again = line.messagesFor(ALICE).at(-1)!.message;
+    expect(JSON.stringify(again)).toContain("19:00〜19:15");
+    await agent.handleEvent(tap(ALICE, buttons(again)["この条件で電話を頼む"]));
+    expect(calls.jobs).toHaveLength(2);
+    expect(calls.jobs[1].phoneRef).toBe(calls.jobs[0].phoneRef);
+    await agent.handleCallFinished({ attemptId: calls.jobs[1].attemptId, transcript: simulateTranscript("accept", calls.jobs[1].brief) });
+    expect(lastTexts(ALICE, 1)).toContain("19:00");
+  });
+
   it("asks before accepting a deposit (CALL-02)", async () => {
     const card = await toApproval();
     await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
