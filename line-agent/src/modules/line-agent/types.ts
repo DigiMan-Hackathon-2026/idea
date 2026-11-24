@@ -133,6 +133,15 @@ export type Reservation = {
   test: boolean;
 };
 
+export type CallProposal = {
+  candidateIds: string[];
+  partySize: number;
+  windowStart: string;
+  windowEnd: string;
+  alias: string;
+  expiresAt: string;
+};
+
 export type RequestStatus =
   | "collecting"
   | "comparing"
@@ -181,6 +190,8 @@ export type DiningRequest = {
   attempts: CallAttempt[];
   reservation: Reservation | null;
   decision: Decision | null;
+  /** Call conditions shown on the approval card, waiting for the requester's tap. */
+  proposal: CallProposal | null;
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
