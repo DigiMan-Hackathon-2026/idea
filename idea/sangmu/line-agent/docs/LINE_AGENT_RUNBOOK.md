@@ -61,6 +61,16 @@ open http://localhost:3000/dev/line-agent
 
 시뮬레이터에서도 `twilio` 모드면 실제로 전화가 간다. LINE 채널 없이 전화부터 시험할 수 있다. 수신 화면에 '국제전화'가 뜨는지 꼭 확인한다.
 
+## 4. 상태를 DB에 저장하기 (선택)
+
+기본 저장소는 메모리라서 서버를 다시 켜면 진행 중인 요청이 사라진다. 시연 중 재시작에 대비하려면 PostgreSQL을 쓴다.
+
+1. 마이그레이션 `drizzle/0009_line_agent.sql`을 적용하고 `scripts/db/configure_roles.sql`로 권한을 다시 준다.
+2. `.env.local`에 `LINE_AGENT_STORE=postgres`를 넣는다. 런타임 역할(`DATABASE_URL`)로 접속한다.
+3. 만료된 요청·이벤트·예약명은 한 시간마다 지운다(만료 후 24시간).
+
+로컬 컨테이너에 PostGIS가 없으면 기존 마이그레이션 0008이 적용되지 않는다. 이 경우 `0009_line_agent.sql`만 직접 적용해도 비서 저장소는 동작한다. CI는 PostGIS 이미지로 전체 마이그레이션을 돈다.
+
 ## 안전 규칙
 
 - 허용 목록에 있는 번호에만 전화한다. 모델이나 사용자가 번호를 정할 수 없다.

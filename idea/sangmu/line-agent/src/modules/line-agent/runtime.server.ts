@@ -5,6 +5,8 @@ import { getTmapWalkingRoute } from "../routing/tmap-walking.server";
 import { DiningAgent } from "./agent";
 import { readLineAgentConfig, type LineAgentConfig } from "./config";
 import { LineMessagingClient, RecordingLineGateway, type LineGateway } from "./line/client";
+import { getRuntimeDatabasePool } from "../../db/runtime.server";
+import { PostgresAgentStore } from "./postgres-store";
 import { MemoryAgentStore, type AgentStore } from "./store";
 import { SimulatedCallPlacer, TwilioCallPlacer, type CallFinished, type CallPlacer } from "./telephony";
 import { RoutedTravelProvider } from "./travel";
@@ -43,7 +45,13 @@ function createRuntime(): LineAgentRuntime {
   const clock = () => new Date(Date.now() + offset).toISOString();
   const keyOf = (raw: string) => createHmac("sha256", config.keySecret).update(`line:${raw}`).digest("base64url").slice(0, 32);
   const attemptToken = (attemptId: string) => createHmac("sha256", config.bridge?.secret ?? config.keySecret).update(`attempt:${attemptId}`).digest("base64url");
-  const store: AgentStore = new MemoryAgentStore();
+  const store: AgentStore = config.store === "postgres" ? new PostgresAgentStore(getRuntimeDatabasePool(), { pool: true }) : new MemoryAgentStore();
+  if (store instanceof PostgresAgentStore) {
+    // Retention (spec §9): drop expired requests, events and aliases hourly.
+    const purge = () => void store.purgeExpired(clock()).catch(() => log("line_agent.purge_failed", {}));
+    purge();
+    setInterval(purge, 60 * 60 * 1000).unref();
+  }
   const travel = new RoutedTravelProvider(async (from, to) =>
     getTmapWalkingRoute({
       start: { latitude: from.lat, longitude: from.lng, name: "출발" },
@@ -75,6 +83,6 @@ function createRuntime(): LineAgentRuntime {
   const realLine: LineGateway = config.accessToken ? new LineMessagingClient(config.accessToken) : new RecordingLineGateway(clock);
   const runtime: LineAgentRuntime = { config, store, agent: make(realLine), simulator: make(simulatorLine), simulatorLine, finishCall, attemptToken };
   self.runtime = runtime;
-  log("line_agent.started", { calls: config.calls, line: config.accessToken !== null, simulator: config.simulatorEnabled });
+  log("line_agent.started", { calls: config.calls, line: config.accessToken !== null, simulator: config.simulatorEnabled, store: config.store });
   return runtime;
 }
