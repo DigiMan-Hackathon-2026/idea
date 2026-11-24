@@ -108,6 +108,13 @@ export function stationAlbumPath(areaId: string): string | null {
   return `/station-album?line=${line}&station=${encodeURIComponent(area.stationKo)}#station-story`;
 }
 
+/** 여기서울 station adventure page (small missions around the station). */
+export function stationAdventurePath(areaId: string): string | null {
+  const area = findArea(areaId);
+  if (!area?.stationCode || !/^\d{3}$/.test(area.stationCode)) return null;
+  return `/quests/adventure?line=${area.stationCode[0]}&station=${area.stationCode}#book-page`;
+}
+
 export function areaAsPlace(area: Area): Place {
   const { id, nameJa, nameKo, point, stationCode, approximate } = area;
   return { id, nameJa, nameKo, point, stationCode, approximate };

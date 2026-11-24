@@ -11,7 +11,7 @@ import { conversationTarget } from "./line/webhook";
 import * as m from "./messages";
 import { classifyCall } from "./outcome";
 import { computePlan, rankPlans, type CandidatePlan } from "./plan";
-import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, menuNames } from "./places";
+import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, menuNames, stationAdventurePath } from "./places";
 import { decodePostback, type Postback } from "./postback";
 import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
@@ -488,7 +488,16 @@ export class DiningAgent {
       return;
     }
     const plan = this.planFor(next, candidateId, now)!;
-    await this.reply(ctx, this.candidateView(next, now, m.waitRecorded(next.lang, restaurant, plan)));
+    await this.reply(ctx, [...this.candidateView(next, now, m.waitRecorded(next.lang, restaurant, plan)), ...this.waitIdea(next, plan)]);
+  }
+
+  /** A nearby mission while a remote wait runs, only when it still fits the schedule. */
+  private waitIdea(request: DiningRequest, plan: CandidatePlan): LineMessage[] {
+    const wait = plan.wait;
+    const restaurant = findRestaurant(plan.candidateId);
+    const path = restaurant ? stationAdventurePath(restaurant.areaId) : null;
+    if (!wait || !restaurant || !path || wait.basis !== "remote_from_observed" || (wait.minutes ?? 0) < 30 || plan.verdict === "late") return [];
+    return [m.waitTimeIdea(request, restaurant, wait.minutes!, this.deps.origin, path)];
   }
 
   // ── Postbacks ─────────────────────────────────────────────────────────────
@@ -563,7 +572,7 @@ export class DiningAgent {
         wait.basis = postback.action === "wait_remote" ? "remote_from_observed" : "on_arrival";
         if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
         const plan = this.planFor(next, restaurant.id, now)!;
-        await this.reply(ctx, this.candidateView(next, now, m.waitRecorded(lang, restaurant, plan)));
+        await this.reply(ctx, [...this.candidateView(next, now, m.waitRecorded(lang, restaurant, plan)), ...this.waitIdea(next, plan)]);
         return;
       }
       case "call_request":

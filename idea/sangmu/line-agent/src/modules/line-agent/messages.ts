@@ -446,6 +446,17 @@ export function arrivalTimePassed(lang: Lang, place: Place, arriveBy: string): L
   return { type: "text", text: tr(lang, `${place.nameJa}の${formatSeoulTime(arriveBy)}はもう過ぎています。到着したい時間をもう一度送ってください。`, `${place.nameKo} ${formatSeoulTime(arriveBy)}은 이미 지났어요. 도착하고 싶은 시간을 다시 보내 주세요.`) };
 }
 
+/** Offered only when a remote wait leaves free time before the seat is ready (spec §4). */
+export function waitTimeIdea(request: DiningRequest, restaurant: Restaurant, minutes: number, origin: string, path: string): LineMessage {
+  const lang = request.lang;
+  const label = tr(lang, "駅のまわりのミッション", "역 주변 미션 보기");
+  return {
+    type: "text",
+    text: tr(lang, `${restaurant.nameJa}の順番まで約${minutes}分あります。呼ばれる時間に戻れる範囲で、駅のまわりの小さなミッションもどうですか？`, `${restaurant.nameKo} 차례까지 약 ${minutes}분 남았어요. 부를 때 돌아올 수 있는 범위에서 역 주변 작은 미션은 어때요?`),
+    quickReply: quickReply([{ type: "uri", label, uri: new URL(path, origin).toString() }]),
+  };
+}
+
 export function waitRecorded(lang: Lang, restaurant: Restaurant, plan: CandidatePlan): string {
   if (plan.verdict === "late") return tr(lang, `${restaurant.nameJa}は${plan.marginMinutes}分間に合わない見込みです。`, `${restaurant.nameKo}는 ${plan.marginMinutes}분 늦을 것 같아요.`);
   if (plan.verdict === "fits") return tr(lang, `${restaurant.nameJa}は間に合う見込みです。`, `${restaurant.nameKo}는 시간 안에 들어갈 수 있을 것 같아요.`);
