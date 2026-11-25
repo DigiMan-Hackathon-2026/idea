@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildCallInstructions, DEFER_PHRASE, GREETING } from "./call-brief";
 import { classifyCall, type TranscriptTurn } from "./outcome";
-import { formatSeoulTime, seoulInstant } from "./time";
+import { formatKoreanSpokenTime, formatSeoulTime, seoulInstant } from "./time";
+import { findClockTimes } from "./interpret";
 
 const context = { partySize: 2, windowStart: seoulInstant("2026-11-29", 17, 55), windowEnd: seoulInstant("2026-11-29", 18, 45) };
 const ai = (text: string): TranscriptTurn => ({ speaker: "ai", text });
@@ -58,5 +59,41 @@ describe("buildCallInstructions", () => {
     expect(text).toContain("오후 5시 55분부터 저녁 6시 45분 사이");
     expect(text).toContain("인원: 2명");
     expect(text).toContain("サトウ");
+  });
+});
+
+describe("times around midnight", () => {
+  // A request at 23:43 gives a 23:55–00:55 window; the first :00 slot is midnight.
+  const lateWindow = { partySize: 2, windowStart: seoulInstant("2026-11-25", 23, 55), windowEnd: seoulInstant("2026-11-26", 0, 55) };
+
+  it("speaks midnight and the small hours unambiguously", () => {
+    expect(formatKoreanSpokenTime(seoulInstant("2026-11-26", 0, 0))).toBe("밤 12시");
+    expect(formatKoreanSpokenTime(seoulInstant("2026-11-26", 0, 30))).toBe("밤 12시 반");
+    expect(formatKoreanSpokenTime(seoulInstant("2026-11-26", 1, 10))).toBe("새벽 1시 10분");
+    expect(formatKoreanSpokenTime(seoulInstant("2026-11-25", 23, 55))).toBe("밤 11시 55분");
+    expect(formatKoreanSpokenTime(seoulInstant("2026-11-25", 19, 0))).toBe("저녁 7시");
+    expect(formatKoreanSpokenTime(seoulInstant("2026-11-25", 12, 0))).toBe("오후 12시");
+  });
+
+  it("reads 오전/밤 12시 as midnight and a bare 12시 as noon", () => {
+    const hours = (text: string) => findClockTimes(text).map((t) => `${t.hour}:${t.minute}`);
+    expect(hours("오전 12시")).toEqual(["0:0"]);
+    expect(hours("밤 12시 반")).toEqual(["0:30"]);
+    expect(hours("새벽 1시")).toEqual(["1:0"]);
+    expect(hours("12시")).toEqual(["12:0"]);
+  });
+
+  it("confirms a midnight booking inside a window that crosses midnight", () => {
+    const outcome = classifyCall(
+      [shop("네, 설레임입니다"), ai(GREETING), shop("밤 12시에 2분 가능해요."), ai("예약 확인: 오늘 밤 12시, 2명, 사토입니다. 맞을까요?"), shop("네, 맞아요")],
+      lateWindow,
+    );
+    expect(outcome.kind).toBe("confirmed");
+    expect(outcome.confirmedTime).toBe(seoulInstant("2026-11-26", 0, 0));
+  });
+
+  it("places a late-evening offer before midnight on the same day", () => {
+    const outcome = classifyCall([shop("네"), ai(GREETING), shop("11시만 돼요"), ai(DEFER_PHRASE)], lateWindow);
+    expect(outcome).toMatchObject({ kind: "alternate_offered", offeredTime: seoulInstant("2026-11-25", 23, 0) });
   });
 });

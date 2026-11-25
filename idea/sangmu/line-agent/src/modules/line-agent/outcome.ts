@@ -16,6 +16,8 @@ const declineWords = /(안 ?돼|안 ?되|어렵|자리가 없|자리 없|만석|
 const depositWords = /(예약금|선결제|보증금|선입금|디파짓|카드 ?번호)/;
 const bookingAsk = /(예약)/;
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 export function classifyCall(turns: readonly TranscriptTurn[], context: OutcomeContext): CallOutcome {
   const shopTurns = turns.filter((turn) => turn.speaker === "shop" && turn.text.trim().length > 1);
   const aiText = turns.filter((turn) => turn.speaker === "ai").map((turn) => turn.text).join(" ");
@@ -27,8 +29,15 @@ export function classifyCall(turns: readonly TranscriptTurn[], context: OutcomeC
     return { ...base, kind: "no_answer", bookingRequested: false, summaryKo: "전화를 받지 않았습니다." };
   }
 
+  // A clock time belongs to the day that puts it closest to the window, so
+  // "밤 12시 반" in a 23:55–00:55 window is after midnight, not this morning.
   const date = seoulDate(context.windowStart);
-  const toInstant = (time: ClockTime) => seoulInstant(date, time.hour, time.minute);
+  const anchor = Date.parse(context.windowStart);
+  const toInstant = (time: ClockTime) => {
+    const sameDay = Date.parse(seoulInstant(date, time.hour, time.minute));
+    const best = [sameDay - DAY_MS, sameDay, sameDay + DAY_MS].reduce((a, b) => (Math.abs(b - anchor) < Math.abs(a - anchor) ? b : a));
+    return new Date(best).toISOString();
+  };
   const inWindow = (iso: string) => Date.parse(iso) >= Date.parse(context.windowStart) && Date.parse(iso) <= Date.parse(context.windowEnd);
 
   const recapIndex = findLastIndex(turns, (turn) => turn.speaker === "ai" && turn.text.includes(RECAP_PREFIX));

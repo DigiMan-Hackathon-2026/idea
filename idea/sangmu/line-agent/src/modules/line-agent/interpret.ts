@@ -62,15 +62,15 @@ export function findClockTimes(text: string): TimeMatch[] {
   const found: TimeMatch[] = [];
   const patterns: { regex: RegExp; read: (m: RegExpExecArray) => ClockTime | null }[] = [
     {
-      regex: /(午前|午後|夜|朝|오전|오후|저녁|밤)?\s*(\d{1,2})\s*(?:時|시)\s*(半|반|(\d{1,2})\s*(?:分|분))?/g,
+      regex: /(午前|午後|夜|朝|深夜|오전|오후|저녁|밤|새벽)?\s*(\d{1,2})\s*(?:時|시)\s*(半|반|(\d{1,2})\s*(?:分|분))?/g,
       read: (m) => clock(Number(m[2]), m[3] === "半" || m[3] === "반" ? 30 : m[4] ? Number(m[4]) : 0, m[1]),
     },
     {
-      regex: /(오전|오후|저녁|밤)?\s*(열두|열한|다섯|여섯|일곱|여덟|아홉|열|한|두|세|네)\s*시\s*(반|(\d{1,2})\s*분)?/g,
+      regex: /(오전|오후|저녁|밤|새벽)?\s*(열두|열한|다섯|여섯|일곱|여덟|아홉|열|한|두|세|네)\s*시\s*(반|(\d{1,2})\s*분)?/g,
       read: (m) => clock(koreanHours[m[2]], m[3] === "반" ? 30 : m[4] ? Number(m[4]) : 0, m[1]),
     },
     {
-      regex: /(午前|午後|夜|오전|오후|저녁|밤)?\s*(\d{1,2}):(\d{2})/g,
+      regex: /(午前|午後|夜|深夜|오전|오후|저녁|밤|새벽)?\s*(\d{1,2}):(\d{2})/g,
       read: (m) => clock(Number(m[2]), Number(m[3]), m[1]),
     },
   ];
@@ -89,8 +89,12 @@ function clock(hour: number, minute: number, period: string | undefined): ClockT
   if (!Number.isInteger(hour) || hour > 24 || minute > 59) return null;
   let h = hour;
   const morning = period === "午前" || period === "朝" || period === "오전";
+  const smallHours = period === "새벽" || period === "深夜";
+  const night = period === "밤" || period === "夜";
   // Dining requests are about later today: a bare "8時" means 20:00.
-  if (!morning && h >= 1 && h <= 11) h += 12;
+  if (!morning && !smallHours && h >= 1 && h <= 11) h += 12;
+  // "오전 12시", "밤 12시", "새벽 12시" are midnight; a bare "12시" is noon.
+  if (h === 12 && (morning || smallHours || night)) h = 0;
   if (h === 24) h = 0;
   return { hour: h, minute };
 }
