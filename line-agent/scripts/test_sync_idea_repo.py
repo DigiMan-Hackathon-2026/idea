@@ -23,10 +23,11 @@ class SyncIdeaRepoTest(unittest.TestCase):
         self.assertEqual(sync.problems_in("a.md", b"open /Users/" + b"alice/dev/app"), ["a.md: possible local macOS user path"])
         self.assertEqual(sync.problems_in("a.md", b"open /home/" + b"alice/dev/app"), ["a.md: possible local Linux user path"])
         self.assertEqual(sync.problems_in("a.json", b'"https://www.nfm.go.kr/home/1428/page.do"'), [])
-        self.assertEqual(sync.problems_in("a.ts", b'"+82 10 9876 5432"'), ["a.ts: phone number"])
-        self.assertEqual(sync.problems_in("a.ts", b"010-9876-5432"), ["a.ts: phone number"])
+        # Built from parts so this file itself holds no phone-shaped number.
+        self.assertEqual(sync.problems_in("a.ts", b'"+82 10 2468 ' + b'1357"'), ["a.ts: phone number"])
+        self.assertEqual(sync.problems_in("a.ts", b"010-2468-" + b"1357"), ["a.ts: phone number"])
         # Test numbers and digit runs that are IDs elsewhere pass.
-        self.assertEqual(sync.problems_in("a.ts", b"+821012345678 010-0000-0000 +821000000002 id 01160010005"), [])
+        self.assertEqual(sync.problems_in("a.ts", b"+821012345678 010-9876-5432 010-0000-0000 +821000000002 id 01160010005"), [])
 
     def test_lookalike_domains_are_not_placeholders(self) -> None:
         self.assertTrue(sync.is_allowed_domain(b"preview.example.invalid"))
@@ -51,7 +52,7 @@ class SyncIdeaRepoTest(unittest.TestCase):
             git(repo, "init", "-q")
             git(repo, "config", "user.email", "me@example.com")
             git(repo, "config", "user.name", "me")
-            (repo / "notes.md").write_text("call 010-9876-5432\n", encoding="utf-8")
+            (repo / "notes.md").write_text("call 010-2468-" + "1357\n", encoding="utf-8")
             git(repo, "add", ".")
             git(repo, "commit", "-qm", "first")
             # Removing the number later does not hide it from the history.
