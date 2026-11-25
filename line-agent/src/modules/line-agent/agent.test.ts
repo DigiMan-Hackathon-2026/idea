@@ -381,7 +381,35 @@ describe("DiningAgent rules", () => {
     await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
     await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("full", calls.jobs[0].brief) });
     await agent.handleCallFinished({ attemptId: calls.jobs[1].attemptId, transcript: [] });
+    for (const job of calls.jobs.slice(2)) await agent.handleCallFinished({ attemptId: job.attemptId, transcript: simulateTranscript("full", job.brief) });
     expect(lastTexts(ALICE, 1)).toContain("予約が取れませんでした");
+  });
+
+  it("comes back with the closest offer when no shop fits, and books it in one tap (up to three shops)", async () => {
+    await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル。20時までに弘大のライブ会場"));
+    const view = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(view)["電話で聞いてもらう"]));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    const card = line.messagesFor(ALICE).at(-1)!.message;
+    expect(JSON.stringify(card)).toContain("残りのお店には電話しません");
+    await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
+    // First full, second only 19:00 (too late for the concert), third full.
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("full", calls.jobs[0].brief) });
+    await agent.handleCallFinished({ attemptId: calls.jobs[1].attemptId, transcript: simulateTranscript("only_later", calls.jobs[1].brief) });
+    expect(calls.jobs).toHaveLength(3);
+    await agent.handleCallFinished({ attemptId: calls.jobs[2].attemptId, transcript: simulateTranscript("full", calls.jobs[2].brief) });
+    const offer = lastTexts(ALICE, 1);
+    expect(offer).toContain("3軒に電話しましたが");
+    expect(offer).toContain("いちばん近いのは");
+    expect(offer).toContain("19:00に遅らせて予約しますか");
+    expect(offer).toMatch(/約\d+分遅れます/);
+    await agent.handleEvent(tap(ALICE, buttons(line.messagesFor(ALICE).at(-1)!.message)["19:00で予約する"]));
+    const again = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(again)["この条件で電話を頼む"]));
+    expect(calls.jobs).toHaveLength(4);
+    expect(calls.jobs[3].phoneRef).toBe(calls.jobs[1].phoneRef);
+    await agent.handleCallFinished({ attemptId: calls.jobs[3].attemptId, transcript: simulateTranscript("accept", calls.jobs[3].brief) });
+    expect(lastTexts(ALICE, 1)).toContain("予約が取れました（テスト）");
   });
 
   it("cancel during a call drops the calls not yet made", async () => {

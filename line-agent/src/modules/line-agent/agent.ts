@@ -58,7 +58,7 @@ const m = bilingual(messages);
 
 const REQUEST_TTL_MINUTES = 6 * 60;
 const APPROVAL_TTL_MINUTES = 10;
-const MAX_CALL_CANDIDATES = 2;
+const MAX_CALL_CANDIDATES = 3;
 const MAX_CARDS = 3;
 const CALL_WINDOW_MINUTES = 75;
 const MEAL_MINUTES = 45;
@@ -913,6 +913,19 @@ export class DiningAgent {
     await this.replyOrPush(ctx, next, [...prefix, m.approvalCard(next, next.proposal, findRestaurant)]);
   }
 
+  /** The earliest time a called shop offered outside the window (not a deposit), still ahead of now. */
+  private bestOffer(request: DiningRequest, approvalId: string, now: string): { restaurant: Restaurant; offeredTime: string; lateMinutes: number | null } | null {
+    const offers = request.attempts
+      .filter((a) => a.approvalId === approvalId && a.outcome?.kind === "alternate_offered" && !a.outcome.depositRequired && a.outcome.offeredTime && Date.parse(a.outcome.offeredTime) > Date.parse(now))
+      .sort((a, b) => Date.parse(a.outcome!.offeredTime!) - Date.parse(b.outcome!.offeredTime!));
+    const first = offers[0];
+    const restaurant = first ? findRestaurant(first.candidateId) : undefined;
+    if (!first || !restaurant) return null;
+    const offeredTime = first.outcome!.offeredTime!;
+    const deadline = this.planFor(request, restaurant.id, now)?.seatDeadline ?? null;
+    return { restaurant, offeredTime, lateMinutes: deadline ? Math.round((Date.parse(offeredTime) - Date.parse(deadline)) / 60_000) : null };
+  }
+
   /** Starts the next approved shop, one call at a time (spec §5). */
   async startNextAttempt(requestId: string, approvalId: string): Promise<void> {
     const placer = this.deps.calls;
@@ -928,9 +941,17 @@ export class DiningAgent {
       const now = this.now();
       if (!candidateId) {
         const next = this.bump(request, now);
-        next.status = "comparing";
+        // None fit: come back with the closest option a shop offered, if any (one tap to book it).
+        const best = this.bestOffer(next, approvalId, now);
+        if (best) {
+          next.status = "needs_decision";
+          next.decision = { reason: "out_of_range", candidateId: best.restaurant.id, offeredTime: best.offeredTime };
+        } else {
+          next.status = "comparing";
+        }
         if (!(await this.deps.store.save(next, request.revision))) continue;
-        await this.push(next, [m.callsExhausted(next)]);
+        const called = approval.candidateIds.length;
+        await this.push(next, [best ? m.bestAlternative(next, best.restaurant, best.offeredTime, called, best.lateMinutes) : m.callsExhausted(next)]);
         return;
       }
       const restaurant = findRestaurant(candidateId)!;
