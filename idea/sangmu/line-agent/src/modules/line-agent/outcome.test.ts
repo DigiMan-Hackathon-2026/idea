@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCallInstructions, DEFER_PHRASE, GREETING } from "./call-brief";
+import { buildCallInstructions, DEFER_PHRASE, GREETING, openingLine } from "./call-brief";
 import { classifyCall, type TranscriptTurn } from "./outcome";
 import { formatKoreanSpokenTime, formatSeoulTime, seoulInstant } from "./time";
 import { findClockTimes } from "./interpret";
@@ -59,6 +59,18 @@ describe("buildCallInstructions", () => {
     expect(text).toContain("오후 5시 55분부터 저녁 6시 45분 사이");
     expect(text).toContain("인원: 2명");
     expect(text).toContain("サトウ");
+  });
+
+  it("asks the whole question in the first line", () => {
+    expect(openingLine({ partySize: 2, windowStart: context.windowStart, windowEnd: context.windowEnd })).toBe(`${GREETING} 오늘 오후 5시 55분부터 저녁 6시 45분 사이에 2명 예약 가능할까요?`);
+  });
+
+  it("reads the shop's time, not the window in the AI's opening", () => {
+    const opening = openingLine({ partySize: 2, windowStart: context.windowStart, windowEnd: context.windowEnd });
+    const later = classifyCall([shop("여보세요"), ai(opening), shop("일곱 시는 돼요"), ai(`저녁 7시 말씀이시죠? ${DEFER_PHRASE}`)], context);
+    expect(later.kind).toBe("alternate_offered");
+    expect(new Date(later.offeredTime!).getUTCHours()).toBe(10); // 19:00 KST
+    expect(classifyCall([shop("여보세요"), ai(opening), shop("6시 반 돼요"), ai("예약 확인: 오늘 저녁 6시 반, 2명, サトウ입니다. 맞을까요?"), shop("네")], context)).toMatchObject({ kind: "confirmed" });
   });
 });
 
