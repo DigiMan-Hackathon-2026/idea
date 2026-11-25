@@ -50,9 +50,11 @@ live.on("upgrade", (request, socket, head) => {
       setTimeout(() => ws.send(JSON.stringify({ type: "session.started", session: { id: "live_1" } })), 100);
     }
     if (event.type === "session.input_audio.append" && seen.appends < 800 && (seen.appends += Buffer.byteLength(event.audio, "base64")) >= 800) {
-      ws.send(JSON.stringify({ type: "session.input_transcript.delta", delta: "네, 테스트 매장입니다." }));
+      // The shop's transcript lags, so its second half lands after the AI starts.
+      ws.send(JSON.stringify({ type: "session.input_transcript.delta", delta: "네, 테스트 " }));
       ws.send(JSON.stringify({ type: "session.output_audio.delta", delta: aiAudio }));
       ws.send(JSON.stringify({ type: "session.output_transcript.delta", delta: "안녕하세요, AI 비서입니다. " }));
+      ws.send(JSON.stringify({ type: "session.input_transcript.delta", delta: "매장입니다." }));
       ws.send(JSON.stringify({ type: "session.output_transcript.delta", delta: "감사합니다." }));
     }
     if (event.type === "session.close") ws.send(JSON.stringify({ type: "session.closed" }));

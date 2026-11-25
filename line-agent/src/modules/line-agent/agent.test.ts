@@ -157,6 +157,8 @@ describe("DiningAgent demo flow (spec 3분 시연, CALL-01)", () => {
     const result = line.messagesFor(GROUP).at(-1)!.message;
     expect(result.type === "flex" && result.altText).toContain("予約が取れました（テスト）");
     expect(result.type === "flex" && result.altText).toContain("18:00");
+    // The quote is the shop's offer, not the later "네, 맞아요".
+    expect(JSON.stringify(result)).toMatch(/お店の返事（韓国語）：「[^」]*시[^」]*가능해요\.」/);
 
     const request = await store.getActiveRequest("k:" + GROUP, clock);
     expect(request).toMatchObject({ status: "confirmed", reservation: { partySize: 2, alias: "サトウ", test: true } });

@@ -26,6 +26,8 @@ const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 5000);
 const closingLine = /(감사합니다|다시 연락드리겠습니다)[.!。\s]*$/;
 const silenceLimit = Number(process.env.VOICE_BRIDGE_SILENCE_LIMIT_MS ?? 25000);
 const maxQueued = 250; // ~5 s of 20 ms chunks while GPT-Live starts
+const bargeInGraceMs = Number(process.env.VOICE_BRIDGE_BARGE_IN_GRACE_MS ?? 1500);
+const turnGapMs = Number(process.env.VOICE_BRIDGE_TURN_GAP_MS ?? 1200);
 const queuedBlockGapMs = Number(process.env.VOICE_BRIDGE_QUEUED_BLOCK_GAP_MS ?? 500);
 const katSecret = process.env.KAT_WEBHOOK_SECRET?.trim() || null;
 
@@ -67,7 +69,7 @@ server.listen(port, () => log("voice_bridge.listening", { port, model: liveModel
 
 function bridgeCall(twilio, provider) {
   const startedAt = Date.now();
-  const call = { streamSid: null, attemptId: null, token: null, live: null, ready: false, queued: [], playbackEndsAt: 0, transcript: [], lastActivity: Date.now(), closingTimer: null, finished: false, latencies: [], lastShopAt: 0 };
+  const call = { streamSid: null, attemptId: null, token: null, live: null, ready: false, queued: [], playbackEndsAt: 0, transcript: [], lastActivity: Date.now(), closingTimer: null, finished: false, latencies: [], lastShopAt: 0, aiTurnStartedAt: 0, liveEvents: {} };
   const silenceTimer = setInterval(() => {
     if (Date.now() - call.lastActivity > silenceLimit) finish("silence");
   }, 1000);
@@ -75,11 +77,21 @@ function bridgeCall(twilio, provider) {
   const sendLive = (event) => call.live?.readyState === WebSocket.OPEN && call.live.send(JSON.stringify(event));
   // Twilio wants the streamSid on every message; KAT identifies the stream by its socket.
   const sendTwilio = (event) => twilio.send(JSON.stringify(provider === "twilio" ? { streamSid: call.streamSid, ...event } : event));
+  // The shop's transcript lags its audio, so its deltas interleave with the AI's
+  // reply. Each speaker keeps one open turn until they pause for turnGapMs;
+  // turns stay in the order they started.
+  const open = { shop: null, ai: null };
   const add = (speaker, delta) => {
     if (!delta) return;
-    const last = call.transcript.at(-1);
-    if (last?.speaker === speaker) last.text += delta;
-    else call.transcript.push({ speaker, text: delta });
+    const now = Date.now();
+    const turn = open[speaker];
+    if (turn && now - turn.lastAt < turnGapMs) {
+      turn.text += delta;
+      turn.lastAt = now;
+      return;
+    }
+    open[speaker] = { speaker, text: delta, lastAt: now };
+    call.transcript.push(open[speaker]);
   };
 
   twilio.on("message", async (text) => {
@@ -147,21 +159,27 @@ function bridgeCall(twilio, provider) {
 
   function onLive(event) {
     const now = Date.now();
+    if (typeof event.type === "string") call.liveEvents[event.type] = (call.liveEvents[event.type] ?? 0) + 1;
     switch (event.type) {
       case "session.started":
         void flushQueued();
         return;
       case "session.output_audio.delta": {
         const bytes = Buffer.byteLength(event.delta ?? "", "base64");
-        if (now >= call.playbackEndsAt && call.lastShopAt) call.latencies.push(now - call.lastShopAt);
+        if (now >= call.playbackEndsAt) {
+          call.aiTurnStartedAt = now;
+          if (call.lastShopAt) call.latencies.push(now - call.lastShopAt);
+        }
         call.playbackEndsAt = Math.max(now, call.playbackEndsAt) + bytes / 8; // 8 bytes per ms
         call.lastActivity = now;
         sendTwilio({ event: "media", media: { payload: event.delta } });
         return;
       }
       case "session.input_transcript.delta":
-        if (now < call.playbackEndsAt - 200) {
-          // The shop talks over the AI: drop audio Twilio still has queued.
+        // Words arriving early in the AI's reply are usually the lagging end of the
+        // shop's previous sentence, not an interruption.
+        if (now < call.playbackEndsAt - 200 && now - call.aiTurnStartedAt > bargeInGraceMs) {
+          // The shop talks over the AI: drop audio the carrier still has queued.
           sendTwilio({ event: "clear" });
           call.playbackEndsAt = now;
         }
@@ -181,7 +199,7 @@ function bridgeCall(twilio, provider) {
           clearTimeout(call.closingTimer);
           call.closingTimer = null;
         }
-        if (closingLine.test(call.transcript.at(-1)?.text ?? "")) {
+        if (closingLine.test(open.ai?.text ?? "")) {
           call.closingTimer = setTimeout(() => finish("closing"), Math.max(0, call.playbackEndsAt - Date.now()) + closingPause);
         }
         return;
@@ -206,7 +224,7 @@ function bridgeCall(twilio, provider) {
     if (twilio.isOpen) twilio.close();
     const turns = call.transcript.map((turn) => ({ speaker: turn.speaker, text: turn.text.trim() })).filter((turn) => turn.text);
     const sorted = [...call.latencies].sort((a, b) => a - b);
-    log("voice_bridge.call_finished", { attempt: call.attemptId, reason, seconds: Math.round((Date.now() - startedAt) / 1000), turns: turns.length, medianLatencyMs: sorted[Math.floor(sorted.length / 2)] ?? null });
+    log("voice_bridge.call_finished", { attempt: call.attemptId, reason, seconds: Math.round((Date.now() - startedAt) / 1000), turns: turns.length, medianLatencyMs: sorted[Math.floor(sorted.length / 2)] ?? null, liveEvents: call.liveEvents });
     if (!call.attemptId || !call.token) return;
     await postResult(call.attemptId, call.token, failed ? { failed: true } : { transcript: turns }).catch(() => log("voice_bridge.result_failed", { attempt: call.attemptId }));
   }
