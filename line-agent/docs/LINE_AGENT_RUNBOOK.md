@@ -175,6 +175,8 @@ AI가 통화 첫마디에서 AI 비서라고 밝힌다. KAT의 통화 시작 안
 - AI는 첫마디에 AI 비서라고 밝힌다. 승인 범위 밖의 시간, 예약금, 결제 정보 요구에는 확정하지 않고 LINE으로 다시 묻는다.
 - 예약을 요청한 뒤 결과가 불분명하면 다음 가게에 전화하지 않는다.
 - 실제 매장에는 동의 없이 걸지 않는다. 후보 목록의 신촌 가게는 실제 가게지만 `testCall`이라 전화는 동의한 팀원 번호(`LINE_AGENT_PHONE_ALLOWLIST`)로만 가고, 카드에 테스트 통화라고 표시된다.
+- 공개 주소로 띄우는 앱은 개발 서버(`next dev`)가 아니라 운영 빌드로 띄운다: `pnpm build` 후 `LINE_AGENT_CALLS=kat npx next start -p 3120`(시연 대체 모드면 `LINE_AGENT_CALLS=simulator LINE_AGENT_SIM_CALL_DELAY_MS=speech`, 알림을 당기려면 `LINE_AGENT_REMINDER_DEMO_SECONDS=20`). 개발 서버는 오류 화면과 개발용 스크립트가 밖으로 보인다. 코드를 고치면 다시 빌드한다(30초 안팎).
+- `/dev/*`(시뮬레이터·콘솔)와 `/api/v1/dev/*`는 `src/proxy.ts`가 페이지에 닿기 전에 막는다. 이 컴퓨터가 아니면 내용 없는 404다. 로컬 시뮬레이터 통화는 하루 상한에 세지 않는다.
 - 키와 전화번호는 `.env.local`에만 둔다. CI의 `secrets` 작업이 Gitleaks로 git 전체 이력을 검사하고, 걸리면 값은 가린 채 규칙·파일·줄·커밋만 보여 준다(`.gitleaks.toml`). 로컬에서 미리 보려면 `docker run --rm -v "$PWD":/repo:ro ghcr.io/gitleaks/gitleaks:v8.30.1 git --redact=100 /repo`.
 - CI가 쓰는 GitHub Actions는 커밋 SHA로 고정하고, 체크아웃 토큰은 남기지 않는다(`persist-credentials: false`).
 

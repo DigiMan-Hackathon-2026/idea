@@ -127,8 +127,9 @@ function createRuntime(): LineAgentRuntime {
     simulatorCalls.push(call);
     if (simulatorCalls.length > 200) simulatorCalls.splice(0, simulatorCalls.length - 200);
   };
+  // The simulator agent (it keeps transcripts for the console) runs on this machine only: no daily call limit.
   const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null, onCallTranscript?: (call: SimulatorCall) => void) =>
-    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log, resolveLink: resolveShortLink, understand, callLimits: config.callLimits, reminderDemoSeconds: config.reminderDemoSeconds });
+    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log, resolveLink: resolveShortLink, understand, callLimits: onCallTranscript ? null : config.callLimits, reminderDemoSeconds: config.reminderDemoSeconds });
 
   const simulatorLine = new RecordingLineGateway(clock);
   const simulatorImages = new Map<string, Buffer>();

@@ -106,7 +106,7 @@ export class PostgresAgentStore implements AgentStore {
   async countCallsSince(since: string, requesterKey: string | null): Promise<number> {
     const result = await this.db.query(
       `select count(*)::int as calls from line_agent_call_attempts a join line_agent_requests r on r.id = a.request_id
-       where a.created_at >= $1 and ($2::text is null or r.requester_key = $2)`,
+       where a.created_at >= $1 and ($2::text is null or r.requester_key = $2) and r.body->>'replyTarget' not like 'sim-%'`,
       [since, requesterKey],
     );
     return Number((result.rows[0] as { calls?: number } | undefined)?.calls ?? 0);
