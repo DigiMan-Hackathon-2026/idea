@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 
 type Action = { type: "postback"; label: string; data: string; displayText?: string } | { type: "uri"; label: string; uri: string } | { type: "message"; label: string; text: string };
 type Node = {
-  type: string; text?: string; action?: Action; contents?: Node[] | Node; header?: Node; body?: Node; footer?: Node;
+  type: string; text?: string; action?: Action; contents?: Node[] | Node; header?: Node; hero?: Node; body?: Node; footer?: Node; url?: string;
   color?: string; weight?: string; size?: string; style?: string; layout?: string; flex?: number; align?: string; spacing?: string; margin?: string;
   backgroundColor?: string; cornerRadius?: string; borderWidth?: string; borderColor?: string; height?: string; width?: string;
   paddingAll?: string; paddingTop?: string; paddingBottom?: string; paddingStart?: string; paddingEnd?: string;
@@ -173,7 +173,11 @@ function BotMessage({ message, onAction }: { message: Message; onAction: (action
     <div className="flex gap-2 overflow-x-auto pb-1" aria-label={message.altText}>
       {bubbles.map((bubble, index) => (
         <div key={index} className="w-64 shrink-0 overflow-hidden rounded-2xl bg-white text-sm">
-          {[bubble.header, bubble.body, bubble.footer].map((part, i) =>
+          {[bubble.header, bubble.hero, bubble.body, bubble.footer].map((part, i) =>
+            part?.type === "image" && part.url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- mirrors LINE's remote hero image
+              <img key={i} src={part.url} alt="" className="block aspect-[20/9] w-full object-cover" />
+            ) :
             part ? (
               <div key={i} className={part.backgroundColor || part.paddingAll ? "" : "px-3 py-2"}>
                 <FlexNode node={part} onAction={onAction} />
