@@ -14,22 +14,22 @@ test("LINE agent books a test shop through the simulator", async ({ page }) => {
   await expect(page.getByText("2名の候補です", { exact: false })).toBeVisible();
   await expect(page.getByText(/ソルレイム|トンブル|コギチャンゴ/).first()).toBeVisible();
 
-  await page.getByRole("button", { name: "電話で聞いてもらう" }).click();
+  await page.getByRole("button", { name: "AIに任せる" }).click();
   await expect(page.getByText("予約名を送ってください", { exact: false })).toBeVisible();
   await input.fill("サトウ");
   await page.getByRole("button", { name: "送信" }).click();
 
-  await expect(page.getByText("この条件で電話を頼みますか？").first()).toBeVisible();
-  await expect(page.getByText("予約名：サトウ")).toBeVisible();
+  await expect(page.getByText("この内容でAIに任せますか？").first()).toBeVisible();
+  await expect(page.getByText("予約名 サトウ", { exact: false })).toBeVisible();
   await expect(page.getByText("テスト通話です", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "この条件で電話を頼む" }).click();
+  await page.getByRole("button", { name: "この内容で任せる" }).click();
 
   await expect(page.getByText("に電話しています", { exact: false }).first()).toBeVisible();
   // Seolleim is full, then Donbul only has 19:00; without a deadline the requester decides.
   await expect(page.getByText("19:00の提案", { exact: false })).toBeVisible({ timeout: 20_000 });
   await page.getByRole("button", { name: "ほかのお店に電話" }).click();
   // A fresh approval card comes for the remaining shops; the old one no longer works.
-  const approve = page.getByRole("button", { name: "この条件で電話を頼む" });
+  const approve = page.getByRole("button", { name: "この内容で任せる" });
   await expect(approve).toHaveCount(2);
   await approve.last().click();
   await expect(page.getByText("予約が取れました（テスト）")).toBeVisible({ timeout: 20_000 });
@@ -54,12 +54,12 @@ test("LINE agent checks a linked shop for today and calls it", async ({ page }) 
   await expect(page.getByText("リンクから「ソルレイム・サムギョプサル", { exact: false })).toBeVisible();
   await expect(page.getByText("今日 2名で行けるか、確認が必要です")).toBeVisible();
   await expect(page.getByText("NAVER Place", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "AIに電話で確かめてもらう" }).click();
+  await page.getByRole("button", { name: "AIに任せる" }).click();
   await expect(page.getByText("予約名を送ってください", { exact: false })).toBeVisible();
   await input.fill("サトウ");
   await page.getByRole("button", { name: "送信" }).click();
   await expect(page.getByText("1. ソルレイム・サムギョプサル")).toBeVisible();
-  await page.getByRole("button", { name: "この条件で電話を頼む" }).click();
+  await page.getByRole("button", { name: "この内容で任せる" }).click();
 
   // Seolleim is full and Donbul only has 19:00 (too late): the agent moves on by itself until one accepts.
   await expect(page.getByText("次のお店に電話します", { exact: false })).toBeVisible({ timeout: 20_000 });

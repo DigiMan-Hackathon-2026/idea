@@ -22,7 +22,7 @@ import { addMinutes, ceilToMinutes, floorToMinutes, laterOf, seoulDate, seoulIns
 import { judgeToday } from "./today";
 import type { Understanding } from "./understand";
 import type { TravelProvider } from "./travel";
-import type { CallApproval, CallAttempt, CallOutcome, CandidateState, DiningRequest, Lang, MenuKey, Restaurant } from "./types";
+import type { CallApproval, CallAttempt, CallOutcome, CandidateState, DiningRequest, Lang, MenuKey, Reminder, Restaurant } from "./types";
 import { readWait } from "./wait";
 
 export type AgentDeps = {
@@ -47,6 +47,10 @@ export type AgentDeps = {
   log?: (event: string, data: Record<string, string | number | boolean | null>) => void;
   /** Follows NAVER/Google Maps short links to their full URL. null = short links are not opened. */
   resolveLink?: LinkResolver | null;
+  /** Demo: send the two after-booking reminders this many seconds (and twice that) after the booking. */
+  reminderDemoSeconds?: number | null;
+  /** Calls per Seoul day for everyone and per requester; null = no limit (tests). */
+  callLimits?: { perDay: number; perRequesterPerDay: number } | null;
   /** Reads a message the rules could not (language model, form only). null = rules only. */
   understand?: ((text: string, lang: Lang, now: string) => Promise<Understanding | null>) | null;
 };
@@ -174,6 +178,7 @@ export class DiningAgent {
           ? makeCardToken({ restaurantId: restaurant.id, partySize: approval.partySize, time: outcome.confirmedTime, alias: approval.alias, test: restaurant.test, expiresAt: addMinutes(outcome.confirmedTime, 6 * 60) }, this.deps.linkSecret)
           : null;
         messages.push(m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token }, quote));
+        messages.push(this.planAfterBooking(next, restaurant, now));
       } else if (outcome.kind === "alternate_offered" && outcome.depositRequired) {
         next.status = "needs_decision";
         next.decision = { reason: "deposit", candidateId: restaurant.id, offeredTime: outcome.offeredTime };
@@ -602,8 +607,9 @@ export class DiningAgent {
 
   private async answerAlias(request: DiningRequest, text: string, ctx: Context): Promise<void> {
     const alias = normalizeText(text).slice(0, 20);
-    // Refuse anything that looks like a phone number, is empty, or is a request ("電話して").
-    if (!alias || /\d{4,}/.test(alias.replace(/[-\s]/g, "")) || wantsCall(text)) {
+    // A name only: letters of any script (kana, kanji, hangul, Latin) and a few separators, up to
+    // three words. It is read out on the call, so nothing that could pass as an instruction.
+    if (!alias || !/^[\p{L}\p{M}][\p{L}\p{M} ・ー'.-]{0,15}$/u.test(alias) || alias.split(/\s+/).length > 3 || wantsCall(text)) {
       await this.reply(ctx, [m.askAlias(request.lang)]);
       return;
     }
@@ -731,6 +737,8 @@ export class DiningAgent {
           await this.reply(ctx, [m.staleCard(lang)]);
           return;
         }
+        const limit = await this.callLimitHit(request, now);
+        if (limit) return this.reply(ctx, [m.callLimitReached(lang, limit)]);
         const approval: CallApproval = { id: this.deps.newId(), revision: request.revision, approvedBy: ctx.requesterKey!, ...proposal, createdAt: now, revokedAt: null };
         const next = this.bump(request, now);
         next.approvals.push(approval);
@@ -798,11 +806,12 @@ export class DiningAgent {
           acceptedAt: now,
           test: restaurant.test || restaurant.testCall === true,
         };
+        const plan = this.planAfterBooking(next, restaurant, now);
         if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
         const token = this.deps.linkSecret
           ? makeCardToken({ restaurantId: restaurant.id, partySize: approval.partySize, time: next.reservation.time, alias: approval.alias, test: next.reservation.test, expiresAt: addMinutes(next.reservation.time, 6 * 60) }, this.deps.linkSecret)
           : null;
-        return this.reply(ctx, [m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token })]);
+        return this.reply(ctx, [m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token }), plan]);
       }
       case "new_search": {
         const next = structuredClone(request);
@@ -817,10 +826,22 @@ export class DiningAgent {
 
   // ── Calls ─────────────────────────────────────────────────────────────────
 
+  /** Which daily limit stops another call for this requester, if any. */
+  private async callLimitHit(request: DiningRequest, now: string): Promise<"user" | "all" | null> {
+    const limits = this.deps.callLimits;
+    if (!limits) return null;
+    const since = seoulInstant(seoulDate(now), 0, 0);
+    if ((await this.deps.store.countCallsSince(since, null)) >= limits.perDay) return "all";
+    if ((await this.deps.store.countCallsSince(since, request.requesterKey)) >= limits.perRequesterPerDay) return "user";
+    return null;
+  }
+
   /** The call buttons (and "電話して"): ask the booking name once, then show the approval card. */
   private async requestCalls(request: DiningRequest, ctx: Context, now: string, prefix: LineMessage[] = []): Promise<void> {
     const lang = request.lang;
     if (!this.deps.calls) return this.reply(ctx, [...prefix, m.callingDisabled(lang)]);
+    const limit = await this.callLimitHit(request, now);
+    if (limit) return this.reply(ctx, [...prefix, m.callLimitReached(lang, limit)]);
     const alias = await this.deps.store.getAlias(request.requesterKey);
     if (!alias) {
       const next = this.bump(request, now);
@@ -926,6 +947,49 @@ export class DiningAgent {
     return { restaurant, offeredTime, lateMinutes: deadline ? Math.round((Date.parse(offeredTime) - Date.parse(deadline)) / 60_000) : null };
   }
 
+  /**
+   * After a booking the agent keeps watching: when to leave for the shop, and when to leave the
+   * shop for the next plan. Sets next.reminders and returns the timeline to show now.
+   */
+  private planAfterBooking(next: DiningRequest, restaurant: Restaurant, now: string): LineMessage {
+    const reservation = next.reservation!;
+    const state = next.candidates.find((c) => c.restaurantId === restaurant.id);
+    const toShop = state?.toRestaurant?.minutes ?? null;
+    const toNext = state?.toNext?.minutes ?? null;
+    const leaveForShop = toShop !== null ? addMinutes(reservation.time, -(toShop + 5)) : null;
+    const leaveForNext = next.arriveBy && toNext !== null ? addMinutes(next.arriveBy, -(toNext + next.bufferMinutes)) : null;
+    const demo = this.deps.reminderDemoSeconds;
+    const reminders: Reminder[] = [];
+    if (leaveForShop && Date.parse(leaveForShop) > Date.parse(now)) {
+      reminders.push({ kind: "leave_for_shop", leaveAt: leaveForShop, dueAt: demo ? addMinutes(now, demo / 60) : leaveForShop, sentAt: null });
+    }
+    if (leaveForNext && Date.parse(leaveForNext) > Date.parse(reservation.time)) {
+      reminders.push({ kind: "leave_for_next", leaveAt: leaveForNext, dueAt: demo ? addMinutes(now, (2 * demo) / 60) : leaveForNext, sentAt: null });
+    }
+    next.reminders = reminders;
+    const leaveNow = leaveForShop !== null && Date.parse(leaveForShop) <= Date.parse(now);
+    return m.afterBookingPlan(next, restaurant, { leaveForShop, leaveNow, leaveForNext });
+  }
+
+  /** Sends this request's reminders that are due (called by the runtime's sweep). */
+  async sendDueReminders(requestId: string): Promise<void> {
+    for (let retry = 0; retry < 3; retry++) {
+      const request = await this.deps.store.getRequest(requestId);
+      const reservation = request?.reservation;
+      const restaurant = reservation ? findRestaurant(reservation.candidateId) : undefined;
+      if (!request || !reservation || !restaurant) return;
+      const now = this.now();
+      const due = (request.reminders ?? []).filter((reminder) => reminder.sentAt === null && Date.parse(reminder.dueAt) <= Date.parse(now));
+      if (due.length === 0) return;
+      const next = this.bump(request, now);
+      for (const reminder of next.reminders ?? []) if (due.some((d) => d.kind === reminder.kind)) reminder.sentAt = now;
+      if (!(await this.deps.store.save(next, request.revision))) continue;
+      this.log("reminder.sent", { count: due.length });
+      await this.push(next, due.map((reminder) => m.reminder(next, restaurant, reminder, this.deps.origin)));
+      return;
+    }
+  }
+
   /** Starts the next approved shop, one call at a time (spec §5). */
   async startNextAttempt(requestId: string, approvalId: string): Promise<void> {
     const placer = this.deps.calls;
@@ -1003,6 +1067,7 @@ export class DiningAgent {
     const inFlight = next.attempts.some((a) => a.status === "placing" || a.status === "in_progress");
     for (const approval of next.approvals) approval.revokedAt ??= now;
     next.proposal = null;
+    next.reminders = [];
     if (!inFlight) next.status = "closed";
     if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(next.lang)]);
     await this.reply(ctx, [m.cancelled(next.lang, inFlight)]);
