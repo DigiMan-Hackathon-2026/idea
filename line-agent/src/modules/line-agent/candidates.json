@@ -19,7 +19,7 @@
       "soloEntry": null,
       "singlePortion": null,
       "bookingLinks": [],
-      "phoneRef": "demo-shop-a",
+      "phoneRef": "demo-shop-c",
       "source": {
         "label": "Polle 店舗ページ / 뽈레 매장 페이지",
         "url": "https://polle.com/place/1YTXw7/%EC%84%A4%EB%A0%88%EC%9E%84%20%EC%82%BC%EA%B2%B9%EC%82%B4",
@@ -90,7 +90,7 @@
           "checkedAt": "2026-11-25"
         }
       ],
-      "phoneRef": "demo-shop-c",
+      "phoneRef": "demo-shop-a",
       "source": {
         "label": "Polle 店舗ページ / 뽈레 매장 페이지",
         "url": "https://polle.com/place/51sDCZ/%EA%B3%A0%EA%B8%B0%EC%B0%BD%EA%B3%A0",

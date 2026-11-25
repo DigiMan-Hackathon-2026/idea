@@ -21,7 +21,7 @@ const liveUrl = process.env.OPENAI_LIVE_URL ?? "wss://api.openai.com/v1/live/ses
 const liveModel = process.env.OPENAI_LIVE_MODEL ?? "gpt-live-1";
 const liveVoice = process.env.OPENAI_LIVE_VOICE ?? "marin";
 const apiKey = process.env.OPENAI_API_KEY;
-const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 5000);
+const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 2500);
 // The AI's turn must *end* with a closing line; "감사합니다. 몇 시에 가능할까요?" is not one.
 const closingLine = /(감사합니다|다시 연락드리겠습니다)[.!。\s]*$/;
 const silenceLimit = Number(process.env.VOICE_BRIDGE_SILENCE_LIMIT_MS ?? 25000);

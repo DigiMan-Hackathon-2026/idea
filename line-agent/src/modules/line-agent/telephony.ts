@@ -1,6 +1,6 @@
 // Phone adapters. The agent decides *whether* to call; adapters only place a
 // call to an allowlisted number and report the transcript back (spec §6 StartCall).
-import { DEFER_PHRASE, GREETING, RECAP_PREFIX, type CallBrief } from "./call-brief";
+import { DEFER_PHRASE, openingLine, RECAP_PREFIX, type CallBrief } from "./call-brief";
 import type { TranscriptTurn } from "./outcome";
 import { formatKoreanSpokenTime } from "./time";
 
@@ -35,9 +35,7 @@ const defaultScripts: Record<string, ShopScript> = {
 export function simulateTranscript(script: ShopScript, brief: CallBrief): TranscriptTurn[] {
   const opening: TranscriptTurn[] = [
     { speaker: "shop", text: `네, ${brief.restaurantNameKo}입니다.` },
-    { speaker: "ai", text: `${GREETING} 오늘 저녁 예약 문의드려도 될까요?` },
-    { speaker: "shop", text: "네, 몇 분이세요?" },
-    { speaker: "ai", text: `${brief.partySize}명이고, ${formatKoreanSpokenTime(brief.windowStart)}부터 ${formatKoreanSpokenTime(brief.windowEnd)} 사이에 예약 가능할까요?` },
+    { speaker: "ai", text: openingLine(brief) },
   ];
   switch (script) {
     case "no_answer":
