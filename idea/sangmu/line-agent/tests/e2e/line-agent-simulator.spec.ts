@@ -25,7 +25,7 @@ test("LINE agent books a test shop through the simulator", async ({ page }) => {
   await page.getByRole("button", { name: "この条件で電話を頼む" }).click();
 
   await expect(page.getByText("に電話しています", { exact: false }).first()).toBeVisible();
-  // The first shop to be called (Seolleim) only has 19:00; without a deadline the requester decides.
+  // Seolleim is full, then Donbul only has 19:00; without a deadline the requester decides.
   await expect(page.getByText("19:00の提案", { exact: false })).toBeVisible({ timeout: 20_000 });
   await page.getByRole("button", { name: "ほかのお店に電話" }).click();
   // A fresh approval card comes for the remaining shops; the old one no longer works.
@@ -61,7 +61,7 @@ test("LINE agent checks a linked shop for today and calls it", async ({ page }) 
   await expect(page.getByText("1. ソルレイム・サムギョプサル")).toBeVisible();
   await page.getByRole("button", { name: "この条件で電話を頼む" }).click();
 
-  // Seolleim only has 19:00, too late for the concert: the agent calls the next shop by itself.
+  // Seolleim is full and Donbul only has 19:00 (too late): the agent moves on by itself until one accepts.
   await expect(page.getByText("次のお店に電話します", { exact: false })).toBeVisible({ timeout: 20_000 });
   await expect(page.getByText("予約が取れました（テスト）")).toBeVisible({ timeout: 20_000 });
 });
