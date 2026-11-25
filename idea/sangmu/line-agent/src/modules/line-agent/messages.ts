@@ -21,6 +21,13 @@ const color = {
 };
 
 const tr = (lang: Lang, ja: string, ko: string) => (lang === "ja" ? ja : ko);
+/** "90分", "2時間", "15時間30分" — long waits read as hours. */
+const duration = (lang: Lang, minutes: number) => {
+  if (minutes < 60) return tr(lang, `${minutes}分`, `${minutes}분`);
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest ? tr(lang, `${hours}時間${rest}分`, `${hours}시간 ${rest}분`) : tr(lang, `${hours}時間`, `${hours}시간`);
+};
 
 function name(lang: Lang, item: { nameJa: string; nameKo: string }): string {
   return lang === "ja" ? item.nameJa : item.nameKo;
@@ -108,7 +115,7 @@ export function askWaitBasis(request: DiningRequest, restaurant: Restaurant, min
   const lang = request.lang;
   return {
     type: "text",
-    text: tr(lang, `${restaurant.nameJa}の「${minutes}分」は、どちらですか？`, `${restaurant.nameKo}의 "${minutes}분"은 어느 쪽인가요?`),
+    text: tr(lang, `${restaurant.nameJa}の「${duration(lang, minutes)}」は、着いてから並ぶ時間ですか？それとも順番待ち登録済みの残り時間ですか？`, `${restaurant.nameKo}의 "${duration(lang, minutes)}"은 도착해서 줄 설 시간인가요, 이미 원격 줄서기를 한 뒤 남은 시간인가요?`),
     quickReply: quickReply([
       postback(request, "wait_on_arrival", tr(lang, "着いてから並ぶ", "도착해서 줄 서기"), { candidateId: restaurant.id, displayText: tr(lang, "着いてから並ぶ", "도착해서 줄 서기") }),
       postback(request, "wait_remote", tr(lang, "もう順番待ち登録済み", "이미 원격 줄서기 함"), { candidateId: restaurant.id, displayText: tr(lang, "もう順番待ち登録済み", "이미 원격 줄서기 함") }),
@@ -149,11 +156,11 @@ export function askWaitFirst(lang: Lang): LineMessage {
 function waitLine(lang: Lang, wait: WaitObservation | null): string {
   if (!wait) return tr(lang, "待ち状況：未確認", "대기 상황: 확인 안 됨");
   const when = wait.source === "user_image" ? tr(lang, `画像・${formatSeoulTime(wait.reportedAt)}`, `이미지 · ${formatSeoulTime(wait.reportedAt)}`) : formatSeoulTime(wait.reportedAt);
-  if (wait.readyAt) return tr(lang, `${formatSeoulTime(wait.readyAt)}に入店できる（${when} 共有）`, `${formatSeoulTime(wait.readyAt)} 입장 가능 (${when} 공유)`);
-  if (wait.minutes === null) return tr(lang, `前に${wait.teams}組・待ち時間は表示なし（${when} 共有）`, `앞에 ${wait.teams}팀 · 예상 시간 표시 없음 (${when} 공유)`);
-  if (wait.minutes === 0) return tr(lang, `待ちなし（${when} 共有）`, `대기 없음 (${when} 공유)`);
+  if (wait.readyAt) return tr(lang, `${formatSeoulTime(wait.readyAt)}に入店予定（${when}時点）`, `${formatSeoulTime(wait.readyAt)} 입장 가능 (${when} 공유)`);
+  if (wait.minutes === null) return tr(lang, `前に${wait.teams}組・待ち時間の表示なし（${when}時点）`, `앞에 ${wait.teams}팀 · 예상 시간 표시 없음 (${when} 공유)`);
+  if (wait.minutes === 0) return tr(lang, `待ちなし（${when}時点）`, `대기 없음 (${when} 공유)`);
   const basis = wait.basis === "remote_from_observed" ? tr(lang, "登録済み", "원격 대기 중") : wait.basis === "on_arrival" ? tr(lang, "着いてから", "도착 후") : tr(lang, "基準未確認", "기준 확인 필요");
-  return tr(lang, `待ち${wait.minutes}分（${basis}・${when} 共有）`, `대기 ${wait.minutes}분 (${basis} · ${when} 공유)`);
+  return tr(lang, `待ち${duration(lang, wait.minutes)}（${basis}・${when}時点）`, `대기 ${duration(lang, wait.minutes)} (${basis} · ${when} 공유)`);
 }
 
 type Verdict = { label: string; color: string };
@@ -276,7 +283,7 @@ export function candidateBubble(request: DiningRequest, restaurant: Restaurant, 
   const verdict = verdictBand(lang, plan);
   const body: FlexComponent[] = [...badges(lang, restaurant), text(travelLine(lang, plan, leg?.minutes ?? null, leg?.mode ?? null, leg?.provider ?? null))];
   if (plan.seatDeadline && request.nextPlace && request.arriveBy) {
-    body.push(text(tr(lang, `${formatSeoulTime(plan.seatDeadline)}までに席に着けば${formatSeoulTime(request.arriveBy)}に${request.nextPlace.nameJa}へ`, `${formatSeoulTime(plan.seatDeadline)}까지 앉으면 ${formatSeoulTime(request.arriveBy)}에 ${request.nextPlace.nameKo} 도착`), { color: color.time }));
+    body.push(text(tr(lang, `${formatSeoulTime(plan.seatDeadline)}までに席に着けば、${formatSeoulTime(request.arriveBy)}に${request.nextPlace.nameJa}へ間に合います`, `${formatSeoulTime(plan.seatDeadline)}까지 앉으면 ${formatSeoulTime(request.arriveBy)}에 ${request.nextPlace.nameKo} 도착`), { color: color.time }));
   }
   body.push(...timeBar(lang, plan, now));
   body.push(text(waitLine(lang, plan.wait)));
@@ -354,7 +361,7 @@ export function approvalCard(request: DiningRequest, approval: CallProposal, loo
     text(tr(lang, `時間：${formatSeoulTime(approval.windowStart)}〜${formatSeoulTime(approval.windowEnd)}のあいだ`, `시간: ${formatSeoulTime(approval.windowStart)}~${formatSeoulTime(approval.windowEnd)} 사이`)),
     text(tr(lang, `予約名：${approval.alias}`, `예약자 이름: ${approval.alias}`)),
     { type: "separator", margin: "md" },
-    text(tr(lang, "AIだと名乗って、韓国語で1店ずつ問い合わせます。この範囲の外の時間や予約金を求められたら、確定せずにここで確認します。", "AI라고 밝히고 한국어로 한 곳씩 물어봐요. 이 범위 밖의 시간이나 예약금을 요구하면 확정하지 않고 여기서 다시 확인해요."), { size: "xs", color: color.muted }),
+    text(tr(lang, "AIであることを伝えたうえで、韓国語で1軒ずつ問い合わせます。この範囲外の時間を提案されたり予約金を求められたりした場合は、確定せずにこちらで確認します。", "AI라고 밝히고 한국어로 한 곳씩 물어봐요. 이 범위 밖의 시간이나 예약금을 요구하면 확정하지 않고 여기서 다시 확인해요."), { size: "xs", color: color.muted }),
   ];
   if (anyTest) body.push(text(tr(lang, "テスト通話です。チームメンバーの電話につながります。", "테스트 통화예요. 팀원 전화로 연결돼요."), { size: "xs", color: color.warning }));
   body.push(text(tr(lang, `${formatSeoulTime(approval.expiresAt)}まで有効です。`, `${formatSeoulTime(approval.expiresAt)}까지 유효해요.`), { size: "xs", color: color.muted }));
@@ -382,27 +389,27 @@ export function callingDisabled(lang: Lang): LineMessage {
 }
 
 export function calling(lang: Lang, restaurant: Restaurant, index: number, total: number): LineMessage {
-  return { type: "text", text: tr(lang, `${restaurant.nameJa}に電話しています（${index}/${total}）。結果はこのトークに送ります。`, `${restaurant.nameKo}에 전화하고 있어요 (${index}/${total}). 결과는 이 대화방으로 보낼게요.`) };
+  return { type: "text", text: tr(lang, `${restaurant.nameJa}に電話しています（${index}/${total}）。結果はこのトークでお知らせします。`, `${restaurant.nameKo}에 전화하고 있어요 (${index}/${total}). 결과는 이 대화방으로 보낼게요.`) };
 }
 
 export function callMovedOn(lang: Lang, restaurant: Restaurant, reason: "declined" | "no_answer" | "late_offer" | "failed", offeredTime: string | null, request: DiningRequest, quote: string | null = null): LineMessage {
-  const arrive = request.arriveBy && request.nextPlace ? tr(lang, `${formatSeoulTime(request.arriveBy)}までの到着に間に合いません。`, `${formatSeoulTime(request.arriveBy)}까지 도착하기 어려워요.`) : "";
+  const arrive = request.arriveBy && request.nextPlace ? tr(lang, `それでは${formatSeoulTime(request.arriveBy)}の到着に間に合いません。`, `${formatSeoulTime(request.arriveBy)}까지 도착하기 어려워요.`) : "";
   const why =
     reason === "late_offer" && offeredTime
-      ? tr(lang, `${restaurant.nameJa}は${formatSeoulTime(offeredTime)}なら空いているそうですが、${arrive}`, `${restaurant.nameKo}는 ${formatSeoulTime(offeredTime)}이면 된대요. 하지만 ${arrive}`)
+      ? tr(lang, `${restaurant.nameJa}は${formatSeoulTime(offeredTime)}なら空いているそうです。${arrive}`, `${restaurant.nameKo}는 ${formatSeoulTime(offeredTime)}이면 된대요. 하지만 ${arrive}`)
       : reason === "declined"
         ? tr(lang, `${restaurant.nameJa}は今日は難しいそうです。`, `${restaurant.nameKo}는 오늘은 어렵대요.`)
         : reason === "no_answer"
           ? tr(lang, `${restaurant.nameJa}は電話に出ませんでした。`, `${restaurant.nameKo}는 전화를 받지 않았어요.`)
           : tr(lang, `${restaurant.nameJa}に電話をかけられませんでした。`, `${restaurant.nameKo}에 전화를 걸지 못했어요.`);
-  return { type: "text", text: `${why}${tr(lang, "人数と時間はそのままで、次のお店に電話します。", " 인원과 시간은 그대로 두고 다음 가게에 전화할게요.")}${shopQuote(lang, quote)}` };
+  return { type: "text", text: `${why}${tr(lang, "人数と時間の条件はそのままで、次のお店に電話します。", " 인원과 시간은 그대로 두고 다음 가게에 전화할게요.")}${shopQuote(lang, quote)}` };
 }
 
 export function callsExhausted(request: DiningRequest): LineMessage {
   const lang = request.lang;
   return {
     type: "text",
-    text: tr(lang, "承認されたお店では予約が取れませんでした。ほかのお店を探しますか？", "승인한 가게에서는 예약을 못 했어요. 다른 가게를 찾아볼까요?"),
+    text: tr(lang, "お願いしたお店では予約が取れませんでした。ほかのお店を探しますか？", "승인한 가게에서는 예약을 못 했어요. 다른 가게를 찾아볼까요?"),
     quickReply: quickReply([postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") })]),
   };
 }
@@ -412,7 +419,7 @@ export function needsDecision(request: DiningRequest, restaurant: Restaurant, re
   const what =
     reason === "deposit"
       ? tr(lang, `${restaurant.nameJa}から予約金の支払いを求められたので、確定していません。`, `${restaurant.nameKo}에서 예약금을 요구해서 확정하지 않았어요.`)
-      : tr(lang, `${restaurant.nameJa}から${offeredTime ? formatSeoulTime(offeredTime) : "別の時間"}の提案がありました。承認された時間の外なので、確定していません。`, `${restaurant.nameKo}에서 ${offeredTime ? formatSeoulTime(offeredTime) : "다른 시간"}을 제안했어요. 승인한 시간 밖이라 확정하지 않았어요.`);
+      : tr(lang, `${restaurant.nameJa}から${offeredTime ? formatSeoulTime(offeredTime) : "別の時間"}の提案がありました。お願いした時間の範囲外なので、まだ確定していません。`, `${restaurant.nameKo}에서 ${offeredTime ? formatSeoulTime(offeredTime) : "다른 시간"}을 제안했어요. 승인한 시간 밖이라 확정하지 않았어요.`);
   const actions: LineAction[] = [];
   if (reason === "out_of_range" && offeredTime) {
     const label = tr(lang, `${formatSeoulTime(offeredTime)}でお願いする`, `${formatSeoulTime(offeredTime)}로 부탁하기`);
@@ -462,8 +469,8 @@ export function confirmedCard(request: DiningRequest, reservation: Reservation, 
   const field = (label: string, value: string): FlexBox => vbox([text(label, { size: "xxs", color: color.muted }), text(value, { size: "md", weight: "bold" })], { spacing: "none", flex: 1 });
   const evidence =
     reservation.evidence === "call_accept"
-      ? tr(lang, `根拠：電話でお店が承諾（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 전화로 가게가 수락 (${formatSeoulTime(reservation.acceptedAt)})`)
-      : tr(lang, `根拠：お店に確認したと依頼者が共有（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 가게에 확인했다고 요청자가 공유 (${formatSeoulTime(reservation.acceptedAt)})`);
+      ? tr(lang, `電話でお店が了承（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 전화로 가게가 수락 (${formatSeoulTime(reservation.acceptedAt)})`)
+      : tr(lang, `依頼者がお店に確認済み（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 가게에 확인했다고 요청자가 공유 (${formatSeoulTime(reservation.acceptedAt)})`);
   // A ticket: one big time, then party and name, framed like a stub.
   const ticket = vbox(
     [
@@ -561,13 +568,13 @@ export function waitTimeIdea(request: DiningRequest, restaurant: Restaurant, min
   const label = tr(lang, "駅のまわりのミッション", "역 주변 미션 보기");
   return {
     type: "text",
-    text: tr(lang, `${restaurant.nameJa}の順番まで約${minutes}分あります。呼ばれる時間に戻れる範囲で、駅のまわりの小さなミッションもどうですか？`, `${restaurant.nameKo} 차례까지 약 ${minutes}분 남았어요. 부를 때 돌아올 수 있는 범위에서 역 주변 작은 미션은 어때요?`),
+    text: tr(lang, `${restaurant.nameJa}の順番まで約${duration(lang, minutes)}あります。呼ばれる時間に戻れる範囲で、駅のまわりの小さなミッションもどうですか？`, `${restaurant.nameKo} 차례까지 약 ${duration(lang, minutes)} 남았어요. 부를 때 돌아올 수 있는 범위에서 역 주변 작은 미션은 어때요?`),
     quickReply: quickReply([{ type: "uri", label, uri: new URL(path, origin).toString() }]),
   };
 }
 
 export function waitRecorded(lang: Lang, restaurant: Restaurant, plan: CandidatePlan): string {
-  if (plan.verdict === "late") return tr(lang, `${restaurant.nameJa}は${plan.marginMinutes}分間に合わない見込みです。`, `${restaurant.nameKo}는 ${plan.marginMinutes}분 늦을 것 같아요.`);
+  if (plan.verdict === "late") return tr(lang, `${restaurant.nameJa}は締切に${plan.marginMinutes}分遅れる見込みです。`, `${restaurant.nameKo}는 ${plan.marginMinutes}분 늦을 것 같아요.`);
   if (plan.verdict === "fits") return tr(lang, `${restaurant.nameJa}は間に合う見込みです。`, `${restaurant.nameKo}는 시간 안에 들어갈 수 있을 것 같아요.`);
   return tr(lang, `${restaurant.nameJa}の待ち状況を記録しました。`, `${restaurant.nameKo}의 대기 상황을 기록했어요.`);
 }
