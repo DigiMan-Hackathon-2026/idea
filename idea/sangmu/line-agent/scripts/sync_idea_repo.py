@@ -68,9 +68,9 @@ def is_text(content: bytes) -> bool:
 
 
 def is_placeholder_phone(number: bytes) -> bool:
-    """010-1234-5678, 010-0000-0000 and +82 10 0000 0001 style test numbers."""
+    """Test numbers: 010-1234-5678, 010-9876-5432, 010-0000-0000, +82 10 0000 0001."""
     subscriber = re.sub(rb"\D", b"", number)[-8:]
-    return subscriber == b"12345678" or subscriber[:7] == b"0000000"
+    return subscriber in (b"12345678", b"98765432") or subscriber[:7] == b"0000000"
 
 
 def problems_in(path: str, content: bytes) -> list[str]:
