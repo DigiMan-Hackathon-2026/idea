@@ -631,9 +631,11 @@ function timingRow(lang: Lang, request: DiningRequest, plan: CandidatePlan, minu
   return row(label, plan.verdict === "fits" || onlyWaitUnknown ? "ok" : "unknown", `${walk}${goal}`);
 }
 
-function seatRow(lang: Lang, plan: CandidatePlan): FlexBox {
+function seatRow(lang: Lang, plan: CandidatePlan, canCall: boolean): FlexBox {
   const label = tr(lang, "今の空席・待ち", "지금 빈자리·대기");
-  if (!plan.wait) return row(label, "unknown", tr(lang, "お店にしか分かりません。AIが韓国語で電話して確かめられます", "가게만 알아요. AI가 한국어로 전화해서 확인할 수 있어요"));
+  if (!plan.wait) {
+    return row(label, "unknown", canCall ? tr(lang, "お店にしか分かりません。AIが韓国語で電話して確かめられます", "가게만 알아요. AI가 한국어로 전화해서 확인할 수 있어요") : tr(lang, "お店にしか分かりません", "가게만 알아요"));
+  }
   return row(label, plan.verdict === "late" ? "no" : "ok", waitLine(lang, plan.wait));
 }
 
@@ -656,7 +658,7 @@ export function todayAnswer(
   const body: FlexComponent[] = [
     hoursRow(lang, restaurant, check, plan.seatDeadline),
     timingRow(lang, request, plan, leg?.minutes ?? null),
-    seatRow(lang, plan),
+    seatRow(lang, plan, check.verdict !== "hard" && options.callingEnabled && restaurant.phoneRef !== null),
     check.tooSmall ? row(tr(lang, "人数", "인원"), "no", tr(lang, `${party}名は入れない可能性があります`, `${party}명은 못 들어갈 수 있어요`)) : partyLine(lang, restaurant, party),
     ...badges(lang, restaurant),
   ];
