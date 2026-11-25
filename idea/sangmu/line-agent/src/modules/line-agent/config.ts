@@ -1,5 +1,6 @@
 // Reads LINE agent settings from the environment. Secrets stay in env files /
 // the deployment's secret store; nothing here is logged.
+import { defaultScripts, SHOP_SCRIPTS, type ShopScript } from "./telephony";
 import { randomBytes } from "node:crypto";
 
 export type CallMode = "off" | "simulator" | "twilio" | "kat";
@@ -22,6 +23,8 @@ export type LineAgentConfig = {
   /** Port of the voice bridge on this machine (the console listens to calls there). */
   bridgePort: number;
   simulatedCallDelayMs: number;
+  /** Rehearsal: which scripted answer each test shop gives (LINE_AGENT_SIM_SCRIPTS, merged over the defaults). */
+  simulatedScripts: Record<string, ShopScript>;
   store: "memory" | "postgres";
   /** Lets the simulator be used through a public URL (e.g. a tunnel) when given as ?token=. */
   simulatorToken: string | null;
@@ -88,8 +91,20 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     demoNow: demoNow && !Number.isNaN(Date.parse(demoNow)) ? new Date(demoNow).toISOString() : null,
     bridgePort: Number(value("VOICE_BRIDGE_PORT") ?? 8787) || 8787,
     simulatedCallDelayMs: Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
+    simulatedScripts: { ...defaultScripts, ...parseSimulatedScripts(value("LINE_AGENT_SIM_SCRIPTS")) },
     store: value("LINE_AGENT_STORE") === "postgres" ? "postgres" : "memory",
     simulatorToken: (value("LINE_AGENT_SIMULATOR_TOKEN")?.length ?? 0) >= 16 ? value("LINE_AGENT_SIMULATOR_TOKEN") : null,
     naverSearch: value("NAVER_SEARCH_CLIENT_ID") && value("NAVER_SEARCH_CLIENT_SECRET") ? { clientId: value("NAVER_SEARCH_CLIENT_ID")!, clientSecret: value("NAVER_SEARCH_CLIENT_SECRET")! } : null,
   };
+}
+
+/** {"demo-shop-c":"walk_in"}: only known phone keys and script names are kept. */
+export function parseSimulatedScripts(raw: string | null | undefined): Record<string, ShopScript> {
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    return Object.fromEntries(Object.entries(parsed).filter((entry): entry is [string, ShopScript] => /^[a-z0-9-]{1,40}$/.test(entry[0]) && (SHOP_SCRIPTS as readonly unknown[]).includes(entry[1])));
+  } catch {
+    return {};
+  }
 }

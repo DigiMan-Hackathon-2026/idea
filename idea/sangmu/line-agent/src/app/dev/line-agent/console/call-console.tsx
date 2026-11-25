@@ -5,7 +5,7 @@ import { useCallAudio } from "./call-audio";
 
 type Turn = { speaker: "ai" | "shop"; text: string; ja: string | null };
 type Phase = "placing" | "ringing" | "talking" | "ended" | "failed";
-type OutcomeKind = "no_answer" | "declined" | "alternate_offered" | "confirmed" | "unknown";
+type OutcomeKind = "no_answer" | "declined" | "alternate_offered" | "confirmed" | "walk_in" | "unknown";
 type Call = {
   attemptId: string;
   approvalId: string | null;
@@ -22,7 +22,7 @@ type Call = {
   windowEnd: string | null;
   arriveBy: string | null;
   nextPlaceJa: string | null;
-  outcome: { kind: OutcomeKind; offeredTime: string | null; confirmedTime: string | null; depositRequired: boolean } | null;
+  outcome: { kind: OutcomeKind; offeredTime: string | null; confirmedTime: string | null; depositRequired: boolean; waitMinutes: number | null } | null;
   reserved: boolean;
   turns: Turn[];
 };
@@ -309,6 +309,8 @@ function Result({ call, hasNext }: { call: Call; hasNext: boolean }) {
         return outcome.depositRequired
           ? { tone: "bg-amber-500/20 text-amber-100", text: "予約金を求められたため確定せず、お客様に確認" }
           : { tone: "bg-amber-500/20 text-amber-100", text: `${time(outcome.offeredTime)}なら空きあり → 承認した時間の外なので${then}` };
+      case "walk_in":
+        return { tone: "bg-sky-500/20 text-sky-100", text: `予約なし・並んで入店${outcome.waitMinutes !== null ? `（待ち約${outcome.waitMinutes}分）` : ""} → 間に合うか判定` };
       case "declined":
         return { tone: "bg-rose-500/20 text-rose-100", text: `満席で断られました → ${then}` };
       case "no_answer":

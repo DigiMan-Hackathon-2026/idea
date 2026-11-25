@@ -102,7 +102,7 @@ function createRuntime(): LineAgentRuntime {
     };
   const placer = (): CallPlacer | null => onBoard(carrier());
   const carrier = (): CallPlacer | null => {
-    if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs);
+    if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs, config.simulatedScripts);
     const statusUrl = (attemptId: string) => `${config.origin}/api/v1/integrations/voice/attempts/${attemptId}/status?t=${attemptToken(attemptId)}`;
     const phoneFor = (ref: string) => config.phoneAllowlist[ref] ?? null;
     if (config.calls === "twilio" && config.twilio && config.bridge) {
