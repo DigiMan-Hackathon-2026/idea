@@ -19,7 +19,7 @@ let attemptId = "attempt0001";
 let seen = fresh();
 // appends counts audio bytes: the shop's five 20 ms chunks (800 bytes) start the fake conversation.
 function fresh() {
-  return { instructionsAuth: null, result: null, resultAuth: null, start: null, appends: 0 };
+  return { instructionsAuth: null, result: null, resultAuth: null, start: null, appends: 0, live: [] };
 }
 
 const app = createServer(async (request, response) => {
@@ -34,6 +34,13 @@ const app = createServer(async (request, response) => {
     seen.result = JSON.parse(body);
     seen.resultAuth = request.headers.authorization;
     response.writeHead(202).end();
+    return;
+  }
+  if (request.method === "POST" && request.url === `/api/v1/integrations/voice/attempts/${attemptId}/live`) {
+    let body = "";
+    for await (const part of request) body += part;
+    seen.live.push({ auth: request.headers.authorization, transcript: JSON.parse(body).transcript });
+    response.writeHead(204).end();
     return;
   }
   response.writeHead(404).end();
@@ -63,7 +70,7 @@ live.on("upgrade", (request, socket, head) => {
 await new Promise((resolve) => live.listen(ports.live, resolve));
 
 const bridge = spawn(process.execPath, [join(here, "bridge.mjs")], {
-  env: { ...process.env, OPENAI_API_KEY: "test-key", OPENAI_LIVE_URL: `ws://127.0.0.1:${ports.live}`, VOICE_BRIDGE_PORT: String(ports.bridge), VOICE_BRIDGE_APP_URL: `http://127.0.0.1:${ports.app}`, VOICE_BRIDGE_CLOSING_PAUSE_MS: "200", KAT_WEBHOOK_SECRET: katSecret },
+  env: { ...process.env, OPENAI_API_KEY: "test-key", OPENAI_LIVE_URL: `ws://127.0.0.1:${ports.live}`, VOICE_BRIDGE_PORT: String(ports.bridge), VOICE_BRIDGE_APP_URL: `http://127.0.0.1:${ports.app}`, VOICE_BRIDGE_CLOSING_PAUSE_MS: "200", VOICE_BRIDGE_LIVE_INTERVAL_MS: "20", KAT_WEBHOOK_SECRET: katSecret },
   stdio: ["ignore", "pipe", "pipe"],
 });
 let output = "";
@@ -135,6 +142,10 @@ async function checkCall(fromBridge, closed) {
     { speaker: "shop", text: "네, 테스트 매장입니다." },
     { speaker: "ai", text: "안녕하세요, AI 비서입니다. 감사합니다." },
   ]);
+  // The console got the transcript while the call was going, with the attempt token.
+  assert.ok(seen.live.length >= 2, "live updates were sent");
+  assert.ok(seen.live.every((update) => update.auth === `Bearer ${token}`));
+  assert.ok(seen.live.some((update) => update.transcript.some((turn) => turn.speaker === "ai")), "a live update carried the AI's words");
   await waitFor(() => closed.value, "stream closed after the closing line");
 }
 

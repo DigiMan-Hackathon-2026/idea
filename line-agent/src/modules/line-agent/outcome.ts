@@ -77,3 +77,16 @@ function findLastIndex<T>(items: readonly T[], test: (item: T) => boolean): numb
   for (let i = items.length - 1; i >= 0; i--) if (test(items[i])) return i;
   return -1;
 }
+
+/** Validates a transcript posted by the voice bridge (at most 200 turns of 2,000 characters). */
+export function readTranscript(value: unknown): TranscriptTurn[] | null {
+  if (!Array.isArray(value) || value.length > 200) return null;
+  const turns: TranscriptTurn[] = [];
+  for (const item of value) {
+    if (!item || typeof item !== "object") return null;
+    const { speaker, text } = item as Record<string, unknown>;
+    if ((speaker !== "ai" && speaker !== "shop") || typeof text !== "string") return null;
+    turns.push({ speaker, text: text.slice(0, 2000) });
+  }
+  return turns;
+}

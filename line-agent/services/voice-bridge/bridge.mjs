@@ -21,6 +21,7 @@ const liveUrl = process.env.OPENAI_LIVE_URL ?? "wss://api.openai.com/v1/live/ses
 const liveModel = process.env.OPENAI_LIVE_MODEL ?? "gpt-live-1";
 const liveVoice = process.env.OPENAI_LIVE_VOICE ?? "marin";
 const apiKey = process.env.OPENAI_API_KEY;
+const liveIntervalMs = Number(process.env.VOICE_BRIDGE_LIVE_INTERVAL_MS ?? 300);
 const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 2500);
 // The AI's turn must *end* with a closing line; "감사합니다. 몇 시에 가능할까요?" is not one.
 const closingLine = /(감사합니다|다시 연락드리겠습니다)[.!。\s]*$/;
@@ -88,10 +89,32 @@ function bridgeCall(twilio, provider) {
     if (turn && now - turn.lastAt < turnGapMs) {
       turn.text += delta;
       turn.lastAt = now;
+      pushLive();
       return;
     }
     open[speaker] = { speaker, text: delta, lastAt: now };
     call.transcript.push(open[speaker]);
+    pushLive();
+  };
+  // The console shows the transcript while the call is going: at most one
+  // update in flight, the latest text wins, and nothing here affects the call.
+  const liveFeed = { timer: null, sending: false, version: 0 };
+  const turnsSoFar = () => call.transcript.map((turn) => ({ speaker: turn.speaker, text: turn.text.trim() })).filter((turn) => turn.text);
+  const pushLive = () => {
+    liveFeed.version++;
+    if (liveFeed.timer || liveFeed.sending || !call.attemptId || !call.token) return;
+    liveFeed.timer = setTimeout(async () => {
+      liveFeed.timer = null;
+      if (call.finished) return;
+      liveFeed.sending = true;
+      const version = liveFeed.version;
+      await postLive(call.attemptId, call.token, turnsSoFar()).catch(() => {});
+      liveFeed.sending = false;
+      if (liveFeed.version !== version) {
+        liveFeed.version--; // pushLive counts again
+        pushLive();
+      }
+    }, liveIntervalMs);
   };
 
   twilio.on("message", async (text) => {
@@ -162,6 +185,7 @@ function bridgeCall(twilio, provider) {
     if (typeof event.type === "string") call.liveEvents[event.type] = (call.liveEvents[event.type] ?? 0) + 1;
     switch (event.type) {
       case "session.started":
+        void postLive(call.attemptId, call.token, []).catch(() => {});
         void flushQueued();
         return;
       case "session.output_audio.delta": {
@@ -216,13 +240,14 @@ function bridgeCall(twilio, provider) {
     call.finished = true;
     clearInterval(silenceTimer);
     if (call.closingTimer) clearTimeout(call.closingTimer);
+    if (liveFeed.timer) clearTimeout(liveFeed.timer);
     if (call.live?.readyState === WebSocket.OPEN) {
       sendLive({ type: "session.close" });
       setTimeout(() => call.live?.close(), 1500);
     }
     // Closing the stream ends the call (Twilio finishes the TwiML; KAT hangs up with STREAM_ENDED).
     if (twilio.isOpen) twilio.close();
-    const turns = call.transcript.map((turn) => ({ speaker: turn.speaker, text: turn.text.trim() })).filter((turn) => turn.text);
+    const turns = turnsSoFar();
     const sorted = [...call.latencies].sort((a, b) => a - b);
     log("voice_bridge.call_finished", { attempt: call.attemptId, reason, seconds: Math.round((Date.now() - startedAt) / 1000), turns: turns.length, medianLatencyMs: sorted[Math.floor(sorted.length / 2)] ?? null, liveEvents: call.liveEvents });
     if (!call.attemptId || !call.token) return;
@@ -235,6 +260,16 @@ async function fetchInstructions(attemptId, token) {
   if (!response.ok) return null;
   const body = await response.json();
   return typeof body.instructions === "string" ? body.instructions : null;
+}
+
+async function postLive(attemptId, token, transcript) {
+  if (!attemptId || !token) return;
+  await fetch(`${appUrl}/api/v1/integrations/voice/attempts/${attemptId}/live`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ transcript }),
+    signal: AbortSignal.timeout(2000),
+  });
 }
 
 async function postResult(attemptId, token, body) {
