@@ -11,7 +11,8 @@
 
 | 경로 | 내용 |
 |---|---|
-| [`kokoseoul/`](kokoseoul) | 앱 전체 코드입니다. 이상무의 개인 저장소(비공개) `main`을 git 기록 없이 복사했습니다. |
+| [`kokoseoul/`](kokoseoul) | 앱 전체 코드입니다. 이상무의 개인 저장소(비공개) `main`을 git 기록째 옮겼습니다(커밋 360개, 2026-11-21~24). |
+| [`line-agent/`](line-agent) | LINE 여행 비서입니다. 여기서울 `a855c50`에서 시작해 LINE 공식 계정과 AI 전화 예약을 더했습니다. 개인 저장소의 git 기록째 옮겼습니다(커밋 43개, 2026-11-25~26). |
 | [`kokoseoul/docs/PRD_v0.1.md`](kokoseoul/docs/PRD_v0.1.md) | 제품 요구사항: 대상, 사용자 흐름, 시연 검수 기준 |
 | [`kokoseoul/docs/TRD_v0.1.md`](kokoseoul/docs/TRD_v0.1.md) | 기술 요구사항: 구성, 표지판 판독, 데이터·배포 |
 | [`kokoseoul/docs/HANDOFF.md`](kokoseoul/docs/HANDOFF.md) | 현재 구현 상태와 인수인계 |
@@ -76,8 +77,15 @@ pnpm dev                     # http://localhost:3000
 | `public/quest-offline.html`, `public/sw.js` | 전파가 없을 때 보이는 퀘스트 화면과 서비스 워커 |
 | `research/desk/quest-drafts/` | 퀘스트 초안과 현장 확인 목록 |
 
+## LINE 여행 비서 (`line-agent/`)
+
+일본인 여행자가 LINE 공식 계정에 일본어로 "신촌에서 2명, 삼겹살. 20시까지 홍대"처럼 보내면, 비서가 후보 식당과 착석 마감 시각을 계산해 보여 줍니다. 사용자가 승인하면 AI가 한국어로 가게에 전화해 예약을 묻고, 결과를 LINE으로 돌려줍니다. 첫 가게가 맞지 않는 시간을 제안하면 조건을 유지한 채 다음 가게에 전화합니다.
+
+- 설계: [`line-agent/docs/LINE_AGENT_SPEC.md`](line-agent/docs/LINE_AGENT_SPEC.md), 진행 상황: [`line-agent/docs/LINE_AGENT_BUILD_PLAN.md`](line-agent/docs/LINE_AGENT_BUILD_PLAN.md), 실행: [`line-agent/docs/LINE_AGENT_RUNBOOK.md`](line-agent/docs/LINE_AGENT_RUNBOOK.md)
+- 시험 전화는 동의한 팀원 번호로만 겁니다. 번호와 키는 저장소에 없습니다.
+
 ## 이 폴더 갱신
 
-`kokoseoul/`은 원본 저장소에서 `pnpm idea:sync --push`로 덮어씁니다. 직접 고치면 다음 갱신 때 사라지니, 수정할 것이 있으면 이상무에게 알려 주세요. 이 README는 `kokoseoul/` 밖에 있어서 갱신해도 그대로 남습니다.
+`kokoseoul/`과 `line-agent/`는 각 원본 저장소에서 `pnpm idea:sync --push`로 갱신합니다. 원본의 새 커밋이 날짜 그대로 이 저장소 기록에 이어 붙습니다. 직접 고치면 다음 갱신과 섞이니, 수정할 것이 있으면 이상무에게 알려 주세요. 이 README는 두 폴더 밖에 있어서 갱신해도 그대로 남습니다.
 
-현재 복사본 기준 커밋: `91f8c9f` (2026-11-23)
+현재 기준 커밋: `kokoseoul/` `a855c50` (2026-11-24), `line-agent/` `f77ba0f` (2026-11-26)

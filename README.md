@@ -14,7 +14,8 @@ idea/
 │   └── omiyage-seoul/   2. 오미야게 서울
 ├── sion/       한시온
 ├── sangmu/     이상무
-│   └── kokoseoul/       1. 지하철 안내 서비스 (여기서울: 안내·퀘스트·스탬프)
+│   ├── kokoseoul/       1. 지하철 안내 서비스 (여기서울: 안내·퀘스트·스탬프)
+│   └── line-agent/      LINE 여행 비서 (식당 후보·AI 전화 예약)
 ├── jonghoon/   임종훈
 │   └── handcarry/       3. 핸드캐리 중개
 ├── minyoung/   허민영
