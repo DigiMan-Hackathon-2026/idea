@@ -87,6 +87,11 @@ export function simulateTranscript(script: ShopScript, brief: CallBrief): Transc
   }
 }
 
+/** About how long the lines take to say; the console's playback uses the same pace. */
+export function spokenMs(transcript: readonly TranscriptTurn[]): number {
+  return transcript.reduce((total, turn) => total + 900 + turn.text.length * 120, 600);
+}
+
 /** First :00 or :30 inside the window (or the start). */
 function acceptSlot(start: string, end: string): string {
   const half = 30 * 60 * 1000;
@@ -100,15 +105,26 @@ export class SimulatedCallPlacer implements CallPlacer {
     private readonly onFinished: FinishedHandler,
     private readonly delayMs = 2500,
     private readonly scripts: Record<string, ShopScript> = defaultScripts,
+    /** Speech-paced calls report each line as it is "said" (the console shows them live). */
+    private readonly onLive: ((attemptId: string, turns: TranscriptTurn[]) => void) | null = null,
   ) {}
 
   async place(job: CallJob): Promise<string> {
     const script = this.scripts[job.phoneRef] ?? "accept";
     const transcript = simulateTranscript(script, job.brief);
     const callId = `SIM-${job.attemptId}`;
+    // A negative delay: take as long as saying the lines (the console plays them back at that pace).
+    const delay = this.delayMs >= 0 ? this.delayMs : spokenMs(transcript) + 1500;
+    if (this.delayMs < 0 && this.onLive) {
+      let at = 600;
+      transcript.forEach((turn, index) => {
+        setTimeout(() => this.onLive?.(job.attemptId, transcript.slice(0, index + 1)), at);
+        at += 900 + turn.text.length * 120;
+      });
+    }
     setTimeout(() => {
       void this.onFinished({ attemptId: job.attemptId, transcript });
-    }, this.delayMs);
+    }, delay);
     return callId;
   }
 }
