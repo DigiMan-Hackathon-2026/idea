@@ -14,6 +14,12 @@ type Entry = { at: string; to: string; via: "reply" | "push"; message: Message }
 type Mine = { at: string; text: string; user: string };
 type CallLog = { attemptId: string; shopJa: string; shopKo: string; transcript: { speaker: "ai" | "shop"; text: string }[]; outcome: string; at: string };
 
+// The demo opening (a shared NAVER Map link) and the condition search it falls back to.
+const examples = [
+  { label: "例：お店のリンク", text: "このお店、今日2人で行ける？20時までに弘大のライブ会場に着きたい https://map.naver.com/p/entry/place/31737840" },
+  { label: "例：条件で探す", text: "新村で2人、サムギョプサルが食べたいです。20時までに弘大のライブ会場に着きたいです。" },
+];
+
 const users = { alice: "Alice（依頼する人）", bob: "Bob（同じグループの人）" } as const;
 type User = keyof typeof users;
 
@@ -43,7 +49,7 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
   const [entries, setEntries] = useState<Entry[]>([]);
   const [callLog, setCallLog] = useState<CallLog[]>([]);
   const [mine, setMine] = useState<Mine[]>([]);
-  const [draft, setDraft] = useState("新村で2人、サムギョプサルが食べたいです。20時までに弘大のライブ会場に着きたいです。");
+  const [draft, setDraft] = useState(examples[0].text);
   const [busy, setBusy] = useState(false);
   const bottom = useRef<HTMLDivElement | null>(null);
 
@@ -151,6 +157,13 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
           ))}
         </div>
       )}
+      <div className="flex gap-2 overflow-x-auto bg-white px-2 pt-2">
+        {examples.map((example) => (
+          <button key={example.label} type="button" onClick={() => setDraft(example.text)} className="shrink-0 rounded border border-[#a4a199] px-2 py-1 text-xs text-[#504e49]">
+            {example.label}
+          </button>
+        ))}
+      </div>
       <form onSubmit={submit} className="sticky bottom-0 flex gap-2 bg-white p-2">
         <label className="sr-only" htmlFor="draft">メッセージ</label>
         <input id="draft" value={draft} onChange={(event) => setDraft(event.target.value)} className="min-w-0 flex-1 rounded border border-[#a4a199] px-2 py-2 text-sm" />

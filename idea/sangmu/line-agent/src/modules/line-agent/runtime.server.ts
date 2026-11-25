@@ -70,7 +70,9 @@ function createRuntime(): LineAgentRuntime {
       destination: { latitude: to.lat, longitude: to.lng, name: "도착" },
     }),
   );
-  const phoneAllowed = (ref: string) => config.calls === "simulator" ? ref.startsWith("demo-") : ref in config.phoneAllowlist;
+  // Rehearsals call the same shops as the real demo when an allowlist is set.
+  const hasAllowlist = Object.keys(config.phoneAllowlist).length > 0;
+  const phoneAllowed = (ref: string) => (config.calls === "simulator" && !hasAllowlist ? ref.startsWith("demo-") : ref in config.phoneAllowlist);
 
   const self: { runtime?: LineAgentRuntime } = {};
   const board = new CallBoard();
