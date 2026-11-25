@@ -1,0 +1,11 @@
+Assets for local recognition of subway sign photos.
+
+worker.min.js is from tesseract.js 7.0.0. See tesseract-js-LICENSE.md
+and worker.min.js.LICENSE.txt.
+
+tesseract-core-lstm.js and tesseract-core-lstm.wasm are from
+tesseract.js-core 7.0.0. See tesseract-js-core-LICENSE.txt.
+
+eng.traineddata.gz and kor.traineddata.gz are gzip-compressed models from
+https://github.com/tesseract-ocr/tessdata_fast/tree/87416418657359cb625c412a48b6e1d6d41c29bd
+See tessdata-fast-LICENSE.txt.

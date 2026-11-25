@@ -1,0 +1,129 @@
+[
+  {
+    "id": "7d7029c4-2798-45f1-8866-792a7e6e6ba6",
+    "versionId": "09e34c04-2c08-4535-91db-1d3b2ce008c6",
+    "slug": "seongsu-beauty-mansion-quick-touch-up",
+    "areaCode": "seongsu",
+    "purpose": "beauty",
+    "titleKo": "올리브영 뷰티 맨션에서 립 수정화장 배워보기",
+    "titleJa": "オリーブヤング ビューティーマンションでリップの直し方を教わる",
+    "summaryKo": "립 메이크업을 고쳐 바르는 방법 하나를 배워요.",
+    "summaryJa": "リップメイクの直し方を一つ教わります。",
+    "bodyKo": "올리브영이 뷰티 맨션 성수의 퀵 터치 업을 안내해요. 당일 립 선택, 접수, 대기, 비용과 일본어 안내는 매장에서 확인해요.",
+    "bodyJa": "オリーブヤングは聖水のビューティーマンションでクイックタッチアップを案内しています。リップを選べるか、受付・待ち時間・料金・日本語対応は店頭で確認しましょう。",
+    "detailKo": "퀵 터치 업 · 접수 조건은 매장 확인",
+    "detailJa": "クイックタッチアップ · 受付は店頭で確認",
+    "durationMinutes": 60,
+    "place": {
+      "id": "62de0897-28e6-4d7e-8d8f-a0d36495fcd6",
+      "nameKo": "올리브영 뷰티 맨션 성수",
+      "nameJa": "オリーブヤング ビューティーマンション聖水",
+      "addressKo": "서울 성동구 성수이로 108",
+      "guideUrlKo": "https://corp.oliveyoung.com/ko/newsroom/press/129",
+      "guideUrlJa": "https://corp.oliveyoung.com/en/newsroom/press/266",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "2d14c4fa-de98-4278-a0dd-d003b7c7a9e4",
+        "titleKo": "뷰티 맨션 성수 찾기",
+        "titleJa": "ビューティーマンション聖水を探す",
+        "bodyKo": "성수이로 108에서 뷰티 맨션 성수 간판을 확인하고 2층 메이크업 구역을 찾아요.",
+        "bodyJa": "「성수이로 108」でビューティーマンション聖水の看板を確認し、2階のメイクアップ売り場へ向かいます。",
+        "completionLabelKo": "메이크업 구역을 찾았어요",
+        "completionLabelJa": "メイクアップ売り場を見つけました",
+        "showsPlace": true
+      },
+      {
+        "id": "f5955bd6-bec4-4fb0-98e0-49f42f97d07e",
+        "titleKo": "오늘 립 상담이 가능한지 묻기",
+        "titleJa": "今日リップの相談ができるか聞く",
+        "bodyKo": "립을 선택할 수 있는지, 접수 방법과 요금이 무엇인지 물어봐요. 마감됐다면 다음 가능한 시간을 확인해요.",
+        "bodyJa": "リップを選べるか、受付方法と料金を尋ねます。受付終了なら次に利用できる時間を確かめましょう。",
+        "completionLabelKo": "이용할 시간을 확인했어요",
+        "completionLabelJa": "利用できる時間を確認しました",
+        "phraseKo": "오늘 퀵 터치 업에서 립 수정화장을 받을 수 있나요? 접수 방법과 비용도 알려 주세요.",
+        "phraseJa": "今日のクイックタッチアップでリップを直してもらえますか？ 受付方法と料金も教えてください。"
+      },
+      {
+        "id": "bd9f1058-9f48-408e-ba03-7718c6dfcfeb",
+        "titleKo": "집에서 해볼 방법 하나 고르기",
+        "titleJa": "自分でも試すコツを一つ選ぶ",
+        "bodyKo": "원하는 색이나 질감을 전해요. 설명을 들은 뒤 집에서 다시 해볼 방법을 하나 골라요.",
+        "bodyJa": "好みの色や質感を伝えます。説明を聞いたら、自分でも試してみたいコツを一つ選びましょう。",
+        "completionLabelKo": "다시 해볼 방법을 하나 골랐어요",
+        "completionLabelJa": "自分でも試すコツを一つ選びました",
+        "phraseKo": "제가 혼자 할 때도 따라 할 수 있게 한 번 더 보여 주실 수 있나요?",
+        "phraseJa": "自分でもできるように、もう一度見せていただけますか？"
+      }
+    ],
+    "seed": {
+      "supplierId": "faed2c1a-7034-488a-b3e9-3867d584a396",
+      "editorId": "b9868cc7-f595-41c0-b0c5-f34544c9cc02",
+      "requestId": "b0b97f1b-17ca-41ab-b354-4dfb1035b877"
+    }
+  },
+  {
+    "id": "b6f598f9-2974-400e-b67d-5cb8d770c429",
+    "versionId": "63e8453c-5b40-451d-8399-c8b1f426c1fb",
+    "slug": "myeongdong-leekaja-head-spa",
+    "areaCode": "myeongdong",
+    "purpose": "beauty",
+    "titleKo": "이가자 명동에서 헤드스파 메뉴 고르기",
+    "titleJa": "イガジャ明洞でヘッドスパのコースを選ぶ",
+    "summaryKo": "기본 코스의 소요 시간과 포함 항목을 보고 내 일정에 맞는 메뉴를 골라요.",
+    "summaryJa": "基本コースの時間と内容を見て、自分の予定に合うメニューを選びます。",
+    "bodyKo": "매장 안내 기준 기본 헤드스파는 약 50분이에요. 코스별 총액과 추가 요금, 일본어 응대는 예약 전에 확인해요.",
+    "bodyJa": "店舗案内では基本のヘッドスパは約50分です。コースの総額・追加料金・日本語対応は予約前に確かめましょう。",
+    "detailKo": "기본 코스 약 50분 · 요금은 예약 전 확인",
+    "detailJa": "基本コース約50分 · 料金は予約前に確認",
+    "durationMinutes": 60,
+    "place": {
+      "id": "a07be6ae-7653-4a5d-ad00-edd4993aa03b",
+      "nameKo": "이가자 명동",
+      "nameJa": "イガジャ明洞",
+      "addressKo": "서울 중구 명동8가길 22",
+      "guideUrlKo": "https://www.myeongdonghairsalon.co.kr/?lang=ko",
+      "guideUrlJa": "https://www.myeongdonghairsalon.co.kr/?lang=ja",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "3bb0afd3-1eb0-4b1c-9d11-04be44f8d0ec",
+        "titleKo": "기본 코스와 포함 항목 비교하기",
+        "titleJa": "基本コースと内容を比べる",
+        "bodyKo": "공식 메뉴를 열어 기본 코스와 다른 코스의 시간, 포함 항목을 비교해요.",
+        "bodyJa": "公式メニューを開き、基本コースとほかのコースの時間・内容を比べます。",
+        "completionLabelKo": "마음에 드는 코스를 골랐어요",
+        "completionLabelJa": "気になるコースを選びました",
+        "showsPlace": true
+      },
+      {
+        "id": "b138459e-1444-4574-ad83-5bb9d2c10700",
+        "titleKo": "가격과 일본어 응대 확인하기",
+        "titleJa": "料金と日本語対応を確認する",
+        "bodyKo": "예약하기 전에 전체 가격과 추가 비용, 취소 조건을 물어요. 일본어 응대가 필요하면 가능한 시간을 함께 확인해요.",
+        "bodyJa": "予約前に総額、追加料金、キャンセル条件を聞きます。日本語対応が必要なら、対応できる時間も尋ねましょう。",
+        "completionLabelKo": "예약 조건을 확인했어요",
+        "completionLabelJa": "予約条件を確認しました",
+        "phraseKo": "이 코스는 추가 비용을 포함해 얼마예요? 일본어로 상담할 수 있을까요?",
+        "phraseJa": "このコースは追加料金込みでいくらですか？ 日本語で相談できますか？"
+      },
+      {
+        "id": "69dd3979-ba30-49c1-89bd-686501368210",
+        "titleKo": "예약했다면 3층에서 메뉴 확인하기",
+        "titleJa": "予約した場合は3階でコースを確認する",
+        "bodyKo": "예약했다면 명동8가길 22의 3층에서 확정 안내를 보여 주고 시작 전에 코스를 다시 확인해요. 아직 예약하지 않았다면 확인한 메뉴와 조건을 정리해요.",
+        "bodyJa": "予約した方は「명동8가길 22」の3階で確定画面を見せ、始める前にコースを確認します。まだ予約していなければ、選んだメニューと条件を整理しましょう。",
+        "completionLabelKo": "이용할 메뉴와 조건을 정했어요",
+        "completionLabelJa": "利用したいコースと条件が決まりました",
+        "showsPlace": true
+      }
+    ],
+    "seed": {
+      "supplierId": "d0ac9e07-04e2-4a14-9f79-e4c9482807ec",
+      "editorId": "7d677e8b-58a1-4765-99c9-ea3e0077f4b0",
+      "requestId": "9dd74976-a7d3-48d0-9738-2b52c63b1b6a"
+    }
+  }
+]
