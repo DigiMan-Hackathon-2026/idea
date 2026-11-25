@@ -8,7 +8,8 @@ import { makeCardToken } from "./links";
 import type { LineGateway } from "./line/client";
 import type { LineEvent, LineMessage, LineSource } from "./line/types";
 import { conversationTarget } from "./line/webhook";
-import * as m from "./messages";
+import { bilingual, say } from "./bilingual";
+import * as messages from "./messages";
 import { classifyCall, type TranscriptTurn } from "./outcome";
 import { computePlan, rankPlans, type CandidatePlan } from "./plan";
 import { searchCandidate, type PlaceSearch } from "./naver-search";
@@ -48,6 +49,9 @@ export type AgentDeps = {
 };
 
 type Target = NonNullable<DiningRequest["target"]>;
+
+/** Message builders; Japanese conversations also get the Korean text below a line. */
+const m = bilingual(messages);
 
 const REQUEST_TTL_MINUTES = 6 * 60;
 const APPROVAL_TTL_MINUTES = 10;
@@ -700,7 +704,7 @@ export class DiningAgent {
           if (ctx.kind !== "user") {
             try {
               await this.deps.line.push(request.requesterTarget, [m.askAlias(lang)]);
-              await this.reply(ctx, [{ type: "text", text: lang === "ja" ? "予約名は個別トークでお聞きします。" : "예약자 이름은 1:1 대화에서 여쭤볼게요." }]);
+              await this.reply(ctx, [{ type: "text", text: say(lang, "予約名は個別トークでお聞きします。", "예약자 이름은 1:1 대화에서 여쭤볼게요.") }]);
               return;
             } catch {
               // Not a friend of the account yet: ask here instead.
@@ -734,7 +738,7 @@ export class DiningAgent {
         next.proposal = null;
         next.status = "comparing";
         if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
-        await this.reply(ctx, [{ type: "text", text: lang === "ja" ? "電話はやめました。" : "전화는 그만뒀어요." }]);
+        await this.reply(ctx, [{ type: "text", text: say(lang, "電話はやめました。", "전화는 그만뒀어요.") }]);
         return;
       }
       case "decision_accept": {
