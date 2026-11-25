@@ -13,7 +13,7 @@ export type CallFinished =
   | { attemptId: string; lost: true };
 
 export interface CallPlacer {
-  readonly kind: "simulator" | "twilio";
+  readonly kind: "simulator" | "twilio" | "kat";
   /** Returns the provider's call id. Throws if the call could not be placed. */
   place(job: CallJob): Promise<string>;
 }
@@ -135,3 +135,77 @@ export class TwilioCallPlacer implements CallPlacer {
   }
 }
 
+
+/** "+821012345678" → "01012345678" (KAT Cloud dials domestic numbers only). */
+export function toKoreanDomestic(e164: string): string | null {
+  const match = /^\+82(\d{8,10})$/.exec(e164);
+  return match ? `0${match[1]}` : null;
+}
+
+type KatConfig = { apiKey: string; from: string; bridgeHost: string; apiUrl: string; groupId: string | null };
+
+/**
+ * Real calls through KAT Cloud (katcloud.kr, 한국에이아이통신): dials from a
+ * Korean 070 number and connects to the voice bridge's /kat WebSocket once the
+ * shop answers. Its stream protocol mirrors Twilio Media Streams, so the same
+ * bridge serves both. The API only answers requests from Korean IP addresses.
+ */
+export class KatCloudCallPlacer implements CallPlacer {
+  readonly kind = "kat" as const;
+  private groupId: Promise<string> | null;
+  constructor(
+    private readonly config: KatConfig,
+    private readonly phoneFor: (phoneRef: string) => string | null,
+    private readonly tokenFor: (attemptId: string) => string,
+    private readonly statusUrlFor: ((attemptId: string) => string) | null = null,
+  ) {
+    this.groupId = config.groupId ? Promise.resolve(config.groupId) : null;
+  }
+
+  async place(job: CallJob): Promise<string> {
+    const phone = this.phoneFor(job.phoneRef);
+    if (!phone) throw new Error("Phone ref is not on the allowlist");
+    const to = toKoreanDomestic(phone);
+    if (!to) throw new Error("KAT Cloud dials Korean numbers only");
+    const groupId = await this.group();
+    const host = this.config.bridgeHost.replace(/^\w+:\/\//, "").replace(/\/$/, "");
+    const response = await this.request(`/group/${encodeURIComponent(groupId)}/media-stream/calls`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "Idempotency-Key": job.attemptId },
+      body: JSON.stringify({
+        from: this.config.from,
+        to,
+        streamUrl: `wss://${host}/kat`,
+        ...(this.statusUrlFor ? { statusCallbackUrl: this.statusUrlFor(job.attemptId) } : {}),
+        metadata: { attemptId: job.attemptId, token: this.tokenFor(job.attemptId) },
+        timeLimit: 300,
+        codec: "PCMU",
+      }),
+    });
+    const body = (await response.json().catch(() => ({}))) as { callId?: string; data?: { callId?: string }; code?: string };
+    const callId = body.callId ?? body.data?.callId;
+    if (!response.ok || !callId) throw new Error(`KAT Cloud refused the call (${response.status}${body.code ? ` ${body.code}` : ""})`);
+    return callId;
+  }
+
+  private group(): Promise<string> {
+    this.groupId ??= this.request("/group", { method: "GET" }).then(async (response) => {
+      const body = (await response.json().catch(() => ({}))) as { id?: string | number; data?: { id?: string | number } };
+      const id = body.id ?? body.data?.id;
+      if (!response.ok || id === undefined) {
+        this.groupId = null;
+        throw new Error(`KAT Cloud group lookup failed (${response.status})`);
+      }
+      return String(id);
+    });
+    return this.groupId;
+  }
+
+  private request(path: string, init: RequestInit): Promise<Response> {
+    return fetch(`${this.config.apiUrl.replace(/\/$/, "")}${path}`, {
+      ...init,
+      headers: { ...(init.headers as Record<string, string>), "x-api-key": this.config.apiKey },
+      signal: AbortSignal.timeout(10_000),
+    });
+  }
+}

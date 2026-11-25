@@ -116,7 +116,7 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
         <p className="text-xs opacity-90">
           <a href="/dev/line-agent" className="underline">新しい会話 · 새 대화</a>
         </p>
-        <p className="text-xs opacity-90">電話: {calls === "simulator" ? "台本どおりのテスト店（実際には電話しません）" : calls === "twilio" ? "実際に発信（許可された番号のみ）" : "オフ"}</p>
+        <p className="text-xs opacity-90">電話: {calls === "simulator" ? "台本どおりのテスト店（実際には電話しません）" : calls === "twilio" || calls === "kat" ? "実際に発信（許可された番号のみ）" : "オフ"}</p>
         <div className="flex flex-wrap gap-2 text-xs">
           <label className="flex items-center gap-1">
             <input type="checkbox" checked={group} onChange={(event) => setGroup(event.target.checked)} /> グループ · 그룹
