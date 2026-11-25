@@ -39,8 +39,9 @@ ALLOWED_EMAIL_DOMAINS = (
     b"users.noreply.github.com", b"example.com", b"example.org", b"example.net",
     b"test", b"invalid", b"example", b"localhost",
 )
-# A made-up address that an early version of this script's own test used as a fixture.
-ALLOWED_EMAILS = {b"someone@gmail.com", b"0someone@gmail.com"}
+# A made-up address that an early version of this script's own test used as a fixture,
+# and the address GitHub signs web commits with.
+ALLOWED_EMAILS = {b"someone@gmail.com", b"0someone@gmail.com", b"noreply@github.com"}
 ALLOWED_ENV_FILES = {".env.example"}
 # Korean mobile numbers written as numbers (+82 10…, 010-…); bare digit runs are IDs elsewhere.
 PHONE_PATTERN = re.compile(rb"(?:\+82[- ]?|\b0)1[016789][- ]\d{3,4}[- ]\d{4}\b|\+82[- ]?1[016789]\d{7,8}\b")
