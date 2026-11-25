@@ -34,3 +34,50 @@ describe("bilingual", () => {
     expect(say("ko", "やめました。", "그만뒀어요.")).toBe("그만뒀어요.");
   });
 });
+
+describe("bilingual cards and buttons", () => {
+  const card = (request: { lang: Lang }): LineMessage => {
+    const ja = request.lang === "ja";
+    return {
+      type: "flex",
+      altText: ja ? "候補" : "후보",
+      contents: {
+        type: "bubble",
+        body: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            { type: "text", text: ja ? "今日行けそうです" : "오늘 갈 수 있어요", size: "md", color: "#ffffff" },
+            { type: "text", text: ja ? "ソルレイム" : "설레임" },
+            { type: "text", text: ja ? "설레임" : "ソルレイム", size: "xs" },
+            { type: "text", text: ja ? "営業時間" : "영업시간", size: "xxs" },
+            { type: "text", text: ja ? "締切 18:50" : "마감 18:50", size: "xxs" },
+            { type: "text", text: ja ? "2. コギチャンゴ 新村" : "2. 고기창고 신촌" },
+            { type: "button", action: { type: "postback", label: ja ? "やめる" : "그만두기", data: "a=cancel", displayText: ja ? "やめる" : "그만두기" } },
+          ],
+        },
+      },
+      quickReply: { items: [{ type: "action", action: { type: "postback", label: ja ? "電話で聞いてもらう" : "전화로 물어봐 주세요", data: "a=call" } }] },
+    };
+  };
+  const joined = bilingual({ card }).card({ lang: "ja" }) as Extract<LineMessage, { type: "flex" }>;
+  const body = (joined.contents as { body: { contents: Record<string, unknown>[] } }).body.contents;
+
+  it("puts a small Korean line under a Japanese card text", () => {
+    expect(body[0]).toMatchObject({ type: "box", layout: "vertical", contents: [{ text: "今日行けそうです", size: "md" }, { text: "오늘 갈 수 있어요", size: "sm", color: "#ffffffcc" }] });
+  });
+
+  it("does not repeat a name the card already shows, and keeps short labels on one line", () => {
+    expect(body[1]).toMatchObject({ type: "text", text: "ソルレイム" });
+    expect(body[2]).toMatchObject({ type: "text", text: "설레임" });
+    expect(body[3]).toMatchObject({ type: "text", text: "営業時間 · 영업시간" });
+    expect(body[4]).toMatchObject({ type: "text", text: "締切 18:50" });
+    expect(body[5]).toMatchObject({ type: "box", contents: [{ text: "2. コギチャンゴ 新村" }, { text: "2. 고기창고 신촌" }] });
+  });
+
+  it("labels buttons and quick replies in both languages within LINE's limits", () => {
+    expect(body[6]).toMatchObject({ action: { label: "やめる · 그만두기", displayText: "やめる / 그만두기", data: "a=cancel" } });
+    expect(joined.quickReply?.items[0].action).toMatchObject({ label: "電話で聞いてもらう·전화 부탁", data: "a=call" });
+  });
+});
+
