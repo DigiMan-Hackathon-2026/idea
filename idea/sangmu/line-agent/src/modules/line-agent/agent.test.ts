@@ -79,7 +79,8 @@ function buttons(message: LineMessage): Record<string, string> {
   const visit = (node: unknown) => {
     if (!node || typeof node !== "object") return;
     const record = node as Record<string, unknown>;
-    if (record.type === "postback" && typeof record.label === "string") found[record.label] = record.data as string;
+    // Labels read "日本語 · 한국어" (quick replies "日本語·한국어"): tests use the Japanese part.
+    if (record.type === "postback" && typeof record.label === "string") found[record.label.split(/ ?· ?/)[0]] = record.data as string;
     for (const value of Object.values(record)) visit(value);
   };
   visit(message);
@@ -518,6 +519,32 @@ describe("DiningAgent: a shop that takes no bookings (walk-in)", () => {
     await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("walk_in_long", calls.jobs[0].brief) });
     expect(lastTexts(ALICE, 2)).toContain("今の待ちは約1時間30分なので");
     expect(calls.jobs).toHaveLength(2);
+  });
+});
+
+describe("LINE limits for two-language labels", () => {
+  it("keeps every button within 40 and every quick reply within 20 characters", async () => {
+    await agent.handleEvent(text(ALICE, "テスト店A 2人で行ける？20時までに弘大のライブ会場"));
+    const answer = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(answer)["近くの似たお店"]));
+    await agent.handleEvent(tap(ALICE, buttons(answer)["AIに電話で確かめてもらう"]));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    await agent.handleEvent(tap(ALICE, buttons(line.messagesFor(ALICE).at(-1)!.message)["この条件で電話を頼む"]));
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("walk_in", calls.jobs[0].brief) });
+    const labels: { label: string; quick: boolean }[] = [];
+    for (const { message } of line.messagesFor(ALICE)) {
+      for (const item of message.quickReply?.items ?? []) labels.push({ label: item.action.label, quick: true });
+      const visit = (node: unknown) => {
+        if (!node || typeof node !== "object") return;
+        const record = node as Record<string, unknown>;
+        if (record.type === "button") labels.push({ label: (record.action as { label: string }).label, quick: false });
+        Object.values(record).forEach(visit);
+      };
+      if (message.type === "flex") visit(message.contents);
+    }
+    expect(labels.length).toBeGreaterThan(5);
+    for (const { label, quick } of labels) expect([...label].length, label).toBeLessThanOrEqual(quick ? 20 : 40);
+    expect(labels.some(({ label }) => /[가-힣]/.test(label))).toBe(true);
   });
 });
 
