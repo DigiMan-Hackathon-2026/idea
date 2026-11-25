@@ -90,7 +90,8 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     simulatorEnabled: !production && (appEnv === "local" || appEnv === "test" || value("LINE_AGENT_SIMULATOR") === "1"),
     demoNow: demoNow && !Number.isNaN(Date.parse(demoNow)) ? new Date(demoNow).toISOString() : null,
     bridgePort: Number(value("VOICE_BRIDGE_PORT") ?? 8787) || 8787,
-    simulatedCallDelayMs: Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
+    // "speech": simulated calls last as long as their lines take to say (fallback demo with the console).
+    simulatedCallDelayMs: value("LINE_AGENT_SIM_CALL_DELAY_MS") === "speech" ? -1 : Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
     simulatedScripts: { ...defaultScripts, ...parseSimulatedScripts(value("LINE_AGENT_SIM_SCRIPTS")) },
     store: value("LINE_AGENT_STORE") === "postgres" ? "postgres" : "memory",
     simulatorToken: (value("LINE_AGENT_SIMULATOR_TOKEN")?.length ?? 0) >= 16 ? value("LINE_AGENT_SIMULATOR_TOKEN") : null,

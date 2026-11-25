@@ -11,6 +11,7 @@ type Call = {
   approvalId: string | null;
   phase: Phase;
   simulated: boolean;
+  readAloud: boolean;
   placedAt: number;
   answeredAt: number | null;
   endedAt: number | null;
@@ -226,7 +227,8 @@ function CallCard({ call, position, hasNext, now, offset, playbackStart, speak }
   // Simulated calls: how many lines have "been said" so far.
   const schedule = useMemo(() => lineStarts(call.turns), [call.turns]);
   const shown = playbackStart === null ? call.turns.length : schedule.starts.filter((start) => now - playbackStart >= start).length;
-  useSpeakLines(call.turns, playbackStart === null ? 0 : shown, speak && playbackStart !== null);
+  // Lines of a call without audio are read aloud as they appear (played back or streamed live).
+  useSpeakLines(call.turns, shown, speak && call.readAloud);
   const playing = playbackStart !== null && shown < call.turns.length;
   const phase: Phase = playbackStart === null ? call.phase : now < playbackStart ? "placing" : playing ? "talking" : call.phase;
   const turns = call.turns.slice(0, shown);

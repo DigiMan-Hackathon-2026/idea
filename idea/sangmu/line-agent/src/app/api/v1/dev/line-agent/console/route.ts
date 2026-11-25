@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
         approvalId: attempt?.approvalId ?? null,
         phase: call.phase,
         simulated: call.simulated,
+        readAloud: call.readAloud,
         placedAt: call.placedAt,
         answeredAt: call.answeredAt,
         endedAt: call.endedAt,
