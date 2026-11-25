@@ -11,6 +11,7 @@ import { PostgresAgentStore } from "./postgres-store";
 import { naverPlaceSearch } from "./naver-search";
 import { fetchLineImage, readImageText } from "./ocr.server";
 import { resolveShortLink } from "./link-resolver.server";
+import { modelReader } from "./understand.server";
 import { MemoryAgentStore, type AgentStore } from "./store";
 import { KatCloudCallPlacer, SimulatedCallPlacer, TwilioCallPlacer, type CallFinished, type CallPlacer } from "./telephony";
 import { RoutedTravelProvider } from "./travel";
@@ -117,6 +118,9 @@ function createRuntime(): LineAgentRuntime {
   };
 
   const searchPlaces = config.naverSearch ? naverPlaceSearch(config.naverSearch) : null;
+  // Messages the rules cannot read go to a language model (form only), when a key is set.
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+  const understand = openaiKey && process.env.LINE_AGENT_MODEL_READING !== "off" ? modelReader(openaiKey) : null;
   const simulatorCalls: SimulatorCall[] = [];
   const keepSimulatorCall = (call: SimulatorCall) => {
     if (!call.replyTarget.startsWith(SIMULATOR_PREFIX)) return;
@@ -124,7 +128,7 @@ function createRuntime(): LineAgentRuntime {
     if (simulatorCalls.length > 200) simulatorCalls.splice(0, simulatorCalls.length - 200);
   };
   const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null, onCallTranscript?: (call: SimulatorCall) => void) =>
-    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log, resolveLink: resolveShortLink });
+    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log, resolveLink: resolveShortLink, understand });
 
   const simulatorLine = new RecordingLineGateway(clock);
   const simulatorImages = new Map<string, Buffer>();

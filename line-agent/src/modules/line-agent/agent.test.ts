@@ -8,6 +8,7 @@ import { decodePostback } from "./postback";
 import { MemoryAgentStore } from "./store";
 import { simulateTranscript, type CallJob, type CallPlacer } from "./telephony";
 import { formatSeoulTime, seoulInstant } from "./time";
+import { fromModel } from "./understand";
 import type { Point, TravelLeg } from "./types";
 
 // Shinchon test shops: minutes from the station and to the Hongdae venue.
@@ -43,6 +44,8 @@ let calls: ManualCalls;
 let agent: DiningAgent;
 let eventCount = 0;
 let imageText: string | null = null;
+/** Stand-in for the language model: messages it "understands", by text. */
+let modelForms: Record<string, Record<string, unknown>> = {};
 
 const GROUP = "Cgroup0001";
 const ALICE = "Ualice0001";
@@ -105,7 +108,9 @@ beforeEach(() => {
     clock: () => clock, newId: () => `id-${String(++ids).padStart(6, "0")}`, keyOf: (raw) => `k:${raw}`,
     origin: "https://example.test", linkSecret: "test-secret", phoneAllowed: () => true,
     readImage: async () => imageText,
+    understand: async (value, lang) => (modelForms[value] ? fromModel({ partySize: null, currentArea: null, menu: null, shopName: null, arriveBy: null, nextArea: null, nextVenue: null, wantsFood: false, wantsCall: false, cancel: false, ...modelForms[value] }, lang) : null),
   });
+  modelForms = {};
 });
 
 describe("DiningAgent demo flow (spec 3분 시연, CALL-01)", () => {
@@ -545,6 +550,62 @@ describe("LINE limits for two-language labels", () => {
     expect(labels.length).toBeGreaterThan(5);
     for (const { label, quick } of labels) expect([...label].length, label).toBeLessThanOrEqual(quick ? 20 : 40);
     expect(labels.some(({ label }) => /[가-힣]/.test(label))).toBe(true);
+  });
+});
+
+describe("DiningAgent: asking for a call in words", () => {
+  it("'<shop>に電話して' answers for that shop and goes straight to the booking name", async () => {
+    await agent.handleEvent(text(ALICE, "テスト店Aに2人で電話して。20時までに弘大のライブ会場"));
+    const sent = lastTexts(ALICE, 3);
+    expect(sent).toContain("今日 2名で行けるか");
+    expect(lastTexts(ALICE, 1)).toContain("予約名");
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    expect(JSON.stringify(line.messagesFor(ALICE).at(-1)!.message)).toContain("1. テスト店A");
+  });
+
+  it("'電話して' during a search asks for calls, the named shop first", async () => {
+    await agent.handleEvent(text(ALICE, "新村で2人、サムギョプサル。20時までに弘大のライブ会場"));
+    await agent.handleEvent(text(ALICE, "テスト店Cに電話で聞いて"));
+    expect(lastTexts(ALICE, 1)).toContain("予約名");
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    const card = JSON.stringify(line.messagesFor(ALICE).at(-1)!.message);
+    expect(card.indexOf("1. テスト店C")).toBeGreaterThan(-1);
+  });
+
+  it("asks what is missing first, then for the call", async () => {
+    await agent.handleEvent(text(ALICE, "テスト店Aに電話して"));
+    expect(lastTexts(ALICE, 1)).toContain("何名");
+    await agent.handleEvent(text(ALICE, "2人"));
+    expect(lastTexts(ALICE, 1)).toContain("予約名");
+    expect(lastTexts(ALICE, 3)).toContain("今日 2名で行けるか");
+  });
+
+  it("asks which shop when none is named, and never takes '電話して' as the booking name", async () => {
+    await agent.handleEvent(text(ALICE, "電話して"));
+    expect(lastTexts(ALICE, 1)).toContain("どのお店に電話しますか");
+    await agent.handleEvent(text(ALICE, "テスト店A 2人"));
+    await agent.handleEvent(tap(ALICE, buttons(line.messagesFor(ALICE).at(-1)!.message)["AIに電話で確かめてもらう"]));
+    await agent.handleEvent(text(ALICE, "電話して"));
+    expect(lastTexts(ALICE, 1)).toContain("予約名");
+  });
+});
+
+describe("DiningAgent: messages the rules cannot read", () => {
+  it("starts a search from what the model read", async () => {
+    modelForms["お腹すいた…カップルで新村あたりのお肉、ライブ7時からなんだけど弘大で"] = { partySize: 2, currentArea: "shinchon", menu: "korean_bbq", arriveBy: "19:00", nextArea: "hongdae", nextVenue: "live", wantsFood: true };
+    await agent.handleEvent(text(ALICE, "お腹すいた…カップルで新村あたりのお肉、ライブ7時からなんだけど弘大で"));
+    expect(lastTexts(ALICE, 2)).toContain("2名の候補");
+    expect(lastTexts(ALICE, 2)).toContain("19:00に弘大のライブ会場");
+  });
+
+  it("answers a pending question the model can read, and ignores invented values", async () => {
+    await agent.handleEvent(text(ALICE, "テスト店Aに行きたい"));
+    modelForms["カップルです"] = { partySize: 2 };
+    await agent.handleEvent(text(ALICE, "カップルです"));
+    expect(lastTexts(ALICE, 1)).toContain("今日 2名で行けるか");
+    modelForms["どこでもいいよ"] = { currentArea: "atlantis", menu: "pizza" };
+    await agent.handleEvent(text(ALICE, "どこでもいいよ"));
+    expect(lastTexts(ALICE, 1)).toContain("食べたいもの、人数");
   });
 });
 

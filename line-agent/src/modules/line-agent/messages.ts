@@ -746,3 +746,7 @@ export function walkIn(request: DiningRequest, restaurant: Restaurant, plan: Can
   };
 }
 
+export function askWhichShop(lang: Lang): LineMessage {
+  return { type: "text", text: tr(lang, "どのお店に電話しますか？お店の名前かNAVER地図のリンクを送ってください。お店が決まっていなければ「新村で2人、サムギョプサル」のように送ってください。", "어느 가게에 전화할까요? 가게 이름이나 네이버 지도 링크를 보내 주세요. 가게가 정해지지 않았다면 \"신촌에서 2명, 삼겹살\"처럼 보내 주세요.") };
+}
+

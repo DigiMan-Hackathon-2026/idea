@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { interpret, parseArriveBy, parsePartySize } from "./interpret";
+import { interpret, parseArriveBy, parsePartySize, wantsCall } from "./interpret";
 
 describe("interpret", () => {
   it("reads the demo request in Japanese", () => {
@@ -66,3 +66,11 @@ describe("parseArriveBy", () => {
     expect(parseArriveBy("19時に予約したい")).toBeNull();
   });
 });
+
+describe("wantsCall", () => {
+  it("hears a request for the AI to call", () => {
+    for (const text of ["電話して", "ソルレイムに電話で聞いて", "電話かけてくれる？", "電話でお願い", "전화해 줘", "전화로 물어봐 줘", "전화 좀 걸어 줘", "can you call them"]) expect(wantsCall(text), text).toBe(true);
+    for (const text of ["電話番号は？", "電話はやめて", "新村で2人", "전화번호 알려줘"]) expect(wantsCall(text), text).toBe(false);
+  });
+});
+
