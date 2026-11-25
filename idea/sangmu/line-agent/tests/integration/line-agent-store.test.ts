@@ -57,6 +57,27 @@ describe("PostgreSQL LINE agent store", () => {
     expect(await store.save(request({ revision: 2, attempts: [attempt, duplicate] }), 1)).toBe(false);
   });
 
+  it("counts calls per day, for everyone and per requester", async () => {
+    const attempt = { id: "att00000011", approvalId: "apr1", candidateId: "test-shinchon-b", ordinal: 1, status: "placing" as const, providerCallId: null, outcome: null, startedAt: now, finishedAt: null };
+    await store.save(request({ attempts: [attempt] }), null);
+    await store.save(request({ id: "req00000002", conversationKey: "conv-b", requesterKey: "req-bob", attempts: [{ ...attempt, id: "att00000012", approvalId: "apr2" }] }), null);
+    expect(await store.countCallsSince("2026-11-29T00:00:00.000Z", null)).toBe(2);
+    expect(await store.countCallsSince("2026-11-29T00:00:00.000Z", "req-alice")).toBe(1);
+    expect(await store.countCallsSince("2026-11-30T00:00:00.000Z", null)).toBe(0);
+    // Calls from the local simulator do not count.
+    await store.save(request({ id: "req00000004", conversationKey: "conv-d", replyTarget: "sim-abc-alice", attempts: [{ ...attempt, id: "att00000013", approvalId: "apr3" }] }), null);
+    expect(await store.countCallsSince("2026-11-29T00:00:00.000Z", null)).toBe(2);
+  });
+
+  it("lists booked requests with reminders still to send", async () => {
+    const reservation = { candidateId: "test-shinchon-a", partySize: 2, time: "2026-11-29T09:30:00.000Z", alias: "サトウ", evidence: "call_accept" as const, acceptedAt: now, test: true };
+    const reminder = { kind: "leave_for_shop" as const, leaveAt: "2026-11-29T09:20:00.000Z", dueAt: "2026-11-29T09:20:00.000Z", sentAt: null };
+    await store.save(request({ status: "confirmed", reservation, reminders: [reminder] }), null);
+    await store.save(request({ id: "req00000003", conversationKey: "conv-c", reservation, reminders: [{ ...reminder, sentAt: now }] }), null);
+    expect((await store.listWithPendingReminders(now)).map((r) => r.id)).toEqual(["req00000001"]);
+    expect(await store.listWithPendingReminders("2026-11-29T15:00:00.000Z")).toEqual([]);
+  });
+
   it("keeps the alias per requester", async () => {
     expect(await store.getAlias("req-alice")).toBeNull();
     await store.setAlias("req-alice", "サトウ");

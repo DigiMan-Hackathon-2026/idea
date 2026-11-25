@@ -131,7 +131,7 @@ export function CallConsole({ token, bridgePort }: { token: string | null; bridg
       {calls.length === 0 ? (
         <section className="flex min-h-[70vh] flex-col items-center justify-center gap-3 text-center text-slate-400">
           <p className="text-3xl">電話の待機中</p>
-          <p className="text-lg">LINEで「この条件で電話を頼む」を押すと、ここに通話が表示されます。</p>
+          <p className="text-lg">LINEで「この内容で任せる」を押すと、ここに通話が表示されます。</p>
         </section>
       ) : (
         <>

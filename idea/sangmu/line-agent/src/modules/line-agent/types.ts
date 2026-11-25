@@ -225,7 +225,19 @@ export type DiningRequest = {
   target?: { candidateId: string; via: "link" | "name" | "image" } | null;
   /** The user asked (in words) for a call before everything was known: ask for calls once it is. */
   callWhenReady?: boolean;
+  /** After a booking, the agent tells the user when to leave (sent once each). */
+  reminders?: Reminder[];
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
 };
+
+export type Reminder = {
+  kind: "leave_for_shop" | "leave_for_next";
+  /** When to leave (Seoul time, shown to the user). */
+  leaveAt: string;
+  /** When the message is due (leaveAt, or earlier in a fast demo). */
+  dueAt: string;
+  sentAt: string | null;
+};
+

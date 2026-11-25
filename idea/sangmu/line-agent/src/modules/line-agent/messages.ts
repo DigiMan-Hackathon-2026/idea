@@ -8,7 +8,7 @@ import { findArea, menuNames } from "./places";
 import { encodePostback, type PostbackAction } from "./postback";
 import { formatSeoulTime } from "./time";
 import type { TodayCheck } from "./today";
-import type { CallProposal, DiningRequest, Lang, Place, Reservation, Restaurant, WaitObservation } from "./types";
+import type { CallProposal, DiningRequest, Lang, Place, Reminder, Reservation, Restaurant, WaitObservation } from "./types";
 
 export const BOT_NAME = { ja: "ココソウル", ko: "코코서울" };
 
@@ -332,10 +332,10 @@ export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[
   const actions: LineAction[] = [];
   const hasLate = plans.some((plan) => plan.verdict === "late");
   if (options.callingEnabled && plans.some((plan) => lookup(plan.candidateId)?.phoneRef)) {
-    actions.push(postback(request, "call_request", tr(lang, "電話で聞いてもらう", "전화로 물어봐 주세요"), { displayText: tr(lang, "電話で聞いてもらう", "전화로 물어봐 주세요") }));
+    actions.push(postback(request, "call_request", tr(lang, "AIに任せる", "AI에게 맡기기"), { displayText: tr(lang, "AIに任せる", "AI에게 맡기기") }));
   }
   actions.push({ type: "message", label: tr(lang, "キャンセル", "취소"), text: tr(lang, "キャンセル", "취소") });
-  const hint = hasLate ? tr(lang, "\n間に合わないお店があります。ほかのお店に電話で空きを聞くこともできます。", "\n시간이 안 맞는 가게가 있어요. 다른 가게에 전화로 자리를 물어볼 수도 있어요.") : "";
+  const hint = hasLate ? tr(lang, "\n間に合わないお店があります。AIに任せれば、ほかのお店に電話して空きを確かめます。", "\n시간이 안 맞는 가게가 있어요. AI에게 맡기면 다른 가게에 전화해서 자리를 확인해요.") : "";
   return [
     { type: "text", text: summary.trim() + hint },
     { type: "flex", altText: tr(lang, `お店の候補 ${bubbles.length}件`, `가게 후보 ${bubbles.length}곳`), contents: { type: "carousel", contents: bubbles }, quickReply: quickReply(actions) },
@@ -350,32 +350,37 @@ function shopQuote(lang: Lang, quote: string | null): string {
   return tr(lang, `\nお店の返事（韓国語）：「${quote}」`, `\n가게 답변: "${quote}"`);
 }
 
+/** The delegation contract: what the AI will do on its own, and when it will come back to ask. */
 export function approvalCard(request: DiningRequest, approval: CallProposal, lookup: (id: string) => Restaurant | undefined): LineMessage {
   const lang = request.lang;
   const shops = approval.candidateIds.map((id, i) => `${i + 1}. ${name(lang, lookup(id) ?? { nameJa: id, nameKo: id })}`);
   const anyTest = approval.candidateIds.some((id) => lookup(id)?.test || lookup(id)?.testCall);
+  const next = request.arriveBy && request.nextPlace ? tr(lang, `・${formatSeoulTime(request.arriveBy)}の${request.nextPlace.nameJa}まで、出発の時間をお知らせ`, `· ${formatSeoulTime(request.arriveBy)} ${request.nextPlace.nameKo}까지 출발 시간 알림`) : tr(lang, "・予約が取れたら、出発の時間をお知らせ", "· 예약되면 출발 시간 알림");
   const body: FlexComponent[] = [
-    text(tr(lang, "電話する順番", "전화 순서"), { size: "xs", color: color.muted }),
-    ...shops.map((line) => text(line, { weight: "bold" })),
+    text(tr(lang, "条件", "조건"), { size: "xs", color: color.muted }),
+    text(tr(lang, `今日 ${approval.partySize}名・${formatSeoulTime(approval.windowStart)}〜${formatSeoulTime(approval.windowEnd)}に席に着ける・予約名 ${approval.alias}`, `오늘 ${approval.partySize}명 · ${formatSeoulTime(approval.windowStart)}~${formatSeoulTime(approval.windowEnd)}에 앉을 수 있는 곳 · 예약자 ${approval.alias}`), { weight: "bold" }),
     { type: "separator", margin: "md" },
-    text(tr(lang, `人数：${approval.partySize}名`, `인원: ${approval.partySize}명`)),
-    text(tr(lang, `時間：${formatSeoulTime(approval.windowStart)}〜${formatSeoulTime(approval.windowEnd)}のあいだ`, `시간: ${formatSeoulTime(approval.windowStart)}~${formatSeoulTime(approval.windowEnd)} 사이`)),
-    text(tr(lang, `予約名：${approval.alias}`, `예약자 이름: ${approval.alias}`)),
+    text(tr(lang, "AIがやること", "AI가 할 일"), { size: "xs", color: color.muted }),
+    text(tr(lang, `・この順に最大${shops.length}軒、AIだと名乗って韓国語で電話`, `· 이 순서로 최대 ${shops.length}곳, AI라고 밝히고 한국어로 전화`)),
+    ...shops.map((line) => text(`　${line}`, { weight: "bold" })),
+    text(tr(lang, "・条件に合えばその場で予約し、残りには電話しない", "· 조건에 맞으면 바로 예약하고 나머지에는 전화하지 않기")),
+    text(tr(lang, "・合わなければ、待ち時間や次のお店まで自分で判断して進める", "· 안 맞으면 대기 시간과 다음 가게까지 스스로 판단해서 진행")),
+    text(next),
     { type: "separator", margin: "md" },
-    text(tr(lang, `上から順に1軒ずつ電話し、条件に合えばそこで予約して、残りのお店には電話しません。どこも合わなければ、いちばん近い案を持って戻ります。`, `위에서부터 한 곳씩 전화하고, 조건에 맞으면 거기서 예약하고 나머지 가게에는 전화하지 않아요. 모두 안 맞으면 가장 가까운 안을 가지고 돌아올게요.`), { size: "xs" }),
-    text(tr(lang, "AIであることを伝えたうえで、韓国語で問い合わせます。この範囲外の時間を提案されたり予約金を求められたりした場合は、確定せずにこちらで確認します。", "AI라고 밝히고 한국어로 물어봐요. 이 범위 밖의 시간이나 예약금을 요구하면 확정하지 않고 여기서 다시 확인해요."), { size: "xs", color: color.muted }),
+    text(tr(lang, "あなたに聞くのは", "당신에게 묻는 건"), { size: "xs", color: color.muted }),
+    text(tr(lang, "時間を変えるとき・予約金を求められたとき・結果がはっきりしないときだけ", "시간을 바꿀 때 · 예약금을 요구받을 때 · 결과가 분명하지 않을 때만"), { size: "sm" }),
   ];
   if (anyTest) body.push(text(tr(lang, "テスト通話です。チームメンバーの電話につながります。", "테스트 통화예요. 팀원 전화로 연결돼요."), { size: "xs", color: color.warning }));
   body.push(text(tr(lang, `${formatSeoulTime(approval.expiresAt)}まで有効です。`, `${formatSeoulTime(approval.expiresAt)}까지 유효해요.`), { size: "xs", color: color.muted }));
   return {
     type: "flex",
-    altText: tr(lang, "この条件で電話を頼みますか？", "이 조건으로 전화를 부탁할까요?"),
+    altText: tr(lang, "この内容でAIに任せますか？", "이 내용으로 AI에게 맡길까요?"),
     contents: {
       type: "bubble",
-      header: vbox([text(tr(lang, "この条件で電話を頼みますか？", "이 조건으로 전화를 부탁할까요?"), { size: "md", weight: "bold" })]),
+      header: vbox([text(tr(lang, "この内容でAIに任せますか？", "이 내용으로 AI에게 맡길까요?"), { size: "md", weight: "bold" })]),
       body: vbox(body),
       footer: vbox([
-        { type: "button", style: "primary", color: color.primary, height: "sm", action: postback(request, "approve", tr(lang, "この条件で電話を頼む", "이 조건으로 전화 부탁하기"), { displayText: tr(lang, "この条件で電話を頼む", "이 조건으로 전화 부탁하기") }) },
+        { type: "button", style: "primary", color: color.primary, height: "sm", action: postback(request, "approve", tr(lang, "この内容で任せる", "이 내용으로 맡기기"), { displayText: tr(lang, "この内容で任せる", "이 내용으로 맡기기") }) },
         { type: "button", style: "link", height: "sm", action: postback(request, "cancel_call", tr(lang, "やめる", "그만두기"), { displayText: tr(lang, "やめる", "그만두기") }) },
       ]),
     },
@@ -454,7 +459,7 @@ export function verifiedNone(request: DiningRequest): LineMessage {
     type: "text",
     text: tr(lang, "予約はないことを記録しました。ほかのお店に電話で聞くこともできます。", "예약이 없다고 기록했어요. 다른 가게에 전화로 물어볼 수도 있어요."),
     quickReply: quickReply([
-      postback(request, "call_request", tr(lang, "電話で聞いてもらう", "전화로 물어봐 주세요"), { displayText: tr(lang, "電話で聞いてもらう", "전화로 물어봐 주세요") }),
+      postback(request, "call_request", tr(lang, "AIに任せる", "AI에게 맡기기"), { displayText: tr(lang, "AIに任せる", "AI에게 맡기기") }),
       postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }),
     ]),
   };
@@ -635,7 +640,7 @@ function timingRow(lang: Lang, request: DiningRequest, plan: CandidatePlan, minu
 function seatRow(lang: Lang, plan: CandidatePlan, canCall: boolean): FlexBox {
   const label = tr(lang, "今の空席・待ち", "지금 빈자리·대기");
   if (!plan.wait) {
-    return row(label, "unknown", canCall ? tr(lang, "お店にしか分かりません。AIが韓国語で電話して確かめられます", "가게만 알아요. AI가 한국어로 전화해서 확인할 수 있어요") : tr(lang, "お店にしか分かりません", "가게만 알아요"));
+    return row(label, "unknown", canCall ? tr(lang, "お店にしか分かりません。任せればAIが韓国語で電話して確かめます", "가게만 알아요. 맡기면 AI가 한국어로 전화해서 확인해요") : tr(lang, "お店にしか分かりません", "가게만 알아요"));
   }
   return row(label, plan.verdict === "late" ? "no" : "ok", waitLine(lang, plan.wait));
 }
@@ -668,12 +673,13 @@ export function todayAnswer(
   const button = (style: "primary" | "secondary" | "link", action: LineAction): FlexComponent => ({ type: "button", style, height: "sm", ...(style === "primary" ? { color: color.primary } : {}), action });
   const alternatives = postback(request, "alternatives", tr(lang, "近くの似たお店", "근처 비슷한 가게"), { displayText: tr(lang, "近くの似たお店を見る", "근처 비슷한 가게 보기") });
   const callLabel = (ja: string, ko: string) => postback(request, "call_request", tr(lang, ja, ko), { displayText: tr(lang, ja, ko) });
+  // One main action: hand the goal to the AI. The rest are small ways to do it yourself.
   if (check.verdict === "hard") {
-    buttons.push(button("primary", alternatives));
-    if (options.canCallOthers) buttons.push(button("secondary", callLabel("ほかのお店に電話で聞く", "다른 가게에 전화로 묻기")));
+    if (options.canCallOthers) buttons.push(button("primary", callLabel("近くのお店をAIに任せる", "근처 가게를 AI에게 맡기기")));
+    buttons.push(button(options.canCallOthers ? "link" : "primary", alternatives));
   } else {
-    if (callable) buttons.push(button("primary", check.verdict === "ok" ? callLabel("電話で予約を頼む", "전화로 예약 부탁하기") : callLabel("AIに電話で確かめてもらう", "AI에게 전화로 확인 부탁하기")));
-    buttons.push(button(callable ? "secondary" : "primary", postback(request, "select", tr(lang, "このまま行く", "그냥 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) })));
+    if (callable) buttons.push(button("primary", callLabel("AIに任せる", "AI에게 맡기기")));
+    buttons.push(button(callable ? "link" : "primary", postback(request, "select", tr(lang, "自分で行く", "직접 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) })));
     buttons.push(button("link", postback(request, "wait", tr(lang, "待ち状況を送る", "대기 상황 보내기"), { candidateId: restaurant.id })));
     buttons.push(button("link", alternatives));
   }
@@ -767,6 +773,52 @@ export function bestAlternative(request: DiningRequest, restaurant: Restaurant, 
       postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }),
       { type: "message", label: tr(lang, "キャンセル", "취소"), text: tr(lang, "キャンセル", "취소") },
     ]),
+  };
+}
+
+export function callLimitReached(lang: Lang, scope: "user" | "all"): LineMessage {
+  return scope === "user"
+    ? { type: "text", text: tr(lang, "今日お願いできる電話の回数を使い切りました。お店の公式ページか地図から確認してください。", "오늘 부탁할 수 있는 전화 횟수를 다 썼어요. 가게 공식 페이지나 지도에서 확인해 주세요.") }
+    : { type: "text", text: tr(lang, "今日は電話の問い合わせが混み合っていて、これ以上かけられません。お店の公式ページか地図から確認してください。", "오늘은 전화 문의가 많아서 더 걸 수 없어요. 가게 공식 페이지나 지도에서 확인해 주세요.") };
+}
+
+/** Right after a booking: what the agent will keep an eye on until the next plan. */
+export function afterBookingPlan(request: DiningRequest, restaurant: Restaurant, plan: { leaveForShop: string | null; leaveNow: boolean; leaveForNext: string | null }): LineMessage {
+  const lang = request.lang;
+  const reservation = request.reservation!;
+  const steps: string[] = [];
+  if (plan.leaveNow) steps.push(tr(lang, "今すぐ出発", "지금 바로 출발"));
+  else if (plan.leaveForShop) steps.push(tr(lang, `${formatSeoulTime(plan.leaveForShop)} 出発（お知らせします）`, `${formatSeoulTime(plan.leaveForShop)} 출발 (알려 드릴게요)`));
+  steps.push(tr(lang, `${formatSeoulTime(reservation.time)} ${restaurant.nameJa}で着席`, `${formatSeoulTime(reservation.time)} ${restaurant.nameKo} 착석`));
+  if (plan.leaveForNext && request.nextPlace) steps.push(tr(lang, `${formatSeoulTime(plan.leaveForNext)} お店を出る（お知らせします）`, `${formatSeoulTime(plan.leaveForNext)} 가게에서 출발 (알려 드릴게요)`));
+  if (request.arriveBy && request.nextPlace) steps.push(tr(lang, `${formatSeoulTime(request.arriveBy)} ${request.nextPlace.nameJa}`, `${formatSeoulTime(request.arriveBy)} ${request.nextPlace.nameKo}`));
+  const head = plan.leaveNow
+    ? tr(lang, "お店まで時間がないので、今すぐ出発してください。このあとはAIが見ておきます。", "가게까지 시간이 빠듯해요. 지금 바로 출발해 주세요. 이후는 AI가 챙길게요.")
+    : tr(lang, "このあとはAIが見ておきます。", "이후는 AI가 챙길게요.");
+  return { type: "text", text: `${head}\n${steps.map((step) => `・${step}`).join("\n")}` };
+}
+
+/** The pushes the agent sends on its own after a booking. */
+export function reminder(request: DiningRequest, restaurant: Restaurant, item: Reminder, origin: string): LineMessage {
+  const lang = request.lang;
+  const reservation = request.reservation!;
+  const state = request.candidates.find((c) => c.restaurantId === restaurant.id);
+  if (item.kind === "leave_for_shop") {
+    const minutes = state?.toRestaurant?.minutes;
+    const label = tr(lang, "お店への行き方", "가게로 가는 길");
+    return {
+      type: "text",
+      text: tr(lang, `そろそろ出発の時間です（${formatSeoulTime(item.leaveAt)}）。${restaurant.nameJa}の${formatSeoulTime(reservation.time)}の予約に間に合います${minutes ? `（お店まで約${minutes}分）` : ""}。`, `슬슬 출발할 시간이에요 (${formatSeoulTime(item.leaveAt)}). ${restaurant.nameKo} ${formatSeoulTime(reservation.time)} 예약에 맞출 수 있어요${minutes ? ` (가게까지 약 ${minutes}분)` : ""}.`),
+      quickReply: quickReply([{ type: "uri", label, uri: goUrl(origin, { to: placeRef({ restaurantId: restaurant.id }), lang }) }]),
+    };
+  }
+  const next = request.nextPlace!;
+  const minutes = state?.toNext?.minutes;
+  const label = tr(lang, "次の予定への行き方", "다음 일정으로 가는 길");
+  return {
+    type: "text",
+    text: tr(lang, `${formatSeoulTime(request.arriveBy!)}に${next.nameJa}に着くには、そろそろお店を出る時間です（${formatSeoulTime(item.leaveAt)}）${minutes ? `。移動は約${minutes}分` : ""}。`, `${formatSeoulTime(request.arriveBy!)}에 ${next.nameKo}에 도착하려면 슬슬 가게에서 나올 시간이에요 (${formatSeoulTime(item.leaveAt)})${minutes ? `. 이동은 약 ${minutes}분` : ""}.`),
+    quickReply: quickReply([{ type: "uri", label, uri: goUrl(origin, { to: placeRef(next), from: placeRef({ restaurantId: restaurant.id }), lang }) }]),
   };
 }
 

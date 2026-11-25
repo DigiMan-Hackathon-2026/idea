@@ -13,6 +13,10 @@ export interface AgentStore {
   findByAttempt(attemptId: string): Promise<DiningRequest | null>;
   /** Saves when the stored revision equals `expectedRevision` (null = new). */
   save(request: DiningRequest, expectedRevision: number | null): Promise<boolean>;
+  /** Open requests with a reminder not yet sent (the agent checks which are due). */
+  listWithPendingReminders(now: string): Promise<DiningRequest[]>;
+  /** Calls placed since `since` from LINE (not the local simulator), by everyone or by one requester (daily limits). */
+  countCallsSince(since: string, requesterKey: string | null): Promise<number>;
   getAlias(requesterKey: string): Promise<string | null>;
   setAlias(requesterKey: string, alias: string): Promise<void>;
   deleteAlias(requesterKey: string): Promise<void>;
@@ -29,6 +33,21 @@ export class MemoryAgentStore implements AgentStore {
   private requests = new Map<string, DiningRequest>();
   private events = new Map<string, string>();
   private aliases = new Map<string, string>();
+
+  async listWithPendingReminders(now: string): Promise<DiningRequest[]> {
+    // A booked request keeps its reminders even after a new request closes it (cancel clears them).
+    return [...this.requests.values()].filter((request) => request.reservation !== null && Date.parse(request.expiresAt) > Date.parse(now) && (request.reminders ?? []).some((reminder) => reminder.sentAt === null)).map((request) => structuredClone(request));
+  }
+
+  async countCallsSince(since: string, requesterKey: string | null): Promise<number> {
+    let count = 0;
+    for (const request of this.requests.values()) {
+      if (request.replyTarget.startsWith("sim-")) continue;
+      if (requesterKey !== null && request.requesterKey !== requesterKey) continue;
+      count += request.attempts.filter((attempt) => Date.parse(attempt.startedAt) >= Date.parse(since)).length;
+    }
+    return count;
+  }
 
   async claimEvent(eventId: string, now: string): Promise<boolean> {
     if (this.events.has(eventId)) return false;

@@ -127,8 +127,9 @@ function createRuntime(): LineAgentRuntime {
     simulatorCalls.push(call);
     if (simulatorCalls.length > 200) simulatorCalls.splice(0, simulatorCalls.length - 200);
   };
+  // The simulator agent (it keeps transcripts for the console) runs on this machine only: no daily call limit.
   const make = (line: LineGateway, readImage: ((messageId: string) => Promise<string | null>) | null, onCallTranscript?: (call: SimulatorCall) => void) =>
-    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log, resolveLink: resolveShortLink, understand });
+    new DiningAgent({ store, line, travel, calls: placer(), clock, newId: () => randomUUID().replace(/-/g, ""), keyOf, origin: config.origin, linkSecret: config.linkSecret, phoneAllowed, readImage, searchPlaces, onCallTranscript, log, resolveLink: resolveShortLink, understand, callLimits: onCallTranscript ? null : config.callLimits, reminderDemoSeconds: config.reminderDemoSeconds });
 
   const simulatorLine = new RecordingLineGateway(clock);
   const simulatorImages = new Map<string, Buffer>();
@@ -147,6 +148,15 @@ function createRuntime(): LineAgentRuntime {
   const realLine: LineGateway = accessToken ? new LineMessagingClient(accessToken) : new RecordingLineGateway(clock);
   const runtime: LineAgentRuntime = { config, store, agent: make(realLine, readLineImage), simulator: make(simulatorLine, readSimulatorImage, keepSimulatorCall), simulatorLine, simulatorImages, simulatorCalls, board, finishCall, attemptToken };
   self.runtime = runtime;
+  // After a booking the agent pushes "time to leave" on its own: check every 15 seconds.
+  const sweepReminders = async () => {
+    const due = await store.listWithPendingReminders(clock()).catch(() => []);
+    for (const request of due) {
+      const owner = request.replyTarget.startsWith(SIMULATOR_PREFIX) ? runtime.simulator : runtime.agent;
+      await owner.sendDueReminders(request.id).catch(() => log("line_agent.reminder_failed", {}));
+    }
+  };
+  setInterval(() => void sweepReminders(), 15_000).unref();
   log("line_agent.started", { calls: config.calls, line: config.accessToken !== null, simulator: config.simulatorEnabled, store: config.store });
   return runtime;
 }

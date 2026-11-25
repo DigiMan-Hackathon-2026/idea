@@ -20,6 +20,10 @@ export type LineAgentConfig = {
   bridge: { host: string; secret: string } | null;
   simulatorEnabled: boolean;
   demoNow: string | null;
+  /** Demo: after-booking reminders this many seconds (and twice that) after the booking; null = real times. */
+  reminderDemoSeconds: number | null;
+  /** Daily call limits (Seoul day): for everyone, and for one requester. */
+  callLimits: { perDay: number; perRequesterPerDay: number };
   /** Port of the voice bridge on this machine (the console listens to calls there). */
   bridgePort: number;
   simulatedCallDelayMs: number;
@@ -90,6 +94,11 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     simulatorEnabled: !production && (appEnv === "local" || appEnv === "test" || value("LINE_AGENT_SIMULATOR") === "1"),
     demoNow: demoNow && !Number.isNaN(Date.parse(demoNow)) ? new Date(demoNow).toISOString() : null,
     bridgePort: Number(value("VOICE_BRIDGE_PORT") ?? 8787) || 8787,
+    reminderDemoSeconds: Number(value("LINE_AGENT_REMINDER_DEMO_SECONDS")) > 0 ? Number(value("LINE_AGENT_REMINDER_DEMO_SECONDS")) : null,
+    callLimits: {
+      perDay: Number(value("LINE_AGENT_CALLS_PER_DAY") ?? 40) || 40,
+      perRequesterPerDay: Number(value("LINE_AGENT_CALLS_PER_USER_PER_DAY") ?? 9) || 9,
+    },
     // "speech": simulated calls last as long as their lines take to say (fallback demo with the console).
     simulatedCallDelayMs: value("LINE_AGENT_SIM_CALL_DELAY_MS") === "speech" ? -1 : Number(value("LINE_AGENT_SIM_CALL_DELAY_MS") ?? 2500) || 2500,
     simulatedScripts: { ...defaultScripts, ...parseSimulatedScripts(value("LINE_AGENT_SIM_SCRIPTS")) },

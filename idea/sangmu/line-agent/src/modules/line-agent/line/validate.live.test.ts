@@ -48,9 +48,9 @@ describe.skipIf(!token)("LINE message validation (live)", () => {
     await send({ data: buttons(first)["待ち状況を送る"] });
     await send({ text: "90分待ち" });
     await send({ data: buttons(last())["着いてから並ぶ"] });
-    await send({ data: buttons(last())["電話で聞いてもらう"] });
+    await send({ data: buttons(last())["AIに任せる"] });
     await send({ text: "サトウ" });
-    await send({ data: buttons(last())["この条件で電話を頼む"] });
+    await send({ data: buttons(last())["この内容で任せる"] });
     clock = seoulInstant("2026-11-29", 17, 33);
     await agent.handleCallFinished({ attemptId: jobs[0].attemptId, transcript: simulateTranscript("only_later", jobs[0].brief) });
     await agent.handleCallFinished({ attemptId: jobs[1].attemptId, transcript: simulateTranscript("accept", jobs[1].brief) });
