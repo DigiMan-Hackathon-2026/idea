@@ -1,5 +1,6 @@
 import { createHmac } from "node:crypto";
 import { after, type NextRequest } from "next/server";
+import type { CallPhase } from "../../../../../../../../modules/line-agent/call-board";
 import { getLineAgentRuntime } from "../../../../../../../../modules/line-agent/runtime.server";
 import { sameToken } from "../../../../../../../../modules/line-agent/tokens";
 import { createMethodNotAllowedHandler } from "../../../../../../../../server/api-response";
@@ -25,8 +26,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const runtime = getLineAgentRuntime();
   const token = request.nextUrl.searchParams.get("t") ?? "";
   if (!runtime.config.bridge || !sameToken(token, runtime.attemptToken(attemptId))) return new Response(null, { status: 401 });
-  const outcome = request.headers.get("content-type")?.includes("json") ? await katOutcome(request) : await twilioOutcome(request);
+  const { outcome, phase } = request.headers.get("content-type")?.includes("json") ? await katOutcome(request) : await twilioOutcome(request);
   if (outcome === "rejected") return new Response(null, { status: 401 });
+  if (phase) runtime.board.phase(attemptId, phase);
   if (outcome === "not_connected") {
     after(() => runtime.finishCall({ attemptId, transcript: [] }));
   } else if (outcome === "ended") {
@@ -40,27 +42,30 @@ export async function POST(request: NextRequest, context: RouteContext) {
 }
 
 type Outcome = "not_connected" | "ended" | "pending" | "rejected";
+type Status = { outcome: Outcome; phase: CallPhase | null };
 
-async function twilioOutcome(request: NextRequest): Promise<Outcome> {
+async function twilioOutcome(request: NextRequest): Promise<Status> {
   const form = await request.formData().catch(() => null);
   const status = typeof form?.get("CallStatus") === "string" ? String(form?.get("CallStatus")) : "";
-  if (NOT_CONNECTED.has(status)) return "not_connected";
-  return status === "completed" ? "ended" : "pending";
+  if (NOT_CONNECTED.has(status)) return { outcome: "not_connected", phase: "failed" };
+  if (status === "completed") return { outcome: "ended", phase: "ended" };
+  return { outcome: "pending", phase: status === "ringing" ? "ringing" : status === "in-progress" ? "talking" : null };
 }
 
-async function katOutcome(request: NextRequest): Promise<Outcome> {
+async function katOutcome(request: NextRequest): Promise<Status> {
   const raw = await request.text();
-  if (!katSignatureValid(request, raw)) return "rejected";
+  if (!katSignatureValid(request, raw)) return { outcome: "rejected", phase: null };
   let event: { data?: { type?: string; answeredAt?: string | null } };
   try {
     event = JSON.parse(raw);
   } catch {
-    return "pending";
+    return { outcome: "pending", phase: null };
   }
   const type = event.data?.type;
   // KAT has no separate busy/no-answer event: "failed" without an answer is one.
-  if (type === "media_stream.call.failed") return event.data?.answeredAt ? "ended" : "not_connected";
-  return type === "media_stream.call.completed" ? "ended" : "pending";
+  if (type === "media_stream.call.failed") return event.data?.answeredAt ? { outcome: "ended", phase: "ended" } : { outcome: "not_connected", phase: "failed" };
+  if (type === "media_stream.call.completed") return { outcome: "ended", phase: "ended" };
+  return { outcome: "pending", phase: type === "media_stream.call.ringing" ? "ringing" : type === "media_stream.call.answered" ? "talking" : null };
 }
 
 /** v1=HMAC-SHA256("{timestamp}.{raw body}") with the KAT webhook secret, when one is configured. */

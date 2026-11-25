@@ -3,6 +3,7 @@ import "server-only";
 import { createHmac, randomUUID } from "node:crypto";
 import { getTmapWalkingRoute } from "../routing/tmap-walking.server";
 import { DiningAgent } from "./agent";
+import { CallBoard } from "./call-board";
 import { readLineAgentConfig, type LineAgentConfig } from "./config";
 import { LineMessagingClient, RecordingLineGateway, type LineGateway } from "./line/client";
 import { getRuntimeDatabasePool } from "../../db/runtime.server";
@@ -29,6 +30,8 @@ export type LineAgentRuntime = {
   simulatorImages: Map<string, Buffer>;
   /** Finished simulator calls with transcripts, newest last (memory only). */
   simulatorCalls: SimulatorCall[];
+  /** Phase and live transcript of recent calls, for the operations console. */
+  board: CallBoard;
   /** Routes a call result to the agent that owns the conversation. */
   finishCall(result: CallFinished): Promise<void>;
   attemptToken(attemptId: string): string;
@@ -69,14 +72,33 @@ function createRuntime(): LineAgentRuntime {
   const phoneAllowed = (ref: string) => config.calls === "simulator" ? ref.startsWith("demo-") : ref in config.phoneAllowlist;
 
   const self: { runtime?: LineAgentRuntime } = {};
+  const board = new CallBoard();
   const finishCall = async (result: CallFinished) => {
+    board.finished(result.attemptId, "transcript" in result ? result.transcript : null);
     const request = await store.findByAttempt(result.attemptId);
     if (!request) return;
     const owner = request.replyTarget.startsWith(SIMULATOR_PREFIX) ? self.runtime!.simulator : self.runtime!.agent;
     await owner.handleCallFinished(result);
   };
 
-  const placer = (): CallPlacer | null => {
+  // Every placed call shows on the console board; a call the carrier refused shows as failed.
+  const onBoard = (inner: CallPlacer | null): CallPlacer | null =>
+    inner && {
+      kind: inner.kind,
+      place: async (job) => {
+        board.placed(job.attemptId, job.brief.restaurantNameKo, inner.kind === "simulator");
+        try {
+          const callId = await inner.place(job);
+          board.phase(job.attemptId, inner.kind === "simulator" ? "talking" : "ringing");
+          return callId;
+        } catch (error) {
+          board.phase(job.attemptId, "failed");
+          throw error;
+        }
+      },
+    };
+  const placer = (): CallPlacer | null => onBoard(carrier());
+  const carrier = (): CallPlacer | null => {
     if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs);
     const statusUrl = (attemptId: string) => `${config.origin}/api/v1/integrations/voice/attempts/${attemptId}/status?t=${attemptToken(attemptId)}`;
     const phoneFor = (ref: string) => config.phoneAllowlist[ref] ?? null;
@@ -114,7 +136,7 @@ function createRuntime(): LineAgentRuntime {
       }
     : null;
   const realLine: LineGateway = accessToken ? new LineMessagingClient(accessToken) : new RecordingLineGateway(clock);
-  const runtime: LineAgentRuntime = { config, store, agent: make(realLine, readLineImage), simulator: make(simulatorLine, readSimulatorImage, keepSimulatorCall), simulatorLine, simulatorImages, simulatorCalls, finishCall, attemptToken };
+  const runtime: LineAgentRuntime = { config, store, agent: make(realLine, readLineImage), simulator: make(simulatorLine, readSimulatorImage, keepSimulatorCall), simulatorLine, simulatorImages, simulatorCalls, board, finishCall, attemptToken };
   self.runtime = runtime;
   log("line_agent.started", { calls: config.calls, line: config.accessToken !== null, simulator: config.simulatorEnabled, store: config.store });
   return runtime;

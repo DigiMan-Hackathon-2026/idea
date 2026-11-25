@@ -1,5 +1,5 @@
 import { after, type NextRequest } from "next/server";
-import type { TranscriptTurn } from "../../../../../../../../modules/line-agent/outcome";
+import { readTranscript } from "../../../../../../../../modules/line-agent/outcome";
 import { getLineAgentRuntime } from "../../../../../../../../modules/line-agent/runtime.server";
 import { createMethodNotAllowedHandler } from "../../../../../../../../server/api-response";
 import { sameToken } from "../../../../../../../../modules/line-agent/tokens";
@@ -11,18 +11,6 @@ export const GET = methodNotAllowed;
 export const PUT = methodNotAllowed;
 export const PATCH = methodNotAllowed;
 export const DELETE = methodNotAllowed;
-
-function readTranscript(value: unknown): TranscriptTurn[] | null {
-  if (!Array.isArray(value) || value.length > 200) return null;
-  const turns: TranscriptTurn[] = [];
-  for (const item of value) {
-    if (!item || typeof item !== "object") return null;
-    const { speaker, text } = item as Record<string, unknown>;
-    if ((speaker !== "ai" && speaker !== "shop") || typeof text !== "string") return null;
-    turns.push({ speaker, text: text.slice(0, 2000) });
-  }
-  return turns;
-}
 
 // The voice bridge reports the transcript when the call ends (or that it
 // failed to connect). The agent classifies the outcome; the bridge never
