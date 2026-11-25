@@ -40,7 +40,8 @@ export function formatSeoulTime(iso: string): string {
 /** Korean spoken form used on calls, e.g. "저녁 6시 30분". */
 export function formatKoreanSpokenTime(iso: string): string {
   const { hour, minute } = seoulClock(iso);
-  const period = hour < 12 ? "오전" : hour < 18 ? "오후" : "저녁";
+  // Midnight is "밤 12시" (not "오전 12시", which reads as noon to many), the small hours "새벽".
+  const period = hour === 0 ? "밤" : hour < 5 ? "새벽" : hour < 12 ? "오전" : hour < 18 ? "오후" : hour < 21 ? "저녁" : "밤";
   const twelve = hour % 12 === 0 ? 12 : hour % 12;
   return minute === 0 ? `${period} ${twelve}시` : minute === 30 ? `${period} ${twelve}시 반` : `${period} ${twelve}시 ${minute}분`;
 }
