@@ -17,6 +17,7 @@ const katSecret = "whsec_selftest";
 let attemptId = "attempt0001";
 
 let seen = fresh();
+// appends counts audio bytes: the shop's five 20 ms chunks (800 bytes) start the fake conversation.
 function fresh() {
   return { instructionsAuth: null, result: null, resultAuth: null, start: null, appends: 0 };
 }
@@ -48,7 +49,7 @@ live.on("upgrade", (request, socket, head) => {
       seen.start = event.session;
       setTimeout(() => ws.send(JSON.stringify({ type: "session.started", session: { id: "live_1" } })), 100);
     }
-    if (event.type === "session.input_audio.append" && ++seen.appends === 5) {
+    if (event.type === "session.input_audio.append" && seen.appends < 800 && (seen.appends += Buffer.byteLength(event.audio, "base64")) >= 800) {
       ws.send(JSON.stringify({ type: "session.input_transcript.delta", delta: "네, 테스트 매장입니다." }));
       ws.send(JSON.stringify({ type: "session.output_audio.delta", delta: aiAudio }));
       ws.send(JSON.stringify({ type: "session.output_transcript.delta", delta: "안녕하세요, AI 비서입니다. " }));
