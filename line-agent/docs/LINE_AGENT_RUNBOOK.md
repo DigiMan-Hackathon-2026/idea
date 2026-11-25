@@ -43,7 +43,7 @@ open http://localhost:3000/dev/line-agent
 
 1. LINE Developers에서 Messaging API 채널을 만들고 채널 시크릿과 채널 액세스 토큰(장기)을 발급한다.
 2. LINE Official Account Manager에서 자동 응답·인사 메시지를 끄고, 그룹·여러 명 대화 참여를 허용한다.
-3. 공개 주소를 연다: `cloudflared tunnel --url http://localhost:3000`. 나온 주소를 `APP_ORIGIN`에 넣는다(링크가 이 주소로 만들어진다).
+3. 공개 주소를 연다. 시연에는 아래 '고정 공개 주소'를 쓴다. 잠깐 시험할 때는 `cloudflared tunnel --url http://localhost:3000`도 되지만, 주소가 매번 바뀌고 몇 시간 만에 끊기기도 한다. 나온 주소를 `APP_ORIGIN`에 넣는다(링크가 이 주소로 만들어진다).
 4. `.env.local`에 `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_AGENT_KEY_SECRET`, `LINE_AGENT_LINK_SECRET`을 넣고 서버를 다시 켠다. 값은 채팅이나 git에 붙여 넣지 않는다.
 5. 채널의 웹훅 URL을 `https://<공개 주소>/api/v1/integrations/line/webhook`으로 정하고 「Use webhook」을 켠 뒤 「Verify」를 누른다.
 
@@ -52,6 +52,20 @@ open http://localhost:3000/dev/line-agent
 카드 위 역 이미지는 `public/line-agent/hero/<역코드>.png`이고, 역을 추가하면 `node scripts/line/render-hero-images.mjs`로 다시 만든다. LINE은 HTTPS 이미지만 읽으므로 `APP_ORIGIN`이 HTTPS일 때만 붙는다.
 
 대화창 아래 고정 메뉴(使い方 · ごはんを探す · やめる)는 `pnpm line:richmenu`로 한 번 만든다. 이미지만 미리 보려면 `node scripts/line/setup-rich-menu.mjs --dry-run menu.png`.
+
+### 고정 공개 주소 (Tailscale Funnel)
+
+도메인 없이 무료로 고정 주소 `https://<맥 이름>.<tailnet>.ts.net`을 쓴다. 앱과 음성 중계를 주소 하나로 연다.
+
+1. Tailscale 앱에 로그인한다. 처음 Funnel을 켤 때 나오는 링크에서 Funnel을 허용한다.
+2. 경로를 나눠 연다(맥에서는 `/Applications/Tailscale.app/Contents/MacOS/Tailscale`이 `tailscale` 명령이다).
+   - `tailscale funnel --bg http://127.0.0.1:3120` (앱)
+   - `tailscale funnel --bg --set-path /kat http://127.0.0.1:8787/kat` (KAT 음성 중계)
+   - 확인: `tailscale funnel status`
+3. `.env.local`에 `APP_ORIGIN=https://<주소>`, `VOICE_BRIDGE_PUBLIC_HOST=<주소>`(https:// 없이)를 넣는다. 앱은 `-p 3120`으로 켠다.
+4. LINE 웹훅 URL을 `https://<주소>/api/v1/integrations/line/webhook`으로 한 번만 바꾸면 된다.
+
+맥이 켜져 있고 Tailscale이 연결돼 있어야 한다. 끄려면 `tailscale funnel --https=443 off`. 주소에는 맥 이름이 들어가므로 시연 전에 맥 이름을 정해 두면 좋다.
 
 ## 3. 실제 전화 켜기
 
@@ -87,7 +101,7 @@ AI가 통화 첫마디에서 AI 비서라고 밝힌다. KAT의 통화 시작 안
    - `LINE_AGENT_PHONE_ALLOWLIST={"demo-shop-a":"+8210…","demo-shop-b":"+8210…","demo-shop-c":"+8210…"}` (동의한 번호만)
    - `VOICE_BRIDGE_SECRET`(16자 이상), `OPENAI_API_KEY`, `VOICE_BRIDGE_APP_URL=http://localhost:3000`
 3. 음성 중계를 켠다: `pnpm voice:bridge` (포트 8787).
-4. 중계용 공개 주소를 하나 더 연다: `cloudflared tunnel --url http://localhost:8787`. 주소에서 `https://`를 뺀 호스트를 `VOICE_BRIDGE_PUBLIC_HOST`에 넣고 앱 서버를 다시 켠다.
+4. 중계용 공개 주소: 고정 공개 주소를 쓰면 `/kat` 경로로 이미 열려 있다. 아니면 `cloudflared tunnel --url http://localhost:8787`로 하나 더 열고, 주소에서 `https://`를 뺀 호스트를 `VOICE_BRIDGE_PUBLIC_HOST`에 넣은 뒤 앱 서버를 다시 켠다.
 
 `APP_ORIGIN`은 앱의 공개 주소여야 한다. 전화망이 통화 결과 상태(안 받음·통화 중·종료)를 이 주소로 알려 준다. 음성 중계는 같은 컴퓨터의 앱에 `VOICE_BRIDGE_APP_URL=http://localhost:3000`으로 붙는다.
 
