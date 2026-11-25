@@ -53,7 +53,7 @@ const listeners = new Set();
 const broadcast = (message) => {
   if (listeners.size === 0) return;
   const text = JSON.stringify(message);
-  for (const listener of listeners) listener.isOpen && listener.send(text);
+  for (const listener of listeners) if (listener.isOpen) listener.send(text);
 };
 const LOOPBACK = /^(::1|127\.\d+\.\d+\.\d+|::ffff:127\.\d+\.\d+\.\d+)$/;
 const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
