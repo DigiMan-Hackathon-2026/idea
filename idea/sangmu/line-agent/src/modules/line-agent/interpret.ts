@@ -117,6 +117,14 @@ const thereMarker = /^\s*(?:の[^。.!?、,]{0,8})?(?:に着|へ|まで|까지|�
 const foodWords = /(食べ|ご飯|ごはん|ランチ|ディナー|夕食|夕飯|晩ご飯|食事|レストラン|お店|먹|식당|밥|맛집|저녁 식사)/;
 const cancelWords = /(キャンセル|やめる|やめます|中止|취소|그만)/;
 
+// "電話して", "電話で聞いて", "電話かけて", "전화해 줘", "전화로 물어봐" — the words for the call buttons.
+const callWords = /電話(?:を)?(?:して|かけ|掛け|で(?:聞|確認|確か|予約|問い合わせ)|お願い|頼|たの)|(?:電話|でんわ)で?(?:お願い)|전화\s*(?:해|좀|걸|부탁|로\s*(?:물어|확인|예약|알아))|\bcall\b/i;
+
+/** The user asks in words for the AI to call. */
+export function wantsCall(text: string): boolean {
+  return callWords.test(normalizeText(text));
+}
+
 export function interpret(text: string): Interpretation {
   const t = normalizeText(text);
   const lang = detectLang(t);

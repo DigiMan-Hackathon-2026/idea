@@ -132,7 +132,11 @@
         "url": null,
         "checkedAt": "2026-11-25"
       },
-      "test": true
+      "test": true,
+      "aliases": [
+        "テスト店C",
+        "테스트C"
+      ]
     },
     {
       "id": "test-shinchon-d",

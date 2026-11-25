@@ -3,7 +3,7 @@
 // — only after the requester approves — calls shops one at a time until one
 // accepts inside the approved window (spec §3–§5, §8).
 import { buildCallInstructions } from "./call-brief";
-import { findClockTimes, interpret, normalizeText, parsePartySize, type Interpretation } from "./interpret";
+import { findClockTimes, interpret, normalizeText, parsePartySize, wantsCall, type Interpretation } from "./interpret";
 import { makeCardToken } from "./links";
 import type { LineGateway } from "./line/client";
 import type { LineEvent, LineMessage, LineSource } from "./line/types";
@@ -20,8 +20,9 @@ import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
 import { addMinutes, ceilToMinutes, floorToMinutes, laterOf, seoulDate, seoulInstant } from "./time";
 import { judgeToday } from "./today";
+import type { Understanding } from "./understand";
 import type { TravelProvider } from "./travel";
-import type { CallApproval, CallAttempt, CallOutcome, CandidateState, DiningRequest, MenuKey, Restaurant } from "./types";
+import type { CallApproval, CallAttempt, CallOutcome, CandidateState, DiningRequest, Lang, MenuKey, Restaurant } from "./types";
 import { readWait } from "./wait";
 
 export type AgentDeps = {
@@ -46,6 +47,8 @@ export type AgentDeps = {
   log?: (event: string, data: Record<string, string | number | boolean | null>) => void;
   /** Follows NAVER/Google Maps short links to their full URL. null = short links are not opened. */
   resolveLink?: LinkResolver | null;
+  /** Reads a message the rules could not (language model, form only). null = rules only. */
+  understand?: ((text: string, lang: Lang, now: string) => Promise<Understanding | null>) | null;
 };
 
 type Target = NonNullable<DiningRequest["target"]>;
@@ -253,36 +256,18 @@ export class DiningAgent {
       await this.reply(ctx, [m.busyCalling(active.lang)]);
       return;
     }
+    if (wantsCall(text)) return this.callFromText(ctx, text, active, reading);
     // A shop the user points at (map link, page, or its name) is answered for that shop first.
     const place = await identifyPlace(text, this.deps.resolveLink ?? null);
     if (place?.kind === "shop") {
-      if (active && !(fromRequester || !isGroup)) return this.reply(ctx, [m.onlyRequester(active.lang)]);
-      if (!ctx.userId) return this.reply(ctx, [m.greeting(reading.lang, isGroup ? "group" : "user")]);
-      if (active) await this.deps.store.save({ ...this.bump(active, now), status: "closed" as const }, active.revision);
       this.log("request.target", { via: place.via });
-      await this.startRequest(ctx, reading, now, { candidateId: place.restaurant.id, via: place.via });
-      return;
+      return this.beginRequest(ctx, active, fromRequester, reading, now, { candidateId: place.restaurant.id, via: place.via });
     }
     if (place && !(reading.wantsFood && filledFields(reading) >= 2)) {
       await this.reply(ctx, [place.kind === "unknown_place" ? m.unknownPlace(reading.lang) : m.unreadableLink(reading.lang, place.host)]);
       return;
     }
-    if (reading.wantsFood || filledFields(reading) >= 2) {
-      if (active && !(fromRequester || !isGroup)) {
-        await this.reply(ctx, [m.onlyRequester(active.lang)]);
-        return;
-      }
-      if (!ctx.userId) {
-        await this.reply(ctx, [m.greeting(reading.lang, isGroup ? "group" : "user")]);
-        return;
-      }
-      if (active) {
-        const closed = { ...this.bump(active, now), status: "closed" as const };
-        await this.deps.store.save(closed, active.revision);
-      }
-      await this.startRequest(ctx, reading, now);
-      return;
-    }
+    if (reading.wantsFood || filledFields(reading) >= 2) return this.beginRequest(ctx, active, fromRequester, reading, now, null);
     if (active) {
       const wait = readWait(text);
       const candidateId = active.pendingWaitCandidateId ?? active.selectedCandidateId;
@@ -291,7 +276,35 @@ export class DiningAgent {
         return;
       }
     }
+    // The rules did not get it: let the model read it into the same form.
+    const understood = await this.understand(text, active?.lang ?? reading.lang);
+    if (understood) {
+      const read = understood.reading;
+      const shop = understood.shopName ? findShopByName(understood.shopName) : null;
+      if (read.cancel) {
+        if (active && (fromRequester || !isGroup)) await this.cancel(active, ctx);
+        return;
+      }
+      if (understood.wantsCall) return this.callFromText(ctx, text, active, read, shop);
+      if (shop) return this.beginRequest(ctx, active, fromRequester, read, now, { candidateId: shop.id, via: "name" });
+      if (read.wantsFood || filledFields(read) >= 2) return this.beginRequest(ctx, active, fromRequester, read, now, null);
+    }
     await this.reply(ctx, [m.didNotUnderstand(reading.lang)]);
+  }
+
+  private async understand(text: string, lang: Lang): Promise<Understanding | null> {
+    if (!this.deps.understand) return null;
+    const found = await this.deps.understand(text, lang, this.now()).catch(() => null);
+    this.log("request.model_read", { understood: found !== null });
+    return found;
+  }
+
+  /** A new request (closing the open one), only by its requester in a group. */
+  private async beginRequest(ctx: Context, active: DiningRequest | null, fromRequester: boolean, reading: Interpretation, now: string, target: Target | null): Promise<void> {
+    if (active && !(fromRequester || ctx.kind === "user")) return this.reply(ctx, [m.onlyRequester(active.lang)]);
+    if (!ctx.userId) return this.reply(ctx, [m.greeting(reading.lang, ctx.kind === "user" ? "user" : "group")]);
+    if (active) await this.deps.store.save({ ...this.bump(active, now), status: "closed" as const }, active.revision);
+    await this.startRequest(ctx, reading, now, target);
   }
 
   private async onImage(ctx: Context, messageId: string): Promise<void> {
@@ -338,7 +351,7 @@ export class DiningAgent {
     await this.startRequest(ctx, { ...interpret(""), lang }, now, { candidateId: restaurant.id, via: "image" });
   }
 
-  private async startRequest(ctx: Context, reading: Interpretation, now: string, target: Target | null = null): Promise<void> {
+  private async startRequest(ctx: Context, reading: Interpretation, now: string, target: Target | null = null, callWhenReady = false): Promise<void> {
     const request: DiningRequest = {
       id: this.deps.newId(),
       conversationKey: ctx.convKey,
@@ -368,6 +381,7 @@ export class DiningAgent {
       decision: null,
       proposal: null,
       target,
+      callWhenReady,
       createdAt: now,
       updatedAt: now,
       expiresAt: addMinutes(now, REQUEST_TTL_MINUTES),
@@ -437,9 +451,16 @@ export class DiningAgent {
     if (ctx.kind === "user") await this.deps.line.showLoading?.(ctx.target, 10);
     next.candidates = await this.searchCandidates(next, now);
     next.status = "comparing";
+    const callNow = next.callWhenReady === true;
+    next.callWhenReady = false;
     if (!(await this.deps.store.save(next, expectedRevision))) return this.reply(ctx, [m.staleCard(next.lang)]);
     const intro = shop && next.target ? [m.todayIntro(next, shop, next.target.via, expectedRevision !== null)] : [];
-    await this.reply(ctx, [...notices, ...intro, ...this.overview(next, now)]);
+    const view = [...notices, ...intro, ...this.overview(next, now)];
+    // Asked for a call in words: go on to the booking name or approval card in the same reply.
+    const targetPlan = shop ? this.planFor(next, shop.id, now) : null;
+    const ruledOut = shop && targetPlan ? judgeToday(next, shop, targetPlan, now).verdict === "hard" : false;
+    if (callNow && !ruledOut) return this.requestCalls(next, ctx, now, view);
+    await this.reply(ctx, view);
   }
 
   private async searchCandidates(request: DiningRequest, now: string): Promise<CandidateState[]> {
@@ -517,7 +538,10 @@ export class DiningAgent {
     switch (request.pendingQuestion) {
       case "party": {
         const reading = interpret(text);
-        const size = parsePartySize(text);
+        let size = parsePartySize(text);
+        if ((size === null || size < 1 || size > 30) && !quietIfUnclear && !(reading.wantsFood && filledFields(reading) >= 2)) {
+          size = (await this.understand(text, request.lang))?.reading.partySize ?? null; // "カップルで" → 2
+        }
         if (size === null || size < 1 || size > 30) {
           if (quietIfUnclear || (reading.wantsFood && filledFields(reading) >= 2)) return false;
           await this.reply(ctx, [m.askPartySize(request)]);
@@ -531,7 +555,11 @@ export class DiningAgent {
       }
       case "area": {
         const mentions = findAreaMentions(normalizeText(text));
-        const mention = mentions.find((hit) => hit.area.diningArea);
+        let mention: { area: { id: string } } | undefined = mentions.find((hit) => hit.area.diningArea);
+        if (!mention && !quietIfUnclear && mentions.length === 0) {
+          const areaId = (await this.understand(text, request.lang))?.reading.currentAreaId;
+          if (areaId && findArea(areaId)?.diningArea) mention = { area: { id: areaId } };
+        }
         if (!mention) {
           if (quietIfUnclear && mentions.length === 0) return false;
           await this.reply(ctx, [m.askArea(request, mentions[0]?.area)]);
@@ -543,7 +571,7 @@ export class DiningAgent {
         return true;
       }
       case "menu": {
-        const menu = findMenu(normalizeText(text));
+        const menu = findMenu(normalizeText(text)) ?? (quietIfUnclear ? null : ((await this.understand(text, request.lang))?.reading.menu ?? null));
         if (!menu) {
           if (quietIfUnclear) return false;
           await this.reply(ctx, [m.askMenu(request)]);
@@ -574,8 +602,8 @@ export class DiningAgent {
 
   private async answerAlias(request: DiningRequest, text: string, ctx: Context): Promise<void> {
     const alias = normalizeText(text).slice(0, 20);
-    // Refuse anything that looks like a phone number or is empty.
-    if (!alias || /\d{4,}/.test(alias.replace(/[-\s]/g, ""))) {
+    // Refuse anything that looks like a phone number, is empty, or is a request ("電話して").
+    if (!alias || /\d{4,}/.test(alias.replace(/[-\s]/g, "")) || wantsCall(text)) {
       await this.reply(ctx, [m.askAlias(request.lang)]);
       return;
     }
@@ -694,28 +722,9 @@ export class DiningAgent {
         return;
       }
       case "call_request":
-      case "decision_retry": {
-        if (!this.deps.calls) return this.reply(ctx, [m.callingDisabled(lang)]);
-        const alias = await this.deps.store.getAlias(request.requesterKey);
-        if (!alias) {
-          const next = this.bump(request, now);
-          next.pendingQuestion = "alias";
-          if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
-          if (ctx.kind !== "user") {
-            try {
-              await this.deps.line.push(request.requesterTarget, [m.askAlias(lang)]);
-              await this.reply(ctx, [{ type: "text", text: say(lang, "予約名は個別トークでお聞きします。", "예약자 이름은 1:1 대화에서 여쭤볼게요.") }]);
-              return;
-            } catch {
-              // Not a friend of the account yet: ask here instead.
-            }
-          }
-          await this.reply(ctx, [m.askAlias(lang)]);
-          return;
-        }
-        await this.propose(this.bump(request, now), request.revision, ctx, alias);
+      case "decision_retry":
+        await this.requestCalls(request, ctx, now);
         return;
-      }
       case "approve": {
         const proposal = request.proposal;
         if (!proposal || Date.parse(proposal.expiresAt) < Date.parse(now)) {
@@ -808,7 +817,64 @@ export class DiningAgent {
 
   // ── Calls ─────────────────────────────────────────────────────────────────
 
-  private async propose(next: DiningRequest, expectedRevision: number, ctx: Context, alias: string): Promise<void> {
+  /** The call buttons (and "電話して"): ask the booking name once, then show the approval card. */
+  private async requestCalls(request: DiningRequest, ctx: Context, now: string, prefix: LineMessage[] = []): Promise<void> {
+    const lang = request.lang;
+    if (!this.deps.calls) return this.reply(ctx, [...prefix, m.callingDisabled(lang)]);
+    const alias = await this.deps.store.getAlias(request.requesterKey);
+    if (!alias) {
+      const next = this.bump(request, now);
+      next.pendingQuestion = "alias";
+      if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
+      if (ctx.kind !== "user") {
+        try {
+          await this.deps.line.push(request.requesterTarget, [m.askAlias(lang)]);
+          await this.reply(ctx, [...prefix, { type: "text", text: say(lang, "予約名は個別トークでお聞きします。", "예약자 이름은 1:1 대화에서 여쭤볼게요.") }]);
+          return;
+        } catch {
+          // Not a friend of the account yet: ask here instead.
+        }
+      }
+      await this.reply(ctx, [...prefix, m.askAlias(lang)]);
+      return;
+    }
+    await this.propose(this.bump(request, now), request.revision, ctx, alias, prefix);
+  }
+
+  /** "電話して" / "전화해 줘", optionally with a shop name: same as the call button, that shop first. */
+  private async callFromText(ctx: Context, text: string, active: DiningRequest | null, reading: Interpretation, shopHint: Restaurant | null = null): Promise<void> {
+    const now = this.now();
+    const shop = shopHint ?? findShopByName(text);
+    if (!active) {
+      if (!shop || !ctx.userId) return this.reply(ctx, [m.askWhichShop(reading.lang)]);
+      return this.startRequest(ctx, reading, now, { candidateId: shop.id, via: "name" }, true);
+    }
+    if (ctx.requesterKey !== active.requesterKey) return this.reply(ctx, [m.onlyRequester(active.lang)]);
+    if (shop && !active.candidates.some((c) => c.restaurantId === shop.id)) {
+      // A shop outside this search: start over for that shop.
+      if (!ctx.userId) return this.reply(ctx, [m.askWhichShop(active.lang)]);
+      await this.deps.store.save({ ...this.bump(active, now), status: "closed" as const }, active.revision);
+      return this.startRequest(ctx, { ...reading, lang: active.lang }, now, { candidateId: shop.id, via: "name" }, true);
+    }
+    const next = structuredClone(active);
+    if (shop) {
+      // Call the named shop first.
+      next.target = { candidateId: shop.id, via: "name" };
+      for (const candidate of next.candidates) if (candidate.restaurantId === shop.id) candidate.rank = 0;
+    }
+    if (next.status === "collecting" || next.candidates.length === 0) {
+      next.callWhenReady = true;
+      return this.advance(next, active.revision, ctx);
+    }
+    if (shop) {
+      const saved = this.bump(next, now);
+      if (!(await this.deps.store.save(saved, active.revision))) return this.reply(ctx, [m.staleCard(active.lang)]);
+      return this.requestCalls(saved, ctx, now);
+    }
+    return this.requestCalls(active, ctx, now);
+  }
+
+  private async propose(next: DiningRequest, expectedRevision: number, ctx: Context, alias: string, prefix: LineMessage[] = []): Promise<void> {
     const now = this.now();
     const lang = next.lang;
     const attempted = new Set(next.attempts.map((attempt) => attempt.candidateId));
@@ -822,7 +888,7 @@ export class DiningAgent {
       .slice(0, MAX_CALL_CANDIDATES);
     if (plans.length === 0) {
       await this.deps.store.save(next, expectedRevision);
-      await this.replyOrPush(ctx, next, [m.noCallableCandidates(lang)]);
+      await this.replyOrPush(ctx, next, [...prefix, m.noCallableCandidates(lang)]);
       return;
     }
     const starts = plans.map((plan) => plan.arriveRestaurantAt ?? addMinutes(now, 15));
@@ -844,7 +910,7 @@ export class DiningAgent {
     };
     next.status = "awaiting_approval";
     if (!(await this.deps.store.save(next, expectedRevision))) return this.reply(ctx, [m.staleCard(lang)]);
-    await this.replyOrPush(ctx, next, [m.approvalCard(next, next.proposal, findRestaurant)]);
+    await this.replyOrPush(ctx, next, [...prefix, m.approvalCard(next, next.proposal, findRestaurant)]);
   }
 
   /** Starts the next approved shop, one call at a time (spec §5). */
