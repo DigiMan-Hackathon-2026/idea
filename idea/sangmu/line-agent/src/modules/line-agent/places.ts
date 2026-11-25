@@ -182,11 +182,21 @@ export function validateCandidates(value: unknown): Restaurant[] {
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(item.source?.checkedAt ?? "")) throw new Error(`${where}: source.checkedAt is required`);
     if (!item.test && !item.source.url?.startsWith("https://")) throw new Error(`${where}: a verified shop needs a source URL`);
+    if (item.testCall !== undefined && typeof item.testCall !== "boolean") throw new Error(`${where}: testCall must be true or false`);
   }
   return list as Restaurant[];
 }
 
-export const restaurants: Restaurant[] = validateCandidates(candidateData);
+let restaurants: Restaurant[] = validateCandidates(candidateData);
+
+/** Automated tests run against fixed test shops instead of the editable demo list. */
+export function setCandidatesForTests(data: unknown): void {
+  restaurants = validateCandidates(data);
+}
+
+export function allRestaurants(): readonly Restaurant[] {
+  return restaurants;
+}
 
 // Search candidates seen in this process (their copies also live in each request).
 const searchRegistry = new Map<string, Restaurant>();

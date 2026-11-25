@@ -12,7 +12,7 @@ test("LINE agent books a test shop through the simulator", async ({ page }) => {
   await page.getByRole("button", { name: "送信" }).click();
 
   await expect(page.getByText("2名の候補です", { exact: false })).toBeVisible();
-  await expect(page.getByText("テスト用の店舗です").first()).toBeVisible();
+  await expect(page.getByText(/ソルレイム|トンブル|コギチャンゴ/).first()).toBeVisible();
 
   await page.getByRole("button", { name: "電話で聞いてもらう" }).click();
   await expect(page.getByText("予約名を送ってください", { exact: false })).toBeVisible();
@@ -21,6 +21,7 @@ test("LINE agent books a test shop through the simulator", async ({ page }) => {
 
   await expect(page.getByText("この条件で電話を頼みますか？").first()).toBeVisible();
   await expect(page.getByText("予約名：サトウ")).toBeVisible();
+  await expect(page.getByText("テスト通話です", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "この条件で電話を頼む" }).click();
 
   await expect(page.getByText("に電話しています", { exact: false }).first()).toBeVisible();
