@@ -362,7 +362,8 @@ export function approvalCard(request: DiningRequest, approval: CallProposal, loo
     text(tr(lang, `時間：${formatSeoulTime(approval.windowStart)}〜${formatSeoulTime(approval.windowEnd)}のあいだ`, `시간: ${formatSeoulTime(approval.windowStart)}~${formatSeoulTime(approval.windowEnd)} 사이`)),
     text(tr(lang, `予約名：${approval.alias}`, `예약자 이름: ${approval.alias}`)),
     { type: "separator", margin: "md" },
-    text(tr(lang, "AIであることを伝えたうえで、韓国語で1軒ずつ問い合わせます。この範囲外の時間を提案されたり予約金を求められたりした場合は、確定せずにこちらで確認します。", "AI라고 밝히고 한국어로 한 곳씩 물어봐요. 이 범위 밖의 시간이나 예약금을 요구하면 확정하지 않고 여기서 다시 확인해요."), { size: "xs", color: color.muted }),
+    text(tr(lang, `上から順に1軒ずつ電話し、条件に合えばそこで予約して、残りのお店には電話しません。どこも合わなければ、いちばん近い案を持って戻ります。`, `위에서부터 한 곳씩 전화하고, 조건에 맞으면 거기서 예약하고 나머지 가게에는 전화하지 않아요. 모두 안 맞으면 가장 가까운 안을 가지고 돌아올게요.`), { size: "xs" }),
+    text(tr(lang, "AIであることを伝えたうえで、韓国語で問い合わせます。この範囲外の時間を提案されたり予約金を求められたりした場合は、確定せずにこちらで確認します。", "AI라고 밝히고 한국어로 물어봐요. 이 범위 밖의 시간이나 예약금을 요구하면 확정하지 않고 여기서 다시 확인해요."), { size: "xs", color: color.muted }),
   ];
   if (anyTest) body.push(text(tr(lang, "テスト通話です。チームメンバーの電話につながります。", "테스트 통화예요. 팀원 전화로 연결돼요."), { size: "xs", color: color.warning }));
   body.push(text(tr(lang, `${formatSeoulTime(approval.expiresAt)}まで有効です。`, `${formatSeoulTime(approval.expiresAt)}까지 유효해요.`), { size: "xs", color: color.muted }));
@@ -742,6 +743,29 @@ export function walkIn(request: DiningRequest, restaurant: Restaurant, plan: Can
       postback(request, "select", tr(lang, "このお店に行く", "이 가게로 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) }),
       postback(request, "call_request", tr(lang, "ほかのお店に電話", "다른 가게에 전화"), { displayText: tr(lang, "ほかのお店に電話", "다른 가게에 전화") }),
       postback(request, "alternatives", tr(lang, "近くの似たお店", "근처 비슷한 가게"), { displayText: tr(lang, "近くの似たお店を見る", "근처 비슷한 가게 보기") }),
+    ]),
+  };
+}
+
+export function askWhichShop(lang: Lang): LineMessage {
+  return { type: "text", text: tr(lang, "どのお店に電話しますか？お店の名前かNAVER地図のリンクを送ってください。お店が決まっていなければ「新村で2人、サムギョプサル」のように送ってください。", "어느 가게에 전화할까요? 가게 이름이나 네이버 지도 링크를 보내 주세요. 가게가 정해지지 않았다면 \"신촌에서 2명, 삼겹살\"처럼 보내 주세요.") };
+}
+
+/** Every approved shop was called and none fits: the closest option, with what it costs. */
+export function bestAlternative(request: DiningRequest, restaurant: Restaurant, offeredTime: string, calledCount: number, lateMinutes: number | null): LineMessage {
+  const lang = request.lang;
+  const time = formatSeoulTime(offeredTime);
+  const next = request.arriveBy && request.nextPlace && lateMinutes !== null && lateMinutes > 0
+    ? tr(lang, `${formatSeoulTime(request.arriveBy)}の${request.nextPlace.nameJa}には約${lateMinutes}分遅れます。`, `${formatSeoulTime(request.arriveBy)} ${request.nextPlace.nameKo}에는 약 ${lateMinutes}분 늦어요. `)
+    : "";
+  const accept = tr(lang, `${time}で予約する`, `${time}로 예약하기`);
+  return {
+    type: "text",
+    text: tr(lang, `${calledCount}軒に電話しましたが、条件どおりの予約は取れませんでした。いちばん近いのは${restaurant.nameJa}の${time}です。${next}${time}に遅らせて予約しますか？`, `${calledCount}곳에 전화했지만 조건대로 예약하지 못했어요. 가장 가까운 건 ${restaurant.nameKo}의 ${time}이에요. ${next}${time}로 늦춰서 예약할까요?`),
+    quickReply: quickReply([
+      postback(request, "decision_accept", accept, { candidateId: restaurant.id, displayText: accept }),
+      postback(request, "new_search", tr(lang, "ほかのお店を探す", "다른 가게 찾기"), { displayText: tr(lang, "ほかのお店を探す", "다른 가게 찾기") }),
+      { type: "message", label: tr(lang, "キャンセル", "취소"), text: tr(lang, "キャンセル", "취소") },
     ]),
   };
 }

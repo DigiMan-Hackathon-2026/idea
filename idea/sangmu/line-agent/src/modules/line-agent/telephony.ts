@@ -26,9 +26,10 @@ export const SHOP_SCRIPTS = ["only_later", "accept", "no_answer", "full", "depos
 export type ShopScript = (typeof SHOP_SCRIPTS)[number];
 
 export const defaultScripts: Record<string, ShopScript> = {
+  // The demo order (Seolleim c → Donbul b → Gogichanggo a): full, then 19:00 only, then yes.
   "demo-shop-a": "accept",
-  "demo-shop-b": "accept",
-  "demo-shop-c": "only_later",
+  "demo-shop-b": "only_later",
+  "demo-shop-c": "full",
   "demo-shop-d": "full",
   "demo-shop-e": "deposit",
 };
@@ -110,7 +111,9 @@ export class SimulatedCallPlacer implements CallPlacer {
   ) {}
 
   async place(job: CallJob): Promise<string> {
-    const script = this.scripts[job.phoneRef] ?? "accept";
+    // Asking again at the time the shop itself offered (a window of 15 minutes or less) gets a yes.
+    const reask = Date.parse(job.brief.windowEnd) - Date.parse(job.brief.windowStart) <= 15 * 60_000;
+    const script = reask && this.scripts[job.phoneRef] === "only_later" ? "accept" : (this.scripts[job.phoneRef] ?? "accept");
     const transcript = simulateTranscript(script, job.brief);
     const callId = `SIM-${job.attemptId}`;
     // A negative delay: take as long as saying the lines (the console plays them back at that pace).

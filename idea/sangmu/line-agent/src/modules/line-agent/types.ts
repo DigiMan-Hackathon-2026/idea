@@ -223,6 +223,8 @@ export type DiningRequest = {
   proposal: CallProposal | null;
   /** The one shop the user pointed at (link, name or sign photo); the other candidates are alternatives. */
   target?: { candidateId: string; via: "link" | "name" | "image" } | null;
+  /** The user asked (in words) for a call before everything was known: ask for calls once it is. */
+  callWhenReady?: boolean;
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
