@@ -26,6 +26,7 @@ const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 5000);
 const closingLine = /(감사합니다|다시 연락드리겠습니다)[.!。\s]*$/;
 const silenceLimit = Number(process.env.VOICE_BRIDGE_SILENCE_LIMIT_MS ?? 25000);
 const maxQueued = 250; // ~5 s of 20 ms chunks while GPT-Live starts
+const queuedBlockGapMs = Number(process.env.VOICE_BRIDGE_QUEUED_BLOCK_GAP_MS ?? 500);
 const katSecret = process.env.KAT_WEBHOOK_SECRET?.trim() || null;
 
 if (!apiKey) {
@@ -132,13 +133,23 @@ function bridgeCall(twilio, provider) {
     live.addEventListener("error", () => log("voice_bridge.live_error", { attempt: call.attemptId }));
   }
 
+  // Audio that arrived while GPT-Live was starting (the shop's "여보세요"). Sent
+  // all at once it trips input_audio_rate_limit_exceeded, so it goes in 1 s
+  // blocks, a little faster than real time, before live audio resumes.
+  async function flushQueued() {
+    while (call.queued.length && !call.finished) {
+      const block = call.queued.splice(0, 50).map((payload) => Buffer.from(payload, "base64"));
+      sendLive({ type: "session.input_audio.append", audio: Buffer.concat(block).toString("base64") });
+      if (call.queued.length) await new Promise((resolve) => setTimeout(resolve, queuedBlockGapMs));
+    }
+    call.ready = true;
+  }
+
   function onLive(event) {
     const now = Date.now();
     switch (event.type) {
       case "session.started":
-        call.ready = true;
-        for (const payload of call.queued) sendLive({ type: "session.input_audio.append", audio: payload });
-        call.queued = [];
+        void flushQueued();
         return;
       case "session.output_audio.delta": {
         const bytes = Buffer.byteLength(event.delta ?? "", "base64");
@@ -175,7 +186,7 @@ function bridgeCall(twilio, provider) {
         }
         return;
       case "error":
-        log("voice_bridge.live_event_error", { attempt: call.attemptId, code: event.error?.code ?? null });
+        log("voice_bridge.live_event_error", { attempt: call.attemptId, code: event.error?.code ?? null, message: String(event.error?.message ?? "").slice(0, 200) });
         return;
       default:
         return;
