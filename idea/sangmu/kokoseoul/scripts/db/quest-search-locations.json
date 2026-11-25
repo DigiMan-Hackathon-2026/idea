@@ -1,0 +1,576 @@
+{
+  "checkedAt": "2026-11-23",
+  "attribution": {
+    "building": "행정안전부 주소기반산업지원서비스 · 한국에스리 전국 건물 레이어",
+    "subwayExit": "행정안전부 주소제공서비스 · 한국에스리 전국 지하철 노선 및 출구 정보",
+    "openStreetMap": "© OpenStreetMap contributors · https://www.openstreetmap.org/copyright"
+  },
+  "places": [
+    {
+      "slug": "myeongdong-kyoja",
+      "questId": "eefed158-0357-4440-8d2b-57977a424cf0",
+      "versionId": "d52d3e20-f414-4ef7-bbe2-e5d339ee1e02",
+      "placeId": "c2080548-a4e9-4b3e-9496-5ff1c4f673fc",
+      "addressKo": "서울 중구 퇴계로 129",
+      "longitude": 126.9860832,
+      "latitude": 37.5611818,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5774051",
+      "originId": "f14685fb-73d2-5f9b-8c72-dd75086eb91f",
+      "radiusM": 800
+    },
+    {
+      "slug": "museum-room-of-contemplation",
+      "questId": "515b3b88-cc31-4f2a-b1a2-35265e9643b5",
+      "versionId": "dcb9ef36-537b-4c39-9424-afb99ce2f7e2",
+      "placeId": "61478405-1782-4447-b513-9ca8ca25c793",
+      "addressKo": "서울 용산구 서빙고로 137",
+      "longitude": 126.980307,
+      "latitude": 37.5238876,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5800589",
+      "originId": "516b7e49-be79-55b5-bf9d-3331e1ccfc64",
+      "radiusM": 800
+    },
+    {
+      "slug": "seongsu-oliveyoung-skin-consulting",
+      "questId": "5f110d1b-cdf2-4811-ab0c-f66219eb8772",
+      "versionId": "5ab3ddba-279e-4fea-a6d3-df31598607ce",
+      "placeId": "1130c578-da89-4318-84e2-338ea4963b99",
+      "addressKo": "서울 성동구 연무장7길 13",
+      "longitude": 127.0544868,
+      "latitude": 37.544177,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5814691",
+      "originId": "82856d62-d66f-5063-9441-ab06ed575dae",
+      "radiusM": 800
+    },
+    {
+      "slug": "yeouido-irotomo-first-meetup",
+      "questId": "3cd732be-7698-4214-b1f1-b4b183436b15",
+      "versionId": "9180d81a-bc8f-4171-8509-d290092896db",
+      "placeId": "58d2c6a5-3db4-47d1-93f7-0a6dbea4bdad",
+      "addressKo": "서울 영등포구 국제금융로8길 31",
+      "longitude": 126.9280666,
+      "latitude": 37.519746,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/6182103",
+      "originId": "2e5ccc76-a1b5-5831-8c68-b9263cbce023",
+      "radiusM": 800
+    },
+    {
+      "slug": "seongsu-somugwan-solo-gukbap",
+      "questId": "c7da6bc7-23e2-46eb-a35d-5a51562a13af",
+      "versionId": "51e3647e-d7e1-4224-9a94-e420ce2dc134",
+      "placeId": "a4b6262f-7980-4fbd-92b9-635b238740b0",
+      "addressKo": "서울 성동구 상원10길 8-1",
+      "longitude": 127.0489239,
+      "latitude": 37.549301,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5821891",
+      "originId": "6ec8ee42-bdc0-541f-9e85-ec9c2b71eb43",
+      "radiusM": 800
+    },
+    {
+      "slug": "changdeokgung-japanese-tour",
+      "questId": "76783b38-fa81-4ec0-870a-d00d65d0877e",
+      "versionId": "7543cdb7-66ef-4925-b553-df1101151231",
+      "placeId": "630ec64b-64b3-43b9-82ca-9e7ca23d3664",
+      "addressKo": "서울 종로구 율곡로 99",
+      "longitude": 126.9895555,
+      "latitude": 37.5783298,
+      "sourceUrl": "https://www.openstreetmap.org/node/896636686",
+      "originId": "fbde1bb7-5bc7-5dd6-b636-9b6a818a4566",
+      "radiusM": 800
+    },
+    {
+      "slug": "gwanghwamun-kyobo-find-book",
+      "questId": "45afa499-50be-476b-b0a8-d4a9b3110f05",
+      "versionId": "1bf6173f-8f7a-47d5-9b0d-ce668b675ba3",
+      "placeId": "749bfc96-610e-45a6-aa4c-429e99df5662",
+      "addressKo": "서울 종로구 종로 1",
+      "longitude": 126.9779288,
+      "latitude": 37.5709578,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5739192",
+      "originId": "39d4b420-20e2-50ec-af84-995e22887e84",
+      "radiusM": 800
+    },
+    {
+      "slug": "myeongdong-moodcollect-personal-color",
+      "questId": "f788f6a3-140d-48a8-98aa-cd837aa19dfe",
+      "versionId": "9180d5a8-cc43-48f6-beb9-a55752cea3d9",
+      "placeId": "9ee0d630-fb62-4bae-bf78-43e46831136e",
+      "addressKo": "서울 중구 퇴계로 125",
+      "longitude": 126.9857112,
+      "latitude": 37.5611441,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5774044",
+      "originId": "f14685fb-73d2-5f9b-8c72-dd75086eb91f",
+      "radiusM": 800
+    },
+    {
+      "slug": "city-hall-seoul-library-first-loan",
+      "questId": "b372cf9d-82a0-45b7-b16b-6b4688704be5",
+      "versionId": "d2d44960-5640-4d3d-aeb3-49c9a8997b9d",
+      "placeId": "45c842cd-9860-4df3-8579-12c642de2b5d",
+      "addressKo": "서울 중구 세종대로 110",
+      "longitude": 126.9778292,
+      "latitude": 37.5663174,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5773727",
+      "originId": "8323428f-a601-54ea-958c-003282db0d5c",
+      "radiusM": 800
+    },
+    {
+      "slug": "gwangjang-soonhee-bindaetteok",
+      "questId": "86593d2f-2894-4f4b-bd11-c8fd467815e6",
+      "versionId": "63f8cc87-6db6-4496-b76f-06ca10adca98",
+      "placeId": "abd917e2-884a-4233-a60d-9fd96ddb9922",
+      "addressKo": "서울 종로구 종로32길 5",
+      "longitude": 127.0007336,
+      "latitude": 37.5706272,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5741590",
+      "originId": "05b576a8-0580-5e6f-a9d5-84ec0c2597e4",
+      "radiusM": 800
+    },
+    {
+      "slug": "gwanghwamun-seoul-museum-city-model",
+      "questId": "8f40a036-739a-4403-b7b8-9a371eb0c697",
+      "versionId": "872dfb90-47d1-4b8e-86c5-8957205d2eaa",
+      "placeId": "8e5bcf6c-2313-4e26-8d54-bbf8e8133f4a",
+      "addressKo": "서울 종로구 새문안로 55",
+      "longitude": 126.9703729,
+      "latitude": 37.5704994,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5760759",
+      "originId": "b76083ba-72dc-5761-ac05-1379ff8b968a",
+      "radiusM": 800
+    },
+    {
+      "slug": "insadong-ssamziegil-craft-gift",
+      "questId": "7c7d7062-8535-4bac-a019-37cf36e17c6d",
+      "versionId": "6e56db44-ffc7-4295-a804-5cf0fd495403",
+      "placeId": "67fcf489-5880-444e-b237-5309437465e4",
+      "addressKo": "서울 종로구 인사동길 44",
+      "longitude": 126.9848766,
+      "latitude": 37.5742648,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5751380",
+      "originId": "0e03948f-3aa2-50f6-9dff-584975d7d501",
+      "radiusM": 800
+    },
+    {
+      "slug": "yongsan-amore-custom-foundation",
+      "questId": "e93e1b43-1acd-4785-93f6-15a288d8140e",
+      "versionId": "9d798b22-3a3e-43d2-b096-1262c7098455",
+      "placeId": "0deb93f1-79f5-4f3f-b74f-c43bc7ad4696",
+      "addressKo": "서울 용산구 한강대로 100",
+      "longitude": 126.9686735,
+      "latitude": 37.5287912,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5801233",
+      "originId": "ef4e7f6c-1dd0-56f8-92c0-2620badd64b0",
+      "radiusM": 800
+    },
+    {
+      "slug": "jamsil-seoul-bookbogo-first-book-talk",
+      "questId": "6092277a-0f16-4bee-97b3-1c6b6102192d",
+      "versionId": "408494d2-92ae-4d22-8b4c-330139197533",
+      "placeId": "11617df5-198e-44c2-aa27-e151a980733d",
+      "addressKo": "서울 송파구 오금로 1",
+      "longitude": 127.102983,
+      "latitude": 37.5223926,
+      "sourceUrl": "https://korean.visitseoul.net/jamsil/%EC%84%9C%EC%9A%B8%EC%B1%85%EB%B3%B4%EA%B3%A0/KOP030789",
+      "originId": "dea5cbd0-96df-5808-8f7d-7fc324bc4441",
+      "radiusM": 800
+    },
+    {
+      "slug": "tongin-market-sonmat-gimbap",
+      "questId": "4335c762-9131-4e15-9aba-99300ccc5000",
+      "versionId": "af129873-784e-44c8-96f0-127b9113b041",
+      "placeId": "0a929f3f-a906-4183-ac79-a0c76aa9f66b",
+      "addressKo": "서울 종로구 자하문로15길 18",
+      "longitude": 126.9699476,
+      "latitude": 37.580767,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5757782",
+      "originId": "766d72c7-157f-5f67-8350-f3490b003548",
+      "radiusM": 800
+    },
+    {
+      "slug": "seongsu-beauty-mansion-quick-touch-up",
+      "questId": "7d7029c4-2798-45f1-8866-792a7e6e6ba6",
+      "versionId": "09e34c04-2c08-4535-91db-1d3b2ce008c6",
+      "placeId": "62de0897-28e6-4d7e-8d8f-a0d36495fcd6",
+      "addressKo": "서울 성동구 성수이로 108",
+      "longitude": 127.0573736,
+      "latitude": 37.5445462,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5819416",
+      "originId": "8fa7a064-0c04-588f-bdcc-b8b7f1436c9e",
+      "radiusM": 800
+    },
+    {
+      "slug": "myeongdong-leekaja-head-spa",
+      "questId": "b6f598f9-2974-400e-b67d-5cb8d770c429",
+      "versionId": "63e8453c-5b40-451d-8399-c8b1f426c1fb",
+      "placeId": "a07be6ae-7653-4a5d-ad00-edd4993aa03b",
+      "addressKo": "서울 중구 명동8가길 22",
+      "longitude": 126.986227,
+      "latitude": 37.5615811,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5764683",
+      "originId": "f14685fb-73d2-5f9b-8c72-dd75086eb91f",
+      "radiusM": 800
+    },
+    {
+      "slug": "anguk-folk-museum-seollal",
+      "questId": "8d3e210f-7766-419d-8dd1-59a9714fd9e4",
+      "versionId": "6ec5b7e8-20e9-412d-aae0-0d0294aecc41",
+      "placeId": "ccfb4127-01d8-4ddb-a8bc-c5b09b16fc64",
+      "addressKo": "서울 종로구 삼청로 37",
+      "longitude": 126.9787636,
+      "latitude": 37.5794848,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5738477",
+      "originId": "6fcb5cae-dc9d-5e73-ad81-6b802e3bfe00",
+      "radiusM": 800
+    },
+    {
+      "slug": "seongsu-lumiere-perfume-class",
+      "questId": "22d9ae82-3527-4df0-b3ca-60a489ec8db4",
+      "versionId": "b1d0afd1-c524-494c-a9b8-7fca63674ce1",
+      "placeId": "e325356e-8675-42ff-bcb4-e9cf2802612a",
+      "addressKo": "서울 성동구 연무장길 49",
+      "longitude": 127.0549152,
+      "latitude": 37.5428016,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5815650",
+      "originId": "82856d62-d66f-5063-9441-ab06ed575dae",
+      "radiusM": 800
+    },
+    {
+      "slug": "ichon-global-village-knitting",
+      "questId": "0468ec78-34ba-4b7d-830f-1c1f036ae171",
+      "versionId": "2760ddca-a657-4101-9205-4f04f2eb6526",
+      "placeId": "65f2f49d-0a4f-4547-a2eb-f4087f0059b4",
+      "addressKo": "서울 용산구 이촌로 224",
+      "longitude": 126.9718771,
+      "latitude": 37.5201457,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5799772",
+      "originId": "d03c710d-b905-523e-b6e4-cdc7836db9fc",
+      "radiusM": 800
+    },
+    {
+      "slug": "ichon-korean-speaking-mentoring",
+      "questId": "588f37ee-f6aa-4063-8a63-a55f65f7d98d",
+      "versionId": "7c6de841-d3bf-4134-b1d4-36e7933bcbeb",
+      "placeId": "50314683-6218-4ed9-95b7-150d620283d2",
+      "addressKo": "서울 용산구 이촌로 224",
+      "longitude": 126.9718771,
+      "latitude": 37.5201457,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5799772",
+      "originId": "d03c710d-b905-523e-b6e4-cdc7836db9fc",
+      "radiusM": 800
+    },
+    {
+      "slug": "seochon-tosokchon-samgyetang",
+      "questId": "16e737bb-f397-47a5-bf02-37e484128b65",
+      "versionId": "9198038c-74fe-480a-87e7-5fa978737dd6",
+      "placeId": "7a8cb7dd-d921-4ccf-b409-f8bbfd41ca30",
+      "addressKo": "서울 종로구 자하문로5길 5",
+      "longitude": 126.9716322,
+      "latitude": 37.577603,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5759440",
+      "originId": "766d72c7-157f-5f67-8350-f3490b003548",
+      "radiusM": 800
+    },
+    {
+      "slug": "seongsu-seoul-forest-walk",
+      "questId": "3ff2af64-4c91-47b2-a93b-04a25380b843",
+      "versionId": "62814b85-eb94-4071-bb51-720f67e3da9c",
+      "placeId": "dc531617-ed3e-46f9-829e-ebe17cf0ea09",
+      "addressKo": "서울 성동구 뚝섬로 273",
+      "longitude": 127.0417991,
+      "latitude": 37.5430701,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5804929",
+      "originId": "ca1a45e9-9507-5a6c-b6dd-fc9da0db52cd",
+      "radiusM": 800
+    },
+    {
+      "slug": "naksan-city-wall-walk",
+      "questId": "662d68f1-d76b-4a14-93d6-ffafbc6bcb6a",
+      "versionId": "92e1a769-b361-4776-a118-da3f9dc3103e",
+      "placeId": "6d8fb951-51d0-4ba5-81f9-8c78982a58a7",
+      "addressKo": "서울 성북구 성북동1가 1-1",
+      "longitude": 127.0038729,
+      "latitude": 37.5879534,
+      "sourceUrl": "https://www.openstreetmap.org/way/348885649",
+      "originId": "b6647d8d-aca0-5e4e-a75e-ae2f644c77a7",
+      "radiusM": 800
+    },
+    {
+      "slug": "namsan-city-wall-walk",
+      "questId": "a82f1b5b-5080-4afd-95c9-d7ed4c3e8369",
+      "versionId": "662fba79-b211-41ca-8292-fdcb6fb9706b",
+      "placeId": "10e9bf62-d5bc-40a1-ba91-3936da175da9",
+      "addressKo": "서울 중구 동호로 241",
+      "longitude": 127.0067869,
+      "latitude": 37.5581832,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5775462",
+      "originId": "2886325b-48cb-5dc0-b3f2-8f677dcbf595",
+      "radiusM": 800
+    },
+    {
+      "slug": "yeouido-hangang-bamseom-view",
+      "questId": "44681732-c18f-4de3-92de-915c8432b2b9",
+      "versionId": "1c70bcbb-41b6-4d5b-8830-cdf68e09db73",
+      "placeId": "8a5f854f-cf82-46fd-a6ee-90668a94b659",
+      "addressKo": "서울 영등포구 여의동로 330",
+      "longitude": 126.9335952,
+      "latitude": 37.5263479,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/6181963",
+      "originId": "4ad9835a-5074-5b0e-a1d9-3da6795fb5f4",
+      "radiusM": 800
+    },
+    {
+      "slug": "inwang-yun-dongju-hill-rest",
+      "questId": "5509bea1-27d5-468b-8019-67de10fc751d",
+      "versionId": "a221248f-f2e4-4508-b3ff-0b40720e8a32",
+      "placeId": "e5c90d6d-a927-45c8-a154-7aeb27d99588",
+      "addressKo": "서울 종로구 창의문로 119",
+      "longitude": 126.9670686,
+      "latitude": 37.5920969,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5756233",
+      "originId": "b613c0fe-aad2-5cc0-b90a-d801438f7b82",
+      "radiusM": 2000
+    },
+    {
+      "slug": "dongdaemun-market-small-trim",
+      "questId": "d13eb739-ecf7-418b-8395-c2b828752043",
+      "versionId": "64cb18dc-15bb-432c-9013-59d4101e334b",
+      "placeId": "f262388c-e89a-4174-bf5f-a8957e65b0f7",
+      "addressKo": "서울 종로구 종로 266",
+      "longitude": 127.0073287,
+      "latitude": 37.5707065,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5739542",
+      "originId": "e0e96be7-74d6-5f25-8d30-ad2ed5a171a1",
+      "radiusM": 800
+    },
+    {
+      "slug": "sinseol-seoul-folk-flea-market",
+      "questId": "68305736-8999-46aa-90f0-9c10cfc2f6b4",
+      "versionId": "c3edc6b7-a54d-4702-b0c3-238c0bfecbc6",
+      "placeId": "c9ac72be-c636-4106-8dbd-d60ffa184763",
+      "addressKo": "서울 동대문구 천호대로4길 21",
+      "longitude": 127.0255029,
+      "latitude": 37.5727131,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/MOIS_KR_Buildings_v2/FeatureServer/0/5868043",
+      "originId": "b9f45bd1-4710-5e6a-9781-4a99be0d4756",
+      "radiusM": 800
+    }
+  ],
+  "exits": [
+    {
+      "id": "766d72c7-157f-5f67-8350-f3490b003548",
+      "sourceKey": "303:2",
+      "nameKo": "경복궁역 2번 출구",
+      "nameJa": "景福宮駅2番出口",
+      "longitude": 126.9723719,
+      "latitude": 37.5763789,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/48"
+    },
+    {
+      "id": "b613c0fe-aad2-5cc0-b90a-d801438f7b82",
+      "sourceKey": "303:3",
+      "nameKo": "경복궁역 3번 출구",
+      "nameJa": "景福宮駅3番出口",
+      "longitude": 126.9726858,
+      "latitude": 37.5759439,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/14"
+    },
+    {
+      "id": "6fcb5cae-dc9d-5e73-ad81-6b802e3bfe00",
+      "sourceKey": "303:5",
+      "nameKo": "경복궁역 5번 출구",
+      "nameJa": "景福宮駅5番出口",
+      "longitude": 126.9744741,
+      "latitude": 37.575702,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/41"
+    },
+    {
+      "id": "b76083ba-72dc-5761-ac05-1379ff8b968a",
+      "sourceKey": "308:1",
+      "nameKo": "광화문역 1번 출구",
+      "nameJa": "光化門駅1番出口",
+      "longitude": 126.9748882,
+      "latitude": 37.5720037,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/49"
+    },
+    {
+      "id": "39d4b420-20e2-50ec-af84-995e22887e84",
+      "sourceKey": "308:4",
+      "nameKo": "광화문역 4번 출구",
+      "nameJa": "光化門駅4番出口",
+      "longitude": 126.9775099,
+      "latitude": 37.5707396,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/12"
+    },
+    {
+      "id": "e0e96be7-74d6-5f25-8d30-ad2ed5a171a1",
+      "sourceKey": "307:9",
+      "nameKo": "동대문역 9번 출구",
+      "nameJa": "東大門駅9番出口",
+      "longitude": 127.0091428,
+      "latitude": 37.5710024,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/52"
+    },
+    {
+      "id": "2886325b-48cb-5dc0-b3f2-8f677dcbf595",
+      "sourceKey": "161:5",
+      "nameKo": "동대입구역 5번 출구",
+      "nameJa": "東大入口駅5番出口",
+      "longitude": 127.0062659,
+      "latitude": 37.5588757,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/193"
+    },
+    {
+      "id": "6ec8ee42-bdc0-541f-9e85-ec9c2b71eb43",
+      "sourceKey": "322:5",
+      "nameKo": "뚝섬역 5번 출구",
+      "nameJa": "トゥクソム駅5番出口",
+      "longitude": 127.0482748,
+      "latitude": 37.5468245,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/289"
+    },
+    {
+      "id": "f14685fb-73d2-5f9b-8c72-dd75086eb91f",
+      "sourceKey": "159:8",
+      "nameKo": "명동역 8번 출구",
+      "nameJa": "明洞駅8番出口",
+      "longitude": 126.9858585,
+      "latitude": 37.5609589,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/179"
+    },
+    {
+      "id": "2e5ccc76-a1b5-5831-8c68-b9263cbce023",
+      "sourceKey": "228:1",
+      "nameKo": "샛강역 1번 출구",
+      "nameJa": "セッカン駅1番出口",
+      "longitude": 126.9285169,
+      "latitude": 37.5176017,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/1096"
+    },
+    {
+      "id": "ca1a45e9-9507-5a6c-b6dd-fc9da0db52cd",
+      "sourceKey": "41:3",
+      "nameKo": "서울숲역 3번 출구",
+      "nameJa": "ソウルの森駅3番出口",
+      "longitude": 127.0444501,
+      "latitude": 37.5429665,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/331"
+    },
+    {
+      "id": "8fa7a064-0c04-588f-bdcc-b8b7f1436c9e",
+      "sourceKey": "323:2",
+      "nameKo": "성수역 2번 출구",
+      "nameJa": "聖水駅2番出口",
+      "longitude": 127.0570324,
+      "latitude": 37.5442677,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/334"
+    },
+    {
+      "id": "82856d62-d66f-5063-9441-ab06ed575dae",
+      "sourceKey": "323:4",
+      "nameKo": "성수역 4번 출구",
+      "nameJa": "聖水駅4番出口",
+      "longitude": 127.0551301,
+      "latitude": 37.544732,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/322"
+    },
+    {
+      "id": "8323428f-a601-54ea-958c-003282db0d5c",
+      "sourceKey": "153:5",
+      "nameKo": "시청역 5번 출구",
+      "nameJa": "市庁駅5番出口",
+      "longitude": 126.9771071,
+      "latitude": 37.566002,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/183"
+    },
+    {
+      "id": "b9f45bd1-4710-5e6a-9781-4a99be0d4756",
+      "sourceKey": "89:9",
+      "nameKo": "신설동역 9번 출구",
+      "nameJa": "新設洞駅9番出口",
+      "longitude": 127.0264785,
+      "latitude": 37.5739629,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/431"
+    },
+    {
+      "id": "ef4e7f6c-1dd0-56f8-92c0-2620badd64b0",
+      "sourceKey": "245:2",
+      "nameKo": "신용산역 2번 출구",
+      "nameJa": "新龍山駅2番出口",
+      "longitude": 126.9671608,
+      "latitude": 37.5285883,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/208"
+    },
+    {
+      "id": "fbde1bb7-5bc7-5dd6-b636-9b6a818a4566",
+      "sourceKey": "302:3",
+      "nameKo": "안국역 3번 출구",
+      "nameJa": "安国駅3番出口",
+      "longitude": 126.9863582,
+      "latitude": 37.5770608,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/13"
+    },
+    {
+      "id": "0e03948f-3aa2-50f6-9dff-584975d7d501",
+      "sourceKey": "302:6",
+      "nameKo": "안국역 6번 출구",
+      "nameJa": "安国駅6番出口",
+      "longitude": 126.9850611,
+      "latitude": 37.5762669,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/65"
+    },
+    {
+      "id": "4ad9835a-5074-5b0e-a1d9-3da6795fb5f4",
+      "sourceKey": "223:3",
+      "nameKo": "여의나루역 3번 출구",
+      "nameJa": "汝矣ナル駅3番出口",
+      "longitude": 126.9329225,
+      "latitude": 37.5267418,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/1062"
+    },
+    {
+      "id": "516b7e49-be79-55b5-bf9d-3331e1ccfc64",
+      "sourceKey": "247:2",
+      "nameKo": "이촌역 2번 출구",
+      "nameJa": "二村駅2番出口",
+      "longitude": 126.9752813,
+      "latitude": 37.52206,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/209"
+    },
+    {
+      "id": "d03c710d-b905-523e-b6e4-cdc7836db9fc",
+      "sourceKey": "247:4",
+      "nameKo": "이촌역 4번 출구",
+      "nameJa": "二村駅4番出口",
+      "longitude": 126.9732982,
+      "latitude": 37.5222116,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/259"
+    },
+    {
+      "id": "dea5cbd0-96df-5808-8f7d-7fc324bc4441",
+      "sourceKey": "285:1",
+      "nameKo": "잠실나루역 1번 출구",
+      "nameJa": "蚕室ナル駅1番出口",
+      "longitude": 127.1038303,
+      "latitude": 37.520614,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/1675"
+    },
+    {
+      "id": "05b576a8-0580-5e6f-a9d5-84ec0c2597e4",
+      "sourceKey": "309:8",
+      "nameKo": "종로5가역 8번 출구",
+      "nameJa": "鍾路5街駅8番出口",
+      "longitude": 127.0015336,
+      "latitude": 37.5708133,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/37"
+    },
+    {
+      "id": "b6647d8d-aca0-5e4e-a75e-ae2f644c77a7",
+      "sourceKey": "255:4",
+      "nameKo": "한성대입구역 4번 출구",
+      "nameJa": "漢城大入口駅4番出口",
+      "longitude": 127.0058501,
+      "latitude": 37.588283,
+      "sourceUrl": "https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0/533"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+## 여기서울 UX rules
+
+Before changing any user-facing screen, interaction, or copy, read and apply `docs/UX_PRINCIPLES_v0.1.md`. Keep the experience bilingual in Korean and Japanese, with equivalent information, actions, and recovery paths in both languages. Do not copy Toss branding or visual assets; use the documented principles within 여기서울's own visual identity.
