@@ -417,7 +417,7 @@ export class DiningAgent {
 
   private candidateView(request: DiningRequest, now: string, intro?: string): LineMessage[] {
     const plans = this.plans(request, now).sort((a, b) => rankOf(request, a.candidateId) - rankOf(request, b.candidateId));
-    return m.candidatesMessages(request, plans, findRestaurant, { callingEnabled: this.deps.calls !== null, intro, now });
+    return m.candidatesMessages(request, plans, findRestaurant, { callingEnabled: this.deps.calls !== null, intro, now, origin: this.deps.origin });
   }
 
   private async answerPending(request: DiningRequest, text: string, ctx: Context, quietIfUnclear = false): Promise<boolean> {

@@ -45,7 +45,8 @@ export type FlexBox = {
   alignItems?: "flex-start" | "center" | "flex-end";
 };
 export type FlexComponent = FlexText | FlexButton | FlexSeparator | FlexBox;
-export type FlexBubble = { type: "bubble"; size?: "kilo" | "mega" | "giga"; header?: FlexBox; body: FlexBox; footer?: FlexBox };
+export type FlexImage = { type: "image"; url: string; size?: "full" | "xs" | "sm" | "md" | "lg"; aspectRatio?: string; aspectMode?: "cover" | "fit" };
+export type FlexBubble = { type: "bubble"; size?: "kilo" | "mega" | "giga"; header?: FlexBox; hero?: FlexImage; body: FlexBox; footer?: FlexBox };
 export type FlexCarousel = { type: "carousel"; contents: FlexBubble[] };
 
 export type LineMessage =

@@ -49,6 +49,8 @@ open http://localhost:3000/dev/line-agent
 
 그룹에서는 「ココソウル」을 붙여 부르거나 비서를 멘션해야 반응한다.
 
+카드 위 역 이미지는 `public/line-agent/hero/<역코드>.png`이고, 역을 추가하면 `node scripts/line/render-hero-images.mjs`로 다시 만든다. LINE은 HTTPS 이미지만 읽으므로 `APP_ORIGIN`이 HTTPS일 때만 붙는다.
+
 대화창 아래 고정 메뉴(使い方 · ごはんを探す · やめる)는 `pnpm line:richmenu`로 한 번 만든다. 이미지만 미리 보려면 `node scripts/line/setup-rich-menu.mjs --dry-run menu.png`.
 
 ## 3. 실제 전화 켜기

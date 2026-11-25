@@ -2,7 +2,7 @@
 // same recovery actions in both (spec §3, AGENTS.md UX rules). Each message
 // leads with one main action.
 import { cardUrl, goUrl, placeRef } from "./links";
-import type { FlexBox, FlexBubble, FlexComponent, LineAction, LineMessage, QuickReply } from "./line/types";
+import type { FlexBox, FlexBubble, FlexComponent, FlexImage, LineAction, LineMessage, QuickReply } from "./line/types";
 import type { CandidatePlan } from "./plan";
 import { findArea, menuNames } from "./places";
 import { encodePostback, type PostbackAction } from "./postback";
@@ -37,6 +37,15 @@ function postback(request: Pick<DiningRequest, "id" | "revision">, action: Postb
 
 function quickReply(actions: LineAction[]): QuickReply {
   return { items: actions.slice(0, 13).map((action) => ({ type: "action", action })) };
+}
+
+const HERO_VERSION = "1";
+
+/** Station image on top of a card (public/line-agent/hero). LINE only loads HTTPS images. */
+export function heroImage(origin: string | undefined, areaId: string): FlexImage | undefined {
+  const code = findArea(areaId)?.stationCode;
+  if (!origin?.startsWith("https://") || !code) return undefined;
+  return { type: "image", url: new URL(`/line-agent/hero/${code}.png?v=${HERO_VERSION}`, origin).toString(), size: "full", aspectRatio: "20:9", aspectMode: "cover" };
 }
 
 const text = (value: string, options: Partial<Omit<Extract<FlexComponent, { type: "text" }>, "type" | "text">> = {}): FlexComponent => ({ type: "text", text: value, wrap: true, size: "sm", color: color.text, ...options });
@@ -260,7 +269,7 @@ function travelLine(lang: Lang, plan: CandidatePlan, minutes: number | null, mod
   return tr(lang, `お店まで約${minutes}分（${how}・${source}）${arrive}`, `가게까지 약 ${minutes}분 (${how} · ${source})${arrive}`);
 }
 
-export function candidateBubble(request: DiningRequest, restaurant: Restaurant, plan: CandidatePlan, now: string = new Date().toISOString()): FlexBubble {
+export function candidateBubble(request: DiningRequest, restaurant: Restaurant, plan: CandidatePlan, now: string = new Date().toISOString(), origin?: string): FlexBubble {
   const lang = request.lang;
   const state = request.candidates.find((c) => c.restaurantId === restaurant.id);
   const leg = state?.toRestaurant ?? null;
@@ -289,10 +298,11 @@ export function candidateBubble(request: DiningRequest, restaurant: Restaurant, 
     const label = link.provider === "naver" ? tr(lang, "NAVERで見る", "네이버에서 보기") : tr(lang, "予約・順番待ちを確認", "예약·웨이팅 확인");
     footer.push({ type: "button", style: "link", height: "sm", action: { type: "uri", label, uri: link.url } });
   }
-  return { type: "bubble", size: "kilo", header, body: vbox(body), footer: vbox(footer) };
+  const hero = heroImage(origin, restaurant.areaId);
+  return { type: "bubble", size: "kilo", header, ...(hero ? { hero } : {}), body: vbox(body), footer: vbox(footer) };
 }
 
-export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[], lookup: (id: string) => Restaurant | undefined, options: { callingEnabled: boolean; intro?: string; now?: string }): LineMessage[] {
+export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[], lookup: (id: string) => Restaurant | undefined, options: { callingEnabled: boolean; intro?: string; now?: string; origin?: string }): LineMessage[] {
   const lang = request.lang;
   if (plans.length === 0) {
     return [{
@@ -302,7 +312,7 @@ export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[
   }
   const bubbles = plans.flatMap((plan) => {
     const restaurant = lookup(plan.candidateId);
-    return restaurant ? [candidateBubble(request, restaurant, plan, options.now)] : [];
+    return restaurant ? [candidateBubble(request, restaurant, plan, options.now, options.origin)] : [];
   });
   const area = request.areaId ? findArea(request.areaId) : undefined;
   const menu = request.menuKey ? menuNames[request.menuKey][lang] : "";
@@ -469,6 +479,7 @@ export function confirmedCard(request: DiningRequest, reservation: Reservation, 
     altText: `${title} ${name(lang, restaurant)} ${formatSeoulTime(reservation.time)}`,
     contents: {
       type: "bubble",
+      ...(heroImage(links.origin, restaurant.areaId) ? { hero: heroImage(links.origin, restaurant.areaId) } : {}),
       header: vbox(
         [
           text(title, { size: "sm", weight: "bold", color: "#ffffff" }),
