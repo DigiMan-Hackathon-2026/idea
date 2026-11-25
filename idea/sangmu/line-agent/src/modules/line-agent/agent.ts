@@ -3,7 +3,7 @@
 // — only after the requester approves — calls shops one at a time until one
 // accepts inside the approved window (spec §3–§5, §8).
 import { buildCallInstructions } from "./call-brief";
-import { interpret, normalizeText, parsePartySize, type Interpretation } from "./interpret";
+import { findClockTimes, interpret, normalizeText, parsePartySize, type Interpretation } from "./interpret";
 import { makeCardToken } from "./links";
 import type { LineGateway } from "./line/client";
 import type { LineEvent, LineMessage, LineSource } from "./line/types";
@@ -877,7 +877,11 @@ function otherCandidateNamed(request: DiningRequest, candidateId: string, text: 
 /** The shop's most telling line: the last one that says something about the booking. */
 function lastShopWords(transcript: readonly { speaker: "ai" | "shop"; text: string }[]): string | null {
   const lines = transcript.filter((turn) => turn.speaker === "shop").map((turn) => turn.text.trim()).filter((text) => text.length > 1);
-  const telling = [...lines].reverse().find((text) => /시|돼|되|안|어렵|만석|가능|예약|맞/.test(text) && !/^네[.,!]?$/.test(text)) ?? lines.at(-1);
+  // The line naming a time says the most ("11시 반에 두 분 가능해요"), more than a later "네, 맞아요".
+  const telling =
+    [...lines].reverse().find((text) => findClockTimes(text).length > 0) ??
+    [...lines].reverse().find((text) => /돼|되|안|어렵|만석|가능|예약|맞/.test(text) && !/^네[.,!]?$/.test(text)) ??
+    lines.at(-1);
   if (!telling) return null;
   return telling.length > 80 ? `${telling.slice(0, 79)}…` : telling;
 }
