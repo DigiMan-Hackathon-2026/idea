@@ -132,4 +132,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run responsive browser flows
+        env:
+          # Shop opening hours make the LINE agent flows depend on the time of day.
+          LINE_AGENT_DEMO_NOW: "2026-11-29T17:30:00+09:00"
         run: pnpm test:e2e

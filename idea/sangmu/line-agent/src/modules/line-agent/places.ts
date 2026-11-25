@@ -1,5 +1,5 @@
 import candidateData from "./candidates.json";
-import type { MenuKey, Place, Restaurant } from "./types";
+import type { MenuKey, OpeningHours, Place, Restaurant, Weekday } from "./types";
 
 // Areas the agent understands, with the spellings travellers use. Points are
 // the station coordinates from the 여기서울 subway data (station-coordinates.json).
@@ -183,8 +183,25 @@ export function validateCandidates(value: unknown): Restaurant[] {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(item.source?.checkedAt ?? "")) throw new Error(`${where}: source.checkedAt is required`);
     if (!item.test && !item.source.url?.startsWith("https://")) throw new Error(`${where}: a verified shop needs a source URL`);
     if (item.testCall !== undefined && typeof item.testCall !== "boolean") throw new Error(`${where}: testCall must be true or false`);
+    if (item.naverPlaceId != null && !/^\d{5,12}$/.test(item.naverPlaceId)) throw new Error(`${where}: naverPlaceId must be digits`);
+    if (item.aliases !== undefined && (!Array.isArray(item.aliases) || item.aliases.some((alias) => typeof alias !== "string" || alias.trim().length < 2))) throw new Error(`${where}: aliases must be names of 2+ characters`);
+    if (item.hours != null) validateHours(item.hours, where);
   }
   return list as Restaurant[];
+}
+
+const WEEKDAYS: Weekday[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const CLOCK = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+function validateHours(hours: OpeningHours, where: string): void {
+  if (!hours.source?.url?.startsWith("https://") || !/^\d{4}-\d{2}-\d{2}$/.test(hours.source.checkedAt ?? "")) throw new Error(`${where}: hours need a source URL and checkedAt`);
+  for (const day of WEEKDAYS) {
+    const spans = hours.weekly?.[day];
+    if (!Array.isArray(spans)) throw new Error(`${where}: hours.weekly.${day} must be a list ([] = closed)`);
+    for (const span of spans) {
+      if (!CLOCK.test(span.open) || !CLOCK.test(span.close) || (span.lastOrder !== undefined && !CLOCK.test(span.lastOrder))) throw new Error(`${where}: hours.weekly.${day} times must be HH:MM`);
+    }
+  }
 }
 
 let restaurants: Restaurant[] = validateCandidates(candidateData);
