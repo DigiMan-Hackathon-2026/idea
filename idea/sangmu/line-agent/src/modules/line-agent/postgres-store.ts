@@ -94,6 +94,24 @@ export class PostgresAgentStore implements AgentStore {
     }
   }
 
+  async listWithPendingReminders(now: string): Promise<DiningRequest[]> {
+    const result = await this.db.query(
+      `select body from line_agent_requests where jsonb_typeof(body->'reservation') = 'object' and expires_at > $1
+       and exists (select 1 from jsonb_array_elements(coalesce(body->'reminders', '[]'::jsonb)) r where r->>'sentAt' is null)`,
+      [now],
+    );
+    return result.rows.map((row) => (row as { body: DiningRequest }).body);
+  }
+
+  async countCallsSince(since: string, requesterKey: string | null): Promise<number> {
+    const result = await this.db.query(
+      `select count(*)::int as calls from line_agent_call_attempts a join line_agent_requests r on r.id = a.request_id
+       where a.created_at >= $1 and ($2::text is null or r.requester_key = $2)`,
+      [since, requesterKey],
+    );
+    return Number((result.rows[0] as { calls?: number } | undefined)?.calls ?? 0);
+  }
+
   async getAlias(requesterKey: string): Promise<string | null> {
     const result = await this.db.query<{ alias: string }>("select alias from line_agent_aliases where requester_key = $1", [requesterKey]);
     return result.rows[0]?.alias ?? null;
