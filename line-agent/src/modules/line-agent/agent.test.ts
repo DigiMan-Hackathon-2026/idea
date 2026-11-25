@@ -121,7 +121,7 @@ describe("DiningAgent demo flow (spec 3분 시연, CALL-01)", () => {
     await agent.handleEvent(text(ALICE, "90分待ち", true));
     const basis = line.messagesFor(GROUP).at(-1)!.message;
     await agent.handleEvent(tap(ALICE, buttons(basis)["着いてから並ぶ"], true));
-    expect(lastTexts(GROUP, 2)).toContain("間に合わない見込み");
+    expect(lastTexts(GROUP, 2)).toContain("遅れる見込み");
 
     // Ask for calls: the name is asked in 1:1, the approval card comes back to the group.
     const view = line.messagesFor(GROUP).at(-1)!.message;
@@ -327,7 +327,7 @@ describe("DiningAgent rules", () => {
     await agent.handleEvent(tap(ALICE, buttons(question)["予約できていた"]));
     const result = line.messagesFor(ALICE).at(-1)!.message;
     expect(result.type === "flex" && result.altText).toContain("予約が取れました");
-    expect(JSON.stringify(result)).toContain("お店に確認したと依頼者が共有");
+    expect(JSON.stringify(result)).toContain("依頼者がお店に確認済み");
   });
 
   it("stops for a check when the call ended without a transcript (CALL-02 lost result)", async () => {
