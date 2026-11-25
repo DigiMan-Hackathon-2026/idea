@@ -1,82 +1,103 @@
 {
-  "$comment": "LINE agent candidate shops. Replace test entries with verified shops: real name, address, coordinates, menus, booking links with checkedAt, and a source URL + checkedAt. phoneRef maps to LINE_AGENT_PHONE_ALLOWLIST; never put phone numbers here.",
+  "$comment": "LINE agent candidate shops. Real shops come from public pages (source.url, checkedAt); facts not on the page (capacity, solo entry) stay null. testCall=true: demo calls go to a teammate via phoneRef (LINE_AGENT_PHONE_ALLOWLIST) and results are marked as tests. Never put phone numbers here.",
   "restaurants": [
     {
-      "id": "test-shinchon-a",
+      "id": "seolleim-samgyeopsal",
       "areaId": "shinchon",
-      "nameJa": "テスト店A（サムギョプサル）",
-      "nameKo": "테스트 매장 A (삼겹살)",
+      "nameJa": "ソルレイム・サムギョプサル",
+      "nameKo": "설레임 삼겹살",
       "point": {
-        "lat": 37.5569,
-        "lng": 126.9372
+        "lat": 37.557199,
+        "lng": 126.9349609
       },
-      "addressKo": "서울 서대문구 신촌역 북쪽 (테스트)",
+      "addressKo": "서울 서대문구 연세로5가길 31 낙원빌딩 1층",
       "menus": [
         "samgyeopsal",
         "korean_bbq"
       ],
-      "maxParty": 6,
-      "soloEntry": false,
-      "singlePortion": false,
-      "bookingLinks": [],
-      "phoneRef": "demo-shop-a",
-      "source": {
-        "label": "テストデータ / 테스트 데이터",
-        "url": null,
-        "checkedAt": "2026-11-25"
-      },
-      "test": true
-    },
-    {
-      "id": "test-shinchon-b",
-      "areaId": "shinchon",
-      "nameJa": "テスト店B（サムギョプサル）",
-      "nameKo": "테스트 매장 B (삼겹살)",
-      "point": {
-        "lat": 37.5547,
-        "lng": 126.9332
-      },
-      "addressKo": "서울 마포구 신촌역 서쪽 (테스트)",
-      "menus": [
-        "samgyeopsal"
-      ],
-      "maxParty": 4,
-      "soloEntry": true,
-      "singlePortion": true,
-      "bookingLinks": [],
-      "phoneRef": "demo-shop-b",
-      "source": {
-        "label": "テストデータ / 테스트 데이터",
-        "url": null,
-        "checkedAt": "2026-11-25"
-      },
-      "test": true
-    },
-    {
-      "id": "test-shinchon-c",
-      "areaId": "shinchon",
-      "nameJa": "テスト店C（焼肉）",
-      "nameKo": "테스트 매장 C (고기구이)",
-      "point": {
-        "lat": 37.5584,
-        "lng": 126.9385
-      },
-      "addressKo": "서울 서대문구 연세로 근처 (테스트)",
-      "menus": [
-        "korean_bbq",
-        "samgyeopsal"
-      ],
-      "maxParty": 10,
+      "maxParty": null,
       "soloEntry": null,
       "singlePortion": null,
       "bookingLinks": [],
-      "phoneRef": "demo-shop-c",
+      "phoneRef": "demo-shop-a",
       "source": {
-        "label": "テストデータ / 테스트 데이터",
-        "url": null,
+        "label": "Polle 店舗ページ / 뽈레 매장 페이지",
+        "url": "https://polle.com/place/1YTXw7/%EC%84%A4%EB%A0%88%EC%9E%84%20%EC%82%BC%EA%B2%B9%EC%82%B4",
         "checkedAt": "2026-11-25"
       },
-      "test": true
+      "test": false,
+      "testCall": true
+    },
+    {
+      "id": "donbul-shinchon",
+      "areaId": "shinchon",
+      "nameJa": "トンブル 新村直営店",
+      "nameKo": "돈불 신촌직영점",
+      "point": {
+        "lat": 37.556962,
+        "lng": 126.9336979
+      },
+      "addressKo": "서울 서대문구 연세로5다길 36 1층",
+      "menus": [
+        "samgyeopsal",
+        "korean_bbq"
+      ],
+      "maxParty": null,
+      "soloEntry": null,
+      "singlePortion": null,
+      "bookingLinks": [
+        {
+          "provider": "naver",
+          "url": "https://booking.naver.com/booking/6/bizes/1723575",
+          "checkedAt": "2026-11-25"
+        }
+      ],
+      "phoneRef": "demo-shop-b",
+      "source": {
+        "label": "Polle 店舗ページ / 뽈레 매장 페이지",
+        "url": "https://polle.com/place/3snfT0/%EB%8F%88%EB%B6%88",
+        "checkedAt": "2026-11-25"
+      },
+      "test": false,
+      "testCall": true
+    },
+    {
+      "id": "gogichanggo-shinchon",
+      "areaId": "shinchon",
+      "nameJa": "コギチャンゴ 新村",
+      "nameKo": "고기창고 신촌",
+      "point": {
+        "lat": 37.5578548,
+        "lng": 126.9350719
+      },
+      "addressKo": "서울 서대문구 연세로7길 34-4 1층",
+      "menus": [
+        "samgyeopsal",
+        "korean_bbq"
+      ],
+      "maxParty": null,
+      "soloEntry": null,
+      "singlePortion": null,
+      "bookingLinks": [
+        {
+          "provider": "catchtable",
+          "url": "https://app.catchtable.co.kr/ct/shop/sinchongogichanggo",
+          "checkedAt": "2026-11-25"
+        },
+        {
+          "provider": "naver",
+          "url": "https://booking.naver.com/booking/6/bizes/257651",
+          "checkedAt": "2026-11-25"
+        }
+      ],
+      "phoneRef": "demo-shop-c",
+      "source": {
+        "label": "Polle 店舗ページ / 뽈레 매장 페이지",
+        "url": "https://polle.com/place/51sDCZ/%EA%B3%A0%EA%B8%B0%EC%B0%BD%EA%B3%A0",
+        "checkedAt": "2026-11-25"
+      },
+      "test": false,
+      "testCall": true
     },
     {
       "id": "test-shinchon-d",

@@ -153,7 +153,7 @@ export class DiningAgent {
           alias: approval.alias,
           evidence: "call_accept",
           acceptedAt: now,
-          test: restaurant.test,
+          test: restaurant.test || restaurant.testCall === true,
         };
         next.status = "confirmed";
         next.selectedCandidateId = restaurant.id;
@@ -690,11 +690,11 @@ export class DiningAgent {
           alias: approval.alias,
           evidence: "user_confirmed",
           acceptedAt: now,
-          test: restaurant.test,
+          test: restaurant.test || restaurant.testCall === true,
         };
         if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
         const token = this.deps.linkSecret
-          ? makeCardToken({ restaurantId: restaurant.id, partySize: approval.partySize, time: next.reservation.time, alias: approval.alias, test: restaurant.test, expiresAt: addMinutes(next.reservation.time, 6 * 60) }, this.deps.linkSecret)
+          ? makeCardToken({ restaurantId: restaurant.id, partySize: approval.partySize, time: next.reservation.time, alias: approval.alias, test: next.reservation.test, expiresAt: addMinutes(next.reservation.time, 6 * 60) }, this.deps.linkSecret)
           : null;
         return this.reply(ctx, [m.confirmedCard(next, next.reservation, restaurant, { origin: this.deps.origin, cardToken: token })]);
       }
@@ -777,7 +777,7 @@ export class DiningAgent {
       const index = approval.candidateIds.indexOf(candidateId) + 1;
       await this.push(next, [m.calling(next.lang, restaurant, index, approval.candidateIds.length)]);
       try {
-        const brief = { restaurantNameKo: restaurant.nameKo, partySize: approval.partySize, windowStart: approval.windowStart, windowEnd: approval.windowEnd, alias: approval.alias, test: restaurant.test };
+        const brief = { restaurantNameKo: restaurant.nameKo, partySize: approval.partySize, windowStart: approval.windowStart, windowEnd: approval.windowEnd, alias: approval.alias, test: restaurant.test || restaurant.testCall === true };
         const providerCallId = await placer.place({ attemptId: attempt.id, phoneRef: restaurant.phoneRef!, brief });
         await this.updateAttempt(attempt.id, (a) => {
           if (a.status === "placing") {
@@ -799,7 +799,7 @@ export class DiningAgent {
     if (!request || !attempt || (attempt.status !== "placing" && attempt.status !== "in_progress")) return null;
     const approval = request.approvals.find((a) => a.id === attempt.approvalId)!;
     const restaurant = findRestaurant(attempt.candidateId)!;
-    return buildCallInstructions({ restaurantNameKo: restaurant.nameKo, partySize: approval.partySize, windowStart: approval.windowStart, windowEnd: approval.windowEnd, alias: approval.alias, test: restaurant.test });
+    return buildCallInstructions({ restaurantNameKo: restaurant.nameKo, partySize: approval.partySize, windowStart: approval.windowStart, windowEnd: approval.windowEnd, alias: approval.alias, test: restaurant.test || restaurant.testCall === true });
   }
 
   private async updateAttempt(attemptId: string, change: (attempt: CallAttempt) => void): Promise<void> {

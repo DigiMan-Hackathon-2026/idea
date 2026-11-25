@@ -53,6 +53,8 @@ export type Restaurant = {
   source: { label: string; url: string | null; checkedAt: string };
   /** Test entries are labelled as such on every card and result. */
   test: boolean;
+  /** A real shop whose demo calls go to a teammate: calls and bookings are marked as tests. */
+  testCall?: boolean;
   /** Found by NAVER local search, not curated: shown as unverified and never called. */
   searchOnly?: boolean;
 };

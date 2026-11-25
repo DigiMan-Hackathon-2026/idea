@@ -261,7 +261,7 @@ function shopQuote(lang: Lang, quote: string | null): string {
 export function approvalCard(request: DiningRequest, approval: CallProposal, lookup: (id: string) => Restaurant | undefined): LineMessage {
   const lang = request.lang;
   const shops = approval.candidateIds.map((id, i) => `${i + 1}. ${name(lang, lookup(id) ?? { nameJa: id, nameKo: id })}`);
-  const anyTest = approval.candidateIds.some((id) => lookup(id)?.test);
+  const anyTest = approval.candidateIds.some((id) => lookup(id)?.test || lookup(id)?.testCall);
   const body: FlexComponent[] = [
     text(tr(lang, "電話する順番", "전화 순서"), { size: "xs", color: color.muted }),
     ...shops.map((line) => text(line, { weight: "bold" })),

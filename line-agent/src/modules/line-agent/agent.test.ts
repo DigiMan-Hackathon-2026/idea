@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import testCandidates from "./__fixtures__/test-candidates.json";
+import { setCandidatesForTests } from "./places";
 import { DiningAgent } from "./agent";
 import { RecordingLineGateway } from "./line/client";
 import type { LineEvent, LineMessage, LineSource } from "./line/types";
@@ -87,6 +89,8 @@ function buttons(message: LineMessage): Record<string, string> {
 function lastTexts(to: string, n = 3): string {
   return line.messagesFor(to).slice(-n).map(({ message }) => (message.type === "text" ? message.text : message.altText)).join("\n");
 }
+
+beforeAll(() => setCandidatesForTests(testCandidates));
 
 beforeEach(() => {
   clock = seoulInstant("2026-11-29", 17, 30);
