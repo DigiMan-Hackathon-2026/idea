@@ -2,6 +2,7 @@
 // action. The server checks all three before doing anything (spec §8).
 export type PostbackAction =
   | "select"
+  | "alternatives"
   | "wait"
   | "wait_on_arrival"
   | "wait_remote"
@@ -19,7 +20,7 @@ export type PostbackAction =
 
 export type Postback = { action: PostbackAction; requestId: string; revision: number; candidateId: string | null; value: string | null };
 
-const actions = new Set<PostbackAction>(["select", "wait", "wait_on_arrival", "wait_remote", "call_request", "approve", "cancel_call", "new_search", "decision_retry", "decision_accept", "verify_yes", "verify_no", "party", "area", "menu"]);
+const actions = new Set<PostbackAction>(["select", "alternatives", "wait", "wait_on_arrival", "wait_remote", "call_request", "approve", "cancel_call", "new_search", "decision_retry", "decision_accept", "verify_yes", "verify_no", "party", "area", "menu"]);
 
 export function encodePostback(postback: Postback): string {
   const params = new URLSearchParams({ a: postback.action, r: postback.requestId, v: String(postback.revision) });

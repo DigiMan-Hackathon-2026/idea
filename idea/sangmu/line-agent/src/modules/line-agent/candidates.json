@@ -1,5 +1,5 @@
 {
-  "$comment": "LINE agent candidate shops. Real shops come from public pages (source.url, checkedAt); facts not on the page (capacity, solo entry) stay null. testCall=true: demo calls go to a teammate via phoneRef (LINE_AGENT_PHONE_ALLOWLIST) and results are marked as tests. Never put phone numbers here.",
+  "$comment": "LINE agent candidate shops. Real shops come from public pages (source.url, checkedAt); facts not on the page (capacity, solo entry) stay null. testCall=true: demo calls go to a teammate via phoneRef (LINE_AGENT_PHONE_ALLOWLIST) and results are marked as tests. Never put phone numbers here. hours: per weekday (mon..sun) open/close HH:MM in Seoul time, close earlier than open = after midnight, [] = closed that day; null hours = unknown. aliases and naverPlaceId let a shared name, link or sign photo find the shop.",
   "restaurants": [
     {
       "id": "seolleim-samgyeopsal",
@@ -26,7 +26,72 @@
         "checkedAt": "2026-11-25"
       },
       "test": false,
-      "testCall": true
+      "testCall": true,
+      "naverPlaceId": "31737840",
+      "aliases": [
+        "설레임",
+        "설레임삼겹살",
+        "설레임 삼겹살 신촌점",
+        "ソルレイム"
+      ],
+      "hours": {
+        "weekly": {
+          "mon": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ],
+          "tue": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ],
+          "wed": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ],
+          "thu": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ],
+          "fri": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ],
+          "sat": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ],
+          "sun": [
+            {
+              "open": "12:00",
+              "close": "02:00",
+              "lastOrder": "01:30"
+            }
+          ]
+        },
+        "source": {
+          "label": "네이버 플레이스 / NAVER Place",
+          "url": "https://m.place.naver.com/restaurant/31737840/home",
+          "checkedAt": "2026-11-26"
+        }
+      }
     },
     {
       "id": "donbul-shinchon",
@@ -59,7 +124,64 @@
         "checkedAt": "2026-11-25"
       },
       "test": false,
-      "testCall": true
+      "testCall": true,
+      "naverPlaceId": "36343564",
+      "aliases": [
+        "돈불",
+        "돈불1971",
+        "トンブル"
+      ],
+      "hours": {
+        "weekly": {
+          "mon": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ],
+          "tue": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ],
+          "wed": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ],
+          "thu": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ],
+          "fri": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ],
+          "sat": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ],
+          "sun": [
+            {
+              "open": "16:00",
+              "close": "22:50"
+            }
+          ]
+        },
+        "source": {
+          "label": "네이버 플레이스 / NAVER Place",
+          "url": "https://m.place.naver.com/restaurant/36343564/home",
+          "checkedAt": "2026-11-26"
+        }
+      }
     },
     {
       "id": "gogichanggo-shinchon",
@@ -97,7 +219,64 @@
         "checkedAt": "2026-11-25"
       },
       "test": false,
-      "testCall": true
+      "testCall": true,
+      "naverPlaceId": "11590700",
+      "aliases": [
+        "고기창고",
+        "신촌고기창고",
+        "コギチャンゴ"
+      ],
+      "hours": {
+        "weekly": {
+          "mon": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "tue": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "wed": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "thu": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "fri": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "sat": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "sun": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ]
+        },
+        "source": {
+          "label": "네이버 플레이스 / NAVER Place",
+          "url": "https://m.place.naver.com/restaurant/11590700/home",
+          "checkedAt": "2026-11-26"
+        }
+      }
     },
     {
       "id": "test-shinchon-d",

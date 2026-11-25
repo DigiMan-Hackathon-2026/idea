@@ -429,3 +429,68 @@ describe("DiningAgent rules", () => {
     expect(line.sent.length).toBeGreaterThan(0);
   });
 });
+
+describe("DiningAgent: a shop the user points at (link, name, photo)", () => {
+  it("answers whether the linked shop works today, then calls it first and an alternative next", async () => {
+    await agent.handleEvent(text(ALICE, "このお店、今日2人で行ける？20時までに弘大のライブ会場に着きたい https://map.naver.com/p/entry/place/1000001"));
+    expect(lastTexts(ALICE, 2)).toContain("リンクから「テスト店A（サムギョプサル）");
+    const answer = line.messagesFor(ALICE).at(-1)!.message;
+    // Open now (hours), the walk fits, but nobody knows the table: a call is offered.
+    expect(answer.type === "flex" && answer.altText).toContain("今日 2名で行けるか、確認が必要です");
+    expect(JSON.stringify(answer)).toContain("17:35〜22:00に入店できます（NAVER Place");
+    const options = buttons(answer);
+    expect(Object.keys(options)).toEqual(expect.arrayContaining(["AIに電話で確かめてもらう", "このまま行く", "待ち状況を送る", "近くの似たお店"]));
+
+    await agent.handleEvent(tap(ALICE, options["AIに電話で確かめてもらう"]));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    const card = line.messagesFor(ALICE).at(-1)!.message;
+    expect(JSON.stringify(card)).toContain("1. テスト店A");
+    await agent.handleEvent(tap(ALICE, buttons(card)["この条件で電話を頼む"]));
+    expect(calls.jobs[0].phoneRef).toBe("demo-shop-a");
+  });
+
+  it("asks only what the link cannot tell, like the party size", async () => {
+    await agent.handleEvent(text(ALICE, "https://m.place.naver.com/restaurant/1000001/home"));
+    expect(lastTexts(ALICE, 1)).toContain("何名");
+    await agent.handleEvent(text(ALICE, "3人"));
+    expect(lastTexts(ALICE, 1)).toContain("今日 3名で行けるか");
+  });
+
+  it("finds the shop by name or from a sign photo", async () => {
+    await agent.handleEvent(text(ALICE, "テスト店Aに2人で行きたい"));
+    expect(lastTexts(ALICE, 1)).toContain("テスト店A");
+    imageText = "테스트A 삼겹살 OPEN";
+    await agent.handleEvent(image(BOB));
+    expect(lastTexts(BOB, 2)).toContain("写真から「テスト店A");
+    expect(lastTexts(BOB, 1)).toContain("何名");
+    await agent.handleEvent(text(BOB, "2人"));
+    expect(lastTexts(BOB, 1)).toContain("今日 2名で行けるか");
+  });
+
+  it("says when the shop cannot seat us today and offers nearby shops instead", async () => {
+    clock = seoulInstant("2026-11-29", 8, 30);
+    await agent.handleEvent(text(ALICE, "テスト店A 2人、午前10時までに弘大のライブ会場"));
+    const answer = line.messagesFor(ALICE).at(-1)!.message;
+    expect(answer.type === "flex" && answer.altText).toContain("今日は難しそうです");
+    expect(JSON.stringify(answer)).toContain("11:00から営業");
+    const options = buttons(answer);
+    expect(options["AIに電話で確かめてもらう"]).toBeUndefined();
+    await agent.handleEvent(tap(ALICE, options["近くの似たお店"]));
+    expect(lastTexts(ALICE, 2)).toContain("近くで、同じメニューのお店です");
+    // A shop whose hours rule today out is never called.
+    const view = line.messagesFor(ALICE).at(-1)!.message;
+    const call = buttons(view)["電話で聞いてもらう"];
+    if (call) {
+      await agent.handleEvent(tap(ALICE, call));
+      await agent.handleEvent(text(ALICE, "サトウ"));
+      expect(JSON.stringify(line.messagesFor(ALICE).at(-1)!.message)).not.toContain("テスト店A");
+    }
+  });
+
+  it("explains links it cannot use", async () => {
+    await agent.handleEvent(text(ALICE, "ここ https://www.instagram.com/p/Cabc123/"));
+    expect(lastTexts(ALICE, 1)).toContain("instagram.com");
+    await agent.handleEvent(text(ALICE, "https://map.naver.com/p/entry/place/99999999"));
+    expect(lastTexts(ALICE, 1)).toContain("まだ情報がないお店");
+  });
+});

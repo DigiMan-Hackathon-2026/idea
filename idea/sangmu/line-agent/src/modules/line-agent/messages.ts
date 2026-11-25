@@ -7,6 +7,7 @@ import type { CandidatePlan } from "./plan";
 import { findArea, menuNames } from "./places";
 import { encodePostback, type PostbackAction } from "./postback";
 import { formatSeoulTime } from "./time";
+import type { TodayCheck } from "./today";
 import type { CallProposal, DiningRequest, Lang, Place, Reservation, Restaurant, WaitObservation } from "./types";
 
 export const BOT_NAME = { ja: "ココソウル", ko: "코코서울" };
@@ -579,3 +580,144 @@ export function waitRecorded(lang: Lang, restaurant: Restaurant, plan: Candidate
   return tr(lang, `${restaurant.nameJa}の待ち状況を記録しました。`, `${restaurant.nameKo}의 대기 상황을 기록했어요.`);
 }
 
+// ── "Can we go there today?" ─────────────────────────────────────────────────
+
+const mark = { ok: "○", unknown: "？", no: "×" } as const;
+
+function row(label: string, state: keyof typeof mark, value: string): FlexBox {
+  const tone = state === "no" ? color.warning : state === "ok" ? color.primary : color.info;
+  return {
+    type: "box",
+    layout: "horizontal",
+    spacing: "sm",
+    contents: [
+      text(mark[state], { size: "sm", weight: "bold", color: tone, flex: 0 }),
+      vbox([text(label, { size: "xxs", color: color.muted }), text(value, { size: "sm" })], { spacing: "none", flex: 1 }),
+    ],
+  };
+}
+
+function hoursRow(lang: Lang, restaurant: Restaurant, check: TodayCheck, deadline: string | null): FlexBox {
+  const label = tr(lang, "営業時間", "영업시간");
+  const hours = check.hours;
+  const checked = restaurant.hours ? tr(lang, `（NAVER Place・${restaurant.hours.source.checkedAt.slice(5).replace("-", "/")}確認）`, ` (네이버 플레이스 · ${restaurant.hours.source.checkedAt.slice(5).replace("-", "/")} 확인)`) : "";
+  switch (hours.state) {
+    case "open":
+      return row(label, "ok", tr(lang, `${formatSeoulTime(hours.seatFrom)}〜${formatSeoulTime(hours.lastSeatAt)}に入店できます${checked}`, `${formatSeoulTime(hours.seatFrom)}~${formatSeoulTime(hours.lastSeatAt)} 사이에 들어갈 수 있어요${checked}`));
+    case "closed_today":
+      return row(label, "no", tr(lang, `今日はお休みです${checked}`, `오늘은 쉬는 날이에요${checked}`));
+    case "outside":
+      return hours.opensAt
+        ? row(label, "no", tr(lang, `${formatSeoulTime(hours.opensAt)}から営業なので${deadline ? `、${formatSeoulTime(deadline)}までに入れません` : "、まだ入れません"}${checked}`, `${formatSeoulTime(hours.opensAt)}부터 영업이라${deadline ? ` ${formatSeoulTime(deadline)}까지 들어갈 수 없어요` : " 아직 못 들어가요"}${checked}`))
+        : row(label, "no", tr(lang, `今日の受付は${hours.lastSeatAt ? formatSeoulTime(hours.lastSeatAt) : ""}で終わっています${checked}`, `오늘 입장은 ${hours.lastSeatAt ? formatSeoulTime(hours.lastSeatAt) : ""}에 끝났어요${checked}`));
+    default:
+      return row(label, "unknown", tr(lang, "営業時間は確認できていません", "영업시간은 확인하지 못했어요"));
+  }
+}
+
+function timingRow(lang: Lang, request: DiningRequest, plan: CandidatePlan, minutesToShop: number | null): FlexBox {
+  const label = tr(lang, "次の予定", "다음 일정");
+  const walk = minutesToShop !== null ? tr(lang, `お店まで約${minutesToShop}分。`, `가게까지 약 ${minutesToShop}분. `) : "";
+  if (!request.arriveBy || !request.nextPlace || !plan.seatDeadline) {
+    return row(tr(lang, "移動", "이동"), minutesToShop !== null ? "ok" : "unknown", walk ? walk.replace(/。$/, "") : tr(lang, "お店までの時間は確認できていません", "가게까지 시간은 확인하지 못했어요"));
+  }
+  const goal = tr(lang, `${formatSeoulTime(plan.seatDeadline)}までに席に着けば、${formatSeoulTime(request.arriveBy)}に${request.nextPlace.nameJa}へ間に合います`, `${formatSeoulTime(plan.seatDeadline)}까지 앉으면 ${formatSeoulTime(request.arriveBy)}에 ${request.nextPlace.nameKo}에 갈 수 있어요`);
+  if (plan.verdict === "late") {
+    const over = plan.marginMinutes ?? 0;
+    return row(label, "no", tr(lang, `${walk}席に着くのが締切より${over}分遅れる見込みです`, `${walk}마감보다 ${over}분 늦게 앉을 것 같아요`));
+  }
+  // An unknown wait is shown on its own row; the walk and the deadline are known here.
+  const onlyWaitUnknown = plan.unknown.every((reason) => reason.startsWith("wait_"));
+  return row(label, plan.verdict === "fits" || onlyWaitUnknown ? "ok" : "unknown", `${walk}${goal}`);
+}
+
+function seatRow(lang: Lang, plan: CandidatePlan): FlexBox {
+  const label = tr(lang, "今の空席・待ち", "지금 빈자리·대기");
+  if (!plan.wait) return row(label, "unknown", tr(lang, "お店にしか分かりません。AIが韓国語で電話して確かめられます", "가게만 알아요. AI가 한국어로 전화해서 확인할 수 있어요"));
+  return row(label, plan.verdict === "late" ? "no" : "ok", waitLine(lang, plan.wait));
+}
+
+/** The answer for one shop the user pointed at: today, on their conditions, and what to do next. */
+export function todayAnswer(
+  request: DiningRequest,
+  restaurant: Restaurant,
+  check: TodayCheck,
+  plan: CandidatePlan,
+  options: { callingEnabled: boolean; canCallOthers: boolean; origin?: string; intro?: string },
+): LineMessage {
+  const lang = request.lang;
+  const party = request.partySize ?? 2;
+  const headline = {
+    ok: { label: tr(lang, `今日 ${party}名で行けそうです`, `오늘 ${party}명이면 갈 수 있을 것 같아요`), background: color.primary },
+    check: { label: tr(lang, `今日 ${party}名で行けるか、確認が必要です`, `오늘 ${party}명이 갈 수 있는지 확인이 필요해요`), background: color.info },
+    hard: { label: tr(lang, "今日は難しそうです", "오늘은 어려울 것 같아요"), background: color.warning },
+  }[check.verdict];
+  const leg = request.candidates.find((c) => c.restaurantId === restaurant.id)?.toRestaurant ?? null;
+  const body: FlexComponent[] = [
+    hoursRow(lang, restaurant, check, plan.seatDeadline),
+    timingRow(lang, request, plan, leg?.minutes ?? null),
+    seatRow(lang, plan),
+    check.tooSmall ? row(tr(lang, "人数", "인원"), "no", tr(lang, `${party}名は入れない可能性があります`, `${party}명은 못 들어갈 수 있어요`)) : partyLine(lang, restaurant, party),
+    ...badges(lang, restaurant),
+  ];
+  const callable = options.callingEnabled && restaurant.phoneRef !== null;
+  const buttons: FlexComponent[] = [];
+  const button = (style: "primary" | "secondary" | "link", action: LineAction): FlexComponent => ({ type: "button", style, height: "sm", ...(style === "primary" ? { color: color.primary } : {}), action });
+  const alternatives = postback(request, "alternatives", tr(lang, "近くの似たお店", "근처 비슷한 가게"), { displayText: tr(lang, "近くの似たお店を見る", "근처 비슷한 가게 보기") });
+  const callLabel = (ja: string, ko: string) => postback(request, "call_request", tr(lang, ja, ko), { displayText: tr(lang, ja, ko) });
+  if (check.verdict === "hard") {
+    buttons.push(button("primary", alternatives));
+    if (options.canCallOthers) buttons.push(button("secondary", callLabel("ほかのお店に電話で聞く", "다른 가게에 전화로 묻기")));
+  } else {
+    if (callable) buttons.push(button("primary", check.verdict === "ok" ? callLabel("電話で予約を頼む", "전화로 예약 부탁하기") : callLabel("AIに電話で確かめてもらう", "AI에게 전화로 확인 부탁하기")));
+    buttons.push(button(callable ? "secondary" : "primary", postback(request, "select", tr(lang, "このまま行く", "그냥 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) })));
+    buttons.push(button("link", postback(request, "wait", tr(lang, "待ち状況を送る", "대기 상황 보내기"), { candidateId: restaurant.id })));
+    buttons.push(button("link", alternatives));
+  }
+  const header = vbox(
+    [
+      text(headline.label, { size: "sm", color: "#ffffff", weight: "bold" }),
+      text(name(lang, restaurant), { size: "lg", weight: "bold", color: "#ffffff" }),
+      text(lang === "ja" ? restaurant.nameKo : restaurant.nameJa, { size: "xs", color: "#ffffffcc" }),
+    ],
+    { spacing: "xs", backgroundColor: headline.background, paddingAll: "14px" },
+  );
+  const hero = heroImage(options.origin, restaurant.areaId);
+  const bubble: FlexBubble = { type: "bubble", size: "mega", header, ...(hero ? { hero } : {}), body: vbox(body, { spacing: "md" }), footer: vbox(buttons) };
+  const altText = `${headline.label}：${name(lang, restaurant)}`;
+  return { type: "flex", altText: options.intro ? `${options.intro} ${altText}` : altText, contents: bubble };
+}
+
+/** Text before the answer: what we understood and what the user can still add. */
+export function todayIntro(request: DiningRequest, restaurant: Restaurant, via: "link" | "name" | "image", alreadySaid = false): LineMessage {
+  const lang = request.lang;
+  const from = { link: tr(lang, "リンク", "링크"), name: tr(lang, "お店の名前", "가게 이름"), image: tr(lang, "写真", "사진") }[via];
+  const missing = !request.arriveBy ? tr(lang, "\n次の予定があれば「20時までに弘大」のように送ってください。間に合うかも一緒に見ます。", "\n다음 일정이 있으면 \"8시까지 홍대\"처럼 보내 주세요. 시간 안에 되는지도 같이 볼게요.") : "";
+  const found = alreadySaid
+    ? tr(lang, `「${restaurant.nameJa}」に今日行けるか調べました。`, `"${restaurant.nameKo}"에 오늘 갈 수 있는지 알아봤어요.`)
+    : tr(lang, `${from}から「${restaurant.nameJa}（${restaurant.nameKo}）」だと分かりました。今日行けるか調べました。`, `${from}에서 "${restaurant.nameKo}"(으)로 확인했어요. 오늘 갈 수 있는지 알아봤어요.`);
+  return { type: "text", text: found + missing };
+}
+
+/** Said before the first question when the user pointed at a shop but gave no party size. */
+export function targetRecognized(request: DiningRequest, restaurant: Restaurant, via: "link" | "name" | "image"): LineMessage {
+  const lang = request.lang;
+  const from = { link: tr(lang, "リンク", "링크"), name: tr(lang, "お店の名前", "가게 이름"), image: tr(lang, "写真", "사진") }[via];
+  return { type: "text", text: tr(lang, `${from}から「${restaurant.nameJa}（${restaurant.nameKo}）」だと分かりました。今日行けるか調べます。`, `${from}에서 "${restaurant.nameKo}"(으)로 확인했어요. 오늘 갈 수 있는지 알아볼게요.`) };
+}
+
+export function unknownPlace(lang: Lang): LineMessage {
+  return { type: "text", text: tr(lang, "地図のリンクは読めましたが、まだ情報がないお店です。いまは新村のお店に対応しています。お店の名前か「新村で2人、サムギョプサル」のように送ってください。", "지도 링크는 읽었지만 아직 정보가 없는 가게예요. 지금은 신촌 가게를 지원해요. 가게 이름이나 \"신촌에서 2명, 삼겹살\"처럼 보내 주세요.") };
+}
+
+export function unreadableLink(lang: Lang, host: string): LineMessage {
+  return { type: "text", text: tr(lang, `${host}のリンクは開けません。お店の名前、NAVER地図・Googleマップのリンク、または看板の写真を送ってください。`, `${host} 링크는 열 수 없어요. 가게 이름, 네이버 지도·구글 지도 링크, 또는 간판 사진을 보내 주세요.`) };
+}
+
+export function alternativesIntro(lang: Lang, restaurant: Restaurant): string {
+  return tr(lang, `${restaurant.nameJa}の近くで、同じメニューのお店です。`, `${restaurant.nameKo} 근처의 같은 메뉴 가게예요.`);
+}
+
+export function photoNotPlace(lang: Lang): LineMessage {
+  return { type: "text", text: tr(lang, "写真からお店が分かりませんでした。お店の名前、NAVER地図・Googleマップのリンク、または看板がはっきり写った写真を送ってください。", "사진에서 가게를 찾지 못했어요. 가게 이름, 네이버 지도·구글 지도 링크, 또는 간판이 잘 보이는 사진을 보내 주세요.") };
+}

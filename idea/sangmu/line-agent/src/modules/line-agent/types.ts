@@ -35,6 +35,17 @@ export type BookingLink = {
   checkedAt: string;
 };
 
+export type Weekday = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
+
+/** One opening span in Seoul time. A close earlier than the open is after midnight. */
+export type OpeningSpan = { open: string; close: string; lastOrder?: string };
+
+export type OpeningHours = {
+  /** Spans per weekday; an empty list is a closed day. */
+  weekly: Record<Weekday, OpeningSpan[]>;
+  source: { label: string; url: string; checkedAt: string };
+};
+
 export type Restaurant = {
   id: string;
   areaId: string;
@@ -57,6 +68,12 @@ export type Restaurant = {
   testCall?: boolean;
   /** Found by NAVER local search, not curated: shown as unverified and never called. */
   searchOnly?: boolean;
+  /** Opening hours from a public page; null or missing = unknown (checked by phone). */
+  hours?: OpeningHours | null;
+  /** NAVER Place id, so a shared NAVER Map link finds the shop. */
+  naverPlaceId?: string | null;
+  /** Other names people write or see on the sign (shorter Korean name, katakana). */
+  aliases?: string[];
 };
 
 export type TravelLeg = {
@@ -199,6 +216,8 @@ export type DiningRequest = {
   decision: Decision | null;
   /** Call conditions shown on the approval card, waiting for the requester's tap. */
   proposal: CallProposal | null;
+  /** The one shop the user pointed at (link, name or sign photo); the other candidates are alternatives. */
+  target?: { candidateId: string; via: "link" | "name" | "image" } | null;
   createdAt: string;
   updatedAt: string;
   expiresAt: string;

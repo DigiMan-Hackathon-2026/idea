@@ -12,11 +12,13 @@ import * as m from "./messages";
 import { classifyCall, type TranscriptTurn } from "./outcome";
 import { computePlan, rankPlans, type CandidatePlan } from "./plan";
 import { searchCandidate, type PlaceSearch } from "./naver-search";
+import { findShopByName, identifyPlace, type LinkResolver } from "./identify";
 import { findArea, findAreaMentions, findMenu, findRestaurant, listRestaurants, menuNames, registerSearchRestaurant, stationAdventurePath } from "./places";
 import { decodePostback, type Postback } from "./postback";
 import { isActive, type AgentStore } from "./store";
 import type { CallFinished, CallPlacer } from "./telephony";
 import { addMinutes, ceilToMinutes, floorToMinutes, laterOf, seoulDate, seoulInstant } from "./time";
+import { judgeToday } from "./today";
 import type { TravelProvider } from "./travel";
 import type { CallApproval, CallAttempt, CallOutcome, CandidateState, DiningRequest, MenuKey, Restaurant } from "./types";
 import { readWait } from "./wait";
@@ -41,7 +43,11 @@ export type AgentDeps = {
   /** Called with each finished call's transcript (the simulator shows it; nothing is stored by default). */
   onCallTranscript?: (info: { replyTarget: string; attemptId: string; restaurantId: string; transcript: TranscriptTurn[]; outcome: CallOutcome["kind"]; at: string }) => void;
   log?: (event: string, data: Record<string, string | number | boolean | null>) => void;
+  /** Follows NAVER/Google Maps short links to their full URL. null = short links are not opened. */
+  resolveLink?: LinkResolver | null;
 };
+
+type Target = NonNullable<DiningRequest["target"]>;
 
 const REQUEST_TTL_MINUTES = 6 * 60;
 const APPROVAL_TTL_MINUTES = 10;
@@ -232,6 +238,20 @@ export class DiningAgent {
       await this.reply(ctx, [m.busyCalling(active.lang)]);
       return;
     }
+    // A shop the user points at (map link, page, or its name) is answered for that shop first.
+    const place = await identifyPlace(text, this.deps.resolveLink ?? null);
+    if (place?.kind === "shop") {
+      if (active && !(fromRequester || !isGroup)) return this.reply(ctx, [m.onlyRequester(active.lang)]);
+      if (!ctx.userId) return this.reply(ctx, [m.greeting(reading.lang, isGroup ? "group" : "user")]);
+      if (active) await this.deps.store.save({ ...this.bump(active, now), status: "closed" as const }, active.revision);
+      this.log("request.target", { via: place.via });
+      await this.startRequest(ctx, reading, now, { candidateId: place.restaurant.id, via: place.via });
+      return;
+    }
+    if (place && !(reading.wantsFood && filledFields(reading) >= 2)) {
+      await this.reply(ctx, [place.kind === "unknown_place" ? m.unknownPlace(reading.lang) : m.unreadableLink(reading.lang, place.host)]);
+      return;
+    }
     if (reading.wantsFood || filledFields(reading) >= 2) {
       if (active && !(fromRequester || !isGroup)) {
         await this.reply(ctx, [m.onlyRequester(active.lang)]);
@@ -261,13 +281,13 @@ export class DiningAgent {
 
   private async onImage(ctx: Context, messageId: string): Promise<void> {
     const active = this.hydrate(await this.deps.store.getActiveRequest(ctx.convKey, this.now()));
-    if (!active) return;
-    // Only images sent as an answer to "send the wait" are read (spec §9: no group-wide reading).
-    const candidateId = active.pendingQuestion === "wait" ? active.pendingWaitCandidateId : ctx.kind === "user" ? active.selectedCandidateId : null;
+    // Only images sent as an answer to "send the wait", or sent in 1:1, are read (spec §9: no group-wide reading).
+    const candidateId = !active ? null : active.pendingQuestion === "wait" ? active.pendingWaitCandidateId : ctx.kind === "user" ? active.selectedCandidateId : null;
     if (!candidateId) {
-      if (ctx.kind === "user") await this.reply(ctx, [m.askWaitFirst(active.lang)]);
+      if (ctx.kind === "user") await this.shopFromPhoto(ctx, messageId, active);
       return;
     }
+    if (!active) return;
     if (ctx.kind === "user") await this.deps.line.showLoading?.(ctx.target, 10);
     const text = this.deps.readImage ? await this.deps.readImage(messageId).catch(() => null) : null;
     if (!text || !readWait(text)) {
@@ -283,7 +303,27 @@ export class DiningAgent {
     if (fresh) await this.recordWait(fresh, candidateId, text, ctx, "user_image");
   }
 
-  private async startRequest(ctx: Context, reading: Interpretation, now: string): Promise<void> {
+  /** A photo sent in 1:1 outside a wait question: the sign or page of a shop the user wants to try. */
+  private async shopFromPhoto(ctx: Context, messageId: string, active: DiningRequest | null): Promise<void> {
+    const lang = active?.lang ?? "ja";
+    if (!this.deps.readImage || !ctx.userId) {
+      await this.reply(ctx, [active ? m.askWaitFirst(lang) : m.greeting(lang, "user")]);
+      return;
+    }
+    await this.deps.line.showLoading?.(ctx.target, 10);
+    const text = await this.deps.readImage(messageId).catch(() => null);
+    const restaurant = text ? findShopByName(text) : null;
+    if (!restaurant) {
+      await this.reply(ctx, [active ? m.askWaitFirst(lang) : m.photoNotPlace(lang)]);
+      return;
+    }
+    const now = this.now();
+    if (active) await this.deps.store.save({ ...this.bump(active, now), status: "closed" as const }, active.revision);
+    this.log("request.target", { via: "image" });
+    await this.startRequest(ctx, { ...interpret(""), lang }, now, { candidateId: restaurant.id, via: "image" });
+  }
+
+  private async startRequest(ctx: Context, reading: Interpretation, now: string, target: Target | null = null): Promise<void> {
     const request: DiningRequest = {
       id: this.deps.newId(),
       conversationKey: ctx.convKey,
@@ -312,10 +352,18 @@ export class DiningAgent {
       reservation: null,
       decision: null,
       proposal: null,
+      target,
       createdAt: now,
       updatedAt: now,
       expiresAt: addMinutes(now, REQUEST_TTL_MINUTES),
     };
+    const shop = target ? findRestaurant(target.candidateId) : undefined;
+    if (shop) {
+      // The shop fixes where and what; the text still gives the party and the next plan.
+      request.areaId = shop.areaId;
+      request.menuKey = shop.menus[0];
+      request.menuLabel = menuNames[shop.menus[0]][request.lang];
+    }
     const notices = this.merge(request, reading, now);
     this.log("request.started", { lang: request.lang, kind: ctx.kind });
     const unsupported = reading.currentAreaId && !findArea(reading.currentAreaId)?.diningArea ? findArea(reading.currentAreaId) : undefined;
@@ -363,6 +411,8 @@ export class DiningAgent {
       next.pendingQuestion = "menu";
       question = m.askMenu(next);
     }
+    const shop = next.target ? findRestaurant(next.target.candidateId) : undefined;
+    if (question && shop && next.target && expectedRevision === null) notices.push(m.targetRecognized(next, shop, next.target.via));
     if (question) {
       next.status = "collecting";
       if (!(await this.deps.store.save(next, expectedRevision))) return this.reply(ctx, [m.staleCard(next.lang)]);
@@ -373,7 +423,8 @@ export class DiningAgent {
     next.candidates = await this.searchCandidates(next, now);
     next.status = "comparing";
     if (!(await this.deps.store.save(next, expectedRevision))) return this.reply(ctx, [m.staleCard(next.lang)]);
-    await this.reply(ctx, [...notices, ...this.candidateView(next, now)]);
+    const intro = shop && next.target ? [m.todayIntro(next, shop, next.target.via, expectedRevision !== null)] : [];
+    await this.reply(ctx, [...notices, ...intro, ...this.overview(next, now)]);
   }
 
   private async searchCandidates(request: DiningRequest, now: string): Promise<CandidateState[]> {
@@ -402,8 +453,34 @@ export class DiningAgent {
         toNext: request.nextPlace ? await this.deps.travel.leg(restaurant.point, request.nextPlace.point, now) : null,
       })),
     );
-    const plans = rankPlans(states.map((state) => computePlan(request, state, now)), states);
-    return plans.slice(0, MAX_CARDS).map((plan, index) => ({ ...states.find((s) => s.restaurantId === plan.candidateId)!, rank: index + 1 }));
+    const ranked = rankPlans(states.map((state) => computePlan(request, state, now)), states).map((plan) => plan.candidateId);
+    // The shop the user pointed at comes first; the best others follow as alternatives.
+    const targetId = request.target?.candidateId;
+    const order = targetId && ranked.includes(targetId) ? [targetId, ...ranked.filter((id) => id !== targetId)] : ranked;
+    return order.slice(0, MAX_CARDS).map((id, index) => ({ ...states.find((s) => s.restaurantId === id)!, rank: index + 1 }));
+  }
+
+  /** Whether the agent may call this shop (calls on, a phone key, the key allowed). */
+  private callable(restaurant: Restaurant | undefined): boolean {
+    return this.deps.calls !== null && !!restaurant?.phoneRef && this.deps.phoneAllowed(restaurant.phoneRef);
+  }
+
+  /** Candidates whose published hours rule out a seat today are never called. */
+  private openForCall(request: DiningRequest, plan: CandidatePlan, now: string): boolean {
+    const restaurant = findRestaurant(plan.candidateId);
+    if (!restaurant) return false;
+    const hours = judgeToday(request, restaurant, plan, now).hours.state;
+    return hours !== "closed_today" && hours !== "outside";
+  }
+
+  /** The answer for the shop the user pointed at, or the candidate list. */
+  private overview(request: DiningRequest, now: string, intro?: string): LineMessage[] {
+    const shop = request.target ? findRestaurant(request.target.candidateId) : undefined;
+    const plan = shop ? this.planFor(request, shop.id, now) : null;
+    if (!shop || !plan) return this.candidateView(request, now, intro);
+    const others = this.plans(request, now).filter((p) => p.candidateId !== shop.id && p.verdict !== "late" && this.openForCall(request, p, now) && this.callable(findRestaurant(p.candidateId)));
+    const answer = m.todayAnswer(request, shop, judgeToday(request, shop, plan, now), plan, { callingEnabled: this.callable(shop), canCallOthers: others.length > 0, origin: this.deps.origin, intro });
+    return intro ? [{ type: "text", text: intro }, answer] : [answer];
   }
 
   private plans(request: DiningRequest, now: string): CandidatePlan[] {
@@ -509,7 +586,7 @@ export class DiningAgent {
       return;
     }
     const plan = this.planFor(next, candidateId, now)!;
-    await this.reply(ctx, [...this.candidateView(next, now, m.waitRecorded(next.lang, restaurant, plan)), ...this.waitIdea(next, plan)]);
+    await this.reply(ctx, [...this.overview(next, now, m.waitRecorded(next.lang, restaurant, plan)), ...this.waitIdea(next, plan)]);
   }
 
   /** A nearby mission while a remote wait runs, only when it still fits the schedule. */
@@ -535,7 +612,7 @@ export class DiningAgent {
       return;
     }
     if (postback.revision !== request.revision) {
-      await this.reply(ctx, [m.staleCard(lang), ...(request.status === "comparing" ? this.candidateView(request, now) : [])]);
+      await this.reply(ctx, [m.staleCard(lang), ...(request.status === "comparing" ? this.overview(request, now) : [])]);
       return;
     }
     if (REQUESTER_ONLY.has(postback.action) && ctx.requesterKey !== request.requesterKey) {
@@ -573,6 +650,11 @@ export class DiningAgent {
         await this.reply(ctx, [m.selectedMessage(next, restaurant, this.deps.origin)]);
         return;
       }
+      case "alternatives": {
+        const shop = request.target ? findRestaurant(request.target.candidateId) : undefined;
+        await this.reply(ctx, this.candidateView(request, now, shop ? m.alternativesIntro(lang, shop) : undefined));
+        return;
+      }
       case "wait": {
         const restaurant = postback.candidateId ? findRestaurant(postback.candidateId) : undefined;
         if (!restaurant) return;
@@ -593,7 +675,7 @@ export class DiningAgent {
         wait.basis = postback.action === "wait_remote" ? "remote_from_observed" : "on_arrival";
         if (!(await this.deps.store.save(next, request.revision))) return this.reply(ctx, [m.staleCard(lang)]);
         const plan = this.planFor(next, restaurant.id, now)!;
-        await this.reply(ctx, [...this.candidateView(next, now, m.waitRecorded(lang, restaurant, plan)), ...this.waitIdea(next, plan)]);
+        await this.reply(ctx, [...this.overview(next, now, m.waitRecorded(lang, restaurant, plan)), ...this.waitIdea(next, plan)]);
         return;
       }
       case "call_request":
@@ -702,6 +784,7 @@ export class DiningAgent {
         const next = structuredClone(request);
         next.proposal = null;
         next.decision = null;
+        next.target = null;
         await this.advance(next, request.revision, ctx);
         return;
       }
@@ -715,7 +798,7 @@ export class DiningAgent {
     const lang = next.lang;
     const attempted = new Set(next.attempts.map((attempt) => attempt.candidateId));
     const plans = this.plans(next, now)
-      .filter((plan) => plan.verdict !== "late" && !attempted.has(plan.candidateId))
+      .filter((plan) => plan.verdict !== "late" && !attempted.has(plan.candidateId) && this.openForCall(next, plan, now))
       .filter((plan) => {
         const ref = findRestaurant(plan.candidateId)?.phoneRef;
         return ref !== null && ref !== undefined && this.deps.phoneAllowed(ref);

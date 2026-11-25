@@ -25,7 +25,63 @@
         "url": null,
         "checkedAt": "2026-11-25"
       },
-      "test": true
+      "test": true,
+      "naverPlaceId": "1000001",
+      "aliases": [
+        "テスト店A",
+        "테스트A"
+      ],
+      "hours": {
+        "weekly": {
+          "mon": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "tue": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "wed": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "thu": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "fri": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "sat": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ],
+          "sun": [
+            {
+              "open": "11:00",
+              "close": "23:00"
+            }
+          ]
+        },
+        "source": {
+          "label": "test",
+          "url": "https://example.test/hours/a",
+          "checkedAt": "2026-11-26"
+        }
+      }
     },
     {
       "id": "test-shinchon-b",
