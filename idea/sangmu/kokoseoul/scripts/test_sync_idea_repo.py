@@ -38,12 +38,9 @@ class SyncIdeaRepoTest(unittest.TestCase):
         changed = ["idea/sangmu/kokoseoul/package.json", "README.md", "idea/sangmu/kokoseoul-copy/a.ts"]
         self.assertEqual(sync.outside_paths(changed, "idea/sangmu/kokoseoul"), ["README.md", "idea/sangmu/kokoseoul-copy/a.ts"])
 
-    def test_maps_own_addresses_to_the_noreply_address(self) -> None:
-        self.assertEqual(sync.noreply_email(42, "octo"), "42+octo@users.noreply.github.com")
-        self.assertEqual(
-            sync.mailmap("octo", "42+octo@users.noreply.github.com", ["me@mail.test", "me@mail.test"]),
-            "octo <42+octo@users.noreply.github.com> <me@mail.test>\n",
-        )
+    def test_publishes_only_the_members_own_commits(self) -> None:
+        self.assertEqual(sync.other_authors(["me@mail.test", "noreply@github.com", ""], "me@mail.test"), set())
+        self.assertEqual(sync.other_authors(["me@mail.test", "friend@mail.test"], "me@mail.test"), {"friend@mail.test"})
         self.assertTrue(sync.merge_message("kokoseoul", "abc1234", 3, False).startswith("Update sangmu's kokoseoul to abc1234\n\n3 new commits"))
 
     def test_scans_every_version_and_message_in_history(self) -> None:

@@ -2,8 +2,8 @@
 """Publish this repository's git history into the team's public idea repository.
 
 The team repository keeps each member's demo under `idea/<name>/`. This rewrites
-a copy of this repository's history so that every file sits in the member folder
-and the member's own e-mail becomes their GitHub noreply address. It checks every
+a copy of this repository's history so that every file sits in the member folder;
+authors, e-mail addresses and dates stay as they are. It checks every
 file version and commit message for credentials, local paths, e-mail addresses
 and phone numbers, then merges the result into the idea repository. Commits keep
 their original dates. The rewrite is deterministic, so a later run adds only the
@@ -118,13 +118,9 @@ def scan_history(repo: Path, ref: str) -> list[str]:
     return sorted(found)
 
 
-def noreply_email(user_id: int, login: str) -> str:
-    return f"{user_id}+{login}@users.noreply.github.com"
-
-
-def mailmap(login: str, noreply: str, own_emails: list[str]) -> str:
-    """Maps the member's own addresses (any name) to their GitHub login and noreply address."""
-    return "".join(f"{login} <{noreply}> <{email}>\n" for email in sorted(set(own_emails)))
+def other_authors(addresses: list[str], own: str) -> set[str]:
+    """Author and committer addresses that are not the member's own (GitHub's own committer is fine)."""
+    return {address for address in addresses if address and address != own and address != "noreply@github.com"}
 
 
 def outside_paths(changed: list[str], prefix: str) -> list[str]:
@@ -136,7 +132,7 @@ def merge_message(folder: str, short: str, new_commits: int, first_time: bool) -
         return (
             f"Bring in sangmu's {folder} with its full history\n\n"
             f"All {new_commits} commits of the original repository up to {short}, with their original dates,\n"
-            f"moved under idea/sangmu/{folder}. Authors use the GitHub noreply address."
+            f"moved under idea/sangmu/{folder}."
         )
     return f"Update sangmu's {folder} to {short}\n\n{new_commits} new commits from the original repository, with their original dates."
 
@@ -157,19 +153,17 @@ def main(argv: list[str] | None = None) -> int:
         run("git", "fetch", "-q", "origin", args.ref.removeprefix("origin/"), cwd=ROOT)
     sha = run("git", "rev-parse", "--verify", f"{args.ref}^{{commit}}", cwd=ROOT)
     short = sha[:7]
-    login_id, login = run("gh", "api", "user", "--jq", '"\\(.id) \\(.login)"').split()
-    noreply = noreply_email(int(login_id), login)
-    own_emails = [run("git", "config", "user.email", cwd=ROOT)]
+    own_name = run("git", "config", "user.name", cwd=ROOT)
+    own_email = run("git", "config", "user.email", cwd=ROOT)
 
     workdir = Path(tempfile.mkdtemp(prefix="idea-sync-"))
     try:
         source = workdir / "source"
         run("git", "clone", "-q", "--no-local", "--no-checkout", str(ROOT), str(source))
         run("git", "update-ref", "refs/heads/publish", sha, cwd=source)
-        (workdir / "mailmap").write_text(mailmap(login, noreply, own_emails), encoding="utf-8")
-        run("git", "filter-repo", "--force", "--quiet", "--mailmap", str(workdir / "mailmap"), "--to-subdirectory-filter", target, cwd=source)
+        run("git", "filter-repo", "--force", "--quiet", "--to-subdirectory-filter", target, cwd=source)
 
-        others = {email for email in run("git", "log", "--format=%ae%n%ce", "publish", cwd=source).splitlines() if not email.endswith("@users.noreply.github.com")}
+        others = other_authors(run("git", "log", "--format=%ae%n%ce", "publish", cwd=source).splitlines(), own_email)
         if others:
             print(f"Stopped: {len(others)} author address(es) other than yours would be published. Ask those authors first.", file=sys.stderr)
             return 1
@@ -199,7 +193,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         before = run("git", "rev-parse", "HEAD", cwd=clone)
-        author = ("-c", f"user.name={login}", "-c", f"user.email={noreply}")
+        author = ("-c", f"user.name={own_name}", "-c", f"user.email={own_email}")
         if snapshot:
             run("git", "rm", "-rq", target, cwd=clone)
             run("git", *author, "commit", "-q", "-m", f"Remove the {folder} copy before bringing in its full history", cwd=clone)
