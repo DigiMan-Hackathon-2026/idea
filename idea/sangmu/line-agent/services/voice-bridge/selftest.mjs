@@ -78,6 +78,11 @@ bridge.stdout.on("data", (data) => (output += data));
 bridge.stderr.on("data", (data) => (output += data));
 await waitFor(() => output.includes("voice_bridge.listening"), "bridge start");
 
+// The operations console on this machine hears both sides; a page from elsewhere does not.
+const heard = await openStream(`ws://127.0.0.1:${ports.bridge}/listen`);
+const foreign = await openStream(`ws://127.0.0.1:${ports.bridge}/listen`, { Origin: "https://evil.example" }).catch(() => null);
+assert.equal(foreign, null, "a page from another origin cannot listen");
+
 // Twilio: /media, streamSid inside start, streamSid echoed on every message.
 {
   const { fromBridge, closed, socket } = await openStream(`ws://127.0.0.1:${ports.bridge}/media`);
@@ -112,6 +117,15 @@ await waitFor(() => output.includes("voice_bridge.listening"), "bridge start");
   assert.equal(fromBridge.find((m) => m.event === "media")?.streamSid, undefined);
 }
 
+// Both calls were heard: start, the shop's and the AI's audio, and the end.
+for (const id of ["attempt0001", "attempt0002"]) {
+  const frames = heard.fromBridge.filter((m) => m.attemptId === id);
+  assert.ok(frames.some((m) => m.type === "call" && m.state === "start"), `${id} start`);
+  assert.ok(frames.some((m) => m.type === "audio" && m.speaker === "shop" && m.payload === chunk), `${id} shop audio`);
+  assert.ok(frames.some((m) => m.type === "audio" && m.speaker === "ai" && m.payload === aiAudio), `${id} AI audio`);
+  assert.ok(frames.some((m) => m.type === "call" && m.state === "end"), `${id} end`);
+}
+heard.socket.close();
 bridge.kill();
 app.close();
 live.close();
