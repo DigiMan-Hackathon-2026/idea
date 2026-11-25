@@ -15,7 +15,7 @@ export interface AgentStore {
   save(request: DiningRequest, expectedRevision: number | null): Promise<boolean>;
   /** Open requests with a reminder not yet sent (the agent checks which are due). */
   listWithPendingReminders(now: string): Promise<DiningRequest[]>;
-  /** Calls placed since `since`, by everyone or by one requester (daily limits). */
+  /** Calls placed since `since` from LINE (not the local simulator), by everyone or by one requester (daily limits). */
   countCallsSince(since: string, requesterKey: string | null): Promise<number>;
   getAlias(requesterKey: string): Promise<string | null>;
   setAlias(requesterKey: string, alias: string): Promise<void>;
@@ -42,6 +42,7 @@ export class MemoryAgentStore implements AgentStore {
   async countCallsSince(since: string, requesterKey: string | null): Promise<number> {
     let count = 0;
     for (const request of this.requests.values()) {
+      if (request.replyTarget.startsWith("sim-")) continue;
       if (requesterKey !== null && request.requesterKey !== requesterKey) continue;
       count += request.attempts.filter((attempt) => Date.parse(attempt.startedAt) >= Date.parse(since)).length;
     }

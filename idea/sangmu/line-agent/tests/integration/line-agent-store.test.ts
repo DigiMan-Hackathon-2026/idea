@@ -64,6 +64,9 @@ describe("PostgreSQL LINE agent store", () => {
     expect(await store.countCallsSince("2026-11-29T00:00:00.000Z", null)).toBe(2);
     expect(await store.countCallsSince("2026-11-29T00:00:00.000Z", "req-alice")).toBe(1);
     expect(await store.countCallsSince("2026-11-30T00:00:00.000Z", null)).toBe(0);
+    // Calls from the local simulator do not count.
+    await store.save(request({ id: "req00000004", conversationKey: "conv-d", replyTarget: "sim-abc-alice", attempts: [{ ...attempt, id: "att00000013", approvalId: "apr3" }] }), null);
+    expect(await store.countCallsSince("2026-11-29T00:00:00.000Z", null)).toBe(2);
   });
 
   it("lists booked requests with reminders still to send", async () => {
