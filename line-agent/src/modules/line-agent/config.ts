@@ -2,7 +2,7 @@
 // the deployment's secret store; nothing here is logged.
 import { randomBytes } from "node:crypto";
 
-export type CallMode = "off" | "simulator" | "twilio";
+export type CallMode = "off" | "simulator" | "twilio" | "kat";
 
 export type LineAgentConfig = {
   appEnv: string;
@@ -14,6 +14,8 @@ export type LineAgentConfig = {
   calls: CallMode;
   phoneAllowlist: Record<string, string>;
   twilio: { accountSid: string; authToken: string; from: string } | null;
+  /** KAT Cloud (katcloud.kr): Korean 070 caller, API reachable from Korean IPs only. */
+  kat: { apiKey: string; from: string; apiUrl: string; groupId: string | null } | null;
   bridge: { host: string; secret: string } | null;
   simulatorEnabled: boolean;
   demoNow: string | null;
@@ -54,6 +56,9 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
   const twilioToken = value("TWILIO_AUTH_TOKEN");
   const twilioFrom = value("TWILIO_FROM");
   const twilio = twilioSid && twilioToken && twilioFrom && E164.test(twilioFrom) ? { accountSid: twilioSid, authToken: twilioToken, from: twilioFrom } : null;
+  const katKey = value("KAT_API_KEY");
+  const katFrom = value("KAT_FROM")?.replace(/[-\s]/g, "") ?? null;
+  const kat = katKey && katFrom && /^0\d{8,10}$/.test(katFrom) ? { apiKey: katKey, from: katFrom, apiUrl: value("KAT_API_URL") ?? "https://api.katcloud.kr", groupId: value("KAT_GROUP_ID") } : null;
   const bridgeHost = value("VOICE_BRIDGE_PUBLIC_HOST");
   const bridgeSecret = value("VOICE_BRIDGE_SECRET");
   const bridge = bridgeHost && bridgeSecret && bridgeSecret.length >= 16 ? { host: bridgeHost, secret: bridgeSecret } : null;
@@ -62,6 +67,7 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
   let calls: CallMode = production ? "off" : "simulator";
   if (requested === "off" || requested === "simulator") calls = requested;
   if (requested === "twilio") calls = twilio && bridge ? "twilio" : "off";
+  if (requested === "kat") calls = kat && bridge ? "kat" : "off";
 
   const demoNow = value("LINE_AGENT_DEMO_NOW");
   return {
@@ -74,6 +80,7 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
     calls,
     phoneAllowlist: parsePhoneAllowlist(env.LINE_AGENT_PHONE_ALLOWLIST),
     twilio,
+    kat,
     bridge,
     simulatorEnabled: !production && (appEnv === "local" || appEnv === "test" || value("LINE_AGENT_SIMULATOR") === "1"),
     demoNow: demoNow && !Number.isNaN(Date.parse(demoNow)) ? new Date(demoNow).toISOString() : null,

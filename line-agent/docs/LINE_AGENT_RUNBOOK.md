@@ -12,7 +12,7 @@
 | LINE 웹훅 | `POST /api/v1/integrations/line/webhook` | 서명 검증 후 이벤트 처리 |
 | 시뮬레이터 | `/dev/line-agent` | LINE 없이 1:1·그룹 대화를 재현. 운영 환경에서는 꺼짐 |
 | 가는 길·예약 카드 | `/go`, `/go/card` | 여기서울 지하철 안내와 네이버 지도로 연결, 가게에 보여 줄 한국어 카드 |
-| 음성 중계 | `services/voice-bridge/` | Twilio 통화 음성 ↔ OpenAI GPT-Live, 끝나면 대화 기록을 앱에 보고 |
+| 음성 중계 | `services/voice-bridge/` | KAT 클라우드·Twilio 통화 음성 ↔ OpenAI GPT-Live, 끝나면 대화 기록을 앱에 보고 |
 
 ## 1. 시뮬레이터로 리허설하기 (계정 불필요)
 
@@ -26,7 +26,7 @@ open http://localhost:3000/dev/line-agent
 - 통화가 끝나면 화면 위 「通話ログ」에 한국어 대화 전문이 쌓이고, 「再生」을 누르면 브라우저 음성으로 읽어 준다. 행사장에서 실제 전화가 안 될 때의 대체 시연용이다.
 - 리허설 시각을 고정하려면 `.env.local`에 `LINE_AGENT_DEMO_NOW=2026-11-29T17:30:00+09:00`을 넣는다. 서버를 켠 순간부터 그 시각에서 시간이 흐른다.
 - 대기 화면 캡처는 「待ち状況を送る」를 누른 뒤 「画像」으로 올린다. 서버에서 글자를 읽어(OCR, 한국어·일본어) 분·팀 수를 기록하고, 이미지는 저장하지 않는다. 처음 한 번 언어 데이터를 내려받는다.
-- 시뮬레이터는 이 컴퓨터(localhost)에서만 열린다. 터널로 공개해도 밖에서는 404다. 다른 기기에서 써야 하면 `LINE_AGENT_SIMULATOR_TOKEN`(16자 이상)을 정하고 `/dev/line-agent?token=…`으로 연다. `twilio` 모드에서는 시뮬레이터가 실제로 전화를 걸기 때문이다.
+- 시뮬레이터는 이 컴퓨터(localhost)에서만 열린다. 터널로 공개해도 밖에서는 404다. 다른 기기에서 써야 하면 `LINE_AGENT_SIMULATOR_TOKEN`(16자 이상)을 정하고 `/dev/line-agent?token=…`으로 연다. `kat`·`twilio` 모드에서는 시뮬레이터가 실제로 전화를 걸기 때문이다.
 - 그룹 대화를 재현하려면 「グループ」를 켠다. Alice가 요청한 사람이고, Bob이 버튼을 누르면 권한이 없다고 나온다.
 
 시연 대본(스펙 3분 시연과 같은 순서):
@@ -55,7 +55,30 @@ open http://localhost:3000/dev/line-agent
 
 ## 3. 실제 전화 켜기
 
-필요한 것: OpenAI API 키(GPT-Live), Twilio 유료 계정과 번호, 시험 전화를 받기로 동의한 팀원 번호.
+전화망은 둘 중 하나를 고른다. 한국 가게에 거는 시연이면 KAT 클라우드를 권한다.
+
+| | KAT 클라우드 (`kat`) | Twilio (`twilio`) |
+| --- | --- | --- |
+| 받는 쪽 화면 | 070 국내 번호 | 해외 번호('국제전화'로 뜰 수 있음) |
+| 계정 | 개인 요금제 월 1만 원(발신 70분 포함), 7일 체험 | 유료 계정 + 번호 + 한국 발신 허용 |
+| 제약 | API는 한국 IP에서만 받는다. 국내 번호만, 동시 발신 1통, 하루 100통(기본) | 체험 계정은 음성 스트림 불가 |
+
+공통으로 필요한 것: OpenAI API 키(GPT-Live), 시험 전화를 받기로 동의한 팀원 번호, 음성 중계.
+
+### KAT 클라우드 (katcloud.kr, 한국에이아이통신)
+
+1. katcloud.kr에 가입하면 070 번호가 나온다. 콘솔에서 API 키를 만든다. 웹훅 서명 비밀값(`whsec_…`)도 받아 두면 좋다.
+2. `.env.local`에 다음을 넣는다.
+   - `LINE_AGENT_CALLS=kat`
+   - `KAT_API_KEY`(`zpa.…`), `KAT_FROM`(가입 때 받은 070 번호)
+   - 선택: `KAT_WEBHOOK_SECRET`(넣으면 앱과 중계가 KAT 서명을 확인한다), `KAT_GROUP_ID`(비우면 처음 걸 때 조회한다)
+   - `LINE_AGENT_PHONE_ALLOWLIST`, `VOICE_BRIDGE_SECRET`, `OPENAI_API_KEY`, `VOICE_BRIDGE_APP_URL`은 아래 Twilio와 같다.
+3. 음성 중계와 중계용 공개 주소는 아래 3·4번과 같다. KAT는 가게가 받은 뒤 `wss://<VOICE_BRIDGE_PUBLIC_HOST>/kat`로 접속한다.
+4. 앱은 한국 IP에서 돌아야 한다(해외 IP는 `403 GL011`). 로컬 맥은 문제없다. Vercel에 올리면 함수 지역을 서울(icn1)로 둔다.
+
+AI가 통화 첫마디에서 AI 비서라고 밝힌다. KAT의 통화 시작 안내 방송(`AI_AND_RECORDING`)은 기본으로 꺼져 있고, 켜면 가게가 받은 뒤 최대 25초 동안 안내가 먼저 나온다.
+
+### Twilio
 
 1. Twilio 콘솔에서 Voice 지역 권한(Geo permissions)의 South Korea 발신을 켠다. 체험 계정은 음성 스트림을 막으므로 유료로 바꾼다.
 2. `.env.local`에 다음을 넣는다.
@@ -66,9 +89,9 @@ open http://localhost:3000/dev/line-agent
 3. 음성 중계를 켠다: `pnpm voice:bridge` (포트 8787).
 4. 중계용 공개 주소를 하나 더 연다: `cloudflared tunnel --url http://localhost:8787`. 주소에서 `https://`를 뺀 호스트를 `VOICE_BRIDGE_PUBLIC_HOST`에 넣고 앱 서버를 다시 켠다.
 
-`APP_ORIGIN`은 앱의 공개 주소여야 한다. Twilio가 통화 결과 상태(안 받음·통화 중·종료)를 이 주소로 알려 준다. 음성 중계는 같은 컴퓨터의 앱에 `VOICE_BRIDGE_APP_URL=http://localhost:3000`으로 붙는다.
+`APP_ORIGIN`은 앱의 공개 주소여야 한다. 전화망이 통화 결과 상태(안 받음·통화 중·종료)를 이 주소로 알려 준다. 음성 중계는 같은 컴퓨터의 앱에 `VOICE_BRIDGE_APP_URL=http://localhost:3000`으로 붙는다.
 
-시뮬레이터에서도 `twilio` 모드면 실제로 전화가 간다. LINE 채널 없이 전화부터 시험할 수 있다. 수신 화면에 '국제전화'가 뜨는지 꼭 확인한다.
+시뮬레이터에서도 `kat`·`twilio` 모드면 실제로 전화가 간다. LINE 채널 없이 전화부터 시험할 수 있다. Twilio는 수신 화면에 '국제전화'가 뜨는지 꼭 확인한다.
 
 ## 4. 상태를 DB에 저장하기 (선택)
 

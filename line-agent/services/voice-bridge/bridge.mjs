@@ -1,14 +1,17 @@
 // Voice bridge for the LINE agent's phone calls.
 //
-// Twilio dials the shop (the app asks it to) and streams the call audio here
-// (<Connect><Stream>, G.711 mu-law 8 kHz). For each call we fetch the approved
+// Twilio (/media) or KAT Cloud (/kat) dials the shop (the app asks it to) and
+// streams the call audio here (G.711 mu-law 8 kHz; KAT mirrors Twilio's
+// Media Streams messages). For each call we fetch the approved
 // instructions from the app, bridge the audio to OpenAI GPT-Live
 // (audio/pcmu 8000 — no transcoding), and when the call ends we send the
 // transcript back. The app — never this bridge — decides what happened.
 //
 // Run: node --env-file-if-exists=.env.local services/voice-bridge/bridge.mjs
 // Env: OPENAI_API_KEY, VOICE_BRIDGE_APP_URL (default APP_ORIGIN),
-//      VOICE_BRIDGE_PORT (default 8787), OPENAI_LIVE_MODEL, OPENAI_LIVE_VOICE
+//      VOICE_BRIDGE_PORT (default 8787), OPENAI_LIVE_MODEL, OPENAI_LIVE_VOICE,
+//      KAT_WEBHOOK_SECRET (checks KAT's signed WebSocket upgrade when set)
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import { acceptWebSocket } from "./ws-server.mjs";
 
@@ -23,6 +26,7 @@ const closingPause = Number(process.env.VOICE_BRIDGE_CLOSING_PAUSE_MS ?? 5000);
 const closingLine = /(감사합니다|다시 연락드리겠습니다)[.!。\s]*$/;
 const silenceLimit = Number(process.env.VOICE_BRIDGE_SILENCE_LIMIT_MS ?? 25000);
 const maxQueued = 250; // ~5 s of 20 ms chunks while GPT-Live starts
+const katSecret = process.env.KAT_WEBHOOK_SECRET?.trim() || null;
 
 if (!apiKey) {
   console.error("OPENAI_API_KEY is missing. Put it in .env.local (never in chat or git).");
@@ -37,14 +41,27 @@ const server = createServer((request, response) => {
 });
 
 server.on("upgrade", (request, socket, head) => {
-  if (!request.url?.startsWith("/media")) return void socket.end("HTTP/1.1 404 Not Found\r\n\r\n");
-  const twilio = acceptWebSocket(request, socket, head);
-  if (twilio) bridgeCall(twilio);
+  const path = request.url?.split("?")[0];
+  const provider = path === "/media" ? "twilio" : path === "/kat" ? "kat" : null;
+  if (!provider) return void socket.end("HTTP/1.1 404 Not Found\r\n\r\n");
+  if (provider === "kat" && !katUpgradeValid(request.headers)) return void socket.end("HTTP/1.1 401 Unauthorized\r\n\r\n");
+  const stream = acceptWebSocket(request, socket, head);
+  if (stream) bridgeCall(stream, provider);
 });
+
+// KAT signs the upgrade: v1=HMAC-SHA256("{timestamp}.{callId}.{streamId}").
+function katUpgradeValid(headers) {
+  if (!katSecret) return true; // The attempt token in the start message still gates the call.
+  const timestamp = String(headers["x-webhook-timestamp"] ?? "");
+  if (!/^\d+$/.test(timestamp) || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
+  const expected = Buffer.from("v1=" + createHmac("sha256", katSecret).update(`${timestamp}.${headers["x-kat-call-id"] ?? ""}.${headers["x-kat-stream-id"] ?? ""}`).digest("hex"));
+  const given = Buffer.from(String(headers["x-webhook-signature"] ?? ""));
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
 
 server.listen(port, () => log("voice_bridge.listening", { port, model: liveModel }));
 
-function bridgeCall(twilio) {
+function bridgeCall(twilio, provider) {
   const startedAt = Date.now();
   const call = { streamSid: null, attemptId: null, token: null, live: null, ready: false, queued: [], playbackEndsAt: 0, transcript: [], lastActivity: Date.now(), closingTimer: null, finished: false, latencies: [], lastShopAt: 0 };
   const silenceTimer = setInterval(() => {
@@ -52,7 +69,8 @@ function bridgeCall(twilio) {
   }, 1000);
 
   const sendLive = (event) => call.live?.readyState === WebSocket.OPEN && call.live.send(JSON.stringify(event));
-  const sendTwilio = (event) => twilio.send(JSON.stringify({ streamSid: call.streamSid, ...event }));
+  // Twilio wants the streamSid on every message; KAT identifies the stream by its socket.
+  const sendTwilio = (event) => twilio.send(JSON.stringify(provider === "twilio" ? { streamSid: call.streamSid, ...event } : event));
   const add = (speaker, delta) => {
     if (!delta) return;
     const last = call.transcript.at(-1);
@@ -68,23 +86,23 @@ function bridgeCall(twilio) {
       return;
     }
     if (message.event === "start") {
-      call.streamSid = message.start.streamSid;
+      call.streamSid = message.start?.streamSid ?? message.streamSid ?? message.start?.streamId ?? null;
       call.attemptId = message.start.customParameters?.attemptId ?? null;
       call.token = message.start.customParameters?.token ?? null;
       if (!call.attemptId || !/^[A-Za-z0-9_-]{8,64}$/.test(call.attemptId) || !call.token) return finish("bad_parameters", true);
       const instructions = await fetchInstructions(call.attemptId, call.token).catch(() => null);
       if (!instructions) return finish("no_instructions", true);
-      log("voice_bridge.call_started", { attempt: call.attemptId });
+      log("voice_bridge.call_started", { attempt: call.attemptId, provider });
       openLive(instructions);
     } else if (message.event === "media") {
-      if (message.media.track && message.media.track !== "inbound") return;
+      if (!message.media?.payload || message.media.track === "outbound") return;
       if (call.ready) sendLive({ type: "session.input_audio.append", audio: message.media.payload });
       else if (call.queued.length < maxQueued) call.queued.push(message.media.payload);
     } else if (message.event === "stop") {
-      finish("twilio_stop");
+      finish("stream_stop");
     }
   });
-  twilio.on("close", () => finish("twilio_closed"));
+  twilio.on("close", () => finish("stream_closed"));
 
   function openLive(instructions) {
     const live = new WebSocket(liveUrl, { headers: { Authorization: `Bearer ${apiKey}` } });
@@ -170,7 +188,7 @@ function bridgeCall(twilio) {
       sendLive({ type: "session.close" });
       setTimeout(() => call.live?.close(), 1500);
     }
-    // Closing the stream lets Twilio finish the TwiML, which ends the call.
+    // Closing the stream ends the call (Twilio finishes the TwiML; KAT hangs up with STREAM_ENDED).
     if (twilio.isOpen) twilio.close();
     const turns = call.transcript.map((turn) => ({ speaker: turn.speaker, text: turn.text.trim() })).filter((turn) => turn.text);
     const sorted = [...call.latencies].sort((a, b) => a - b);

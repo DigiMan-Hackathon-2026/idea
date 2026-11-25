@@ -10,7 +10,7 @@ import { PostgresAgentStore } from "./postgres-store";
 import { naverPlaceSearch } from "./naver-search";
 import { fetchLineImage, readImageText } from "./ocr.server";
 import { MemoryAgentStore, type AgentStore } from "./store";
-import { SimulatedCallPlacer, TwilioCallPlacer, type CallFinished, type CallPlacer } from "./telephony";
+import { KatCloudCallPlacer, SimulatedCallPlacer, TwilioCallPlacer, type CallFinished, type CallPlacer } from "./telephony";
 import { RoutedTravelProvider } from "./travel";
 
 export const SIMULATOR_PREFIX = "sim-";
@@ -78,9 +78,13 @@ function createRuntime(): LineAgentRuntime {
 
   const placer = (): CallPlacer | null => {
     if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs);
+    const statusUrl = (attemptId: string) => `${config.origin}/api/v1/integrations/voice/attempts/${attemptId}/status?t=${attemptToken(attemptId)}`;
+    const phoneFor = (ref: string) => config.phoneAllowlist[ref] ?? null;
     if (config.calls === "twilio" && config.twilio && config.bridge) {
-      const statusUrl = (attemptId: string) => `${config.origin}/api/v1/integrations/voice/attempts/${attemptId}/status?t=${attemptToken(attemptId)}`;
-      return new TwilioCallPlacer({ ...config.twilio, bridgeHost: config.bridge.host }, (ref) => config.phoneAllowlist[ref] ?? null, attemptToken, statusUrl);
+      return new TwilioCallPlacer({ ...config.twilio, bridgeHost: config.bridge.host }, phoneFor, attemptToken, statusUrl);
+    }
+    if (config.calls === "kat" && config.kat && config.bridge) {
+      return new KatCloudCallPlacer({ ...config.kat, bridgeHost: config.bridge.host }, phoneFor, attemptToken, statusUrl);
     }
     return null;
   };
