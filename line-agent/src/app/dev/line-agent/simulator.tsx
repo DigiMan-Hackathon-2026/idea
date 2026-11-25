@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 type Action = { type: "postback"; label: string; data: string; displayText?: string } | { type: "uri"; label: string; uri: string } | { type: "message"; label: string; text: string };
-type Node = { type: string; text?: string; action?: Action; contents?: Node[] | Node; header?: Node; body?: Node; footer?: Node; color?: string; weight?: string; size?: string; style?: string };
+type Node = {
+  type: string; text?: string; action?: Action; contents?: Node[] | Node; header?: Node; body?: Node; footer?: Node;
+  color?: string; weight?: string; size?: string; style?: string; layout?: string; flex?: number; align?: string; spacing?: string; margin?: string;
+  backgroundColor?: string; cornerRadius?: string; borderWidth?: string; borderColor?: string; height?: string; width?: string;
+  paddingAll?: string; paddingTop?: string; paddingBottom?: string; paddingStart?: string; paddingEnd?: string;
+};
 type Message = { type: "text"; text: string; quickReply?: { items: { action: Action }[] } } | { type: "flex"; altText: string; contents: Node; quickReply?: { items: { action: Action }[] } };
 type Entry = { at: string; to: string; via: "reply" | "push"; message: Message };
 type Mine = { at: string; text: string; user: string };
@@ -167,17 +172,31 @@ function BotMessage({ message, onAction }: { message: Message; onAction: (action
   return (
     <div className="flex gap-2 overflow-x-auto pb-1" aria-label={message.altText}>
       {bubbles.map((bubble, index) => (
-        <div key={index} className="w-64 shrink-0 space-y-2 rounded-2xl bg-white p-3 text-sm">
-          {[bubble.header, bubble.body, bubble.footer].map((part, i) => (part ? <FlexNode key={i} node={part} onAction={onAction} /> : null))}
+        <div key={index} className="w-64 shrink-0 overflow-hidden rounded-2xl bg-white text-sm">
+          {[bubble.header, bubble.body, bubble.footer].map((part, i) =>
+            part ? (
+              <div key={i} className={part.backgroundColor || part.paddingAll ? "" : "px-3 py-2"}>
+                <FlexNode node={part} onAction={onAction} />
+              </div>
+            ) : null,
+          )}
         </div>
       ))}
     </div>
   );
 }
 
+const textSizes: Record<string, string> = { xxs: "10px", xs: "11px", sm: "13px", md: "15px", lg: "17px", xl: "19px", xxl: "22px", "3xl": "28px" };
+
+/** Rough HTML stand-in for LINE Flex: enough to judge layout and colours in rehearsal. */
 function FlexNode({ node, onAction }: { node: Node; onAction: (action: Action) => void }) {
   if (node.type === "text") {
-    return <p className={`${node.weight === "bold" ? "font-bold" : ""} ${node.size === "xs" ? "text-xs" : ""}`} style={{ color: node.color ?? "#504e49" }}>{node.text}</p>;
+    const spans = Array.isArray(node.contents) ? node.contents : null;
+    return (
+      <p style={{ color: node.color ?? "#504e49", fontWeight: node.weight === "bold" ? 700 : 400, fontSize: textSizes[node.size ?? "md"], textAlign: (node.align === "end" ? "right" : node.align === "center" ? "center" : "left"), flex: node.flex, lineHeight: 1.35 }}>
+        {spans ? spans.map((span, index) => <span key={index} style={{ color: span.color }}>{span.text}</span>) : node.text}
+      </p>
+    );
   }
   if (node.type === "button" && node.action) {
     const action = node.action;
@@ -187,9 +206,30 @@ function FlexNode({ node, onAction }: { node: Node; onAction: (action: Action) =
       </button>
     );
   }
-  if (node.type === "separator") return <hr className="border-[#dfdfdd]" />;
+  if (node.type === "separator") return <hr style={{ borderColor: node.color ?? "#dfdfdd", margin: "6px 0" }} />;
   const children = Array.isArray(node.contents) ? node.contents : [];
-  return <div className="space-y-1">{children.map((child, index) => <FlexNode key={index} node={child} onAction={onAction} />)}</div>;
+  const horizontal = node.layout === "horizontal" || node.layout === "baseline";
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: horizontal ? "row" : "column",
+        gap: { none: 0, xs: 2, sm: 4, md: 8, lg: 12 }[node.spacing ?? "none"] ?? 0,
+        marginTop: node.margin === "md" ? 8 : node.margin === "sm" ? 4 : undefined,
+        flex: node.flex === 0 ? "0 0 auto" : node.flex,
+        backgroundColor: node.backgroundColor,
+        borderRadius: node.cornerRadius,
+        border: node.borderWidth ? `${node.borderWidth} solid ${node.borderColor ?? "#504e49"}` : undefined,
+        height: node.height,
+        width: node.width,
+        padding: node.paddingAll ?? (node.paddingStart || node.paddingTop ? `${node.paddingTop ?? 0} ${node.paddingEnd ?? 0} ${node.paddingBottom ?? 0} ${node.paddingStart ?? 0}` : undefined),
+        overflow: node.cornerRadius ? "hidden" : undefined,
+        alignItems: horizontal ? "center" : undefined,
+      }}
+    >
+      {children.map((child, index) => <FlexNode key={index} node={child} onAction={onAction} />)}
+    </div>
+  );
 }
 
 const outcomeLabels: Record<string, string> = {
