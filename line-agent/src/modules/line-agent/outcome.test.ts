@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildCallInstructions, DEFER_PHRASE, GREETING, openingLine } from "./call-brief";
-import { classifyCall, type TranscriptTurn } from "./outcome";
+import { classifyCall, spokenWait, type TranscriptTurn } from "./outcome";
 import { formatKoreanSpokenTime, formatSeoulTime, seoulInstant } from "./time";
 import { findClockTimes } from "./interpret";
 
@@ -109,3 +109,34 @@ describe("times around midnight", () => {
     expect(outcome).toMatchObject({ kind: "alternate_offered", offeredTime: seoulInstant("2026-11-25", 23, 0) });
   });
 });
+
+// What a judge might make the "shop" say during the demo (runbook: 방해 카드).
+describe("classifyCall with curveballs", () => {
+  const opening = (text: string) => [shop("네, 설레임입니다."), ai(`${GREETING} 오늘 오후 5시 55분부터 저녁 6시 45분 사이에 2명 예약 가능할까요?`), shop(text)];
+
+  it("a deposit is never confirmed", () => {
+    expect(classifyCall([...opening("6시 반에 두 분 되는데 예약금 만 원 먼저 보내 주셔야 해요."), ai(`6시 반, 2명 가능하다는 말씀이시죠? ${DEFER_PHRASE}`)], context)).toMatchObject({ kind: "alternate_offered", depositRequired: true });
+  });
+
+  it("a different party size is a no for us", () => {
+    expect(classifyCall([...opening("두 분은 예약이 안 되고요, 네 분부터 받아요."), ai(DEFER_PHRASE)], context).kind).toBe("declined");
+  });
+
+  it("walk-in only gives the wait it said", () => {
+    const outcome = classifyCall([...opening("저희는 예약은 안 받아요. 그냥 오시면 돼요."), ai("지금 가면 얼마나 기다려야 할까요?"), shop("지금 한 이십 분 정도요."), ai("알겠습니다. 감사합니다.")], context);
+    expect(outcome).toMatchObject({ kind: "walk_in", waitMinutes: 20, waitTeams: null });
+  });
+
+  it("a seat condition or a name-only booking still confirms", () => {
+    expect(classifyCall([...opening("6시 반에 두 분 바 자리만 가능한데 괜찮으세요?"), ai("예약 확인: 오늘 저녁 6시 반, 2명, サトウ입니다. 바 자리로요. 맞을까요?"), shop("네 맞아요."), ai("감사합니다.")], context)).toMatchObject({ kind: "confirmed" });
+    expect(classifyCall([...opening("6시 반 두 분 돼요. 연락처 하나 남겨 주세요."), ai("죄송하지만 손님 연락처는 드릴 수 없어서요. 예약자 이름으로만 부탁드려도 될까요?"), shop("그럼 이름으로만 해 둘게요."), ai("예약 확인: 오늘 저녁 6시 반, 2명, サトウ입니다. 맞을까요?"), shop("네 맞아요.")], context)).toMatchObject({ kind: "confirmed" });
+  });
+
+  it("reads waits said in words", () => {
+    expect(spokenWait("한 삼십오 분이요")).toEqual({ minutes: 35, teams: null });
+    expect(spokenWait("한 시간 반 정도")).toEqual({ minutes: 90, teams: null });
+    expect(spokenWait("앞에 세 팀 있어요")).toEqual({ minutes: null, teams: 3 });
+    expect(spokenWait("15분이면 돼요")).toEqual({ minutes: 15, teams: null });
+  });
+});
+

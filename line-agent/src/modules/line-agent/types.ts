@@ -104,7 +104,8 @@ export type WaitObservation = {
   observedAt: string | null;
   reportedAt: string;
   reportedBy: string;
-  source: "user_text" | "user_image";
+  /** shop_call: what the shop said on our call. */
+  source: "user_text" | "user_image" | "shop_call";
 };
 
 export type CallApproval = {
@@ -121,7 +122,8 @@ export type CallApproval = {
   revokedAt: string | null;
 };
 
-export type CallOutcomeKind = "no_answer" | "declined" | "alternate_offered" | "confirmed" | "unknown";
+/** walk_in: the shop takes no bookings; come and queue (with the wait it gave, if any). */
+export type CallOutcomeKind = "no_answer" | "declined" | "alternate_offered" | "confirmed" | "walk_in" | "unknown";
 
 export type CallOutcome = {
   kind: CallOutcomeKind;
@@ -131,6 +133,9 @@ export type CallOutcome = {
   depositRequired: boolean;
   /** True once the agent asked the shop to book; an unclear end then needs checking. */
   bookingRequested: boolean;
+  /** walk_in: the wait the shop gave on the phone. */
+  waitMinutes?: number | null;
+  waitTeams?: number | null;
   summaryKo: string;
 };
 

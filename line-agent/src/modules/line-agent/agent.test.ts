@@ -494,3 +494,30 @@ describe("DiningAgent: a shop the user points at (link, name, photo)", () => {
     expect(lastTexts(ALICE, 1)).toContain("まだ情報がないお店");
   });
 });
+
+describe("DiningAgent: a shop that takes no bookings (walk-in)", () => {
+  async function approveDemo(): Promise<void> {
+    await agent.handleEvent(text(ALICE, "テスト店A 2人で行ける？20時までに弘大のライブ会場"));
+    const answer = line.messagesFor(ALICE).at(-1)!.message;
+    await agent.handleEvent(tap(ALICE, buttons(answer)["AIに電話で確かめてもらう"]));
+    await agent.handleEvent(text(ALICE, "サトウ"));
+    await agent.handleEvent(tap(ALICE, buttons(line.messagesFor(ALICE).at(-1)!.message)["この条件で電話を頼む"]));
+  }
+
+  it("stops calling when the queue still fits the next plan", async () => {
+    await approveDemo();
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("walk_in", calls.jobs[0].brief) });
+    expect(lastTexts(ALICE, 1)).toContain("並んで入るお店でした。今の待ちは約20分だそうです。今から行けば");
+    expect(lastTexts(ALICE, 1)).toContain("間に合う見込みです");
+    expect(Object.keys(buttons(line.messagesFor(ALICE).at(-1)!.message))).toEqual(["このお店に行く", "ほかのお店に電話", "近くの似たお店"]);
+    expect(calls.jobs).toHaveLength(1);
+  });
+
+  it("calls the next shop when the queue is too long", async () => {
+    await approveDemo();
+    await agent.handleCallFinished({ attemptId: calls.jobs[0].attemptId, transcript: simulateTranscript("walk_in_long", calls.jobs[0].brief) });
+    expect(lastTexts(ALICE, 2)).toContain("今の待ちは約1時間30分なので");
+    expect(calls.jobs).toHaveLength(2);
+  });
+});
+

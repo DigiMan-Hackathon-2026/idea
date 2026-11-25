@@ -22,9 +22,10 @@ export type FinishedHandler = (result: CallFinished) => Promise<void>;
 
 // Scripted shops for rehearsal and as a fallback during the demo. They follow
 // the spec's demo: once the first card (B) is too slow, C only has 19:00 and A accepts.
-type ShopScript = "only_later" | "accept" | "no_answer" | "full" | "deposit";
+export const SHOP_SCRIPTS = ["only_later", "accept", "no_answer", "full", "deposit", "walk_in", "walk_in_long", "party_change", "bar_seat"] as const;
+export type ShopScript = (typeof SHOP_SCRIPTS)[number];
 
-const defaultScripts: Record<string, ShopScript> = {
+export const defaultScripts: Record<string, ShopScript> = {
   "demo-shop-a": "accept",
   "demo-shop-b": "accept",
   "demo-shop-c": "only_later",
@@ -44,6 +45,27 @@ export function simulateTranscript(script: ShopScript, brief: CallBrief): Transc
       return [...opening, { speaker: "shop", text: "죄송해요, 오늘은 예약이 다 차서 어렵습니다." }, { speaker: "ai", text: "알겠습니다. 감사합니다." }];
     case "deposit":
       return [...opening, { speaker: "shop", text: `${formatKoreanSpokenTime(brief.windowStart)} 되는데 예약금을 먼저 보내 주셔야 해요.` }, { speaker: "ai", text: DEFER_PHRASE }];
+    case "walk_in":
+    case "walk_in_long":
+      return [
+        ...opening,
+        { speaker: "shop", text: "저희는 예약은 안 받아요. 그냥 오시면 돼요." },
+        { speaker: "ai", text: "지금 가면 얼마나 기다려야 할까요?" },
+        { speaker: "shop", text: script === "walk_in" ? "지금 한 이십 분 정도요." : "지금은 한 시간 반은 기다리셔야 해요." },
+        { speaker: "ai", text: "알겠습니다. 감사합니다." },
+      ];
+    case "party_change":
+      return [...opening, { speaker: "shop", text: "두 분은 예약이 안 되고요, 네 분부터 받아요." }, { speaker: "ai", text: DEFER_PHRASE }];
+    case "bar_seat": {
+      const spoken = formatKoreanSpokenTime(acceptSlot(brief.windowStart, brief.windowEnd));
+      return [
+        ...opening,
+        { speaker: "shop", text: `${spoken}에 두 분 바 자리만 되는데 괜찮으세요?` },
+        { speaker: "ai", text: `${RECAP_PREFIX}: 오늘 ${spoken}, ${brief.partySize}명, ${brief.alias}입니다. 바 자리로요. 맞을까요?` },
+        { speaker: "shop", text: "네, 맞아요." },
+        { speaker: "ai", text: "감사합니다." },
+      ];
+    }
     case "only_later":
       return [
         ...opening,

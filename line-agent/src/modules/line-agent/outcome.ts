@@ -15,6 +15,25 @@ const acceptWords = /(네|예|맞(?:아요|습니다)|그렇습니다|가능|돼
 const declineWords = /(안 ?돼|안 ?되|어렵|자리가 없|자리 없|만석|마감|못 받|안 받|불가|꽉 찼|힘들)/;
 const depositWords = /(예약금|선결제|보증금|선입금|디파짓|카드 ?번호)/;
 const bookingAsk = /(예약)/;
+const walkInWords = /(예약\s*(?:은|을|는)?\s*(?:안|못)\s*받|예약\s*없이|예약을?\s*안\s*해|그냥\s*오시|바로\s*오시|오셔서\s*(?:줄|기다)|현장\s*대기|줄\s*(?:서|을\s*서))/;
+
+const KOREAN_TENS: Record<string, number> = { 십: 10, 이십: 20, 삼십: 30, 사십: 40, 오십: 50, 육십: 60 };
+const KOREAN_COUNT: Record<string, number> = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6, 일곱: 7, 여덟: 8, 아홉: 9, 열: 10 };
+
+/** The wait a shop says on the phone: "20분", "이십 분", "한 시간", "세 팀". */
+export function spokenWait(text: string): { minutes: number | null; teams: number | null } {
+  let minutes: number | null = null;
+  const digits = text.match(/(\d{1,3})\s*분/);
+  const words = text.match(/(육십|오십|사십|삼십|이십|십)\s*(오)?\s*분/);
+  const hours = text.match(/(한|두|\d)\s*시간(?:\s*(반))?/);
+  if (digits) minutes = Number(digits[1]);
+  else if (words) minutes = KOREAN_TENS[words[1]] + (words[2] ? 5 : 0);
+  else if (hours) minutes = (hours[1] === "한" ? 1 : hours[1] === "두" ? 2 : Number(hours[1])) * 60 + (hours[2] ? 30 : 0);
+  const teamDigits = text.match(/(\d{1,2})\s*팀/);
+  const teamWords = text.match(/(다섯|여섯|일곱|여덟|아홉|한|두|세|네|열)\s*팀/);
+  const teams = teamDigits ? Number(teamDigits[1]) : teamWords ? KOREAN_COUNT[teamWords[1]] : null;
+  return { minutes, teams };
+}
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -58,6 +77,13 @@ export function classifyCall(turns: readonly TranscriptTurn[], context: OutcomeC
 
   if (depositWords.test(shopText)) {
     return { ...base, kind: "alternate_offered", depositRequired: true, summaryKo: "예약금 또는 결제 정보를 요구했습니다." };
+  }
+
+  // "We don't take bookings, just come": not a refusal, a queue — with the wait if they said it.
+  if (walkInWords.test(shopText)) {
+    const after = shopTurns.slice(shopTurns.findIndex((turn) => walkInWords.test(turn.text)));
+    const wait = spokenWait(after.map((turn) => turn.text).join(" "));
+    return { ...base, kind: "walk_in", waitMinutes: wait.minutes, waitTeams: wait.teams, summaryKo: "예약은 받지 않고 현장 대기라고 했습니다." };
   }
 
   const offered = shopTurns.flatMap((turn) => findClockTimes(turn.text)).map(toInstant);

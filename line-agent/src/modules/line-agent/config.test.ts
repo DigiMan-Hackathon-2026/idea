@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parsePhoneAllowlist, readLineAgentConfig } from "./config";
+import { parsePhoneAllowlist, parseSimulatedScripts, readLineAgentConfig } from "./config";
 
 const secret = () => "generated";
 
@@ -45,3 +45,11 @@ describe("parsePhoneAllowlist", () => {
     expect(parsePhoneAllowlist("not json")).toEqual({});
   });
 });
+
+describe("parseSimulatedScripts", () => {
+  it("keeps known phone keys and script names only", () => {
+    expect(parseSimulatedScripts('{"demo-shop-c":"walk_in","demo-shop-a":"nope","Bad Key":"accept"}')).toEqual({ "demo-shop-c": "walk_in" });
+    expect(parseSimulatedScripts("not json")).toEqual({});
+  });
+});
+

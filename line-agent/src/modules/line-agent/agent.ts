@@ -183,6 +183,17 @@ export class DiningAgent {
           next.decision = { reason: "out_of_range", candidateId: restaurant.id, offeredTime: outcome.offeredTime };
           messages.push(m.needsDecision(next, restaurant, "out_of_range", outcome.offeredTime, quote));
         }
+      } else if (outcome.kind === "walk_in") {
+        // No bookings, but a queue: what the shop said is a wait report, checked against the next plan.
+        next.waits.push({ candidateId: restaurant.id, minutes: outcome.waitMinutes ?? null, teams: outcome.waitTeams ?? null, readyAt: null, basis: "on_arrival", observedAt: now, reportedAt: now, reportedBy: "shop_call", source: "shop_call" });
+        const plan = this.planFor(next, restaurant.id, now);
+        if (plan?.verdict === "late") {
+          messages.push(m.walkIn(next, restaurant, plan, quote, "late"));
+          continueCalling = true;
+        } else {
+          next.status = "comparing";
+          messages.push(m.walkIn(next, restaurant, plan, quote, plan?.verdict === "fits" ? "fits" : "unknown"));
+        }
       } else if (outcome.kind === "unknown" && outcome.bookingRequested) {
         // A booking may exist: never call the next shop until it is checked (spec CALL-03).
         next.status = "needs_verification";
