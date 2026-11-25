@@ -181,7 +181,7 @@ describe("DiningAgent rules", () => {
 
   it("asks one missing thing at a time (LINE-01)", async () => {
     await agent.handleEvent(text(ALICE, "サムギョプサルが食べたい"));
-    expect(lastTexts(ALICE, 1)).toBe("今回、お食事は何名ですか？");
+    expect(lastTexts(ALICE, 1)).toBe("今回、お食事は何名ですか？\n----\n이번 식사는 몇 명이세요?");
     await agent.handleEvent(text(ALICE, "5人"));
     expect(lastTexts(ALICE, 1)).toContain("どのあたり");
     await agent.handleEvent(text(ALICE, "新村"));
@@ -242,7 +242,7 @@ describe("DiningAgent rules", () => {
     await agent.handleEvent(text(ALICE, "使い方"));
     expect(lastTexts(ALICE, 1)).toContain("食べたいもの、人数");
     await agent.handleEvent(text(ALICE, "ごはんを探したい"));
-    expect(lastTexts(ALICE, 1)).toBe("今回、お食事は何名ですか？");
+    expect(lastTexts(ALICE, 1)).toBe("今回、お食事は何名ですか？\n----\n이번 식사는 몇 명이세요?");
     await agent.handleEvent(text(ALICE, "キャンセル"));
     expect(lastTexts(ALICE, 1)).toContain("終了しました");
   });
@@ -399,7 +399,7 @@ describe("DiningAgent rules", () => {
 
   it("does not nag the group when the requester chats about something else", async () => {
     await agent.handleEvent(text(ALICE, "ココソウル サムギョプサル食べたい", true));
-    expect(lastTexts(GROUP, 1)).toBe("今回、お食事は何名ですか？");
+    expect(lastTexts(GROUP, 1)).toBe("今回、お食事は何名ですか？\n----\n이번 식사는 몇 명이세요?");
     const count = line.sent.length;
     await agent.handleEvent(text(ALICE, "今日の公演たのしみ！", true));
     expect(line.sent.length).toBe(count);
