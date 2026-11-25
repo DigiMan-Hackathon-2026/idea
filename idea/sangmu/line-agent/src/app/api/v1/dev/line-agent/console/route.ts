@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
         approvalId: attempt?.approvalId ?? null,
         phase: call.phase,
         simulated: call.simulated,
+        readAloud: call.readAloud,
         placedAt: call.placedAt,
         answeredAt: call.answeredAt,
         endedAt: call.endedAt,
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
         windowEnd: approval?.windowEnd ?? null,
         arriveBy: dining?.arriveBy ?? null,
         nextPlaceJa: dining?.nextPlace?.nameJa ?? null,
-        outcome: attempt?.outcome ? { kind: attempt.outcome.kind, offeredTime: attempt.outcome.offeredTime, confirmedTime: attempt.outcome.confirmedTime, depositRequired: attempt.outcome.depositRequired } : null,
+        outcome: attempt?.outcome ? { kind: attempt.outcome.kind, offeredTime: attempt.outcome.offeredTime, confirmedTime: attempt.outcome.confirmedTime, depositRequired: attempt.outcome.depositRequired, waitMinutes: attempt.outcome.waitMinutes ?? null } : null,
         reserved: dining?.reservation?.candidateId === attempt?.candidateId && dining?.reservation !== null && attempt !== null,
         // A line still being spoken is translated once it settles.
         turns: call.turns.map((turn, index) => ({ ...turn, ja: settled || index < call.turns.length - 1 ? translationFor(turn.text) : null })),

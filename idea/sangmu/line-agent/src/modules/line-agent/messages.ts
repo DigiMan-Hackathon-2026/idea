@@ -723,3 +723,26 @@ export function alternativesIntro(lang: Lang, restaurant: Restaurant): string {
 export function photoNotPlace(lang: Lang): LineMessage {
   return { type: "text", text: tr(lang, "写真からお店が分かりませんでした。お店の名前、NAVER地図・Googleマップのリンク、または看板がはっきり写った写真を送ってください。", "사진에서 가게를 찾지 못했어요. 가게 이름, 네이버 지도·구글 지도 링크, 또는 간판이 잘 보이는 사진을 보내 주세요.") };
 }
+
+/** The shop takes no bookings but you can queue: fits the plan, too late (next shop), or unknown. */
+export function walkIn(request: DiningRequest, restaurant: Restaurant, plan: CandidatePlan | null, quote: string | null, fit: "fits" | "late" | "unknown"): LineMessage {
+  const lang = request.lang;
+  const wait = plan?.wait;
+  const waitText = wait?.minutes != null ? tr(lang, `今の待ちは約${duration(lang, wait.minutes)}`, `지금 대기는 약 ${duration(lang, wait.minutes)}`) : wait?.teams != null ? tr(lang, `今は前に${wait.teams}組`, `지금 앞에 ${wait.teams}팀`) : tr(lang, "待ち時間は分かりませんでした", "대기 시간은 알 수 없었어요");
+  const next = request.arriveBy && request.nextPlace ? { at: formatSeoulTime(request.arriveBy), ja: request.nextPlace.nameJa, ko: request.nextPlace.nameKo } : null;
+  if (fit === "late") {
+    return { type: "text", text: tr(lang, `${restaurant.nameJa}は予約を受けておらず、${waitText}なので${next ? `${next.at}の${next.ja}に` : ""}間に合いません。人数と時間の条件はそのままで、次のお店に電話します。`, `${restaurant.nameKo}는 예약을 받지 않고 ${waitText}라 ${next ? `${next.at} ${next.ko}에 ` : ""}맞출 수 없어요. 인원과 시간 조건은 그대로 두고 다음 가게에 전화할게요.`) + shopQuote(lang, quote) };
+  }
+  const seat = fit === "fits" && plan?.seatExpected ? tr(lang, `今から行けば${formatSeoulTime(plan.seatExpected)}ごろ席に着けて、${next ? `${next.at}の${next.ja}に間に合う見込みです。` : "間に合う見込みです。"}`, `지금 가면 ${formatSeoulTime(plan.seatExpected)}쯤 앉을 수 있어서 ${next ? `${next.at} ${next.ko}에 맞출 수 있을 것 같아요.` : "괜찮을 것 같아요."}`) : "";
+  const textValue = tr(lang, `${restaurant.nameJa}は予約を受けていない、並んで入るお店でした。${waitText}だそうです。`, `${restaurant.nameKo}는 예약을 받지 않고 줄 서서 들어가는 가게였어요. ${waitText}래요. `) + seat + shopQuote(lang, quote);
+  return {
+    type: "text",
+    text: textValue.trim(),
+    quickReply: quickReply([
+      postback(request, "select", tr(lang, "このお店に行く", "이 가게로 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) }),
+      postback(request, "call_request", tr(lang, "ほかのお店に電話", "다른 가게에 전화"), { displayText: tr(lang, "ほかのお店に電話", "다른 가게에 전화") }),
+      postback(request, "alternatives", tr(lang, "近くの似たお店", "근처 비슷한 가게"), { displayText: tr(lang, "近くの似たお店を見る", "근처 비슷한 가게 보기") }),
+    ]),
+  };
+}
+

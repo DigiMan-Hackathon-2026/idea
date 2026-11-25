@@ -89,7 +89,9 @@ function createRuntime(): LineAgentRuntime {
     inner && {
       kind: inner.kind,
       place: async (job) => {
-        board.placed(job.attemptId, job.brief.restaurantNameKo, inner.kind === "simulator");
+        const simulator = inner.kind === "simulator";
+        // Speech-paced simulated calls stream their lines like a real call; quick ones are played back.
+        board.placed(job.attemptId, job.brief.restaurantNameKo, simulator && config.simulatedCallDelayMs >= 0, simulator);
         try {
           const callId = await inner.place(job);
           board.phase(job.attemptId, inner.kind === "simulator" ? "talking" : "ringing");
@@ -102,7 +104,7 @@ function createRuntime(): LineAgentRuntime {
     };
   const placer = (): CallPlacer | null => onBoard(carrier());
   const carrier = (): CallPlacer | null => {
-    if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs);
+    if (config.calls === "simulator") return new SimulatedCallPlacer(finishCall, config.simulatedCallDelayMs, config.simulatedScripts, (attemptId, turns) => board.live(attemptId, turns));
     const statusUrl = (attemptId: string) => `${config.origin}/api/v1/integrations/voice/attempts/${attemptId}/status?t=${attemptToken(attemptId)}`;
     const phoneFor = (ref: string) => config.phoneAllowlist[ref] ?? null;
     if (config.calls === "twilio" && config.twilio && config.bridge) {

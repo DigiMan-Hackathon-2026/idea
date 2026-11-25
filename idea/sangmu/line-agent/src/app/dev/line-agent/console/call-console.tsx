@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallAudio } from "./call-audio";
 
 type Turn = { speaker: "ai" | "shop"; text: string; ja: string | null };
 type Phase = "placing" | "ringing" | "talking" | "ended" | "failed";
-type OutcomeKind = "no_answer" | "declined" | "alternate_offered" | "confirmed" | "unknown";
+type OutcomeKind = "no_answer" | "declined" | "alternate_offered" | "confirmed" | "walk_in" | "unknown";
 type Call = {
   attemptId: string;
   approvalId: string | null;
   phase: Phase;
   simulated: boolean;
+  readAloud: boolean;
   placedAt: number;
   answeredAt: number | null;
   endedAt: number | null;
@@ -21,7 +23,7 @@ type Call = {
   windowEnd: string | null;
   arriveBy: string | null;
   nextPlaceJa: string | null;
-  outcome: { kind: OutcomeKind; offeredTime: string | null; confirmedTime: string | null; depositRequired: boolean } | null;
+  outcome: { kind: OutcomeKind; offeredTime: string | null; confirmedTime: string | null; depositRequired: boolean; waitMinutes: number | null } | null;
   reserved: boolean;
   turns: Turn[];
 };
@@ -29,13 +31,33 @@ type Status = { line: boolean; calls: string; carrier: boolean | null; bridge: b
 type Feed = { now: number; status: Status; calls: Call[] };
 
 const POLL_MS = 700;
-/** Simulated calls arrive whole; play them back one line at a time like a real call. */
-const SIM_TURN_MS = 1600;
+/** Simulated calls arrive whole; play them back one line at a time, about as long as saying it. */
+const lineMs = (text: string) => 900 + text.length * 120;
+const lineStarts = (turns: { text: string }[]) => {
+  const starts: number[] = [];
+  let at = 600;
+  for (const turn of turns) {
+    starts.push(at);
+    at += lineMs(turn.text);
+  }
+  return { starts, total: at };
+};
+
+const noSubscribe = () => () => {};
+
+/** The bridge's /listen stream, only when this page is opened on the machine itself. */
+function localListenUrl(port: number): string | null {
+  if (typeof window === "undefined") return null;
+  return ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname) ? `ws://127.0.0.1:${port}/listen` : null;
+}
 
 const time = (iso: string | null) => (iso ? new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso)) : "—");
 const clock = (ms: number) => `${String(Math.floor(ms / 60000)).padStart(2, "0")}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, "0")}`;
 
-export function CallConsole({ token }: { token: string | null }) {
+export function CallConsole({ token, bridgePort }: { token: string | null; bridgePort: number }) {
+  // Known only in the browser; the server render shows no audio button (no hydration mismatch).
+  const listenUrl = useSyncExternalStore(noSubscribe, () => localListenUrl(bridgePort), () => null);
+  const audio = useCallAudio(listenUrl);
   // `seen`: when each call first showed up here; `offset`: server clock minus ours.
   const [data, setData] = useState<{ feed: Feed; offset: number; seen: Record<string, number> } | null>(null);
   const [offline, setOffline] = useState(false);
@@ -88,7 +110,7 @@ export function CallConsole({ token }: { token: string | null }) {
       if (!call.simulated) continue;
       const start = Math.max(data?.seen[call.attemptId] ?? 0, previousEnd);
       result.set(call.attemptId, start);
-      previousEnd = start + (call.turns.length + 1) * SIM_TURN_MS;
+      previousEnd = start + lineStarts(call.turns).total;
     }
     return result;
   }, [calls, data?.seen]);
@@ -100,7 +122,10 @@ export function CallConsole({ token }: { token: string | null }) {
           <h1 className="text-2xl font-bold tracking-tight">AI電話コンソール</h1>
           <p className="text-sm text-slate-400">ココソウル · AI가 가게에 거는 전화를 실시간으로 보여 줍니다</p>
         </div>
-        <StatusBar status={feed?.status ?? null} offline={offline} />
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusBar status={feed?.status ?? null} offline={offline} />
+          <AudioButton audio={audio} />
+        </div>
       </header>
 
       {calls.length === 0 ? (
@@ -113,7 +138,7 @@ export function CallConsole({ token }: { token: string | null }) {
           <Conditions call={calls[0]} />
           <section className={`grid gap-5 px-6 pb-8 ${calls.length > 1 ? "lg:grid-cols-2" : ""}`}>
             {calls.map((call, index) => (
-              <CallCard key={call.attemptId} call={call} position={index + 1} hasNext={index < calls.length - 1} now={tick} offset={data?.offset ?? 0} playbackStart={playback.get(call.attemptId) ?? null} />
+              <CallCard key={call.attemptId} call={call} position={index + 1} hasNext={index < calls.length - 1} now={tick} offset={data?.offset ?? 0} playbackStart={playback.get(call.attemptId) ?? null} speak={audio.state === "on" || audio.state === "connecting"} />
             ))}
           </section>
         </>
@@ -169,10 +194,41 @@ function Conditions({ call }: { call: Call }) {
   );
 }
 
-function CallCard({ call, position, hasNext, now, offset, playbackStart }: { call: Call; position: number; hasNext: boolean; now: number; offset: number; playbackStart: number | null }) {
+function AudioButton({ audio }: { audio: ReturnType<typeof useCallAudio> }) {
+  if (audio.state === "unavailable") return null;
+  const on = audio.state === "on" || audio.state === "connecting";
+  return (
+    <button type="button" onClick={audio.toggle} className={`rounded-full px-4 py-1.5 text-sm font-semibold ${on ? "bg-emerald-500 text-[#0f1720]" : "bg-white/10 text-slate-100"}`}>
+      {on ? "通話の音声：オン" : "通話の音声を流す"}
+    </button>
+  );
+}
+
+/** Reads a simulated line aloud in Korean while it is shown (real calls play their own audio). */
+function useSpeakLines(turns: Turn[], count: number, enabled: boolean) {
+  const spoken = useRef(0);
+  useEffect(() => {
+    if (!enabled || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    while (spoken.current < count) {
+      const turn = turns[spoken.current];
+      spoken.current += 1;
+      if (!turn) continue;
+      const utterance = new SpeechSynthesisUtterance(turn.text);
+      utterance.lang = "ko-KR";
+      utterance.rate = 1.05;
+      utterance.pitch = turn.speaker === "ai" ? 1.1 : 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [turns, count, enabled]);
+}
+
+function CallCard({ call, position, hasNext, now, offset, playbackStart, speak }: { call: Call; position: number; hasNext: boolean; now: number; offset: number; playbackStart: number | null; speak: boolean }) {
   const bottom = useRef<HTMLDivElement | null>(null);
   // Simulated calls: how many lines have "been said" so far.
-  const shown = playbackStart === null ? call.turns.length : Math.max(0, Math.min(call.turns.length, Math.floor((now - playbackStart) / SIM_TURN_MS)));
+  const schedule = useMemo(() => lineStarts(call.turns), [call.turns]);
+  const shown = playbackStart === null ? call.turns.length : schedule.starts.filter((start) => now - playbackStart >= start).length;
+  // Lines of a call without audio are read aloud as they appear (played back or streamed live).
+  useSpeakLines(call.turns, shown, speak && call.readAloud);
   const playing = playbackStart !== null && shown < call.turns.length;
   const phase: Phase = playbackStart === null ? call.phase : now < playbackStart ? "placing" : playing ? "talking" : call.phase;
   const turns = call.turns.slice(0, shown);
@@ -255,6 +311,8 @@ function Result({ call, hasNext }: { call: Call; hasNext: boolean }) {
         return outcome.depositRequired
           ? { tone: "bg-amber-500/20 text-amber-100", text: "予約金を求められたため確定せず、お客様に確認" }
           : { tone: "bg-amber-500/20 text-amber-100", text: `${time(outcome.offeredTime)}なら空きあり → 承認した時間の外なので${then}` };
+      case "walk_in":
+        return { tone: "bg-sky-500/20 text-sky-100", text: `予約なし・並んで入店${outcome.waitMinutes !== null ? `（待ち約${outcome.waitMinutes}分）` : ""} → 間に合うか判定` };
       case "declined":
         return { tone: "bg-rose-500/20 text-rose-100", text: `満席で断られました → ${then}` };
       case "no_answer":

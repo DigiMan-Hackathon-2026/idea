@@ -11,6 +11,10 @@
 // Env: OPENAI_API_KEY, VOICE_BRIDGE_APP_URL (default APP_ORIGIN),
 //      VOICE_BRIDGE_PORT (default 8787), OPENAI_LIVE_MODEL, OPENAI_LIVE_VOICE,
 //      KAT_WEBHOOK_SECRET (checks KAT's signed WebSocket upgrade when set)
+//
+// /listen streams both sides of every call to the operations console on this
+// machine, so the demo room can hear the call. It answers only to a browser on
+// the machine itself (loopback address, no proxy headers, local page origin).
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import { acceptWebSocket } from "./ws-server.mjs";
@@ -44,8 +48,34 @@ const server = createServer((request, response) => {
   response.writeHead(404).end();
 });
 
+// Consoles listening to calls on this machine.
+const listeners = new Set();
+const broadcast = (message) => {
+  if (listeners.size === 0) return;
+  const text = JSON.stringify(message);
+  for (const listener of listeners) if (listener.isOpen) listener.send(text);
+};
+const LOOPBACK = /^(::1|127\.\d+\.\d+\.\d+|::ffff:127\.\d+\.\d+\.\d+)$/;
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+
+function listenAllowed(remoteAddress, headers) {
+  if (!LOOPBACK.test(remoteAddress ?? "")) return false;
+  // A tunnel (Funnel, cloudflared) also connects from loopback but adds these.
+  if (headers["x-forwarded-for"] || headers["forwarded"] || headers["cf-connecting-ip"] || headers["tailscale-funnel-request"] || headers["tailscale-user-login"]) return false;
+  return !headers.origin || LOCAL_ORIGIN.test(headers.origin);
+}
+
 server.on("upgrade", (request, socket, head) => {
   const path = request.url?.split("?")[0];
+  if (path === "/listen") {
+    if (!listenAllowed(request.socket.remoteAddress, request.headers)) return void socket.end("HTTP/1.1 403 Forbidden\r\n\r\n");
+    const listener = acceptWebSocket(request, socket, head);
+    if (!listener) return;
+    listeners.add(listener);
+    listener.on("close", () => listeners.delete(listener));
+    listener.on("error", () => listeners.delete(listener));
+    return;
+  }
   const provider = path === "/media" ? "twilio" : path === "/kat" ? "kat" : null;
   if (!provider) return void socket.end("HTTP/1.1 404 Not Found\r\n\r\n");
   if (provider === "kat" && !katUpgradeValid(request.headers)) {
@@ -70,7 +100,7 @@ server.listen(port, () => log("voice_bridge.listening", { port, model: liveModel
 
 function bridgeCall(twilio, provider) {
   const startedAt = Date.now();
-  const call = { streamSid: null, attemptId: null, token: null, live: null, ready: false, queued: [], playbackEndsAt: 0, transcript: [], lastActivity: Date.now(), closingTimer: null, finished: false, latencies: [], lastShopAt: 0, aiTurnStartedAt: 0, liveEvents: {} };
+  const call = { verified: false, streamSid: null, attemptId: null, token: null, live: null, ready: false, queued: [], playbackEndsAt: 0, transcript: [], lastActivity: Date.now(), closingTimer: null, finished: false, latencies: [], lastShopAt: 0, aiTurnStartedAt: 0, liveEvents: {} };
   const silenceTimer = setInterval(() => {
     if (Date.now() - call.lastActivity > silenceLimit) finish("silence");
   }, 1000);
@@ -132,9 +162,14 @@ function bridgeCall(twilio, provider) {
       const instructions = await fetchInstructions(call.attemptId, call.token).catch(() => null);
       if (!instructions) return finish("no_instructions", true);
       log("voice_bridge.call_started", { attempt: call.attemptId, provider });
+      // Only calls the app placed are heard; the shop's first words wait in the queue until then.
+      call.verified = true;
+      broadcast({ type: "call", attemptId: call.attemptId, state: "start" });
+      for (const payload of call.queued) broadcast({ type: "audio", attemptId: call.attemptId, speaker: "shop", payload });
       openLive(instructions);
     } else if (message.event === "media") {
       if (!message.media?.payload || message.media.track === "outbound") return;
+      if (call.verified) broadcast({ type: "audio", attemptId: call.attemptId, speaker: "shop", payload: message.media.payload });
       if (call.ready) sendLive({ type: "session.input_audio.append", audio: message.media.payload });
       else if (call.queued.length < maxQueued) call.queued.push(message.media.payload);
     } else if (message.event === "stop") {
@@ -197,6 +232,7 @@ function bridgeCall(twilio, provider) {
         call.playbackEndsAt = Math.max(now, call.playbackEndsAt) + bytes / 8; // 8 bytes per ms
         call.lastActivity = now;
         sendTwilio({ event: "media", media: { payload: event.delta } });
+        broadcast({ type: "audio", attemptId: call.attemptId, speaker: "ai", payload: event.delta });
         return;
       }
       case "session.input_transcript.delta":
@@ -205,6 +241,7 @@ function bridgeCall(twilio, provider) {
         if (now < call.playbackEndsAt - 200 && now - call.aiTurnStartedAt > bargeInGraceMs) {
           // The shop talks over the AI: drop audio the carrier still has queued.
           sendTwilio({ event: "clear" });
+          broadcast({ type: "clear", attemptId: call.attemptId });
           call.playbackEndsAt = now;
         }
         call.lastShopAt = now;
@@ -248,6 +285,7 @@ function bridgeCall(twilio, provider) {
     // Closing the stream ends the call (Twilio finishes the TwiML; KAT hangs up with STREAM_ENDED).
     if (twilio.isOpen) twilio.close();
     const turns = turnsSoFar();
+    if (call.verified) broadcast({ type: "call", attemptId: call.attemptId, state: "end" });
     const sorted = [...call.latencies].sort((a, b) => a - b);
     log("voice_bridge.call_finished", { attempt: call.attemptId, reason, seconds: Math.round((Date.now() - startedAt) / 1000), turns: turns.length, medianLatencyMs: sorted[Math.floor(sorted.length / 2)] ?? null, liveEvents: call.liveEvents });
     if (!call.attemptId || !call.token) return;

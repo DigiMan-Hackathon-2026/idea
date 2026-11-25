@@ -16,7 +16,7 @@ async function Console({ searchParams }: { searchParams: SearchParams }) {
   const [params, list] = await Promise.all([searchParams, headers()]);
   const runtime = getLineAgentRuntime();
   if (!runtime.config.simulatorEnabled || !simulatorAllowed(requestOrigin((name) => list.get(name)), params.token ?? null, runtime.config.simulatorToken)) notFound();
-  return <CallConsole token={params.token ?? null} />;
+  return <CallConsole token={params.token ?? null} bridgePort={runtime.config.bridgePort} />;
 }
 
 // Shown next to the LINE screen during the demo: what the AI is saying on the

@@ -14,8 +14,10 @@ export type BoardCall = {
   answeredAt: number | null;
   endedAt: number | null;
   turns: TranscriptTurn[];
-  /** Simulated calls arrive with the whole transcript at once. */
+  /** Simulated calls that arrive with the whole transcript at once (the console plays them back). */
   simulated: boolean;
+  /** No call audio exists (simulator): the console may read the lines aloud. */
+  readAloud: boolean;
 };
 
 const MAX_CALLS = 20;
@@ -26,9 +28,9 @@ export class CallBoard {
 
   constructor(private readonly now: () => number = Date.now) {}
 
-  placed(attemptId: string, restaurantNameKo: string, simulated: boolean): void {
+  placed(attemptId: string, restaurantNameKo: string, simulated: boolean, readAloud = simulated): void {
     if (this.find(attemptId)) return;
-    this.calls.push({ attemptId, restaurantNameKo, phase: "placing", placedAt: this.now(), answeredAt: null, endedAt: null, turns: [], simulated });
+    this.calls.push({ attemptId, restaurantNameKo, phase: "placing", placedAt: this.now(), answeredAt: null, endedAt: null, turns: [], simulated, readAloud });
     if (this.calls.length > MAX_CALLS) this.calls.splice(0, this.calls.length - MAX_CALLS);
   }
 
