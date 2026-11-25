@@ -25,7 +25,7 @@ describe("readLineAgentConfig", () => {
     expect(readLineAgentConfig({ APP_ENV: "local", LINE_AGENT_CALLS: "kat", ...kat, KAT_FROM: "+827000000000", ...bridge }, secret).calls).toBe("off");
     const config = readLineAgentConfig({ APP_ENV: "local", LINE_AGENT_CALLS: "kat", ...kat, ...bridge }, secret);
     expect(config.calls).toBe("kat");
-    expect(config.kat).toEqual({ apiKey: "zpa.k1.x", from: "07000000000", apiUrl: "https://api.katcloud.kr", groupId: null });
+    expect(config.kat).toEqual({ apiKey: "zpa.k1.x", from: "07000000000", apiUrl: "https://studio-gateway.zerocall.kr", groupId: null });
   });
 
   it("turns on real calls only with Twilio and the bridge configured", () => {

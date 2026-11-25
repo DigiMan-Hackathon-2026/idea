@@ -142,6 +142,9 @@ export function toKoreanDomestic(e164: string): string | null {
   return match ? `0${match[1]}` : null;
 }
 
+/** KAT wraps responses as {code: "0", message, result}; the bare form is accepted too. */
+type KatResponse<T> = { code?: string; message?: string; result?: T } & (T extends unknown[] ? object : Partial<T>);
+
 type KatConfig = { apiKey: string; from: string; bridgeHost: string; apiUrl: string; groupId: string | null };
 
 /**
@@ -182,16 +185,17 @@ export class KatCloudCallPlacer implements CallPlacer {
         codec: "PCMU",
       }),
     });
-    const body = (await response.json().catch(() => ({}))) as { callId?: string; data?: { callId?: string }; code?: string };
-    const callId = body.callId ?? body.data?.callId;
-    if (!response.ok || !callId) throw new Error(`KAT Cloud refused the call (${response.status}${body.code ? ` ${body.code}` : ""})`);
+    const body = (await response.json().catch(() => ({}))) as KatResponse<{ callId?: string }>;
+    const callId = body.result?.callId ?? body.callId;
+    if (!response.ok || !callId) throw new Error(`KAT Cloud refused the call (${response.status}${body.code && body.code !== "0" ? ` ${body.code}` : ""})`);
     return callId;
   }
 
   private group(): Promise<string> {
     this.groupId ??= this.request("/group", { method: "GET" }).then(async (response) => {
-      const body = (await response.json().catch(() => ({}))) as { id?: string | number; data?: { id?: string | number } };
-      const id = body.id ?? body.data?.id;
+      // A console key is bound to one group: {code:"0", result:[{id, status, …}]}.
+      const body = (await response.json().catch(() => ({}))) as KatResponse<{ id?: string | number }[]>;
+      const id = Array.isArray(body.result) ? body.result[0]?.id : undefined;
       if (!response.ok || id === undefined) {
         this.groupId = null;
         throw new Error(`KAT Cloud group lookup failed (${response.status})`);

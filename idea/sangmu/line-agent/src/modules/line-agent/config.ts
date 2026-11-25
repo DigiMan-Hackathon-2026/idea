@@ -58,7 +58,7 @@ export function readLineAgentConfig(env: Readonly<Record<string, string | undefi
   const twilio = twilioSid && twilioToken && twilioFrom && E164.test(twilioFrom) ? { accountSid: twilioSid, authToken: twilioToken, from: twilioFrom } : null;
   const katKey = value("KAT_API_KEY");
   const katFrom = value("KAT_FROM")?.replace(/[-\s]/g, "") ?? null;
-  const kat = katKey && katFrom && /^0\d{8,10}$/.test(katFrom) ? { apiKey: katKey, from: katFrom, apiUrl: value("KAT_API_URL") ?? "https://api.katcloud.kr", groupId: value("KAT_GROUP_ID") } : null;
+  const kat = katKey && katFrom && /^0\d{8,10}$/.test(katFrom) ? { apiKey: katKey, from: katFrom, apiUrl: value("KAT_API_URL") ?? "https://studio-gateway.zerocall.kr", groupId: value("KAT_GROUP_ID") } : null;
   const bridgeHost = value("VOICE_BRIDGE_PUBLIC_HOST");
   const bridgeSecret = value("VOICE_BRIDGE_SECRET");
   const bridge = bridgeHost && bridgeSecret && bridgeSecret.length >= 16 ? { host: bridgeHost, secret: bridgeSecret } : null;

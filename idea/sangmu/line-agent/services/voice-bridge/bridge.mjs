@@ -44,7 +44,10 @@ server.on("upgrade", (request, socket, head) => {
   const path = request.url?.split("?")[0];
   const provider = path === "/media" ? "twilio" : path === "/kat" ? "kat" : null;
   if (!provider) return void socket.end("HTTP/1.1 404 Not Found\r\n\r\n");
-  if (provider === "kat" && !katUpgradeValid(request.headers)) return void socket.end("HTTP/1.1 401 Unauthorized\r\n\r\n");
+  if (provider === "kat" && !katUpgradeValid(request.headers)) {
+    log("voice_bridge.kat_signature_rejected", { hasSignature: Boolean(request.headers["x-webhook-signature"]) });
+    return void socket.end("HTTP/1.1 401 Unauthorized\r\n\r\n");
+  }
   const stream = acceptWebSocket(request, socket, head);
   if (stream) bridgeCall(stream, provider);
 });

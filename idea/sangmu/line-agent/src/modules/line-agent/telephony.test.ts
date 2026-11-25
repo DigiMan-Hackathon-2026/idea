@@ -48,7 +48,9 @@ describe("KatCloudCallPlacer", () => {
 
   it("looks up the group once, then streams to the bridge's /kat path with the attempt token", async () => {
     const fetchMock = vi.fn(async (url: string) =>
-      url.endsWith("/group") ? new Response(JSON.stringify({ id: 42 }), { status: 200 }) : new Response(JSON.stringify({ callId: "call-uuid", status: "queued" }), { status: 202 }),
+      url.endsWith("/group")
+        ? new Response(JSON.stringify({ code: "0", message: "Success", result: [{ id: 42, status: "ACTIVE" }] }), { status: 200 })
+        : new Response(JSON.stringify({ code: "0", message: "Success", result: { callId: "call-uuid", status: "queued" } }), { status: 202 }),
     );
     vi.stubGlobal("fetch", fetchMock);
     const placer = new KatCloudCallPlacer(config, (ref) => (ref === "demo-shop-b" ? "+821000000001" : null), (id) => `tok-${id}`, (id) => `https://app.example.test/status/${id}`);
