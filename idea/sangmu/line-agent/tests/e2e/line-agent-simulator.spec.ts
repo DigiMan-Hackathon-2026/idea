@@ -26,7 +26,8 @@ test("LINE agent books a test shop through the simulator", async ({ page }) => {
 
   await expect(page.getByText("に電話しています", { exact: false }).first()).toBeVisible();
   await expect(page.getByText("予約が取れました（テスト）")).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByText("予約名：サトウ").last()).toBeVisible();
+  await expect(page.getByText("予約時間")).toBeVisible();
+  await expect(page.getByText("サトウ", { exact: true }).last()).toBeVisible();
 });
 
 test("route page links to the subway guide", async ({ page }) => {

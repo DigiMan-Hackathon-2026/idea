@@ -7,25 +7,42 @@ export type LineAction =
 
 export type QuickReply = { items: { type: "action"; action: LineAction }[] };
 
+export type FlexSize = "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "3xl";
+export type FlexSpan = { type: "span"; text: string; color?: string; weight?: "regular" | "bold"; size?: FlexSize };
 export type FlexText = {
   type: "text";
   text: string;
-  size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl";
+  contents?: FlexSpan[];
+  size?: FlexSize;
   weight?: "regular" | "bold";
   color?: string;
   wrap?: boolean;
+  align?: "start" | "center" | "end";
+  flex?: number;
   margin?: "none" | "xs" | "sm" | "md" | "lg";
 };
 export type FlexButton = { type: "button"; action: LineAction; style?: "primary" | "secondary" | "link"; height?: "sm" | "md"; color?: string };
-export type FlexSeparator = { type: "separator"; margin?: "sm" | "md" | "lg" };
+export type FlexSeparator = { type: "separator"; margin?: "sm" | "md" | "lg"; color?: string };
 export type FlexBox = {
   type: "box";
   layout: "vertical" | "horizontal" | "baseline";
   contents: FlexComponent[];
   spacing?: "none" | "xs" | "sm" | "md" | "lg";
   margin?: "none" | "xs" | "sm" | "md" | "lg";
+  flex?: number;
+  width?: string;
+  height?: string;
   paddingAll?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
+  paddingStart?: string;
+  paddingEnd?: string;
   backgroundColor?: string;
+  borderWidth?: string;
+  borderColor?: string;
+  cornerRadius?: string;
+  justifyContent?: "flex-start" | "center" | "flex-end" | "space-between";
+  alignItems?: "flex-start" | "center" | "flex-end";
 };
 export type FlexComponent = FlexText | FlexButton | FlexSeparator | FlexBox;
 export type FlexBubble = { type: "bubble"; size?: "kilo" | "mega" | "giga"; header?: FlexBox; body: FlexBox; footer?: FlexBox };

@@ -147,27 +147,96 @@ function waitLine(lang: Lang, wait: WaitObservation | null): string {
   return tr(lang, `待ち${wait.minutes}分（${basis}・${when} 共有）`, `대기 ${wait.minutes}분 (${basis} · ${when} 공유)`);
 }
 
-function verdictLine(lang: Lang, plan: CandidatePlan): FlexComponent | null {
-  if (plan.unknown.includes("no_deadline")) return null;
-  if (plan.verdict === "fits") {
-    const spare = -(plan.marginMinutes ?? 0);
-    const room = spare > 120 ? tr(lang, "時間に余裕あり", "시간 여유 있음") : tr(lang, `余裕${spare}分`, `여유 ${spare}분`);
-    return text(tr(lang, `間に合う見込み（${room}）`, `시간 안에 들어갈 수 있어요 (${room})`), { color: color.primary, weight: "bold" });
-  }
+type Verdict = { label: string; color: string };
+
+/** The coloured band on top of each card: one look tells whether the shop works. */
+function verdictBand(lang: Lang, plan: CandidatePlan): Verdict {
+  const room = (spare: number) => (spare > 120 ? tr(lang, "時間に余裕あり", "시간 여유 있음") : tr(lang, `余裕${spare}分`, `여유 ${spare}분`));
+  if (plan.unknown.includes("no_deadline")) return { label: tr(lang, "候補", "후보"), color: color.text };
+  if (plan.verdict === "fits") return { label: tr(lang, `間に合う見込み（${room(-(plan.marginMinutes ?? 0))}）`, `시간 안에 들어갈 수 있어요 (${room(-(plan.marginMinutes ?? 0))})`), color: color.primary };
   if (plan.verdict === "late") {
     const over = plan.marginMinutes ?? 0;
     return plan.seatExpected
-      ? text(tr(lang, `${formatSeoulTime(plan.seatExpected)}着席見込み・${over}分オーバー`, `${formatSeoulTime(plan.seatExpected)} 착석 예상 · ${over}분 초과`), { color: color.warning, weight: "bold" })
-      : text(tr(lang, `お店に着く時点で締切を${over}分過ぎます`, `가게 도착 때 이미 마감을 ${over}분 넘겨요`), { color: color.warning, weight: "bold" });
+      ? { label: tr(lang, `${formatSeoulTime(plan.seatExpected)}着席見込み・${over}分オーバー`, `${formatSeoulTime(plan.seatExpected)} 착석 예상 · ${over}분 초과`), color: color.warning }
+      : { label: tr(lang, `お店に着く時点で締切を${over}分過ぎます`, `가게 도착 때 이미 마감을 ${over}분 넘겨요`), color: color.warning };
   }
-  if (plan.unknown.includes("wait_basis_unknown")) return text(tr(lang, "待ちの基準を確認中", "대기 기준 확인 중"), { color: color.info });
-  if (plan.unknown.includes("wait_teams_only")) return text(tr(lang, "組数だけでは間に合うか判断できません", "팀 수만으로는 판단할 수 없어요"), { color: color.info });
+  if (plan.unknown.includes("wait_basis_unknown")) return { label: tr(lang, "待ちの基準を確認中", "대기 기준 확인 중"), color: color.info };
+  if (plan.unknown.includes("wait_teams_only")) return { label: tr(lang, "組数だけでは判断できません", "팀 수만으로는 판단할 수 없어요"), color: color.info };
   if (plan.unknown.includes("wait_unknown") && plan.marginMinutes !== null) {
-    const spare = -plan.marginMinutes;
-    const room = spare > 120 ? tr(lang, "時間に余裕あり", "시간 여유 있음") : tr(lang, `余裕${spare}分`, `여유 ${spare}분`);
-    return text(tr(lang, `移動だけなら間に合います（${room}）・待ちは未確認`, `이동만 보면 시간 안이에요 (${room}) · 대기는 확인 안 됨`), { color: color.info });
+    return { label: tr(lang, `移動だけなら間に合います（${room(-plan.marginMinutes)}）・待ちは未確認`, `이동만 보면 시간 안이에요 (${room(-plan.marginMinutes)}) · 대기는 확인 안 됨`), color: color.info };
   }
-  return text(tr(lang, "間に合うか確認できませんでした", "시간 안에 들어갈 수 있는지 확인하지 못했어요"), { color: color.info });
+  return { label: tr(lang, "間に合うか確認できませんでした", "시간 안에 들어갈 수 있는지 확인하지 못했어요"), color: color.info };
+}
+
+const barColor = { travel: "#a4a199", wait: "#e5b560", slack: "#7f9a8d", over: "#941e34" };
+
+function segment(minutes: number, background: string): FlexBox {
+  return { type: "box", layout: "vertical", contents: [], flex: Math.max(1, Math.round(minutes)), height: "8px", backgroundColor: background };
+}
+
+/** Now → arrive → seated → deadline as one bar; red where it runs past the deadline. */
+function timeBar(lang: Lang, plan: CandidatePlan, now: string): FlexComponent[] {
+  if (!plan.seatDeadline || !plan.arriveRestaurantAt) return [];
+  const t = (iso: string) => Date.parse(iso) / 60000;
+  const start = t(now);
+  const deadline = t(plan.seatDeadline) - start;
+  const arrive = t(plan.arriveRestaurantAt) - start;
+  const seat = plan.seatExpected ? t(plan.seatExpected) - start : null;
+  const segments: FlexBox[] = [];
+  const end = seat ?? arrive;
+  const before = Math.min(end, deadline);
+  // Before the deadline: travel, then waiting.
+  if (Math.min(arrive, before) > 0) segments.push(segment(Math.min(arrive, before), barColor.travel));
+  if (seat !== null && before > arrive) segments.push(segment(before - arrive, barColor.wait));
+  if (end > deadline) segments.push(segment(end - deadline, barColor.over));
+  else if (deadline > end) segments.push(segment(deadline - end, seat === null ? "#dfdfdd" : barColor.slack));
+  if (segments.length === 0) return [];
+  const label = (value: string, align: "start" | "center" | "end") => text(value, { size: "xxs", color: color.muted, align, flex: 1, wrap: false });
+  const legend: FlexComponent = {
+    type: "text",
+    text: " ",
+    size: "xxs",
+    color: color.muted,
+    contents: [
+      { type: "span", text: "■", color: barColor.travel },
+      { type: "span", text: tr(lang, "移動 ", "이동 ") },
+      { type: "span", text: "■", color: barColor.wait },
+      { type: "span", text: tr(lang, "待ち ", "대기 ") },
+      { type: "span", text: "■", color: barColor.slack },
+      { type: "span", text: tr(lang, "余裕 ", "여유 ") },
+      { type: "span", text: "■", color: barColor.over },
+      { type: "span", text: tr(lang, "超過", "초과") },
+    ],
+  };
+  return [
+    { type: "box", layout: "horizontal", contents: segments, cornerRadius: "4px", margin: "md", spacing: "none" },
+    {
+      type: "box",
+      layout: "horizontal",
+      contents: [
+        label(tr(lang, `今 ${formatSeoulTime(now)}`, `지금 ${formatSeoulTime(now)}`), "start"),
+        label(plan.seatExpected ? tr(lang, `席 ${formatSeoulTime(plan.seatExpected)}`, `착석 ${formatSeoulTime(plan.seatExpected)}`) : tr(lang, `着 ${formatSeoulTime(plan.arriveRestaurantAt)}`, `도착 ${formatSeoulTime(plan.arriveRestaurantAt)}`), "center"),
+        label(tr(lang, `締切 ${formatSeoulTime(plan.seatDeadline)}`, `마감 ${formatSeoulTime(plan.seatDeadline)}`), "end"),
+      ],
+    },
+    legend,
+  ];
+}
+
+/** Small rounded labels: test shop, test call, booking link, search candidate. */
+function badges(lang: Lang, restaurant: Restaurant): FlexComponent[] {
+  const items: { label: string; background: string }[] = [];
+  if (restaurant.test) items.push({ label: tr(lang, "テスト店舗", "테스트 매장"), background: color.warning });
+  if (restaurant.testCall && !restaurant.test) items.push({ label: tr(lang, "テスト通話", "테스트 통화"), background: color.time });
+  if (restaurant.searchOnly) items.push({ label: tr(lang, `検索候補・未確認（NAVER ${restaurant.source.checkedAt}）`, `검색 후보 · 확인 안 됨 (네이버 ${restaurant.source.checkedAt})`), background: color.muted });
+  if (restaurant.bookingLinks.some((link) => link.provider !== "naver" || !restaurant.searchOnly)) items.push({ label: tr(lang, "予約リンクあり", "예약 링크 있음"), background: color.info });
+  if (items.length === 0) return [];
+  return [{
+    type: "box",
+    layout: "horizontal",
+    spacing: "xs",
+    contents: items.map((item) => ({ type: "box", layout: "vertical", flex: 0, backgroundColor: item.background, cornerRadius: "12px", paddingStart: "8px", paddingEnd: "8px", paddingTop: "2px", paddingBottom: "2px", contents: [text(item.label, { size: "xxs", color: "#ffffff", weight: "bold", wrap: false })] })),
+  }];
 }
 
 function partyLine(lang: Lang, restaurant: Restaurant, partySize: number): FlexComponent {
@@ -191,21 +260,26 @@ function travelLine(lang: Lang, plan: CandidatePlan, minutes: number | null, mod
   return tr(lang, `お店まで約${minutes}分（${how}・${source}）${arrive}`, `가게까지 약 ${minutes}분 (${how} · ${source})${arrive}`);
 }
 
-export function candidateBubble(request: DiningRequest, restaurant: Restaurant, plan: CandidatePlan): FlexBubble {
+export function candidateBubble(request: DiningRequest, restaurant: Restaurant, plan: CandidatePlan, now: string = new Date().toISOString()): FlexBubble {
   const lang = request.lang;
   const state = request.candidates.find((c) => c.restaurantId === restaurant.id);
   const leg = state?.toRestaurant ?? null;
-  const body: FlexComponent[] = [text(travelLine(lang, plan, leg?.minutes ?? null, leg?.mode ?? null, leg?.provider ?? null))];
+  const verdict = verdictBand(lang, plan);
+  const body: FlexComponent[] = [...badges(lang, restaurant), text(travelLine(lang, plan, leg?.minutes ?? null, leg?.mode ?? null, leg?.provider ?? null))];
   if (plan.seatDeadline && request.nextPlace && request.arriveBy) {
     body.push(text(tr(lang, `${formatSeoulTime(plan.seatDeadline)}までに席に着けば${formatSeoulTime(request.arriveBy)}に${request.nextPlace.nameJa}へ`, `${formatSeoulTime(plan.seatDeadline)}까지 앉으면 ${formatSeoulTime(request.arriveBy)}에 ${request.nextPlace.nameKo} 도착`), { color: color.time }));
   }
+  body.push(...timeBar(lang, plan, now));
   body.push(text(waitLine(lang, plan.wait)));
-  const verdict = verdictLine(lang, plan);
-  if (verdict) body.push(verdict);
   body.push(partyLine(lang, restaurant, request.partySize ?? 2));
-  const header: FlexComponent[] = [text(name(lang, restaurant), { size: "md", weight: "bold" }), text(lang === "ja" ? restaurant.nameKo : restaurant.nameJa, { size: "xs", color: color.muted })];
-  if (restaurant.test) header.push(text(tr(lang, "テスト用の店舗です", "테스트용 매장이에요"), { size: "xs", color: color.warning }));
-  if (restaurant.searchOnly) header.push(text(tr(lang, `検索候補・未確認（NAVER ${restaurant.source.checkedAt}）`, `검색 후보 · 확인 안 됨 (네이버 ${restaurant.source.checkedAt})`), { size: "xs", color: color.info }));
+  const header = vbox(
+    [
+      text(verdict.label, { size: "xs", color: "#ffffff", weight: "bold" }),
+      text(name(lang, restaurant), { size: "md", weight: "bold", color: "#ffffff" }),
+      text(lang === "ja" ? restaurant.nameKo : restaurant.nameJa, { size: "xs", color: "#ffffffcc" }),
+    ],
+    { spacing: "xs", backgroundColor: verdict.color, paddingAll: "12px" },
+  );
   const footer: FlexComponent[] = [
     { type: "button", style: "primary", color: color.primary, height: "sm", action: postback(request, "select", tr(lang, "ここに行く", "여기로 갈게요"), { candidateId: restaurant.id, displayText: tr(lang, `${restaurant.nameJa}に行く`, `${restaurant.nameKo}로 갈게요`) }) },
     { type: "button", style: "secondary", height: "sm", action: postback(request, "wait", tr(lang, "待ち状況を送る", "대기 상황 보내기"), { candidateId: restaurant.id }) },
@@ -215,10 +289,10 @@ export function candidateBubble(request: DiningRequest, restaurant: Restaurant, 
     const label = link.provider === "naver" ? tr(lang, "NAVERで見る", "네이버에서 보기") : tr(lang, "予約・順番待ちを確認", "예약·웨이팅 확인");
     footer.push({ type: "button", style: "link", height: "sm", action: { type: "uri", label, uri: link.url } });
   }
-  return { type: "bubble", size: "kilo", header: vbox(header, { spacing: "xs" }), body: vbox(body), footer: vbox(footer) };
+  return { type: "bubble", size: "kilo", header, body: vbox(body), footer: vbox(footer) };
 }
 
-export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[], lookup: (id: string) => Restaurant | undefined, options: { callingEnabled: boolean; intro?: string }): LineMessage[] {
+export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[], lookup: (id: string) => Restaurant | undefined, options: { callingEnabled: boolean; intro?: string; now?: string }): LineMessage[] {
   const lang = request.lang;
   if (plans.length === 0) {
     return [{
@@ -228,7 +302,7 @@ export function candidatesMessages(request: DiningRequest, plans: CandidatePlan[
   }
   const bubbles = plans.flatMap((plan) => {
     const restaurant = lookup(plan.candidateId);
-    return restaurant ? [candidateBubble(request, restaurant, plan)] : [];
+    return restaurant ? [candidateBubble(request, restaurant, plan, options.now)] : [];
   });
   const area = request.areaId ? findArea(request.areaId) : undefined;
   const menu = request.menuKey ? menuNames[request.menuKey][lang] : "";
@@ -375,24 +449,37 @@ export function confirmedCard(request: DiningRequest, reservation: Reservation, 
   ];
   if (links.cardToken) footer.push({ type: "button", style: "secondary", height: "sm", action: { type: "uri", label: tr(lang, "韓国語の予約カード", "한국어 예약 카드"), uri: cardUrl(links.origin, links.cardToken, lang) } });
   if (request.nextPlace) footer.push({ type: "button", style: "link", height: "sm", action: { type: "uri", label: tr(lang, "次の予定への行き方", "다음 일정으로 가는 길"), uri: goUrl(links.origin, { to: placeRef(request.nextPlace), from: placeRef({ restaurantId: restaurant.id }), lang }) } });
+  const field = (label: string, value: string): FlexBox => vbox([text(label, { size: "xxs", color: color.muted }), text(value, { size: "md", weight: "bold" })], { spacing: "none", flex: 1 });
+  const evidence =
+    reservation.evidence === "call_accept"
+      ? tr(lang, `根拠：電話でお店が承諾（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 전화로 가게가 수락 (${formatSeoulTime(reservation.acceptedAt)})`)
+      : tr(lang, `根拠：お店に確認したと依頼者が共有（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 가게에 확인했다고 요청자가 공유 (${formatSeoulTime(reservation.acceptedAt)})`);
+  // A ticket: one big time, then party and name, framed like a stub.
+  const ticket = vbox(
+    [
+      text(tr(lang, "予約時間", "예약 시간"), { size: "xxs", color: color.muted }),
+      text(formatSeoulTime(reservation.time), { size: "3xl", weight: "bold", color: color.time }),
+      { type: "separator", margin: "md", color: "#d8ccad" },
+      { type: "box", layout: "horizontal", margin: "md", contents: [field(tr(lang, "人数", "인원"), tr(lang, `${reservation.partySize}名`, `${reservation.partySize}명`)), field(tr(lang, "予約名", "예약자"), reservation.alias)] },
+    ],
+    { spacing: "xs", borderWidth: "2px", borderColor: color.primary, cornerRadius: "12px", paddingAll: "12px", backgroundColor: "#fbf8f1" },
+  );
   return {
     type: "flex",
     altText: `${title} ${name(lang, restaurant)} ${formatSeoulTime(reservation.time)}`,
     contents: {
       type: "bubble",
-      header: vbox([text(title, { size: "md", weight: "bold", color: color.primary })]),
+      header: vbox(
+        [
+          text(title, { size: "sm", weight: "bold", color: "#ffffff" }),
+          text(name(lang, restaurant), { size: "lg", weight: "bold", color: "#ffffff" }),
+          text(lang === "ja" ? restaurant.nameKo : restaurant.nameJa, { size: "xs", color: "#ffffffcc" }),
+        ],
+        { spacing: "xs", backgroundColor: color.primary, paddingAll: "14px" },
+      ),
       body: vbox([
-        text(name(lang, restaurant), { weight: "bold" }),
-        text(lang === "ja" ? restaurant.nameKo : restaurant.nameJa, { size: "xs", color: color.muted }),
-        text(tr(lang, `時間：${formatSeoulTime(reservation.time)}`, `시간: ${formatSeoulTime(reservation.time)}`), { color: color.time, weight: "bold" }),
-        text(tr(lang, `人数：${reservation.partySize}名`, `인원: ${reservation.partySize}명`)),
-        text(tr(lang, `予約名：${reservation.alias}`, `예약자 이름: ${reservation.alias}`)),
-        text(
-          reservation.evidence === "call_accept"
-            ? tr(lang, `根拠：電話でお店が承諾（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 전화로 가게가 수락 (${formatSeoulTime(reservation.acceptedAt)})`)
-            : tr(lang, `根拠：お店に確認したと依頼者が共有（${formatSeoulTime(reservation.acceptedAt)}）`, `근거: 가게에 확인했다고 요청자가 공유 (${formatSeoulTime(reservation.acceptedAt)})`),
-          { size: "xs", color: color.muted },
-        ),
+        ticket,
+        text(evidence, { size: "xs", color: color.muted }),
         ...(quote ? [text(tr(lang, `お店の返事（韓国語）：「${quote}」`, `가게 답변: "${quote}"`), { size: "xs", color: color.muted })] : []),
       ]),
       footer: vbox(footer),
