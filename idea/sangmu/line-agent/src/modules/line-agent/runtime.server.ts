@@ -10,6 +10,7 @@ import { getRuntimeDatabasePool } from "../../db/runtime.server";
 import { PostgresAgentStore } from "./postgres-store";
 import { naverPlaceSearch } from "./naver-search";
 import { fetchLineImage, readImageText } from "./ocr.server";
+import { visionReader } from "./vision.server";
 import { resolveShortLink } from "./link-resolver.server";
 import { modelReader } from "./understand.server";
 import { MemoryAgentStore, type AgentStore } from "./store";
@@ -133,16 +134,19 @@ function createRuntime(): LineAgentRuntime {
 
   const simulatorLine = new RecordingLineGateway(clock);
   const simulatorImages = new Map<string, Buffer>();
+  // Photos are read by a vision model when a key is set; tesseract OCR is the fallback.
+  const vision = openaiKey && process.env.LINE_AGENT_VISION !== "off" ? visionReader(openaiKey) : null;
+  const readImage = async (image: Buffer) => (vision ? await vision(image).catch(() => null) : null) ?? readImageText(image);
   const readSimulatorImage = async (id: string) => {
     const image = simulatorImages.get(id);
     simulatorImages.delete(id);
-    return image ? readImageText(image) : null;
+    return image ? readImage(image) : null;
   };
   const accessToken = config.accessToken;
   const readLineImage = accessToken
     ? async (messageId: string) => {
         const image = await fetchLineImage(messageId, accessToken);
-        return image ? readImageText(image) : null;
+        return image ? readImage(image) : null;
       }
     : null;
   const realLine: LineGateway = accessToken ? new LineMessagingClient(accessToken) : new RecordingLineGateway(clock);
