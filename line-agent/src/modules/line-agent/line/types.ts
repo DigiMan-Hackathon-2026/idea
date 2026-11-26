@@ -3,7 +3,9 @@
 export type LineAction =
   | { type: "postback"; label: string; data: string; displayText?: string }
   | { type: "uri"; label: string; uri: string }
-  | { type: "message"; label: string; text: string };
+  | { type: "message"; label: string; text: string }
+  /** Quick reply only: opens LINE's camera or photo picker. */
+  | { type: "camera" | "cameraRoll"; label: string };
 
 export type QuickReply = { items: { type: "action"; action: LineAction }[] };
 

@@ -74,7 +74,7 @@ open http://localhost:3000/dev/line-agent
 
 카드 위 역 이미지는 `public/line-agent/hero/<역코드>.png`이고, 역을 추가하면 `node scripts/line/render-hero-images.mjs`로 다시 만든다. LINE은 HTTPS 이미지만 읽으므로 `APP_ORIGIN`이 HTTPS일 때만 붙는다.
 
-대화창 아래 고정 메뉴(使い方 · ごはんを探す · やめる)는 `pnpm line:richmenu`로 한 번 만든다. 이미지만 미리 보려면 `node scripts/line/setup-rich-menu.mjs --dry-run menu.png`.
+대화창 아래 고정 메뉴(使い方 · 写真を送る · ごはんを探す · やめる)는 `pnpm line:richmenu`로 한 번 만든다. LINE은 사진첩·카메라를 빠른 답장에서만 열어 주므로, 「写真を送る」를 누르면 에이전트가 「写真を選ぶ」「撮影する」 버튼으로 답한다. 사용법 답장에도 같은 버튼이 붙는다. 이미지만 미리 보려면 `node scripts/line/setup-rich-menu.mjs --dry-run menu.png`.
 
 ### 고정 공개 주소 (Tailscale Funnel)
 

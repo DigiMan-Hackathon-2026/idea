@@ -558,7 +558,24 @@ export function cancelled(lang: Lang, hadPendingCalls: boolean): LineMessage {
 export function greeting(lang: Lang, kind: "user" | "group"): LineMessage {
   return kind === "group"
     ? { type: "text", text: tr(lang, `${BOT_NAME.ja}です。グループでは「${BOT_NAME.ja} このお店、今日2人で行ける？（NAVER地図のリンク）」や「${BOT_NAME.ja} 新村で2人、サムギョプサル。20時までに弘大」のように名前を付けて呼んでください。`, `${BOT_NAME.ko}예요. 그룹에서는 "${BOT_NAME.ko} 이 가게 오늘 2명 돼? (네이버 지도 링크)"나 "${BOT_NAME.ko} 신촌에서 2명, 삼겹살. 8시까지 홍대"처럼 이름을 붙여 불러 주세요.`) }
-    : { type: "text", text: tr(lang, `${BOT_NAME.ja}です。気になるお店のNAVER地図・Googleマップのリンク、お店の名前、看板の写真を送ると、今日行けるか確かめます。お店が決まっていなければ、食べたいもの、人数、いる場所、次の予定を送ってください。例：「新村で2人、サムギョプサル。20時までに弘大のライブ会場に着きたい」`, `${BOT_NAME.ko}예요. 가고 싶은 가게의 네이버 지도·구글 지도 링크, 가게 이름, 간판 사진을 보내면 오늘 갈 수 있는지 확인해 드려요. 가게가 정해지지 않았다면 먹고 싶은 것, 인원, 지금 위치, 다음 일정을 보내 주세요. 예: "신촌에서 2명, 삼겹살. 8시까지 홍대 공연장"`) };
+    : { type: "text", text: tr(lang, `${BOT_NAME.ja}です。気になるお店のNAVER地図・Googleマップのリンク、お店の名前、看板の写真を送ると、今日行けるか確かめます。お店が決まっていなければ、食べたいもの、人数、いる場所、次の予定を送ってください。例：「新村で2人、サムギョプサル。20時までに弘大のライブ会場に着きたい」`, `${BOT_NAME.ko}예요. 가고 싶은 가게의 네이버 지도·구글 지도 링크, 가게 이름, 간판 사진을 보내면 오늘 갈 수 있는지 확인해 드려요. 가게가 정해지지 않았다면 먹고 싶은 것, 인원, 지금 위치, 다음 일정을 보내 주세요. 예: "신촌에서 2명, 삼겹살. 8시까지 홍대 공연장"`), quickReply: quickReply([...photoButtons(lang), { type: "message", label: tr(lang, "ごはんを探す", "식당 찾기"), text: tr(lang, "ごはんを探したい", "식당 찾고 싶어요") }]) };
+}
+
+/** Quick replies that open LINE's photo picker or camera, so a photo is one tap away. */
+function photoButtons(lang: Lang): LineAction[] {
+  return [
+    { type: "cameraRoll", label: tr(lang, "写真を選ぶ", "사진 선택") },
+    { type: "camera", label: tr(lang, "撮影する", "촬영") },
+  ];
+}
+
+/** The rich menu's 「写真を送る」: what photos help, and the picker one tap away. */
+export function photoPrompt(lang: Lang): LineMessage {
+  return {
+    type: "text",
+    text: tr(lang, "お店の看板、NAVER地図のお店の画面、または順番待ちの画面の写真を送ってください。お店と今日行けるかを確かめます。", "가게 간판, 네이버 지도의 가게 화면, 또는 웨이팅 화면 사진을 보내 주세요. 어느 가게인지, 오늘 갈 수 있는지 확인해 드려요."),
+    quickReply: quickReply(photoButtons(lang)),
+  };
 }
 
 export function didNotUnderstand(lang: Lang): LineMessage {

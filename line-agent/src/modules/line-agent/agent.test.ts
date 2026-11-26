@@ -535,7 +535,15 @@ describe("DiningAgent: a shop the user points at (link, name, photo)", () => {
     expect(json).toContain("https://map.naver.com/p/entry/place/99999999");
     expect(card.quickReply?.items.map((item) => item.action.label)).toContain("ごはんを探す·식당 찾기");
     await agent.handleEvent(text(ALICE, "使い方"));
-    expect(lastTexts(ALICE, 1)).not.toBe("");
+    const help = line.messagesFor(ALICE).at(-1)!.message;
+    expect(help.quickReply?.items.map((item) => item.action.type)).toEqual(["cameraRoll", "camera", "message"]);
+  });
+
+  it("answers the rich menu's 写真を送る with the photo picker one tap away", async () => {
+    await agent.handleEvent(text(ALICE, "写真を送る"));
+    const prompt = line.messagesFor(ALICE).at(-1)!.message;
+    expect(lastTexts(ALICE, 1)).toContain("看板");
+    expect(prompt.quickReply?.items.map((item) => item.action.label)).toEqual(["写真を選ぶ·사진 선택", "撮影する·촬영"]);
   });
 });
 

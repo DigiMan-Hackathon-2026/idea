@@ -63,6 +63,8 @@ const m = bilingual(messages);
 const REQUEST_TTL_MINUTES = 6 * 60;
 const APPROVAL_TTL_MINUTES = 10;
 const MAX_CALL_CANDIDATES = 3;
+/** 「写真を送る」 from the rich menu, or the same said in Korean (a call-word prefix in groups is allowed). */
+const PHOTO_ASK = /^(?:ココソウル\s*|코코서울\s*)?(?:写真を送(?:る|りたい)|사진\s*보내(?:기|요|고 싶어요)?)$/;
 const MAX_CARDS = 3;
 const CALL_WINDOW_MINUTES = 75;
 const MEAL_MINUTES = 45;
@@ -259,6 +261,11 @@ export class DiningAgent {
     }
     if (active?.status === "calling") {
       await this.reply(ctx, [m.busyCalling(active.lang)]);
+      return;
+    }
+    // The rich menu's 「写真を送る」: open the way to a photo (LINE lets only quick replies open the picker).
+    if (PHOTO_ASK.test(text.trim())) {
+      await this.reply(ctx, [m.photoPrompt(reading.lang)]);
       return;
     }
     if (wantsCall(text)) return this.callFromText(ctx, text, active, reading);
