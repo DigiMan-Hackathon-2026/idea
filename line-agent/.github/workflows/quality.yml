@@ -1,0 +1,138 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    # Full-history secret scan (from the Sova security CI): pinned Gitleaks,
+    # values redacted, and on failure only rule/file/line/commit are printed.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install pinned official Gitleaks
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, io, os, tarfile, urllib.request
+          url = 'https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz'
+          with urllib.request.urlopen(url, timeout=60) as response:
+              archive_bytes = response.read(30_000_001)
+          assert len(archive_bytes) <= 30_000_000
+          assert hashlib.sha256(archive_bytes).hexdigest() == '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb'
+          destination = Path(os.environ['RUNNER_TEMP']) / 'gitleaks'
+          with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode='r:gz') as archive:
+              member = archive.getmember('gitleaks')
+              assert member.isfile() and member.size <= 50_000_000
+              destination.write_bytes(archive.extractfile(member).read())
+          destination.chmod(0o700)
+          PY
+
+      - name: Scan complete Git history with redacted output
+        run: >-
+          "$RUNNER_TEMP/gitleaks" git --redact=100 --no-banner
+          --log-opts=--all --report-format=json
+          --report-path="$RUNNER_TEMP/gitleaks-report.json" .
+
+      - name: Locate rejected records without printing their content
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, os
+          path = Path(os.environ['RUNNER_TEMP']) / 'gitleaks-report.json'
+          if path.is_file():
+              records = json.loads(path.read_text())
+              for record in records[:20]:
+                  print(json.dumps({key: record.get(key) for key in ('RuleID', 'File', 'StartLine', 'Commit')}))
+          PY
+
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgis/postgis:17-3.7-alpine@sha256:05c73e6e309fb978eb3555f42e7725fb74a9bdc8ef99fac11397dbbd3edb95bc
+        env:
+          POSTGRES_DB: digiman_test_ci
+          POSTGRES_USER: digiman_migration
+          POSTGRES_PASSWORD: ci-local-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U digiman_migration -d digiman_test_ci"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .node-version
+
+      - name: Enable pinned pnpm
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify application and documents
+        run: pnpm verify
+
+      - name: Audit moderate-or-higher dependency vulnerabilities
+        run: pnpm audit:dependencies
+
+      - name: Mark and migrate integration database
+        env:
+          APP_ENV: test
+          DATABASE_DIRECT_URL: postgresql://digiman_migration:ci-local-only@127.0.0.1:5432/digiman_test_ci
+        run: |
+          docker exec "${{ job.services.postgres.id }}" psql -U digiman_migration -d postgres -c "comment on database digiman_test_ci is 'digiman:test'"
+          pnpm db:migrate
+
+      - name: Configure database capability roles
+        run: |
+          docker cp scripts/db/configure_roles.sql "${{ job.services.postgres.id }}:/tmp/configure_roles.sql"
+          docker exec "${{ job.services.postgres.id }}" psql -v ON_ERROR_STOP=1 -U digiman_migration -d digiman_test_ci -f /tmp/configure_roles.sql
+          docker cp scripts/db/configure_test_runtime_login.sql "${{ job.services.postgres.id }}:/tmp/configure_test_runtime_login.sql"
+          docker exec "${{ job.services.postgres.id }}" psql -v ON_ERROR_STOP=1 -v runtime_password=ci-local-only-runtime -U digiman_migration -d digiman_test_ci -f /tmp/configure_test_runtime_login.sql
+
+      - name: Test PostgreSQL constraints
+        env:
+          APP_ENV: test
+          APP_ORIGIN: https://example.test
+          DATABASE_URL: postgresql://digiman_runtime_test:ci-local-only-runtime@127.0.0.1:5432/digiman_test_ci
+          SESSION_TOKEN_ACTIVE_VERSION: "1"
+          SESSION_TOKEN_PEPPERS: '{"1":"ERERERERERERERERERERERERERERERERERERERERERE"}'
+          TEST_DATABASE_URL: postgresql://digiman_migration:ci-local-only@127.0.0.1:5432/digiman_test_ci
+        run: pnpm test:integration
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run responsive browser flows
+        env:
+          # Shop opening hours make the LINE agent flows depend on the time of day.
+          LINE_AGENT_DEMO_NOW: "2026-11-29T17:30:00+09:00"
+        run: pnpm test:e2e

@@ -1,0 +1,112 @@
+.scene {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  height: 9rem;
+  overflow: hidden;
+  perspective: 28rem;
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(ellipse at 75% 15%, #514976, transparent 75%),
+    linear-gradient(155deg, #272445, #16182d);
+}
+
+.track {
+  position: relative;
+  width: 94%;
+  height: 3rem;
+  margin-inline: auto;
+  transform: translateY(0.5rem) rotateX(45deg) rotateZ(-12deg);
+  transform-style: preserve-3d;
+  border-radius: 0.4rem;
+  background:
+    linear-gradient(to bottom, transparent 26%, #aeb3d4 26% 31%, transparent 31% 69%, #aeb3d4 69% 74%, transparent 74%),
+    repeating-linear-gradient(90deg, #49496b 0 0.28rem, #313350 0.28rem 0.9rem);
+  box-shadow: 0 0.35rem #24263e;
+}
+
+.start,
+.finish {
+  position: absolute;
+  top: 50%;
+  width: 0.8rem;
+  height: 0.8rem;
+  transform: translate3d(-50%, -50%, 1px);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #6789ca;
+}
+
+.start { left: 17%; }
+.finish {
+  left: 83%;
+  background: #e5b560;
+  box-shadow: 0 0 0.85rem #e5b569b0;
+}
+
+.train {
+  position: absolute;
+  left: 17%;
+  top: 50%;
+  width: 4rem;
+  height: 1.5rem;
+  transform: translate3d(-50%, -50%, 3px);
+  transform-style: preserve-3d;
+}
+
+.disclosure[open] .train {
+  animation: travel 2.6s cubic-bezier(0.55, 0.05, 0.25, 1) both;
+}
+
+.roof,
+.side,
+.front {
+  position: absolute;
+  display: block;
+}
+
+.roof {
+  inset: 0;
+  transform: translateZ(1.23rem);
+  border-radius: 0.18rem;
+  background: linear-gradient(#f7f5ff, #b5b8ce);
+}
+
+.side {
+  bottom: 0;
+  width: 100%;
+  height: 1.25rem;
+  transform: rotateX(-90deg);
+  transform-origin: bottom;
+  border: 2px solid #e0e3ed;
+  border-bottom: 4px solid #6789ca;
+  background: repeating-linear-gradient(90deg, #c6cede 0 0.18rem, #292f50 0.18rem 0.67rem);
+}
+
+.front {
+  right: 0;
+  width: 1.25rem;
+  height: 100%;
+  transform: rotateY(90deg);
+  transform-origin: right;
+  border: 2px solid #d1d7e6;
+  background:
+    radial-gradient(circle at 24% 23%, #f5cd8c 0 2px, transparent 3px),
+    radial-gradient(circle at 24% 77%, #f5cd8c 0 2px, transparent 3px),
+    linear-gradient(90deg, #6e7897 42%, #292f50 42% 83%, #b6bfd4 83%);
+}
+
+@keyframes travel {
+  0%, 12% { left: 17%; }
+  88%, 100% { left: 83%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure[open] .train {
+    animation: none;
+    left: 50%;
+  }
+
+  .replay { display: none; }
+}

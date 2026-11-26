@@ -1,0 +1,318 @@
+[
+  {
+    "id": "3ff2af64-4c91-47b2-a93b-04a25380b843",
+    "versionId": "62814b85-eb94-4071-bb51-720f67e3da9c",
+    "slug": "seongsu-seoul-forest-walk",
+    "areaCode": "seongsu",
+    "purpose": "rest",
+    "titleKo": "서울숲에서 천천히 한 바퀴 걷기",
+    "titleJa": "ソウルの森をゆっくり歩く",
+    "summaryKo": "입구 안내판에서 가까운 곳을 골라 내 속도로 걸어요.",
+    "summaryJa": "入口の案内図で近くの場所を選び、自分のペースで歩きます。",
+    "bodyKo": "서울숲의 야외 산책로를 이용해요. 계절에 따라 시설 이용 조건이 달라질 수 있으니 입구 안내를 확인해요.",
+    "bodyJa": "ソウルの森の屋外遊歩道を歩きます。季節によって施設の利用条件が変わるので、入口の案内を確認しましょう。",
+    "detailKo": "야외 산책 · 가볍게 30분",
+    "detailJa": "屋外散策 · 30分が目安",
+    "durationMinutes": 30,
+    "costMin": 0,
+    "walking": "light",
+    "place": {
+      "id": "dc531617-ed3e-46f9-829e-ebe17cf0ea09",
+      "nameKo": "서울숲",
+      "nameJa": "ソウルの森",
+      "addressKo": "서울 성동구 뚝섬로 273",
+      "guideUrlKo": "https://www.sd.go.kr/main/contents.do?key=1463",
+      "guideUrlJa": "https://seoulforest.or.kr/english",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "fadeab3b-588f-43f3-9790-528efac1d978",
+        "titleKo": "서울숲 안내판 찾기",
+        "titleJa": "ソウルの森の案内図を探す",
+        "bodyKo": "입구 안내판에서 지금 위치와 가까운 길을 확인해요.",
+        "bodyJa": "入口の案内図で現在地と近くの道を確認します。",
+        "completionLabelKo": "출발할 길을 찾았어요",
+        "completionLabelJa": "歩き始める道を見つけました",
+        "showsPlace": true
+      },
+      {
+        "id": "ca93e61d-5c7d-459c-8539-0550c09e5a5f",
+        "titleKo": "가까운 곳 한 곳까지 걷기",
+        "titleJa": "近くの場所を一つ選んで歩く",
+        "bodyKo": "서울숲 광장이나 가족마당처럼 가까운 장소를 하나 골라요. 통제된 길은 안내판에서 우회로를 찾아요.",
+        "bodyJa": "広場やファミリー広場など、近い場所を一つ選びます。通行止めなら案内図で迂回路を探しましょう。",
+        "completionLabelKo": "정한 곳까지 걸었어요",
+        "completionLabelJa": "選んだ場所まで歩きました"
+      },
+      {
+        "id": "a53b7c22-13fd-4a15-9dd9-f536ba819fbf",
+        "titleKo": "쉬었다가 돌아가는 길 고르기",
+        "titleJa": "ひと休みして帰り道を選ぶ",
+        "bodyKo": "자리가 있으면 잠깐 쉬어요. 돌아갈 출구 방향을 확인해요.",
+        "bodyJa": "座れる場所があればひと休みして、帰りに使う出口を確認しましょう。",
+        "completionLabelKo": "쉬고 돌아가는 길을 정했어요",
+        "completionLabelJa": "休んで帰り道を決めました"
+      }
+    ],
+    "seed": {
+      "supplierId": "79bcdb07-674c-46ab-83fc-264b68830028",
+      "editorId": "b06e6a5d-f2d2-4f28-aa92-249554411d06",
+      "requestId": "6f778ce7-5aec-452e-a5ab-516c1455c1df"
+    }
+  },
+  {
+    "id": "662d68f1-d76b-4a14-93d6-ffafbc6bcb6a",
+    "versionId": "92e1a769-b361-4776-a118-da3f9dc3103e",
+    "slug": "naksan-city-wall-walk",
+    "areaCode": "jongno",
+    "purpose": "rest",
+    "titleKo": "혜화문에서 낙산 성곽길 걷기",
+    "titleJa": "恵化門から駱山の城郭を歩く",
+    "summaryKo": "혜화문에서 출발해 성곽을 따라 걸으며 전망을 만나요.",
+    "summaryJa": "恵化門から城壁に沿って歩き、眺めを楽しみます。",
+    "bodyKo": "혜화문에서 흥인지문 방향으로 걸어요. 계단과 오르막이 있어요. 전 구간을 걷기 어렵다면 낙산공원에서 끝내도 돼요.",
+    "bodyJa": "恵化門から興仁之門方面へ歩きます。階段や上り坂があります。全区間が難しければ、駱山公園まででも構いません。",
+    "detailKo": "성곽길 · 오르막과 계단",
+    "detailJa": "城郭の道 · 上り坂と階段あり",
+    "durationMinutes": 90,
+    "costMin": 0,
+    "walking": "moderate",
+    "place": {
+      "id": "6d8fb951-51d0-4ba5-81f9-8c78982a58a7",
+      "nameKo": "혜화문",
+      "nameJa": "恵化門",
+      "addressKo": "서울 성북구 성북동1가 1-1",
+      "guideUrlKo": "https://seoulcitywall.seoul.go.kr/wallcourse/2.do",
+      "guideUrlJa": "https://seoulcitywall.seoul.go.kr/wallcourse/2.do",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "d38dcd6f-6f45-4813-9cc3-e79052d24287",
+        "titleKo": "혜화문에서 성곽 찾기",
+        "titleJa": "恵化門で城壁を探す",
+        "bodyKo": "한성대입구역 4번 출구 쪽 혜화문에서 공식 순성 지도를 확인해요.",
+        "bodyJa": "漢城大入口駅4番出口側の恵化門で、公式ルートマップを見ます。",
+        "completionLabelKo": "출발점을 확인했어요",
+        "completionLabelJa": "出発地点を確認しました",
+        "showsPlace": true
+      },
+      {
+        "id": "5c3289a8-ae7c-4412-bfa1-ed962c232699",
+        "titleKo": "낙산공원 방향으로 걷기",
+        "titleJa": "駱山公園方面へ歩く",
+        "bodyKo": "장수마을과 낙산공원 표지를 따라가요. 계단이 힘들거나 통제되어 있으면 무리하지 말고 가까운 열린 길에서 돌아가요.",
+        "bodyJa": "長寿村と駱山公園の表示をたどります。階段がきつかったり通行止めだったりしたら、無理をせず通れる道で引き返しましょう。",
+        "completionLabelKo": "성곽을 따라 걸었어요",
+        "completionLabelJa": "城壁沿いを歩きました",
+        "phraseKo": "성곽길을 따라 낙산공원에 가고 싶어요. 이쪽으로 가면 되나요?",
+        "phraseJa": "城郭道を通って駱山公園へ行きたいです。こちらで合っていますか。"
+      },
+      {
+        "id": "95f08da5-3391-418d-9c34-31ccf63f9c40",
+        "titleKo": "전망을 보고 내려갈 곳 정하기",
+        "titleJa": "景色を見て下りる場所を決める",
+        "bodyKo": "성곽이 보이는 곳에서 잠깐 멈춰요. 흥인지문까지 이어 걷거나 낙산공원 안내를 보고 내려가요.",
+        "bodyJa": "城壁が見える場所で少し立ち止まります。興仁之門まで歩くか、駱山公園の案内に従って下りましょう。",
+        "completionLabelKo": "전망을 보고 갈 길을 골랐어요",
+        "completionLabelJa": "景色を見て次の道を選びました"
+      }
+    ],
+    "seed": {
+      "supplierId": "cdd2c231-f5e6-479c-b646-37f4a6703d21",
+      "editorId": "d4a1ee09-c024-4d1a-ba00-09b1e0b5446b",
+      "requestId": "760f3673-bf6e-42e7-b7c7-8d8d335bff49"
+    }
+  },
+  {
+    "id": "a82f1b5b-5080-4afd-95c9-d7ed4c3e8369",
+    "versionId": "662fba79-b211-41ca-8292-fdcb6fb9706b",
+    "slug": "namsan-city-wall-walk",
+    "areaCode": "jangchung",
+    "purpose": "rest",
+    "titleKo": "장충에서 남산 성곽의 안팎 걸어보기",
+    "titleJa": "奨忠から南山の城壁の内外を歩く",
+    "summaryKo": "장충체육관 뒤에서 성곽을 보고 국립극장 방향으로 걸어요.",
+    "summaryJa": "奨忠体育館の裏から城壁を見て、国立劇場方面へ歩きます。",
+    "bodyKo": "남산 정상까지 오르기 전에 국립극장 부근에서 마치는 코스예요. 계단과 경사가 있으니 현장 통제 안내를 따라요.",
+    "bodyJa": "南山の頂上へは上らず、国立劇場の近くまで歩くコースです。階段と坂があるので、現地の通行案内に従いましょう。",
+    "detailKo": "장충체육관에서 국립극장 방향",
+    "detailJa": "奨忠体育館から国立劇場方面",
+    "durationMinutes": 60,
+    "costMin": 0,
+    "walking": "moderate",
+    "place": {
+      "id": "10e9bf62-d5bc-40a1-ba91-3936da175da9",
+      "nameKo": "장충체육관",
+      "nameJa": "奨忠体育館",
+      "addressKo": "서울 중구 동호로 241",
+      "guideUrlKo": "https://seoulcitywall.seoul.go.kr/wallcourse/4.do",
+      "guideUrlJa": "https://seoulcitywall.seoul.go.kr/wallcourse/4.do",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "88e7ce18-d3f2-4d04-b135-d4812b74053b",
+        "titleKo": "장충체육관 뒤쪽 길 찾기",
+        "titleJa": "奨忠体育館の裏道を探す",
+        "bodyKo": "동호로 241 장충체육관에서 공식 안내의 성곽길을 확인해요.",
+        "bodyJa": "「동호로 241」の奨忠体育館で、公式案内の城郭ルートを確認します。",
+        "completionLabelKo": "성곽길 출발점을 찾았어요",
+        "completionLabelJa": "城郭ルートの出発地点を見つけました",
+        "showsPlace": true
+      },
+      {
+        "id": "361fbad9-3d36-4cd4-8d4f-77411ee1e641",
+        "titleKo": "성곽 안팎이 보이는 길 걷기",
+        "titleJa": "城壁の内外が見える道を歩く",
+        "bodyKo": "열린 보행로를 걸으며 성곽을 사이에 두고 풍경이 어떻게 달라지는지 봐요. 길이 막히면 되돌아가요.",
+        "bodyJa": "通れる歩道を進み、城壁の内側と外側で景色がどう変わるか見ます。通行止めなら引き返しましょう。",
+        "completionLabelKo": "성곽을 따라 풍경을 봤어요",
+        "completionLabelJa": "城壁沿いの景色を見ました",
+        "phraseKo": "성곽길을 따라 국립극장까지 가고 싶어요. 이 길이 맞나요?",
+        "phraseJa": "城郭道を通って国立劇場まで行きたいです。この道で合っていますか。"
+      },
+      {
+        "id": "f5d1b131-a204-4338-a626-f9e41a5e787a",
+        "titleKo": "국립극장 부근에서 산책 마치기",
+        "titleJa": "国立劇場の近くで散策を終える",
+        "bodyKo": "국립극장 표지를 찾고 다음에 갈 곳을 지도에서 확인해요. 피곤하면 열린 갈림길에서 먼저 내려가도 돼요.",
+        "bodyJa": "国立劇場の表示を探して、次の行き先を地図で確認します。疲れたら、手前の通れる分岐から下りても構いません。",
+        "completionLabelKo": "산책을 마칠 곳을 정했어요",
+        "completionLabelJa": "散策の終点を決めました"
+      }
+    ],
+    "seed": {
+      "supplierId": "4d843c97-6bb0-4476-a23c-fce46da1e509",
+      "editorId": "afb3a745-eac1-4808-ac99-df3ba83ed0bd",
+      "requestId": "68dbbd2a-b813-4c85-9f0e-aeb4a7ef5c34"
+    }
+  },
+  {
+    "id": "44681732-c18f-4de3-92de-915c8432b2b9",
+    "versionId": "1c70bcbb-41b6-4d5b-8830-cdf68e09db73",
+    "slug": "yeouido-hangang-bamseom-view",
+    "areaCode": "yeouido",
+    "purpose": "rest",
+    "titleKo": "여의도한강공원에서 밤섬 바라보기",
+    "titleJa": "汝矣島漢江公園からパムソムを眺める",
+    "summaryKo": "강변의 조망 지점에서 밤섬을 찾아 조용히 바라봐요.",
+    "summaryJa": "川沿いの展望場所からパムソムを探して、静かに眺めます。",
+    "bodyKo": "밤섬은 생태경관 보전지역이에요. 섬 건너편 공개 산책로와 조망 지점에서 봐요. 강변 길이 통제되면 공원 안내를 따라요.",
+    "bodyJa": "パムソムは生態景観保全地域です。対岸の遊歩道や展望場所から眺めます。川沿いが通行止めなら公園の案内に従いましょう。",
+    "detailKo": "공개 산책로에서 밤섬 조망",
+    "detailJa": "遊歩道からパムソムを眺める",
+    "durationMinutes": 30,
+    "costMin": 0,
+    "walking": "light",
+    "place": {
+      "id": "8a5f854f-cf82-46fd-a6ee-90668a94b659",
+      "nameKo": "여의도한강공원",
+      "nameJa": "汝矣島漢江公園",
+      "addressKo": "서울 영등포구 여의동로 330",
+      "guideUrlKo": "https://hangang.seoul.go.kr/www/contents/874.do?mid=868",
+      "guideUrlJa": "https://hangang.seoul.go.kr/www/contents/874.do?mid=868",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "8088c8a7-4359-4b6c-91e8-2d1bf2b806da",
+        "titleKo": "여의도한강공원 들어가기",
+        "titleJa": "汝矣島漢江公園に入る",
+        "bodyKo": "공원 안내판에서 지금 위치와 강변 보행로를 확인해요.",
+        "bodyJa": "公園の案内図で現在地と川沿いの歩道を確認します。",
+        "completionLabelKo": "강변 보행로를 찾았어요",
+        "completionLabelJa": "川沿いの歩道を見つけました",
+        "showsPlace": true
+      },
+      {
+        "id": "35e2af1c-24c9-4557-91e9-626d464bf07b",
+        "titleKo": "공개 조망 지점으로 가기",
+        "titleJa": "公開されている展望場所へ行く",
+        "bodyKo": "공식 안내의 밤섬 철새 조망 지점을 찾고, 걸을 수 있는 보행로를 따라가요. 문이 닫히거나 통제 표시가 있으면 열린 강변에서 바라봐요.",
+        "bodyJa": "公式案内のバードウォッチング地点を探し、通れる歩道を進みます。閉鎖中なら開いている川沿いから眺めましょう。",
+        "completionLabelKo": "밤섬 방향을 찾았어요",
+        "completionLabelJa": "パムソムの方向が分かりました"
+      },
+      {
+        "id": "227773b0-e9b9-4b24-9679-cfc9589761bc",
+        "titleKo": "보이는 풍경 하나 기억하기",
+        "titleJa": "見えた景色を一つ覚える",
+        "bodyKo": "물살이나 나무 윤곽처럼 눈에 들어온 것을 하나 골라요. 자전거길을 피해서 잠깐 쉬어요.",
+        "bodyJa": "水の流れや木の輪郭など、目に留まった景色を一つ選びます。自転車道を避けてひと休みしましょう。",
+        "completionLabelKo": "기억하고 싶은 풍경을 골랐어요",
+        "completionLabelJa": "覚えておきたい景色を選びました"
+      }
+    ],
+    "seed": {
+      "supplierId": "e438a517-4d26-4eae-9aca-1165413ae062",
+      "editorId": "a3c6e527-0346-4abe-85de-5af5118f8a77",
+      "requestId": "29547307-3077-4403-87ec-358017ab4d9b"
+    }
+  },
+  {
+    "id": "5509bea1-27d5-468b-8019-67de10fc751d",
+    "versionId": "a221248f-f2e4-4508-b3ff-0b40720e8a32",
+    "slug": "inwang-yun-dongju-hill-rest",
+    "areaCode": "jongno",
+    "purpose": "rest",
+    "titleKo": "윤동주 시인의 언덕에서 잠깐 쉬기",
+    "titleJa": "尹東柱 詩人の丘でひと休みする",
+    "summaryKo": "문학관 옆 언덕에 올라 시비를 보고 쉬어요.",
+    "summaryJa": "文学館のそばの丘に上り、詩碑を見てひと休みします。",
+    "bodyKo": "창의문 부근 야외 언덕을 짧게 다녀오는 길이에요. 경사와 계단이 있으니 당일 안내와 길 상태를 확인해요.",
+    "bodyJa": "彰義門の近くにある屋外の丘を短く歩きます。坂と階段があるので、当日の案内と足元を確認しましょう。",
+    "detailKo": "창의문 부근 · 야외 언덕",
+    "detailJa": "彰義門の近く · 屋外の丘",
+    "durationMinutes": 30,
+    "costMin": 0,
+    "walking": "moderate",
+    "place": {
+      "id": "e5c90d6d-a927-45c8-a154-7aeb27d99588",
+      "nameKo": "윤동주 시인의 언덕",
+      "nameJa": "尹東柱 詩人の丘",
+      "addressKo": "서울 종로구 창의문로 119",
+      "guideUrlKo": "https://seoulcitywall.seoul.go.kr/content/136.do",
+      "guideUrlJa": "https://seoulcitywall.seoul.go.kr/content/136.do",
+      "verifiedAt": "2026-11-22T00:00:00+09:00"
+    },
+    "steps": [
+      {
+        "id": "d1a20541-d639-4d02-9d06-9f9dd7064209",
+        "titleKo": "윤동주문학관 앞에서 출발하기",
+        "titleJa": "尹東柱文学館の前から出発する",
+        "bodyKo": "창의문로 119에서 문학관을 찾아요. 시인의 언덕 안내가 보이는지 살펴봐요.",
+        "bodyJa": "「창의문로 119」で文学館を探し、詩人の丘の案内を確認します。",
+        "completionLabelKo": "언덕 입구를 확인했어요",
+        "completionLabelJa": "丘の入口を確認しました",
+        "showsPlace": true,
+        "phraseKo": "윤동주 시인의 언덕에 가고 싶어요. 이 버스가 맞나요?",
+        "phraseJa": "尹東柱詩人の丘へ行きたいです。このバスで合っていますか。"
+      },
+      {
+        "id": "4f62e9ed-20d9-44fc-8ae0-7f542a2f06f9",
+        "titleKo": "시비가 있는 곳까지 걷기",
+        "titleJa": "詩碑まで歩く",
+        "bodyKo": "열린 길을 따라 올라가 ‘서시’ 시비를 찾아요. 경사가 힘들거나 길이 통제되면 문학관 쪽에서 쉬어도 돼요.",
+        "bodyJa": "通れる道を上り、「序詩」の詩碑を探します。坂がきつかったり通行止めだったりすれば、文学館側で休んでも構いません。",
+        "completionLabelKo": "쉬어갈 곳을 찾았어요",
+        "completionLabelJa": "休む場所を見つけました"
+      },
+      {
+        "id": "89bd35c1-0799-4d5a-ba5c-5ebc893d0415",
+        "titleKo": "잠깐 쉬고 돌아갈 길 확인하기",
+        "titleJa": "ひと休みして帰り道を確認する",
+        "bodyKo": "시비나 주변 풍경을 천천히 보고 내려갈 길을 정해요.",
+        "bodyJa": "詩碑や周りの景色をゆっくり眺め、下りる道を決めましょう。",
+        "completionLabelKo": "잠깐 쉬고 갈 길을 정했어요",
+        "completionLabelJa": "ひと休みして帰り道を決めました"
+      }
+    ],
+    "seed": {
+      "supplierId": "bd9f3dfd-63b9-4596-b373-4cae2c6a971a",
+      "editorId": "ae1f4673-7fe2-4b93-9d07-ad9457a394e3",
+      "requestId": "e43f9b11-4883-4d71-b2ed-08509b9d0825"
+    }
+  }
+]
