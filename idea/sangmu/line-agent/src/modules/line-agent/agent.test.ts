@@ -526,8 +526,24 @@ describe("DiningAgent: a shop the user points at (link, name, photo)", () => {
   it("explains links it cannot use", async () => {
     await agent.handleEvent(text(ALICE, "ここ https://www.instagram.com/p/Cabc123/"));
     expect(lastTexts(ALICE, 1)).toContain("instagram.com");
-    await agent.handleEvent(text(ALICE, "https://map.naver.com/p/entry/place/99999999"));
-    expect(lastTexts(ALICE, 1)).toContain("まだ情報がないお店");
+    await agent.handleEvent(text(ALICE, "2人で行ける？ https://map.naver.com/p/entry/place/99999999"));
+    expect(lastTexts(ALICE, 2)).toContain("まだ登録されていない");
+    // No dead end: a Korean card for the staff with the party size, the map, and a way on.
+    const card = line.messagesFor(ALICE).at(-1)!.message;
+    const json = JSON.stringify(card);
+    expect(json).toContain("지금 2명 들어갈 수 있나요?");
+    expect(json).toContain("https://map.naver.com/p/entry/place/99999999");
+    expect(card.quickReply?.items.map((item) => item.action.label)).toContain("ごはんを探す·식당 찾기");
+    await agent.handleEvent(text(ALICE, "使い方"));
+    const help = line.messagesFor(ALICE).at(-1)!.message;
+    expect(help.quickReply?.items.map((item) => item.action.type)).toEqual(["cameraRoll", "camera", "message"]);
+  });
+
+  it("answers the rich menu's 写真を送る with the photo picker one tap away", async () => {
+    await agent.handleEvent(text(ALICE, "写真を送る"));
+    const prompt = line.messagesFor(ALICE).at(-1)!.message;
+    expect(lastTexts(ALICE, 1)).toContain("看板");
+    expect(prompt.quickReply?.items.map((item) => item.action.label)).toEqual(["写真を選ぶ·사진 선택", "撮影する·촬영"]);
   });
 });
 

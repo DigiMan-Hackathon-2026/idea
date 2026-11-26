@@ -63,6 +63,8 @@ const m = bilingual(messages);
 const REQUEST_TTL_MINUTES = 6 * 60;
 const APPROVAL_TTL_MINUTES = 10;
 const MAX_CALL_CANDIDATES = 3;
+/** 「写真を送る」 from the rich menu, or the same said in Korean (a call-word prefix in groups is allowed). */
+const PHOTO_ASK = /^(?:ココソウル\s*|코코서울\s*)?(?:写真を送(?:る|りたい)|사진\s*보내(?:기|요|고 싶어요)?)$/;
 const MAX_CARDS = 3;
 const CALL_WINDOW_MINUTES = 75;
 const MEAL_MINUTES = 45;
@@ -261,6 +263,11 @@ export class DiningAgent {
       await this.reply(ctx, [m.busyCalling(active.lang)]);
       return;
     }
+    // The rich menu's 「写真を送る」: open the way to a photo (LINE lets only quick replies open the picker).
+    if (PHOTO_ASK.test(text.trim())) {
+      await this.reply(ctx, [m.photoPrompt(reading.lang)]);
+      return;
+    }
     if (wantsCall(text)) return this.callFromText(ctx, text, active, reading);
     // A shop the user points at (map link, page, or its name) is answered for that shop first.
     const place = await identifyPlace(text, this.deps.resolveLink ?? null);
@@ -269,7 +276,7 @@ export class DiningAgent {
       return this.beginRequest(ctx, active, fromRequester, reading, now, { candidateId: place.restaurant.id, via: place.via });
     }
     if (place && !(reading.wantsFood && filledFields(reading) >= 2)) {
-      await this.reply(ctx, [place.kind === "unknown_place" ? m.unknownPlace(reading.lang) : m.unreadableLink(reading.lang, place.host)]);
+      await this.reply(ctx, place.kind === "unknown_place" ? m.unknownPlace(reading.lang, { mapUrl: place.url, partySize: reading.partySize ?? active?.partySize ?? null }) : [m.unreadableLink(reading.lang, place.host)]);
       return;
     }
     if (reading.wantsFood || filledFields(reading) >= 2) return this.beginRequest(ctx, active, fromRequester, reading, now, null);
