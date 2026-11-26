@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
-type Action = { type: "postback"; label: string; data: string; displayText?: string } | { type: "uri"; label: string; uri: string } | { type: "message"; label: string; text: string };
+type Action = { type: "postback"; label: string; data: string; displayText?: string } | { type: "uri"; label: string; uri: string } | { type: "message"; label: string; text: string } | { type: "camera" | "cameraRoll"; label: string };
 type Node = {
   type: string; text?: string; action?: Action; contents?: Node[] | Node; header?: Node; hero?: Node; body?: Node; footer?: Node; url?: string;
   color?: string; weight?: string; size?: string; style?: string; layout?: string; flex?: number; align?: string; spacing?: string; margin?: string;
@@ -77,6 +77,8 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
     bottom.current?.scrollIntoView({ block: "end" });
   }, [entries.length, mine.length]);
 
+  const picker = useRef<HTMLInputElement>(null);
+
   async function sendImage(file: File) {
     if (file.size > 5 * 1024 * 1024) return;
     const image = await new Promise<string>((resolve) => {
@@ -99,7 +101,8 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
   function onAction(action: Action) {
     if (action.type === "uri") window.open(action.uri, "_blank", "noopener");
     else if (action.type === "message") void send({ text: action.text }, action.text);
-    else void send({ data: action.data }, action.displayText ?? `［${action.label}］`);
+    else if (action.type === "postback") void send({ data: action.data }, action.displayText ?? `［${action.label}］`);
+    else picker.current?.click(); // camera / camera roll: the image picker stands in for LINE's
   }
 
   function submit(event: FormEvent) {
@@ -169,7 +172,7 @@ export function LineAgentSimulator({ calls, token }: { calls: string; token: str
         <input id="draft" value={draft} onChange={(event) => setDraft(event.target.value)} className="min-w-0 flex-1 rounded border border-[#a4a199] px-2 py-2 text-sm" />
         <label className="flex cursor-pointer items-center rounded border border-[#a4a199] px-2 text-xs">
           画像
-          <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void sendImage(file); event.target.value = ""; }} />
+          <input ref={picker} type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void sendImage(file); event.target.value = ""; }} />
         </label>
         <button type="submit" disabled={busy} className="rounded bg-[#455f54] px-3 text-sm text-white">送信</button>
       </form>

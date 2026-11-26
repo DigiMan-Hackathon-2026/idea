@@ -10,8 +10,11 @@ import { chromium } from "@playwright/test";
 
 const WIDTH = 2500;
 const HEIGHT = 843;
+// 「写真を送る」 sends text: LINE opens the photo picker only from quick replies,
+// so the agent answers it with 「写真を選ぶ」「撮影する」 buttons.
 const buttons = [
   { ja: "使い方", ko: "사용법", text: "使い方" },
+  { ja: "写真を送る", ko: "사진 보내기", text: "写真を送る" },
   { ja: "ごはんを探す", ko: "식당 찾기", text: "ごはんを探したい" },
   { ja: "やめる", ko: "그만두기", text: "キャンセル" },
 ];
@@ -22,8 +25,8 @@ async function renderImage() {
   const cells = buttons
     .map(
       (button, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;${i ? "border-left:6px solid #d8ccad;" : ""}">
-        <div style="font-size:120px;font-weight:700;color:#ffffff">${button.ja}</div>
-        <div style="font-size:72px;color:#d8ccad">${button.ko}</div>
+        <div style="font-size:86px;font-weight:700;color:#ffffff">${button.ja}</div>
+        <div style="font-size:64px;color:#d8ccad">${button.ko}</div>
       </div>`,
     )
     .join("");
