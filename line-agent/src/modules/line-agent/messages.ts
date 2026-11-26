@@ -715,8 +715,44 @@ export function targetRecognized(request: DiningRequest, restaurant: Restaurant,
   return { type: "text", text: tr(lang, `${from}から「${restaurant.nameJa}（${restaurant.nameKo}）」だと分かりました。今日行けるか調べます。`, `${from}에서 "${restaurant.nameKo}"(으)로 확인했어요. 오늘 갈 수 있는지 알아볼게요.`) };
 }
 
-export function unknownPlace(lang: Lang): LineMessage {
-  return { type: "text", text: tr(lang, "地図のリンクは読めましたが、まだ情報がないお店です。いまは新村のお店に対応しています。お店の名前か「新村で2人、サムギョプサル」のように送ってください。", "지도 링크는 읽었지만 아직 정보가 없는 가게예요. 지금은 신촌 가게를 지원해요. 가게 이름이나 \"신촌에서 2명, 삼겹살\"처럼 보내 주세요.") };
+/**
+ * A map link to a shop the agent has no facts for. It cannot judge today or call,
+ * so it says so and hands over what still helps at the door: a card in Korean to
+ * show the staff, the map, and a search among the shops it knows.
+ */
+export function unknownPlace(lang: Lang, options: { mapUrl: string | null; partySize: number | null }): LineMessage[] {
+  const n = options.partySize;
+  const say = tr(
+    lang,
+    "このお店はまだ登録されていないので、営業時間や空席は調べられず、AIの電話もできません。お店の前で下のカードを見せれば、韓国語で聞けます。",
+    "이 가게는 아직 등록되지 않아서 영업시간과 빈자리를 알아볼 수 없고, AI 전화도 할 수 없어요. 가게 앞에서 아래 카드를 보여 주면 한국어로 물어볼 수 있어요.",
+  );
+  // The card is for the staff, so it is the same in both languages: Korean to read, Japanese under it.
+  const line = (ko: string, ja: string): FlexComponent =>
+    vbox([text(ko, { size: "lg", weight: "bold", color: color.text }), text(ja, { size: "xs", color: color.muted })], { spacing: "none" });
+  const map = options.mapUrl && options.mapUrl.startsWith("https://") && options.mapUrl.length <= 1000 ? options.mapUrl : null;
+  const card: LineMessage = {
+    type: "flex",
+    altText: "가게 직원분께 보여 주세요 / お店の方に見せてください",
+    contents: {
+      type: "bubble",
+      header: vbox([text("가게 직원분께 · お店の方へ", { size: "xs", color: "#ffffff", weight: "bold" })], { backgroundColor: color.primary, paddingAll: "12px" }),
+      body: vbox(
+        [
+          line("안녕하세요. 일본에서 온 여행객이에요.", "こんにちは。日本から来た旅行者です。"),
+          line(n ? `지금 ${n}명 들어갈 수 있나요?` : "지금 들어갈 수 있나요?", n ? `今${n}人で入れますか？` : "今、入れますか？"),
+          line("기다려야 하면 몇 분 정도 걸릴까요?", "待つなら何分くらいですか？"),
+        ],
+        { spacing: "lg" },
+      ),
+      ...(map ? { footer: vbox([{ type: "button", style: "link", height: "sm", action: { type: "uri", label: "地図で開く · 지도에서 보기", uri: map } }]) } : {}),
+    },
+    quickReply: quickReply([
+      { type: "message", label: tr(lang, "ごはんを探す", "식당 찾기"), text: tr(lang, "ごはんを探したい", "식당 찾고 싶어요") },
+      { type: "message", label: tr(lang, "使い方", "사용법"), text: tr(lang, "使い方", "사용법") },
+    ]),
+  };
+  return [{ type: "text", text: say }, card];
 }
 
 export function unreadableLink(lang: Lang, host: string): LineMessage {

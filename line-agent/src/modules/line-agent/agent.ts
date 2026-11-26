@@ -269,7 +269,7 @@ export class DiningAgent {
       return this.beginRequest(ctx, active, fromRequester, reading, now, { candidateId: place.restaurant.id, via: place.via });
     }
     if (place && !(reading.wantsFood && filledFields(reading) >= 2)) {
-      await this.reply(ctx, [place.kind === "unknown_place" ? m.unknownPlace(reading.lang) : m.unreadableLink(reading.lang, place.host)]);
+      await this.reply(ctx, place.kind === "unknown_place" ? m.unknownPlace(reading.lang, { mapUrl: place.url, partySize: reading.partySize ?? active?.partySize ?? null }) : [m.unreadableLink(reading.lang, place.host)]);
       return;
     }
     if (reading.wantsFood || filledFields(reading) >= 2) return this.beginRequest(ctx, active, fromRequester, reading, now, null);
