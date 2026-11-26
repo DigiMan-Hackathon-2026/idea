@@ -1,6 +1,0 @@
-# Secret scanning for CI (.github/workflows/quality.yml, job "secrets").
-# Keep every upstream rule. Real keys live only in .env.local / the host's
-# secret store; add an allowlist entry only for a public, non-credential value,
-# with the reason and date next to it.
-[extend]
-useDefault = true

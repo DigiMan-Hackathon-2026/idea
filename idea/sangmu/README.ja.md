@@ -12,7 +12,7 @@
 | パス | 内容 |
 |---|---|
 | [`kokoseoul/`](kokoseoul) | アプリ全体のコードです。イ・サンムの個人リポジトリ（非公開）の `main` を、git の履歴ごと移しました（コミット360件、2026-11-21〜24）。 |
-| [`line-agent/`](line-agent) | LINE旅行秘書です。ココソウル `a855c50` から始め、LINE公式アカウントとAI電話予約を加えました。個人リポジトリの git の履歴ごと移しました（コミット43件、2026-11-25〜26）。 |
+| [`line-agent/`](../../line-agent) | LINE旅行秘書です。ココソウル `a855c50` から始め、LINE公式アカウントとAI電話予約を加えました。個人リポジトリの git の履歴ごと移し、リポジトリ最上位の `line-agent/` に置いています（コミット65件、2026-11-25〜27）。 |
 | [`kokoseoul/docs/PRD_v0.1.md`](kokoseoul/docs/PRD_v0.1.md) | プロダクト要件：対象、利用の流れ、デモの検収基準（韓国語） |
 | [`kokoseoul/docs/TRD_v0.1.md`](kokoseoul/docs/TRD_v0.1.md) | 技術要件：構成、案内板の読み取り、データ・デプロイ（韓国語） |
 | [`kokoseoul/docs/HANDOFF.md`](kokoseoul/docs/HANDOFF.md) | 現在の実装状況と引き継ぎ（韓国語） |
@@ -81,11 +81,11 @@ pnpm dev                     # http://localhost:3000
 
 日本人旅行者がLINE公式アカウントに「新村で2人、サムギョプサル。20時までに弘大」のように日本語で送ると、秘書が候補のお店と、席に着くべき時刻を計算して見せます。利用者が承認すると、AIが韓国語でお店に電話して予約を問い合わせ、結果をLINEで返します。最初のお店が合わない時間を提案したら、条件を保ったまま次のお店に電話します。
 
-- 設計: [`line-agent/docs/LINE_AGENT_SPEC.md`](line-agent/docs/LINE_AGENT_SPEC.md)、進捗: [`line-agent/docs/LINE_AGENT_BUILD_PLAN.md`](line-agent/docs/LINE_AGENT_BUILD_PLAN.md)、実行: [`line-agent/docs/LINE_AGENT_RUNBOOK.md`](line-agent/docs/LINE_AGENT_RUNBOOK.md)（いずれも韓国語）
+- 設計: [`line-agent/docs/LINE_AGENT_SPEC.md`](../../line-agent/docs/LINE_AGENT_SPEC.md)、進捗: [`line-agent/docs/LINE_AGENT_BUILD_PLAN.md`](../../line-agent/docs/LINE_AGENT_BUILD_PLAN.md)、実行: [`line-agent/docs/LINE_AGENT_RUNBOOK.md`](../../line-agent/docs/LINE_AGENT_RUNBOOK.md)（いずれも韓国語）
 - テスト電話は同意したチームメンバーの番号にだけかけます。番号とキーはリポジトリにありません。
 
 ## このフォルダの更新
 
-`kokoseoul/` と `line-agent/` は、それぞれ元のリポジトリから `pnpm idea:sync --push` で更新します。元の新しいコミットが日付そのままでこのリポジトリの履歴に続きます。直接直すと次の更新と混ざるので、直したいところがあればイ・サンムに知らせてください。この README は2つのフォルダの外にあるので、更新してもそのまま残ります。
+`kokoseoul/` と最上位の `line-agent/` は、それぞれ元のリポジトリから `pnpm idea:sync --push` で更新します。元の新しいコミットが日付そのままでこのリポジトリの履歴に続きます。直接直すと次の更新と混ざるので、直したいところがあればイ・サンムに知らせてください。この README は2つのフォルダの外にあるので、更新してもそのまま残ります。
 
-現在の基準コミット: `kokoseoul/` `a855c50`（2026-11-24）、`line-agent/` `f77ba0f`（2026-11-26）
+現在の基準コミット: `kokoseoul/` `a855c50`（2026-11-24）、`line-agent/` `5fa3033`（2026-11-27）
