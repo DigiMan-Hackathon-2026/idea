@@ -41,7 +41,8 @@ class SyncIdeaRepoTest(unittest.TestCase):
     def test_publishes_only_the_members_own_commits(self) -> None:
         self.assertEqual(sync.other_authors(["me@mail.test", "noreply@github.com", ""], "me@mail.test"), set())
         self.assertEqual(sync.other_authors(["me@mail.test", "friend@mail.test"], "me@mail.test"), {"friend@mail.test"})
-        self.assertTrue(sync.merge_message("kokoseoul", "abc1234", 3, False).startswith("Update sangmu's kokoseoul to abc1234\n\n3 new commits"))
+        self.assertTrue(sync.merge_message("idea/sangmu/kokoseoul", "abc1234", 3, False).startswith("Update sangmu's kokoseoul to abc1234\n\n3 new commits"))
+        self.assertTrue(sync.merge_message("line-agent", "abc1234", 63, True).endswith("placed under line-agent/."))
 
     def test_scans_every_version_and_message_in_history(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Publish this repository's git history into the team's public idea repository.
 
-The team repository keeps each member's demo under `idea/<name>/`. This rewrites
-a copy of this repository's history so that every file sits in the member folder;
+The team repository keeps this agent in its top-level `line-agent/` folder (until
+2026-11-27 it sat under `idea/sangmu/`). This rewrites a copy of this repository's
+history so that every file sits in that folder;
 authors, e-mail addresses and dates stay as they are. It checks every
 file version and commit message for credentials, local paths, e-mail addresses
 and phone numbers, then merges the result into the idea repository. Commits keep
@@ -31,7 +32,7 @@ from scripts.verify_scope_gate import SECRET_PATTERNS  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 IDEA_REPO = "DigiMan-Hackathon-2026/idea"
 IDEA_BRANCH = "main"
-DEFAULT_TARGET = "idea/sangmu/line-agent"
+DEFAULT_TARGET = "line-agent"
 
 EMAIL_PATTERN = re.compile(rb"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 # Placeholder and reserved (RFC 2606/6761) domains, plus GitHub's noreply addresses.
@@ -128,12 +129,13 @@ def outside_paths(changed: list[str], prefix: str) -> list[str]:
     return [path for path in changed if path != prefix and not path.startswith(prefix + "/")]
 
 
-def merge_message(folder: str, short: str, new_commits: int, first_time: bool) -> str:
+def merge_message(target: str, short: str, new_commits: int, first_time: bool) -> str:
+    folder = target.rsplit("/", 1)[-1]
     if first_time:
         return (
             f"Bring in sangmu's {folder} with its full history\n\n"
             f"All {new_commits} commits of the original repository up to {short}, with their original dates,\n"
-            f"moved under idea/sangmu/{folder}."
+            f"placed under {target}/."
         )
     return f"Update sangmu's {folder} to {short}\n\n{new_commits} new commits from the original repository, with their original dates."
 
@@ -198,7 +200,7 @@ def main(argv: list[str] | None = None) -> int:
         if snapshot:
             run("git", "rm", "-rq", target, cwd=clone)
             run("git", *author, "commit", "-q", "-m", f"Remove the {folder} copy before bringing in its full history", cwd=clone)
-        merge = ("git", *author, "merge", "-q", "--no-ff", "-m", merge_message(folder, short, new_commits, first_time))
+        merge = ("git", *author, "merge", "-q", "--no-ff", "-m", merge_message(target, short, new_commits, first_time))
         run(*merge, *(("--allow-unrelated-histories",) if first_time else ()), "member-history", cwd=clone)
 
         changed = run("git", "diff", "--name-only", before, "HEAD", cwd=clone).splitlines()
